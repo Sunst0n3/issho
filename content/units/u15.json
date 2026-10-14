@@ -1,0 +1,102 @@
+{
+  "id": 15,
+  "title": "Weather and seasons",
+  "titleJp": "{雨|あめ}が{降|ふ}る{前|まえ}に",
+  "level": "A2",
+  "topic": "Weather & seasons",
+  "grammar": [
+    "mae-ni-ato-de",
+    "tari-tari",
+    "counters-objects",
+    "ta-koto-ga-aru",
+    "hou-ga-ii"
+  ],
+  "coreWordCeiling": 995,
+  "canDos": [
+    {
+      "id": "u15-cd1",
+      "text": "Understand a short weather forecast (sunny, rain later, the temperature) and decide what to take with you.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u15-cd2",
+      "text": "Plan your day around the weather and give your partner advice (go before the rain, take an umbrella, don't forget water).",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u15-cd3",
+      "text": "Write a few lines about your favourite season: what the weather is like and the things you do then.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u15-cd4",
+      "text": "Ask each other about weather experiences (snow, typhoons, cherry blossoms) and tell your own.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u15-cd5",
+      "text": "Read a weekend weather chart and a shopping list, and work out what to do before and after the rain.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    }
+  ],
+  "conversation": "rp-u15",
+  "task": {
+    "id": "u15-task",
+    "canDo": "u15-cd2",
+    "goal": "Plan Saturday around the weather: agree what to do before and after the rain and what to take with you.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Has Saturday's hourly forecast (card A)",
+      "b": "Has the list of errands and the plan for a picnic (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Our four seasons",
+    "brief": "Present a short 'seasons diary' together: each of you presents two seasons (the weather, what you do then with 〜たり〜たり, what you have or haven't experienced, and one piece of advice for that season), then asks the other a follow-up question.",
+    "minLinesEach": 10,
+    "structures": [
+      "mae-ni-ato-de",
+      "tari-tari",
+      "counters-objects",
+      "ta-koto-ga-aru",
+      "hou-ga-ii",
+      "adj-naru",
+      "toki-when",
+      "ichiban"
+    ]
+  }
+}

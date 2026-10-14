@@ -1,0 +1,102 @@
+{
+  "id": 16,
+  "title": "A trip for two",
+  "titleJp": "{二人|ふたり}で{旅行|りょこう}",
+  "level": "A2",
+  "topic": "Travel & trips",
+  "grammar": [
+    "node",
+    "dake-shika",
+    "tsumori",
+    "tte-quote",
+    "wa-contrast"
+  ],
+  "coreWordCeiling": 1050,
+  "canDos": [
+    {
+      "id": "u16-cd1",
+      "text": "Plan a short trip: say where you plan to go, how long you'll stay and what you want to see.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u16-cd2",
+      "text": "Read a ryokan or hotel information sheet (check-in time, meals, bath hours) and answer questions about it.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u16-cd3",
+      "text": "Understand a friend's travel tips and what they've heard about a place (the food's great, it's crowded in autumn).",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u16-cd4",
+      "text": "Explain politely why you need something at a hotel or station, and make a request ('It's our first time here, so…').",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u16-cd5",
+      "text": "Write a postcard-style message about your trip: where you went, what was great and what wasn't.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    }
+  ],
+  "conversation": "rp-u16",
+  "task": {
+    "id": "u16-task",
+    "canDo": "u16-cd1",
+    "goal": "Plan a two-night trip: share what you each know about two places and agree where to go, how to get there and where to stay.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Has the guide page for a hot-spring town (card A)",
+      "b": "Has the guide page for a seaside town and your budget (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Our trip",
+    "brief": "Act out a trip from planning to coming home: decide where you plan to go and for how long, pass on what friends said about it, check in politely at a ryokan with a request, and on the way home talk about what was great and what wasn't.",
+    "minLinesEach": 10,
+    "structures": [
+      "node",
+      "dake-shika",
+      "tsumori",
+      "tte-quote",
+      "wa-contrast",
+      "ta-koto-ga-aru",
+      "tari-tari",
+      "de-amount"
+    ]
+  }
+}

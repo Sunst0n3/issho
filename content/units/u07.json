@@ -1,0 +1,101 @@
+{
+  "id": 7,
+  "title": "I'm home!",
+  "titleJp": "ただいま！",
+  "level": "A1",
+  "topic": "Home life & casual talk",
+  "grammar": [
+    "adjective-past",
+    "he-direction",
+    "casual-speech",
+    "position-words",
+    "te-form"
+  ],
+  "coreWordCeiling": 540,
+  "canDos": [
+    {
+      "id": "u07-cd1",
+      "text": "Greet your partner when they come home and ask about their day in casual Japanese.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u07-cd2",
+      "text": "Follow your partner's directions to find things around the house (on the table, in the fridge, under the sofa).",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u07-cd3",
+      "text": "Say what you'll do this evening in order, linking the actions with the て-form.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u07-cd4",
+      "text": "Read a casual note from your partner saying where they've gone, where things are and what to do.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u07-cd5",
+      "text": "Send your partner a short casual message about your day: where you went and how it was.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    }
+  ],
+  "conversation": "rp-u07",
+  "task": {
+    "id": "u07-task",
+    "canDo": "u07-cd2",
+    "goal": "Find three things your partner left at home: the one who is out explains by phone where they should be, and the one at home searches the room and reports back.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Out of the house; remembers roughly where they left things (card A)",
+      "b": "At home, with a picture of the room (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "An evening at home",
+    "brief": "Act out an ordinary evening in casual Japanese: one of you comes home, you ask about each other's day, hunt for something that's gone missing, and plan the rest of the evening in order (dinner, bath, TV…).",
+    "minLinesEach": 9,
+    "structures": [
+      "adjective-past",
+      "he-direction",
+      "casual-speech",
+      "position-words",
+      "te-form",
+      "arimasu-imasu",
+      "ne-yo"
+    ]
+  }
+}

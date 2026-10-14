@@ -1,0 +1,101 @@
+{
+  "id": 4,
+  "title": "Dinner out",
+  "titleJp": "{晩|ばん}ご{飯|はん}はお{店|みせ}で",
+  "level": "A1",
+  "topic": "Eating out",
+  "grammar": [
+    "keigo-set-phrases",
+    "masu-past",
+    "i-adjectives",
+    "de-place-means",
+    "counters-people"
+  ],
+  "coreWordCeiling": 370,
+  "canDos": [
+    {
+      "id": "u04-cd1",
+      "text": "Understand what staff say as you walk into a restaurant (welcome, how many people?, this way) and answer them.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u04-cd2",
+      "text": "Tell the staff how many you are and order a dish and a drink each.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u04-cd3",
+      "text": "Say what your food is like (tasty, spicy, sweet, not hot) and ask your partner about theirs.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u04-cd4",
+      "text": "Read a ramen shop's menu board with prices and find a dish each that fits your budget.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u04-cd5",
+      "text": "Text a friend about where you ate yesterday, what you had and how you got there.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    }
+  ],
+  "conversation": "rp-u04",
+  "task": {
+    "id": "u04-task",
+    "canDo": "u04-cd2",
+    "goal": "Get a table for two at a ramen shop and order a dish and a drink each from the server (played by the AI), keeping the total under 2,500 yen.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Knows what you both feel like eating",
+      "b": "Has the menu with prices and the budget"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Dinner out",
+    "brief": "Go out for dinner: get seated, order for the two of you, talk about how the food tastes and pay. Then, the next day, one of you tells a friend (played by the other) where you went, how you got there and what you ate.",
+    "minLinesEach": 8,
+    "structures": [
+      "masu-past",
+      "i-adjectives",
+      "de-place-means",
+      "counters-people",
+      "wo-kudasai",
+      "numbers-prices",
+      "ne-yo"
+    ]
+  }
+}

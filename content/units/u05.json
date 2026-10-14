@@ -1,0 +1,102 @@
+{
+  "id": 5,
+  "title": "Shall we go out?",
+  "titleJp": "{一緒|いっしょ}に{出|で}かけませんか",
+  "level": "A1",
+  "topic": "Invitations & weekend plans",
+  "grammar": [
+    "masenka-mashou",
+    "tai-want",
+    "arimasu-imasu",
+    "to-with",
+    "deshita"
+  ],
+  "coreWordCeiling": 425,
+  "canDos": [
+    {
+      "id": "u05-cd1",
+      "text": "Invite your partner to do something this weekend, and accept or gently turn down an invitation.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u05-cd2",
+      "text": "Say where you want to go and what you want to do, and ask what your partner would like to do.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u05-cd3",
+      "text": "Read a friend's invitation message and find the day, time, place and who else is coming.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u05-cd4",
+      "text": "Understand a short voicemail from a friend about their plans: when, where and who they're going with.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u05-cd5",
+      "text": "Reply to a message: say whether you have time at the weekend and suggest something to do together.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    }
+  ],
+  "conversation": "rp-u05",
+  "task": {
+    "id": "u05-task",
+    "canDo": "u05-cd1",
+    "goal": "Agree on one thing to do together this weekend, with a day, a time, a meeting place and who is coming.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Has three ideas and their free times (card A)",
+      "b": "Has other ideas, a busy Saturday and a friend who wants to come (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Planning a date",
+    "brief": "Plan a date for next weekend. Start by saying what last weekend was like, then invite each other, say what you each want to do, check what there is nearby, decide who else is coming, and fix a day and a time.",
+    "minLinesEach": 8,
+    "structures": [
+      "masenka-mashou",
+      "tai-want",
+      "arimasu-imasu",
+      "to-with",
+      "deshita",
+      "ni-time-place",
+      "time-telling",
+      "masu-past"
+    ]
+  }
+}

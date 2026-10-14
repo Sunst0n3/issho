@@ -1,0 +1,91 @@
+{
+  "id": 8,
+  "title": "Out shopping",
+  "titleJp": "どれがいい？",
+  "level": "A1",
+  "topic": "Shopping & opening hours",
+  "grammar": [
+    "kara-made",
+    "adverbs-degree",
+    "nai-form",
+    "te-kudasai",
+    "ga-subject"
+  ],
+  "coreWordCeiling": 595,
+  "canDos": [
+    {
+      "id": "u08-cd1",
+      "text": "Read shop signs with opening hours and work out when you can go together.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u08-cd2",
+      "text": "Make simple requests in a shop: ask the clerk to wait, to put things in a bag, or to write the price down.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u08-cd3",
+      "text": "Compare things with your partner while shopping (this one's good, it's not very expensive, that's really big) and choose one.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u08-cd4",
+      "text": "Follow a casual chat about what to buy and what you don't need, and tick off a shopping list.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    }
+  ],
+  "conversation": "rp-u08",
+  "task": {
+    "id": "u08-task",
+    "canDo": "u08-cd3",
+    "goal": "Buy new towels and cups for home for under 5,000 yen: compare the options, agree which ones are best, and ask the clerk (played by the AI) to put them in a bag.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Sees the shelf with the options and prices (card A)",
+      "b": "Knows the budget, the colours you like and what's already at home (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Saturday at the shops",
+    "brief": "Go shopping together for the house. Check when the shop opens and closes, compare items (which is better? is it very expensive?), say in casual Japanese what you don't need, make two requests to the clerk, and decide what to buy.",
+    "minLinesEach": 9,
+    "structures": [
+      "kara-made",
+      "adverbs-degree",
+      "nai-form",
+      "te-kudasai",
+      "ga-subject",
+      "numbers-prices",
+      "i-adjectives",
+      "casual-speech"
+    ]
+  }
+}

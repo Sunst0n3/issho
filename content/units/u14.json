@@ -1,0 +1,91 @@
+{
+  "id": 14,
+  "title": "Getting around",
+  "titleJp": "{駅|えき}までどのくらい？",
+  "level": "A2",
+  "topic": "Transport & directions",
+  "grammar": [
+    "toki-when",
+    "adjectives-te",
+    "adj-naru",
+    "duration-kakaru",
+    "ichiban"
+  ],
+  "coreWordCeiling": 935,
+  "canDos": [
+    {
+      "id": "u14-cd1",
+      "text": "Ask how to get somewhere and how long it takes, and explain the way from your home to the station.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u14-cd2",
+      "text": "Follow simple directions (go straight, turn right at the second corner) and find the place on a map.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u14-cd3",
+      "text": "Read a simple route map or timetable and choose the quickest or cheapest way.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u14-cd4",
+      "text": "Text your partner that you'll be late: where you are, how long it'll take, and what to do when you get to the station.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    }
+  ],
+  "conversation": "rp-u14",
+  "task": {
+    "id": "u14-task",
+    "canDo": "u14-cd1",
+    "goal": "Meet up in an unfamiliar part of town: guide your partner from the station to the café and agree how long it'll take.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Is at the station and can see the signs around them (card A)",
+      "b": "Has the map with the café marked (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Lost in a new city",
+    "brief": "You're exploring a new city together. Ask a passer-by (one of you) the way, compare ways to get there, pick the quickest, agree what you'll do when it gets late, and talk about the best thing you saw on the way.",
+    "minLinesEach": 10,
+    "structures": [
+      "toki-when",
+      "adjectives-te",
+      "adj-naru",
+      "duration-kakaru",
+      "ichiban",
+      "te-kudasai",
+      "kara-made",
+      "de-place-means"
+    ]
+  }
+}

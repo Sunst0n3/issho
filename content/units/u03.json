@@ -1,0 +1,91 @@
+{
+  "id": 3,
+  "title": "Our daily routine",
+  "titleJp": "{二人|ふたり}の{毎日|まいにち}",
+  "level": "A1",
+  "topic": "Daily routine & time",
+  "grammar": [
+    "wo-object",
+    "counting-tsu",
+    "time-telling",
+    "wo-kudasai",
+    "ni-time-place"
+  ],
+  "coreWordCeiling": 300,
+  "canDos": [
+    {
+      "id": "u03-cd1",
+      "text": "Tell your partner what time you get up, leave home and go to bed on weekdays, and ask about theirs.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u03-cd2",
+      "text": "Catch the times in a short message about someone's day: when they leave, arrive and get home.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u03-cd3",
+      "text": "Write your partner a short note about tomorrow: what time you'll leave, where you're going and when you'll be back.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u03-cd4",
+      "text": "Buy things at a bakery or convenience store, asking for one, two or three of something.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    }
+  ],
+  "conversation": "rp-u03",
+  "task": {
+    "id": "u03-task",
+    "canDo": "u03-cd1",
+    "goal": "Compare your schedules for tomorrow and agree on a time to eat dinner together at home.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Starts early tomorrow (schedule card A)",
+      "b": "Works late tomorrow (schedule card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "A day in our life",
+    "brief": "Act out one weekday from morning to night: getting up, breakfast, leaving for work, buying two or three things at a bakery on the way home, and dinner. Each of you says what you do and when, and asks about the other's day.",
+    "minLinesEach": 8,
+    "structures": [
+      "wo-object",
+      "counting-tsu",
+      "time-telling",
+      "wo-kudasai",
+      "ni-time-place",
+      "masu-forms",
+      "ne-yo"
+    ]
+  }
+}

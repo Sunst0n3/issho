@@ -1,0 +1,100 @@
+{
+  "id": 21,
+  "title": "Busy at work",
+  "titleJp": "{仕事|しごと}、{忙|いそが}しい？",
+  "level": "N3-path",
+  "topic": "Work & busy weeks",
+  "grammar": [
+    "ba-conditional",
+    "shi-reasons",
+    "sou-hearsay",
+    "te-oku"
+  ],
+  "coreWordCeiling": 1335,
+  "canDos": [
+    {
+      "id": "u21-cd1",
+      "text": "Tell your partner what your week at work is like, giving several reasons why you're busy or tired.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u21-cd2",
+      "text": "Understand news someone passes on from work or the neighbourhood ('I heard the manager is leaving').",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u21-cd3",
+      "text": "Plan ahead for a busy week together: what to get ready in advance (cook, shop, set alarms) and who does it.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u21-cd4",
+      "text": "Read a notice at work or in your building (a meeting, a water shut-off) and work out what to do beforehand.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u21-cd5",
+      "text": "Write a message asking for advice, and suggest what to do if things go well ('If I finish early, shall we eat out?').",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    }
+  ],
+  "conversation": "rp-u21",
+  "task": {
+    "id": "u21-task",
+    "canDo": "u21-cd3",
+    "goal": "Get ready for a busy week: decide what to prepare in advance and who does which job on which day.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Has their work schedule (late meetings on Tuesday and Thursday) and the shopping list (card A)",
+      "b": "Has their schedule (a business trip on Wednesday) and the household jobs (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Friday night catch-up",
+    "brief": "It's Friday night. Tell each other about your week at work (what happened, what you heard, why you're exhausted), then plan next week: what to get done in advance, and what you'll do if you both finish early.",
+    "minLinesEach": 11,
+    "structures": [
+      "ba-conditional",
+      "shi-reasons",
+      "sou-hearsay",
+      "te-oku",
+      "nakereba-naranai",
+      "tsumori",
+      "kara-because"
+    ]
+  }
+}

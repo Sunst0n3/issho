@@ -1,0 +1,101 @@
+{
+  "id": 12,
+  "title": "Our story",
+  "titleJp": "{私|わたし}たちの{話|はなし}",
+  "level": "A2",
+  "topic": "Our life together",
+  "grammar": [
+    "mou-mada",
+    "to-iu",
+    "de-amount",
+    "te-iru-state",
+    "hoshii"
+  ],
+  "coreWordCeiling": 825,
+  "canDos": [
+    {
+      "id": "u12-cd1",
+      "text": "Tell a new friend about your life together: where you live, how long you've been married, and whether you have children or pets.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u12-cd2",
+      "text": "Write a short wish list for your life together (a bigger kitchen, a dog, a car) with a reason for each.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u12-cd3",
+      "text": "Understand someone passing on what another person said ('Ken said he'll be late') and asking what something is called.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u12-cd4",
+      "text": "Read a short profile of a couple (where they live, what they do, what they want) and answer questions about it.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u12-cd5",
+      "text": "Before guests arrive, check what's already done and what's still left, and decide who does the rest, alone or together.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    }
+  ],
+  "conversation": "rp-u12",
+  "task": {
+    "id": "u12-task",
+    "canDo": "u12-cd5",
+    "goal": "Get the flat ready before friends arrive at six: find out what's already done and what's still left, and split the rest between you.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Has the to-do list with their own ticks (card A)",
+      "b": "Has the shopping list with their own ticks (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Our story",
+    "brief": "A Japanese friend interviews you as a couple (take turns playing the friend). Explain where you live, how long you've been married, what you've already done together and what you haven't yet, what you'd like in the future, and pass on something a friend said about you.",
+    "minLinesEach": 9,
+    "structures": [
+      "mou-mada",
+      "to-iu",
+      "de-amount",
+      "te-iru-state",
+      "hoshii",
+      "to-omou",
+      "kara-because"
+    ]
+  }
+}

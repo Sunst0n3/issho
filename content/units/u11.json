@@ -1,0 +1,101 @@
+{
+  "id": 11,
+  "title": "Days off",
+  "titleJp": "{休|やす}みの{日|ひ}",
+  "level": "A2",
+  "topic": "Free time & going out",
+  "grammar": [
+    "tewa-ikenai",
+    "no-ga-suki",
+    "relative-clauses",
+    "kedo-but",
+    "te-kara"
+  ],
+  "coreWordCeiling": 765,
+  "canDos": [
+    {
+      "id": "u11-cd1",
+      "text": "Tell your partner what you like doing on your days off, and what you don't enjoy so much.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u11-cd2",
+      "text": "Read the rules at a museum, pool or park and say what you mustn't do there.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u11-cd3",
+      "text": "Talk about a film, place or meal you've enjoyed, describing it with a clause ('the film we saw on Sunday').",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u11-cd4",
+      "text": "Follow a friend's plan for a day out (what they'll do first and what after that) and note the order.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u11-cd5",
+      "text": "Write a short review of a café, film or place you've been to, with one good point and one bad point.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    }
+  ],
+  "conversation": "rp-u11",
+  "task": {
+    "id": "u11-task",
+    "canDo": "u11-cd1",
+    "goal": "Plan a free Sunday together: agree on two things to do, and in what order, that you'll both enjoy.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Has a page of local events with times and rules (card A)",
+      "b": "Has a list of what you both like and don't like, and the budget (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Our perfect day off",
+    "brief": "Plan and then act out your perfect day off: say what you each like doing, pick places by describing them ('the café we went to last month'), check the rules at one place, decide the order of the day, and finish by saying what was good and what wasn't.",
+    "minLinesEach": 9,
+    "structures": [
+      "tewa-ikenai",
+      "no-ga-suki",
+      "relative-clauses",
+      "kedo-but",
+      "te-kara",
+      "casual-past",
+      "to-omou"
+    ]
+  }
+}

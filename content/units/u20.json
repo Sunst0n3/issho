@@ -1,0 +1,100 @@
+{
+  "id": 20,
+  "title": "Does it suit me?",
+  "titleJp": "{似合|にあ}う？",
+  "level": "A2",
+  "topic": "Clothes & style",
+  "grammar": [
+    "sugiru",
+    "no-one",
+    "sou-looks",
+    "te-kureru"
+  ],
+  "coreWordCeiling": 1280,
+  "canDos": [
+    {
+      "id": "u20-cd1",
+      "text": "Shop for clothes: say what's too big, too long or too expensive, and ask for a different one (a smaller one, the blue one).",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u20-cd2",
+      "text": "Comment on how things look (that looks warm, that looks expensive) and tell your partner what suits them.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u20-cd3",
+      "text": "Understand a clothes-shop clerk's suggestions and questions (would you like to try it on? we have a smaller one).",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u20-cd4",
+      "text": "Write a message thanking someone for a favour they did for you (choosing clothes, carrying bags, sewing on a button).",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u20-cd5",
+      "text": "Read a size chart and a care label and choose the right size.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    }
+  ],
+  "conversation": "rp-u20",
+  "task": {
+    "id": "u20-task",
+    "canDo": "u20-cd1",
+    "goal": "Buy a winter coat for one of you for under 20,000 yen: try things on, talk to the clerk (played by the AI), take your partner's honest advice, and leave with one coat.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Is buying the coat; knows their size and the colour they want (card A)",
+      "b": "Is the honest adviser; knows the budget and what goes with your other clothes (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Getting ready to go out",
+    "brief": "You're getting ready for a friend's party. Try things on and ask each other's opinion, say what's too much or too plain, swap in a different one (the darker one?), and thank your partner for what they do to help.",
+    "minLinesEach": 11,
+    "structures": [
+      "sugiru",
+      "no-one",
+      "sou-looks",
+      "te-kureru",
+      "yori-hou",
+      "to-omou",
+      "tara-conditional"
+    ]
+  }
+}

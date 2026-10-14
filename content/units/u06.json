@@ -1,0 +1,102 @@
+{
+  "id": 6,
+  "title": "What do you like?",
+  "titleJp": "{何|なに}が{好|す}き？",
+  "level": "A1",
+  "topic": "Likes, dislikes & habits",
+  "grammar": [
+    "adverbs-frequency",
+    "na-adjectives",
+    "ka-or-ni-suru",
+    "dictionary-form",
+    "suki-kirai"
+  ],
+  "coreWordCeiling": 485,
+  "canDos": [
+    {
+      "id": "u06-cd1",
+      "text": "Tell each other which foods, drinks and pastimes you like and dislike, and find something you both love.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u06-cd2",
+      "text": "Write a few lines about your week: what you always, often, sometimes and never do.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u06-cd3",
+      "text": "Listen to a friend describe a place they like (quiet, pretty, lively) and what they often do there.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u06-cd4",
+      "text": "Decide what to eat in casual Japanese: ask what your partner feels like, offer two options and settle on one.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u06-cd5",
+      "text": "Read a short profile of a new friend (likes, dislikes, favourite places) and find things you have in common.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    }
+  ],
+  "conversation": "rp-u06",
+  "task": {
+    "id": "u06-task",
+    "canDo": "u06-cd4",
+    "goal": "Decide what to have for dinner tonight: share your likes, dislikes and cravings, and agree on one meal you're both happy with.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Knows what's in the fridge and what they don't like (card A)",
+      "b": "Knows what they're craving and what they can't eat (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "First date, again",
+    "brief": "Pretend it's your first date. Ask each other about likes and dislikes (food, music, films, places) and how often you do things, choose between two desserts, and finish by deciding in casual Japanese what to do next.",
+    "minLinesEach": 8,
+    "structures": [
+      "adverbs-frequency",
+      "na-adjectives",
+      "ka-or-ni-suru",
+      "dictionary-form",
+      "suki-kirai",
+      "i-adjectives",
+      "tai-want",
+      "masenka-mashou"
+    ]
+  }
+}

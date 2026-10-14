@@ -1,0 +1,100 @@
+{
+  "id": 1,
+  "title": "Nice to meet you",
+  "titleJp": "はじめまして",
+  "level": "A1",
+  "topic": "Meeting & introductions",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "kore-sore-are",
+    "ja-nai-desu",
+    "mo-also"
+  ],
+  "coreWordCeiling": 80,
+  "canDos": [
+    {
+      "id": "u01-cd1",
+      "text": "Recognise morning, daytime, evening and bedtime greetings, and reply with the right one.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u01-cd2",
+      "text": "Introduce yourself and your partner to someone you've just met: your names and that you're married.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u01-cd3",
+      "text": "Point at things and ask what they are and whose they are, and say when something isn't yours.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u01-cd4",
+      "text": "Read a short welcome note from a new neighbour and work out their names and who is who.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u01-cd5",
+      "text": "When you don't catch something, ask the speaker to say it again, slow down, or explain a word.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    }
+  ],
+  "conversation": "rp-u01",
+  "task": {
+    "id": "u01-task",
+    "canDo": "u01-cd2",
+    "goal": "Meet as strangers at a friend's party: using your name cards, introduce yourselves and the partner you came with, and find out the other person's name and who they're with.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Guest with name card A (your name, your partner's name, a few things you brought)",
+      "b": "Guest with name card B (a different name, partner and things)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Party introductions",
+    "brief": "At a friend's party, each of you plays yourself and then a new guest. Greet each other, introduce yourselves and the partner you came with, ask about things around you (what's that? whose is this?), find something you have in common with も, and use a 'say that again' phrase at least once.",
+    "minLinesEach": 8,
+    "structures": [
+      "wa-desu",
+      "ka-question",
+      "no-possession",
+      "kore-sore-are",
+      "ja-nai-desu",
+      "mo-also"
+    ]
+  }
+}

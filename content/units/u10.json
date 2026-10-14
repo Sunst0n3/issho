@@ -1,0 +1,91 @@
+{
+  "id": 10,
+  "title": "Family and friends",
+  "titleJp": "{家族|かぞく}と{友達|ともだち}",
+  "level": "A2",
+  "topic": "Family & friends",
+  "grammar": [
+    "wa-ga-description",
+    "temo-ii",
+    "to-omou",
+    "ni-target",
+    "ya-nado"
+  ],
+  "coreWordCeiling": 710,
+  "canDos": [
+    {
+      "id": "u10-cd1",
+      "text": "Show family photos and describe each person: what they're like, what they're good at, and what you think of them.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u10-cd2",
+      "text": "Understand a friend talking about their family and match the people they describe to a photo.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u10-cd3",
+      "text": "Ask for and give permission when visiting someone's home (may I come in, sit here, take a photo?).",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u10-cd4",
+      "text": "Write a short message to a friend about your week: who you met or called, and a few things you did.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    }
+  ],
+  "conversation": "rp-u10",
+  "task": {
+    "id": "u10-task",
+    "canDo": "u10-cd1",
+    "goal": "You each hold half of the names for a family photo; by describing the people and what they are like, work out who everyone is.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Has the names of the people on the left of the photo (card A)",
+      "b": "Has the names of the people on the right of the photo (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Visiting the family",
+    "brief": "Spend an afternoon with a friend's family (one of you plays the host): ask permission to come in and sit down, describe the people in a family photo, say what you think of the food and the house, and afterwards tell each other who you met and what they were like.",
+    "minLinesEach": 9,
+    "structures": [
+      "wa-ga-description",
+      "temo-ii",
+      "to-omou",
+      "ni-target",
+      "ya-nado",
+      "na-adjectives",
+      "casual-past"
+    ]
+  }
+}

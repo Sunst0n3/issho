@@ -1,0 +1,100 @@
+{
+  "id": 2,
+  "title": "Coffee, please",
+  "titleJp": "コーヒー、お{願|ねが}いします",
+  "level": "A1",
+  "topic": "Café & prices",
+  "grammar": [
+    "ne-yo",
+    "numbers-prices",
+    "masu-forms",
+    "koko-soko-asoko"
+  ],
+  "coreWordCeiling": 190,
+  "canDos": [
+    {
+      "id": "u02-cd1",
+      "text": "Order a drink and something to eat for each of you at a café counter.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u02-cd2",
+      "text": "Catch prices in yen when a clerk tells you what something costs or what the total is.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u02-cd3",
+      "text": "Read a café menu with prices and choose what the two of you can have for 1,000 yen.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u02-cd4",
+      "text": "Ask where the toilet is and follow a 'here / there / over there' answer.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u02-cd5",
+      "text": "Say what you each drink every day, and react to your food and drinks together with ね and よ.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    }
+  ],
+  "conversation": "rp-u02",
+  "task": {
+    "id": "u02-task",
+    "canDo": "u02-cd1",
+    "goal": "Order two drinks and one snack to share from the café clerk (played by the AI), spending no more than 1,000 yen.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Reads the menu and does the ordering",
+      "b": "Holds the 1,000 yen and knows what you both want"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Our little café",
+    "brief": "One of you runs a tiny café and the other drops in for a break; then swap. Greet, order, ask and give prices, react to the taste with ね and よ, and ask where the toilet is.",
+    "minLinesEach": 8,
+    "structures": [
+      "wa-desu",
+      "ka-question",
+      "kore-sore-are",
+      "mo-also",
+      "ne-yo",
+      "numbers-prices",
+      "masu-forms",
+      "koko-soko-asoko"
+    ]
+  }
+}

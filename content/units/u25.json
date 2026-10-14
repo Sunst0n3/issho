@@ -1,0 +1,100 @@
+{
+  "id": 25,
+  "title": "Talking it through",
+  "titleJp": "{二人|ふたり}で{話|はな}し{合|あ}う",
+  "level": "N3-path",
+  "topic": "Feelings, wishes & making up",
+  "grammar": [
+    "te-hoshii",
+    "noni",
+    "causative"
+  ],
+  "coreWordCeiling": 1560,
+  "canDos": [
+    {
+      "id": "u25-cd1",
+      "text": "Tell your partner kindly what you'd like them to do, or not do, more often.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u25-cd2",
+      "text": "Express disappointment without blaming ('I waited, and yet…'), listen to your partner's side, and make up.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u25-cd3",
+      "text": "Understand people talking about what someone made them do or let them do (my parents made me practise, let me pay).",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u25-cd4",
+      "text": "Write your partner a short anniversary letter: what you're grateful for and what you'd like to do together next year.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u25-cd5",
+      "text": "Read a short advice column about couples talking things through and answer questions about it.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    }
+  ],
+  "conversation": "rp-u25",
+  "task": {
+    "id": "u25-task",
+    "canDo": "u25-cd2",
+    "goal": "Settle a small disagreement about your next long weekend: say what you'd like the other to understand, listen, and agree on a plan you're both happy with.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Wants a quiet hot-spring trip and has reasons (card A)",
+      "b": "Wants to see friends in the city and has reasons (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Our anniversary dinner",
+    "brief": "At your anniversary dinner, look back on the year: what you've become able to do, what you wish had gone differently ('I wanted to…, and yet…'), what you'd like each other to do next year, and what you've decided to do together. End with a toast.",
+    "minLinesEach": 12,
+    "structures": [
+      "te-hoshii",
+      "noni",
+      "koto-ni-suru",
+      "you-ni-naru",
+      "te-kureru",
+      "to-omou",
+      "tara-conditional",
+      "hoshii"
+    ]
+  }
+}

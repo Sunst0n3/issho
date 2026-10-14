@@ -9,16 +9,20 @@
 // examples) and any array of { jp } (content/sentences/*.json). A directory is searched for
 // .json files; files of other kinds are skipped.
 //
-// For each item it prints the number of content tokens, the share covered by core words with
-// order ≤ the ceiling (✓ at 98 % or more, else ✗), the highest core word used, the uncovered
-// lemmas (#order = core word past the ceiling, jm = JMdict word not in the core list, ? = not
-// found), names left out of the count, and ruby problems (src/lib/ruby.ts validateRuby). For
-// stories it also checks the character count against the level, the gist question, and that
-// every grammar id exists and is taught by the grammar maximum.
+// For each item it prints the number of content tokens (scripts/v2/tokenize.ts), the share
+// covered by core words with order ≤ the ceiling (✓ at 98 % or more, else ✗), the highest core
+// word used, the uncovered words (#order = core word past the ceiling, jm = JMdict word not in
+// the core list, ? = not found), names left out of the count, and ruby problems in every ruby
+// field (src/lib/ruby.ts validateRuby). For stories it also checks the character count (and
+// for 'start' the distinct words) against the level, the sentences and the gist question, and
+// that every grammar id exists and is taught by the grammar maximum. For units and role-plays
+// it checks that grammar ids, capstone structures and core:/grammar: targets exist (grammar
+// ones by the grammar maximum).
 //
 // The ceiling is --ceiling, else the item's unit's coreWordCeiling (content/units.json or
-// content/units/*.json), else every core word. The grammar maximum is --grammar-max, else the
-// order of the unit's last grammar point, else unchecked.
+// content/units/*.json; a grammar point uses the unit that teaches it), else every core word.
+// The grammar maximum is --grammar-max, else the order of the unit's last grammar point, else
+// unchecked.
 //
 // --fails        print only items under 98 % or with problems
 // --json         print a JSON report instead of text
@@ -104,12 +108,25 @@ export interface Context {
   tk: RubyTokenizer;
   grammarOrder: Map<string, number>;
   units: Map<number, UnitSpec>;
+  /** The unit that teaches each grammar point. */
+  grammarUnit: Map<string, number>;
   conversations: Set<string> | null;
   maxCoreOrder: number;
 }
 
 function readJson(path: string): unknown {
   return JSON.parse(readFileSync(path, 'utf8'));
+}
+
+/** A JSON file the context needs, or undefined (with a warning) when it is missing or broken. */
+function readOptional(path: string): unknown {
+  if (!existsSync(path)) return undefined;
+  try {
+    return readJson(path);
+  } catch (e) {
+    console.error(`warning: skipping ${relative(ROOT, path)}: ${(e as Error).message}`);
+    return undefined;
+  }
 }
 
 function unitsFrom(data: unknown): UnitSpec[] {
@@ -120,22 +137,23 @@ function unitsFrom(data: unknown): UnitSpec[] {
 export async function loadContext(): Promise<Context> {
   const tk = await getTokenizer();
   const grammarOrder = new Map<string, number>();
-  const gPath = join(CONTENT, 'grammar-v2.json');
-  if (existsSync(gPath)) for (const g of readJson(gPath) as GrammarPoint[]) grammarOrder.set(g.id, g.order);
+  const grammar = readOptional(join(CONTENT, 'grammar-v2.json'));
+  if (Array.isArray(grammar)) for (const g of grammar as GrammarPoint[]) grammarOrder.set(g.id, g.order);
   const units = new Map<number, UnitSpec>();
-  const uFile = join(CONTENT, 'units.json');
-  if (existsSync(uFile)) for (const u of unitsFrom(readJson(uFile))) units.set(u.id, u);
+  for (const u of unitsFrom(readOptional(join(CONTENT, 'units.json')))) units.set(u.id, u);
   const uDir = join(CONTENT, 'units');
   if (existsSync(uDir)) {
     for (const f of readdirSync(uDir).filter((n) => n.endsWith('.json')).sort()) {
-      for (const u of unitsFrom(readJson(join(uDir, f)))) units.set(u.id, u);
+      for (const u of unitsFrom(readOptional(join(uDir, f)))) units.set(u.id, u);
     }
   }
-  const rPath = join(CONTENT, 'roleplays-v2.json');
-  const conversations = existsSync(rPath) ? new Set((readJson(rPath) as RolePlay[]).map((r) => r.id)) : null;
+  const grammarUnit = new Map<string, number>();
+  for (const u of units.values()) for (const id of u.grammar ?? []) grammarUnit.set(id, u.id);
+  const roleplays = readOptional(join(CONTENT, 'roleplays-v2.json'));
+  const conversations = Array.isArray(roleplays) ? new Set((roleplays as RolePlay[]).map((r) => r.id)) : null;
   let maxCoreOrder = 0;
   for (const w of tk.core.values()) maxCoreOrder = Math.max(maxCoreOrder, w.order);
-  return { tk, grammarOrder, units, conversations, maxCoreOrder };
+  return { tk, grammarOrder, units, grammarUnit, conversations, maxCoreOrder };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -203,8 +221,8 @@ export function coverageOf(
       continue;
     }
     const why = core ? `#${core.order}` : t.ref ? 'jm' : '?';
-    const key = `${t.lemma}\u0000${why}`;
-    const entry = missing.get(key) ?? { lemma: t.lemma, why, count: 0 };
+    const key = t.ref ?? `?${t.lemma}`;
+    const entry = missing.get(key) ?? { lemma: core ? (core.written ?? core.kana) : t.lemma, why, count: 0 };
     entry.count++;
     missing.set(key, entry);
   }
@@ -229,6 +247,8 @@ interface Field {
 
 export interface Item {
   label: string;
+  /** The entry's id where it has one. */
+  id?: string;
   /** Texts whose words are counted. */
   texts: Field[];
   /** Further ruby fields that are only validated (titles, names, patterns, drills). */
@@ -336,6 +356,7 @@ export function itemsOf(kind: ContentKind, data: unknown): Item[] {
     case 'grammar':
       return (list as GrammarPoint[]).map((g) => ({
         label: `${String(g.order).padStart(3)} ${g.id}`,
+        id: g.id,
         texts: g.examples.map((e, i) => ({ field: `examples[${i}]`, jp: e.jp })),
         rubyOnly: [
           ...(g.pattern ? [{ field: 'pattern', jp: g.pattern }] : []),
@@ -478,7 +499,8 @@ export interface FileReport {
 }
 
 export function analyzeFile(path: string, ctx: Context, opts: Options = {}): FileReport {
-  const file = relative(process.cwd(), path) || path;
+  const rel = relative(process.cwd(), path);
+  const file = rel && !rel.startsWith('..') ? rel : path;
   let data: unknown;
   try {
     data = readJson(path);
@@ -487,7 +509,12 @@ export function analyzeFile(path: string, ctx: Context, opts: Options = {}): Fil
   }
   const kind = detectKind(data);
   if (!kind) return { file, skipped: 'not a story, unit, role-play, grammar or { jp } file', items: [] };
-  return { file, kind, items: itemsOf(kind, data).map((item) => analyzeItem(item, ctx, opts)) };
+  // A unit file being checked is the freshest copy of its units (and may live elsewhere).
+  const units = kind === 'unit' ? new Map([...ctx.units, ...unitsFrom(data).map((u) => [u.id, u] as const)]) : ctx.units;
+  const items = itemsOf(kind, data);
+  // A grammar point's examples are measured against the unit that teaches it.
+  if (kind === 'grammar') for (const item of items) item.unit = ctx.grammarUnit.get(item.id ?? '');
+  return { file, kind, items: items.map((item) => analyzeItem(item, { ...ctx, units }, opts)) };
 }
 
 function emptyReport(label: string): ItemReport {
@@ -538,9 +565,8 @@ function printFile(fr: FileReport, failsOnly: boolean): void {
     const problems = r.errors.length + r.warnings.length;
     if (failsOnly && ok && !problems) continue;
     const unitNote = r.ceilingFrom.startsWith('unit') ? `  [${r.ceilingFrom}: ≤ #${r.ceiling}${r.grammarMax ? `, grammar ≤ #${r.grammarMax}` : ''}]` : '';
-    console.log(
-      `${ok ? '✓' : '✗'} ${pct(c.ratio).padStart(6)} ${String(c.content).padStart(4)} tok  max #${String(c.maxOrder).padEnd(5)} ${r.label}${unitNote}`,
-    );
+    const flag = c.content ? `${ok ? '✓' : '✗'} ${pct(c.ratio).padStart(6)}` : '–       ';
+    console.log(`${flag} ${String(c.content).padStart(4)} tok  max #${String(c.maxOrder).padEnd(5)} ${r.label}${unitNote}`);
     if (c.uncovered.length) console.log(`      uncovered: ${uncoveredText(c.uncovered)}`);
     if (c.names.length) console.log(`      names (not counted): ${c.names.join(', ')}`);
     for (const n of r.notes) console.log(`      ${n}`);
@@ -607,9 +633,9 @@ function parseArgs(argv: string[]): Args {
   };
   const args: Partial<Args> & { fails: boolean; json: boolean } = { fails: false, json: false };
   for (let i = 0; i < argv.length; i++) {
-    const a = argv[i];
+    const [a, inline] = argv[i].startsWith('--') && argv[i].includes('=') ? argv[i].split('=', 2) : [argv[i], undefined];
     const num = () => {
-      const v = Number(argv[++i]);
+      const v = Number(inline ?? argv[++i]);
       if (!Number.isInteger(v) || v < 0) bad(`${a} needs a whole number`);
       return v;
     };

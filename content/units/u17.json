@@ -1,0 +1,100 @@
+{
+  "id": 17,
+  "title": "Get well soon",
+  "titleJp": "お{大事|だいじ}に",
+  "level": "A2",
+  "topic": "Health & looking after each other",
+  "grammar": [
+    "nakereba-naranai",
+    "adverb-form",
+    "deshou",
+    "nagara"
+  ],
+  "coreWordCeiling": 1105,
+  "canDos": [
+    {
+      "id": "u17-cd1",
+      "text": "Tell your partner how you feel and where it hurts, and ask how they are feeling.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u17-cd2",
+      "text": "Understand a doctor's or pharmacist's instructions: what you must do, how to take the medicine, and what to avoid.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u17-cd3",
+      "text": "Read a medicine label or clinic notice (times, how many, before or after meals) and answer questions.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u17-cd4",
+      "text": "Look after your partner when they're unwell: guess what's wrong, give gentle advice and tell them to rest properly.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u17-cd5",
+      "text": "Write a message cancelling plans because you're unwell, saying what you have to do instead.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    }
+  ],
+  "conversation": "rp-u17",
+  "task": {
+    "id": "u17-task",
+    "canDo": "u17-cd4",
+    "goal": "One of you feels unwell: work out what's wrong, decide whether to go to the clinic, and make a plan for the rest of the day.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Feels unwell (symptoms card A)",
+      "b": "Has the clinic's opening hours and what's in the medicine box (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Under the weather",
+    "brief": "One of you falls ill. At home, say how you feel and get advice; at the clinic, explain your symptoms and hear what you have to do (the other plays the doctor); back home, agree on healthier habits, such as not eating while you work.",
+    "minLinesEach": 10,
+    "structures": [
+      "nakereba-naranai",
+      "adverb-form",
+      "deshou",
+      "nagara",
+      "n-desu",
+      "hou-ga-ii",
+      "naide-kudasai"
+    ]
+  }
+}

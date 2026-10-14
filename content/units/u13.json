@@ -1,0 +1,101 @@
+{
+  "id": 13,
+  "title": "Let's cook together",
+  "titleJp": "{一緒|いっしょ}に{作|つく}ろう",
+  "level": "A2",
+  "topic": "Cooking at home",
+  "grammar": [
+    "volitional",
+    "yori-hou",
+    "naide-kudasai",
+    "n-desu",
+    "nanika-nanimo"
+  ],
+  "coreWordCeiling": 880,
+  "canDos": [
+    {
+      "id": "u13-cd1",
+      "text": "Suggest what to cook in casual Japanese and compare two options (which is quicker, which is better for you).",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u13-cd2",
+      "text": "Read a simple recipe and put the steps in order.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u13-cd3",
+      "text": "Understand your partner's instructions and warnings in the kitchen (don't add the salt yet, don't touch that pan).",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u13-cd4",
+      "text": "Explain why you can't or don't want to eat something, and ask what's wrong when your partner isn't eating.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u13-cd5",
+      "text": "Leave your partner a note saying there's nothing in the fridge and asking them to buy something for dinner.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    }
+  ],
+  "conversation": "rp-u13",
+  "task": {
+    "id": "u13-task",
+    "canDo": "u13-cd1",
+    "goal": "Decide on tonight's dinner and who cooks what: agree on one main dish and one side using what you have.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Knows what's in the fridge and the cupboard (card A)",
+      "b": "Knows what you both had for lunch and what's on special at the supermarket (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Cooking show for two",
+    "brief": "Host a two-person cooking show: decide what to make by comparing two dishes, explain the steps, warn each other what not to do, deal with a small problem (something's missing: is there anything we can use instead?), and taste the result.",
+    "minLinesEach": 10,
+    "structures": [
+      "volitional",
+      "yori-hou",
+      "naide-kudasai",
+      "n-desu",
+      "nanika-nanimo",
+      "te-form",
+      "mou-mada"
+    ]
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "id": 22,
+  "title": "I can do it now!",
+  "titleJp": "できるようになった！",
+  "level": "N3-path",
+  "topic": "Habits, changes & progress",
+  "grammar": [
+    "to-conditional",
+    "you-ni-naru",
+    "you-da",
+    "nakutemo-ii"
+  ],
+  "coreWordCeiling": 1390,
+  "canDos": [
+    {
+      "id": "u22-cd1",
+      "text": "Talk about how your life and skills have changed this year (I can read kanji now, I've started cooking more).",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u22-cd2",
+      "text": "Read instructions for a machine or a local rule (press this and…, if you put the rubbish out late…) and say what happens.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u22-cd3",
+      "text": "Show your partner how to use something at home, step by step (when you press this, it starts).",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u22-cd4",
+      "text": "Understand someone guessing from what they notice (it seems the shop is closed, it looks like nobody's home).",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u22-cd5",
+      "text": "Reassure your partner in a message about what they don't have to do today (cook, hurry, pick you up).",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    }
+  ],
+  "conversation": "rp-u22",
+  "task": {
+    "id": "u22-task",
+    "canDo": "u22-cd3",
+    "goal": "Teach your partner to use a new appliance until they can tell you back what each button does.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Has the instruction sheet (card A)",
+      "b": "Has only a picture of the machine's buttons (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Our new habits",
+    "brief": "You've each started a new habit (morning runs, cooking from scratch, daily kanji). Tell each other how it's going and what you can do now, explain step by step how something works (the new rice cooker, a gym machine), say what you've noticed, and tell each other what you don't have to do any more.",
+    "minLinesEach": 11,
+    "structures": [
+      "to-conditional",
+      "you-ni-naru",
+      "you-da",
+      "nakutemo-ii",
+      "potential-form",
+      "te-miru"
+    ]
+  }
+}

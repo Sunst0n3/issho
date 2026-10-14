@@ -1,0 +1,100 @@
+{
+  "id": 23,
+  "title": "We've decided to move",
+  "titleJp": "{引|ひ}っ{越|こ}すことにしました",
+  "level": "N3-path",
+  "topic": "Big decisions & moving home",
+  "grammar": [
+    "nara",
+    "passive",
+    "koto-ni-suru",
+    "temo-even-if"
+  ],
+  "coreWordCeiling": 1450,
+  "canDos": [
+    {
+      "id": "u23-cd1",
+      "text": "Talk through a big decision with your partner (moving, changing jobs) and say what you've decided and why.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u23-cd2",
+      "text": "Read flat listings (rent, rooms, minutes from the station) and pick the one that fits both your conditions.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u23-cd3",
+      "text": "Give advice that builds on what someone has just told you ('If you're moving to Osaka, …').",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u23-cd4",
+      "text": "Understand a friend or neighbour talking about things that happened to them (they were told off, their bike was taken).",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u23-cd5",
+      "text": "Write a message telling friends about your decision and that you'll go ahead even if it's difficult.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    }
+  ],
+  "conversation": "rp-u23",
+  "task": {
+    "id": "u23-task",
+    "canDo": "u23-cd1",
+    "goal": "Choose your next home from three flats: share your information, weigh up the must-haves, and decide on one, even if it isn't perfect.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Has the rent and floor plans of the three flats (card A)",
+      "b": "Has the travel times to work and notes on each neighbourhood (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "We're moving!",
+    "brief": "Talk through whether to move (if it's near your work…, even if the rent is higher…), make the decision, then tell a friend (played by your partner) what you've decided and why, and answer their questions about the new place.",
+    "minLinesEach": 11,
+    "structures": [
+      "nara",
+      "koto-ni-suru",
+      "temo-even-if",
+      "ba-conditional",
+      "shi-reasons",
+      "tsumori",
+      "yori-hou"
+    ]
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "id": 24,
+  "title": "Polite Japanese",
+  "titleJp": "{丁寧|ていねい}な{日本語|にほんご}",
+  "level": "N3-path",
+  "topic": "Phone calls, bookings & polite service",
+  "grammar": [
+    "tokoro",
+    "keigo-verbs",
+    "embedded-questions"
+  ],
+  "coreWordCeiling": 1505,
+  "canDos": [
+    {
+      "id": "u24-cd1",
+      "text": "Understand polite staff speech at a hotel, a restaurant or on the phone, and reply in everyday です/ます Japanese.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u24-cd2",
+      "text": "Phone to make or change a booking, asking about what you don't know (what time it starts, whether there are seats).",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u24-cd3",
+      "text": "Text your partner exactly where you are: just about to leave, on the way, or just arrived.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u24-cd4",
+      "text": "Read a booking confirmation or a hotel notice written in polite Japanese and find the key details.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    }
+  ],
+  "conversation": "rp-u24",
+  "task": {
+    "id": "u24-task",
+    "canDo": "u24-cd2",
+    "goal": "Book a table for an anniversary dinner by phone: find out if there are seats at your time, what the course includes, and whether you can bring a cake.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Customer calling to book (card A: dates, number of people, requests)",
+      "b": "Restaurant staff (card B: free tables, course details, house rules)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "An evening to remember",
+    "brief": "Arrange a special evening: phone a restaurant to book (one of you plays the staff, in polite Japanese), ask about things you don't know (what time it closes, whether you can bring a cake), then on the night tell each other where you are (just leaving, on the way) and arrive together.",
+    "minLinesEach": 11,
+    "structures": [
+      "tokoro",
+      "embedded-questions",
+      "node",
+      "te-oku",
+      "tara-conditional",
+      "temo-ii",
+      "kamoshirenai"
+    ]
+  }
+}

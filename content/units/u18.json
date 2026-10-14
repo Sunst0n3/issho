@@ -1,0 +1,100 @@
+{
+  "id": 18,
+  "title": "Let's try it!",
+  "titleJp": "やってみよう！",
+  "level": "A2",
+  "topic": "Hobbies & trying new things",
+  "grammar": [
+    "konna-donna",
+    "koto-ga-dekiru",
+    "te-miru",
+    "kamoshirenai"
+  ],
+  "coreWordCeiling": 1165,
+  "canDos": [
+    {
+      "id": "u18-cd1",
+      "text": "Ask what kind of music, films or sports your partner likes, and describe the kind you like.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u18-cd2",
+      "text": "Understand a short introduction to a class or club (what you can do there, what it's like) and answer questions.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u18-cd3",
+      "text": "Read a list of classes and find one you can both do (day, time, what you can learn).",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u18-cd4",
+      "text": "Suggest trying something new together, and talk about how it might go (it might be hard, we might love it).",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u18-cd5",
+      "text": "Write a few lines about a hobby you'd like to try and what you can and can't do yet.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    }
+  ],
+  "conversation": "rp-u18",
+  "task": {
+    "id": "u18-task",
+    "canDo": "u18-cd4",
+    "goal": "Choose one new hobby to try together this month: find out what each class involves, talk about what might be fun or hard, and pick one.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Has listings for a cooking class and a dance class (card A)",
+      "b": "Has listings for a yoga class and a guitar class, and your free evenings (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Teach me something",
+    "brief": "Talk about the kinds of hobbies you each have and what you can and can't do. Then one of you teaches the other a simple skill in Japanese (a song, a stretch, a recipe step), the learner tries it, and you talk about what might happen if you keep it up.",
+    "minLinesEach": 10,
+    "structures": [
+      "konna-donna",
+      "koto-ga-dekiru",
+      "te-miru",
+      "kamoshirenai",
+      "no-ga-suki",
+      "adverb-form",
+      "yori-hou"
+    ]
+  }
+}

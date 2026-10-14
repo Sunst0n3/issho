@@ -1,0 +1,90 @@
+{
+  "id": 9,
+  "title": "Special days",
+  "titleJp": "{誕生日|たんじょうび}はいつ？",
+  "level": "A2",
+  "topic": "Dates, birthdays & catching up",
+  "grammar": [
+    "dates-days",
+    "ni-iku-purpose",
+    "te-imasu",
+    "casual-past",
+    "kara-because"
+  ],
+  "coreWordCeiling": 655,
+  "canDos": [
+    {
+      "id": "u09-cd1",
+      "text": "Tell each other your birthdays and other important dates, and find out what day of the week they fall on this year.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u09-cd2",
+      "text": "Read a calendar or an invitation and find the date, the day of the week and what's happening.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u09-cd3",
+      "text": "Text your partner what you're doing right now and what you're going out to do later.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u09-cd4",
+      "text": "Follow your partner's casual account of their day (what they did and why) and answer questions about it.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    }
+  ],
+  "conversation": "rp-u09",
+  "task": {
+    "id": "u09-task",
+    "canDo": "u09-cd1",
+    "goal": "Find a free evening next month for an anniversary dinner: compare your calendars, agree on the date, and decide what you will go out to eat.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Has their calendar for next month (card A)",
+      "b": "Has their calendar and the restaurant's closing days (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "The night before our anniversary",
+    "brief": "It's the evening before your anniversary. In casual Japanese, catch up on what you each did today and why, check the date and the day of the week, and plan where you'll go tomorrow to eat or to buy something special.",
+    "minLinesEach": 9,
+    "structures": [
+      "dates-days",
+      "ni-iku-purpose",
+      "te-imasu",
+      "casual-past",
+      "kara-because",
+      "casual-speech",
+      "tai-want"
+    ]
+  }
+}

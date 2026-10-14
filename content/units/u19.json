@@ -1,0 +1,101 @@
+{
+  "id": 19,
+  "title": "Thanks for the present!",
+  "titleJp": "プレゼント、ありがとう！",
+  "level": "A2",
+  "topic": "Gifts & celebrations",
+  "grammar": [
+    "ageru-morau",
+    "potential-form",
+    "te-shimau",
+    "tara-conditional",
+    "kureru"
+  ],
+  "coreWordCeiling": 1220,
+  "canDos": [
+    {
+      "id": "u19-cd1",
+      "text": "Talk about presents you've given and received: who gave what to whom, and which one you liked best.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u19-cd2",
+      "text": "Choose a present for a friend together: suggest ideas, and say what to do if they don't like it or can't use it.",
+      "check": {
+        "kind": "speak",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u19-cd3",
+      "text": "Understand a friend's story about a celebration that went wrong (forgot the cake, broke a glass) and answer questions.",
+      "check": {
+        "kind": "listen",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    },
+    {
+      "id": "u19-cd4",
+      "text": "Write a thank-you message for a present, saying who gave it and what you'll do with it.",
+      "check": {
+        "kind": "write",
+        "instructions": "",
+        "material": "",
+        "questions": [],
+        "rubric": []
+      }
+    },
+    {
+      "id": "u19-cd5",
+      "text": "Read a shop's gift service notice (wrapping, delivery, exchanges) and find out what you can and can't do.",
+      "check": {
+        "kind": "read",
+        "instructions": "",
+        "material": "",
+        "questions": []
+      }
+    }
+  ],
+  "conversation": "rp-u19",
+  "task": {
+    "id": "u19-task",
+    "canDo": "u19-cd2",
+    "goal": "Choose a birthday present for a friend for under 5,000 yen, and agree what you'll do if it doesn't work out.",
+    "outcomeQuestion": "",
+    "roles": {
+      "a": "Knows the friend's likes and what others are already giving her (card A)",
+      "b": "Has the shop's items, prices and exchange rules (card B)"
+    },
+    "infoA": "",
+    "infoB": "",
+    "targets": [],
+    "register": "",
+    "twist": "",
+    "scripted": []
+  },
+  "capstone": {
+    "title": "Anniversary presents",
+    "brief": "Exchange anniversary presents: explain why you chose them, remember presents you've given and received before, own up to a small mishap (you ate half the chocolates, you lost the receipt), and say what you'll do with your present.",
+    "minLinesEach": 11,
+    "structures": [
+      "ageru-morau",
+      "potential-form",
+      "te-shimau",
+      "tara-conditional",
+      "kureru",
+      "ta-koto-ga-aru",
+      "to-omou"
+    ]
+  }
+}
