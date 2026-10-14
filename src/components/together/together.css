@@ -9,7 +9,7 @@
 .tg-button-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .tg-button-row.tg-center { justify-content: center; }
 .tg-link-btn {
-  min-height: var(--tap); padding: 0 6px; border: 0; background: none; cursor: pointer;
+  min-width: var(--tap); min-height: var(--tap); padding: 0 6px; border: 0; background: none; cursor: pointer;
   color: inherit; font-size: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 2px;
 }
 .tg-pulse {
@@ -72,9 +72,9 @@
 
 /* ---- This week ---- */
 .tg-week-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
-.tg-legend { display: flex; gap: 12px; margin: 0; padding: 0; list-style: none; font-size: 13px; color: var(--muted); }
-.tg-legend li { display: flex; align-items: center; gap: 6px; }
-.tg-swatch { width: 10px; height: 10px; border-radius: 3px; }
+.tg-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; min-width: 0; margin: 0; padding: 0; list-style: none; font-size: 13px; color: var(--muted); }
+.tg-legend li { display: flex; align-items: center; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
+.tg-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
 .tg-swatch.tg-you, .tg-bar.tg-you { background: var(--shu); }
 .tg-swatch.tg-partner, .tg-bar.tg-partner { background: var(--ai); }
 .tg-week-chart { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; height: 128px; }
@@ -93,24 +93,53 @@
   margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--line);
 }
 .tg-stat { display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: 2px; min-width: 0; }
-.tg-stat dt { font-size: 12px; color: var(--muted); }
+.tg-stat dt { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
 .tg-stat dd { margin: 0; font-family: var(--font-display); font-size: 24px; font-weight: 700; line-height: 1.2; }
 .tg-stat-unit { font-family: var(--font-body); font-size: 13px; font-weight: 400; color: var(--muted); }
 .tg-stat-sep { color: var(--muted); }
-.tg-stat-sub { display: block; font-size: 11px; }
+/* A long partner name is cut short here; it shows in full in the legend above. */
+.tg-stat-sub { display: block; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---- Ink surfaces ----
+   The chat card and my own bubbles are dark ink in light mode. --ink turns light in
+   dark mode, so there they become a raised dark card with a border, like Today's
+   session panel, instead of the brightest blocks on the screen. */
+.tg-chat-card, .tg-bubble.tg-mine {
+  --tg-ink-bg: var(--ink); --tg-ink-fg: var(--on-ink); --tg-ink-muted: var(--muted-on-ink); --tg-ink-border: var(--ink);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .tg-chat-card {
+    --tg-ink-bg: var(--card); --tg-ink-fg: var(--ink); --tg-ink-muted: var(--muted); --tg-ink-border: var(--line);
+  }
+  :root:not([data-theme="light"]) .tg-bubble.tg-mine {
+    --tg-ink-bg: var(--ink-soft); --tg-ink-fg: var(--ink); --tg-ink-muted: var(--muted); --tg-ink-border: var(--line-strong);
+  }
+}
+:root[data-theme="dark"] .tg-chat-card {
+  --tg-ink-bg: var(--card); --tg-ink-fg: var(--ink); --tg-ink-muted: var(--muted); --tg-ink-border: var(--line);
+}
+:root[data-theme="dark"] .tg-bubble.tg-mine {
+  --tg-ink-bg: var(--ink-soft); --tg-ink-fg: var(--ink); --tg-ink-muted: var(--muted); --tg-ink-border: var(--line-strong);
+}
 
 /* ---- Practice cards ---- */
 .tg-chat-card {
   display: flex; align-items: center; gap: 14px; min-height: 76px; padding: 16px;
-  border-radius: var(--r-lg); background: var(--ink); color: var(--on-ink); text-decoration: none;
+  border-radius: var(--r-lg); border: 1px solid var(--tg-ink-border);
+  background: var(--tg-ink-bg); color: var(--tg-ink-fg); text-decoration: none;
+  /* Shu next to dark ink is only 2.8:1. The ring goes inside the card in its text colour
+     (on-ink in light mode, ink in dark mode), as on Today's session panel. Outside, an
+     on-ink ring would vanish into the paper. */
+  --focus-ring: var(--tg-ink-fg);
 }
+.tg-chat-card:focus-visible { outline-offset: -5px; }
 .tg-chat-card-icon {
   width: var(--tap); height: var(--tap); border-radius: 50%; flex-shrink: 0;
   display: grid; place-items: center; background: var(--shu); color: var(--on-accent);
 }
 .tg-chat-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .tg-chat-card-title { font-weight: 700; }
-.tg-chat-card-preview { font-size: 14px; opacity: 0.78; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tg-chat-card-preview { font-size: 14px; color: var(--tg-ink-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tg-unread-badge {
   min-width: 24px; height: 24px; padding: 0 7px; border-radius: 12px; flex-shrink: 0;
   display: inline-grid; place-items: center; background: var(--shu); color: var(--on-accent);
@@ -125,7 +154,7 @@
   display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: var(--r-lg);
   background: var(--ai); color: var(--on-accent); text-decoration: none;
 }
-.tg-invite-banner > span { flex: 1; }
+.tg-invite-banner > span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .tg-invite-card {
   display: flex; flex-direction: column; gap: 10px; padding: 16px;
   border-radius: var(--r-lg); background: var(--ai-tint); color: var(--ai-ink);
@@ -137,6 +166,7 @@
   border-radius: var(--r-lg); background: var(--ai-tint); color: var(--ai-ink);
 }
 .tg-quiz-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.tg-quiz-card-head > div { min-width: 0; overflow-wrap: anywhere; }
 .tg-quiz-card-head h3 { font-size: 17px; font-weight: 700; }
 .tg-quiz-card-head p { font-size: 14px; }
 .tg-quiz-card .btn.secondary { background: transparent; border-color: var(--ai); color: var(--ai-ink); flex-shrink: 0; }
@@ -172,7 +202,7 @@
   background: var(--ai-tint); color: var(--ai-ink); font-weight: 700;
 }
 .tg-chat-who-text { display: flex; flex-direction: column; min-width: 0; }
-.tg-chat-name { font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tg-chat-name { font-size: 17px; font-weight: 700; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tg-chat-sub { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 400; color: var(--muted); }
 .tg-furigana-toggle {
   width: var(--tap); height: var(--tap); flex-shrink: 0; cursor: pointer;
@@ -195,10 +225,17 @@
 .tg-bubble-row.tg-mine { align-self: flex-end; align-items: flex-end; }
 .tg-bubble-row.tg-theirs { align-self: flex-start; align-items: flex-start; }
 .tg-bubble { padding: 10px 14px; border-radius: 18px; font-size: 17px; line-height: 1.6; overflow-wrap: anywhere; }
-.tg-bubble ruby rt { font-size: 0.55em; }
+/* 0.65em of 17px is 11px: readings stay legible on a phone. A reading wider than its
+   kanji centres them rather than spreading the kanji apart (勉 強). */
+.tg-bubble ruby { ruby-align: center; }
+.tg-bubble ruby rt { font-size: max(0.65em, 11px); }
+/* The global 0.5em is under 11px on the smaller Japanese lines of these screens. */
+.tg-rp-card-jp rt, .tg-rp-row-jp rt, .tg-rp-title-jp rt, .tg-rp-prev rt, .tg-tip-fixed rt { font-size: max(0.5em, 11px); }
 .tg-bubble.tg-theirs { background: var(--card); border: 1px solid var(--line); border-top-left-radius: 4px; }
-.tg-bubble.tg-mine { background: var(--ink); color: var(--on-ink); border-top-right-radius: 4px; }
-.tg-bubble.tg-mine rt { color: inherit; opacity: 0.75; }
+.tg-bubble.tg-mine {
+  background: var(--tg-ink-bg); color: var(--tg-ink-fg); border: 1px solid var(--tg-ink-border); border-top-right-radius: 4px;
+}
+.tg-bubble.tg-mine rt { color: var(--tg-ink-muted); }
 .tg-bubble-row.tg-pending .tg-bubble, .tg-bubble-row.tg-failed .tg-bubble { opacity: 0.7; }
 .tg-bubble-meta { display: flex; align-items: center; gap: 4px; padding: 0 4px; font-size: 12px; color: var(--muted); }
 .tg-bubble-meta.tg-failed { flex-wrap: wrap; justify-content: flex-end; color: var(--shu-ink); }
@@ -232,7 +269,11 @@
 .tg-composer-notice { font-size: 13px; color: var(--shu-ink); }
 .tg-known-chips { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .tg-known-chips .label { flex-shrink: 0; }
-.tg-chip-scroll { flex: 1; min-width: 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+/* The padding (taken back by the margin) leaves room for the chips' focus outline inside the scroller. */
+.tg-chip-scroll {
+  flex: 1; min-width: 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
+  margin: -4px; padding: 4px;
+}
 .tg-chip-scroll::-webkit-scrollbar { display: none; }
 .tg-kanji-chip {
   flex-shrink: 0; min-width: var(--tap); height: var(--tap); padding: 0 8px; cursor: pointer;
@@ -242,7 +283,7 @@
 .tg-composer-row { position: relative; display: flex; align-items: center; gap: 8px; }
 .tg-composer-input {
   flex: 1; min-width: 0; height: 48px; padding: 0 18px; border-radius: 24px;
-  border: 1px solid var(--line-strong); background: var(--card); font-size: 17px;
+  border: 1px solid var(--line-input); background: var(--card); font-size: 17px;
 }
 .tg-composer-input[readonly] { color: var(--muted); }
 .tg-mic-btn, .tg-send-btn {
@@ -313,7 +354,8 @@
 /* ---- Role-plays ---- */
 .tg-rp-level { display: flex; flex-direction: column; gap: 10px; }
 .tg-rp-level.tg-recommended { margin: 0 -12px; padding: 12px; border-radius: 20px; background: var(--shu-tint); }
-.tg-rp-level-title { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 17px; font-weight: 700; }
+.tg-rp-level-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.tg-rp-level-title { font-size: 17px; font-weight: 700; }
 .tg-rp-level-title .muted { font-weight: 400; }
 .tg-rp-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
 .tg-rp-row {
@@ -343,7 +385,10 @@
 .tg-option-card:has(input:checked) { border-color: var(--ai); box-shadow: inset 0 0 0 1px var(--ai); }
 .tg-option-card:has(input:focus-visible) { outline: 2px solid var(--shu); outline-offset: 2px; }
 .tg-option-card input { width: 20px; height: 20px; margin: 2px 0 0; flex-shrink: 0; accent-color: var(--ai); }
-.tg-option-card.tg-disabled { opacity: 0.6; cursor: default; }
+/* Only the unavailable choice looks switched off; the note saying why stays readable. */
+.tg-option-card.tg-disabled { cursor: default; }
+.tg-option-card.tg-disabled input { opacity: 0.5; }
+.tg-option-card.tg-disabled strong { color: var(--muted); }
 .tg-option-text { display: flex; flex-direction: column; gap: 2px; }
 .tg-option-text .muted { font-size: 14px; }
 

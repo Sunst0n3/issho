@@ -2,7 +2,7 @@
 //   vi.mock('<path>/lib/data.ts', async () => (await import('<path>/test-utils.tsx')).dataMock);
 //   vi.mock('<path>/writing/WritingPad.tsx', async () => (await import('<path>/test-utils.tsx')).writingPadMock);
 
-import { forwardRef, useImperativeHandle } from 'react';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { DEFAULT_SETTINGS, db } from '../../lib/db.ts';
 import type {
   Curriculum,
@@ -120,6 +120,11 @@ export const STROKES: Record<string, string[]> = {
 
 export const MNEMONICS: Record<string, string> = { 水: 'A stream splashing drops to both sides: water.' };
 
+/** Hand-picked kana examples (kana-examples.json); the other kana fall back to a word search. */
+export const KANA_EXAMPLES: Record<string, { kana: string; written?: string; en: string }> = {
+  い: { kana: 'いけ', written: '池', en: 'pond' },
+};
+
 export const dataMock = {
   loadKana: async () => KANA,
   loadKanji: async () => KANJI,
@@ -134,20 +139,27 @@ export const dataMock = {
   loadGrammar: async () => GRAMMAR,
   loadSentences: async () => SENTENCES,
   loadRolePlays: async () => [],
+  loadKanaExamples: async () => KANA_EXAMPLES,
 };
 
 /**
- * Stand-in for the canvas: buttons finish the character cleanly, miss a
- * stroke, or (through the handle) give up.
+ * Stand-in for the canvas: buttons finish the character cleanly, draw the next
+ * stroke right, miss a stroke (direction or shape), or (through the handle)
+ * undo, clear and give up.
  */
 const MockWritingPad = forwardRef<WritingPadHandle, WritingPadProps>(function MockWritingPad(
   { strokes, mode, label, onStrokeResult, onComplete, disabled },
   ref,
 ) {
+  const done = useRef(0);
   const result = { mistakes: 0, hintsUsed: 0, strokeCount: strokes.length, gaveUp: false, failedStrokes: 0 };
   useImperativeHandle(ref, () => ({
-    undo() {},
-    clear() {},
+    undo() {
+      done.current = Math.max(0, done.current - 1);
+    },
+    clear() {
+      done.current = 0;
+    },
     hint() {},
     giveUp() {
       onComplete?.({ ...result, gaveUp: true, failedStrokes: strokes.length });
@@ -156,9 +168,16 @@ const MockWritingPad = forwardRef<WritingPadHandle, WritingPadProps>(function Mo
   return (
     <div role="img" aria-label={`Writing pad for ${label} (${mode})`} data-mode={mode}>
       <button type="button" disabled={disabled} onClick={() => onComplete?.(result)}>Finish writing</button>
+      <button type="button" disabled={disabled} onClick={() => onStrokeResult?.(done.current++, true, { ok: true, score: 0.9 })}>
+        Draw a stroke
+      </button>
       <button type="button" disabled={disabled}
-        onClick={() => onStrokeResult?.(0, false, { ok: false, score: 0.2, reason: 'direction' })}>
+        onClick={() => onStrokeResult?.(done.current, false, { ok: false, score: 0.2, reason: 'direction' })}>
         Miss a stroke
+      </button>
+      <button type="button" disabled={disabled}
+        onClick={() => onStrokeResult?.(done.current, false, { ok: false, score: 0.2, reason: 'shape' })}>
+        Miss the shape
       </button>
     </div>
   );

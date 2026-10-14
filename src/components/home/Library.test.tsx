@@ -14,7 +14,11 @@ beforeEach(async () => {
   await addLearned('radical', '氵', { stability: 1, state: State.Learning, reps: 1 });
 });
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  sessionStorage.clear();
+  document.documentElement.scrollTop = 0;
+});
 
 const tileNames = () => screen.queryAllByRole('link').map((a) => a.getAttribute('aria-label')).filter((n) => n !== 'Back');
 
@@ -58,6 +62,37 @@ describe('Library', () => {
 
     fireEvent.click(screen.getByRole('radio', { name: 'All' }));
     expect(tileNames()).toHaveLength(6);
+  });
+
+  it('counts each phase in kanji, like Today and Learn, with a spaced accessible name', async () => {
+    renderAt('/kanji', '/kanji', <Library />);
+    const phase2 = await screen.findByRole('button', { name: 'Phase 2 · Foundation, 2 of 5 kanji learned' });
+    // 氵 is a part, not a kanji: it shows as a tile but isn't counted.
+    expect(phase2.textContent).toContain('2 of 5 kanji');
+    expect(screen.getByRole('heading', { level: 1, name: 'Kanji library' })).toBeTruthy();
+  });
+
+  it('comes back with the filter, open groups, pages and scroll it was left with', async () => {
+    const first = renderAt('/kanji', '/kanji', <Library />);
+    await screen.findByRole('button', { name: /Phase 2/ });
+    fireEvent.click(screen.getByRole('button', { name: /Phase 4/ }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Needs work' }));
+    first.unmount();
+
+    renderAt('/kanji', '/kanji', <Library />);
+    await screen.findByRole('link', { name: '一, one, learned, needs work' });
+    expect(screen.getByRole('radio', { name: 'Needs work' }).getAttribute('aria-checked')).toBe('true');
+    expect(tileNames()).toEqual(['一, one, learned, needs work']);
+    fireEvent.click(screen.getByRole('radio', { name: 'All' }));
+    expect(screen.getByRole('button', { name: /Phase 4/ }).getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('restores the scroll position when coming back', async () => {
+    sessionStorage.setItem('issho.library.view', JSON.stringify({ filter: 'all', open: {}, limits: {}, scrollY: 640 }));
+    // A MemoryRouter's first entry counts as a back/forward (POP) visit.
+    renderAt('/kanji', '/kanji', <Library />);
+    await screen.findByRole('button', { name: /Phase 2/ });
+    expect(document.documentElement.scrollTop).toBe(640);
   });
 
   it('says so when nothing needs work', async () => {

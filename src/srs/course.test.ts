@@ -410,6 +410,7 @@ describe('courseProgress', () => {
       unitsTotal: CURRICULUM.units.length,
       kanjiIntroduced: 0,
       nextPhaseAt: 22,
+      phaseTarget: 22,
       phaseDone: BASIC_HIRAGANA.length,
     });
   });
@@ -427,5 +428,19 @@ describe('courseProgress', () => {
       nextPhaseAt: 2,
       phaseDone: 1,
     });
+  });
+
+  it("counts each phase in its own kanji, like the library's phase groups", async () => {
+    await updateSettings({ knowsHiragana: true, knowsKatakana: true });
+    // A phase-4 kanji learned ahead of schedule counts in phase 4, not in phase 2.
+    await markKnownMany([{ kind: 'kanji', key: '水' }]);
+    expect(await courseProgress()).toMatchObject({ phase: 2, phaseDone: 0, phaseTarget: 2, nextPhaseAt: 2, kanjiIntroduced: 1 });
+
+    // Phase 3 counts only its own kanji (大), not the ones from phase 2.
+    await markKnownMany([{ kind: 'radical', key: '亻' }, { kind: 'kanji', key: '一' }, { kind: 'kanji', key: '人' }]);
+    expect(await courseProgress()).toMatchObject({ phase: 3, phaseDone: 0, phaseTarget: 1, nextPhaseAt: 1 });
+
+    await markKnownMany([{ kind: 'kanji', key: '大' }]);
+    expect(await courseProgress()).toMatchObject({ phase: 4, phaseDone: 1, phaseTarget: 1, nextPhaseAt: null });
   });
 });

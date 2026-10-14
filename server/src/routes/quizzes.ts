@@ -13,10 +13,17 @@ import { HttpError, parseWith } from '../errors.ts';
 const LIST_LIMIT = 20;
 const MAX_ITEMS = 50;
 const char = z.string().min(1).max(4);
+/** A quiz asks for kanji: one Han character each (no kana, words or punctuation). */
+const kanji = char.regex(/^\p{Script=Han}$/u, 'must be a single kanji');
 
 const CreateQuizSchema = z.object({
   toMemberId: z.uuid(),
-  items: z.array(z.object({ char })).min(1).max(MAX_ITEMS),
+  // A repeated kanji would be asked twice and counted twice; keep its first place.
+  items: z
+    .array(z.object({ char: kanji }))
+    .min(1)
+    .max(MAX_ITEMS)
+    .transform((items) => [...new Map(items.map((item) => [item.char, item])).values()]),
 }) satisfies z.ZodType<CreateQuizRequest>;
 
 const QuizResultSchema = z
@@ -66,10 +73,12 @@ export function quizRoutes(app: FastifyInstance, ctx: AppContext): void {
     // A retried submission (e.g. from a flaky connection) gets the stored result back unchanged.
     if (quiz.result) return quiz;
 
+    // Only the quiz's own kanji can be missed, each once.
+    const asked = new Set(quiz.items.map((item) => item.char));
     const finished = ctx.store.setQuizResult(id, {
       correct: body.correct,
       total: body.total,
-      missed: body.missed,
+      missed: [...new Set(body.missed)].filter((c) => asked.has(c)),
       finishedAt: ctx.now().toISOString(),
     });
     ctx.hub.sendToMembers([finished.fromMemberId, finished.toMemberId], { type: 'quiz', quiz: finished });

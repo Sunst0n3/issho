@@ -1,5 +1,6 @@
 import { gradeFor } from '../../../srs/answers.ts';
 import { Glyph } from '../../Glyph.tsx';
+import { MixedText } from '../MixedText.tsx';
 import { AnswerArea, Question } from './parts.tsx';
 import type { CardProps } from './types.ts';
 
@@ -17,7 +18,7 @@ export function RadicalMeaningCard({ prepared, onAnswer }: CardProps<'radical-me
           grade: gradeFor(r),
           mode: r.mode,
           correct: r.correct,
-          feedback: { expected: radical.meaning, note },
+          feedback: { expected: radical.meaning, note: <MixedText text={note} /> },
         })} />
     </>
   );

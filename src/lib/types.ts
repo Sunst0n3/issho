@@ -242,12 +242,28 @@ export interface Settings {
   deviceToken?: string;
   memberId?: string;
   householdName?: string;
+  /**
+   * The household this phone last paired with, and its member there. Unlike the fields above,
+   * unpairing keeps it: the chat cache and unsent messages belong to that household, and pairing
+   * with it again keeps them and signs in as the same member.
+   */
+  lastPairing?: LastPairing;
+}
+
+export interface LastPairing {
+  /** RegisterResponse.householdId; missing when paired with an older server. */
+  householdId?: string;
+  memberId: string;
+  serverUrl: string;
 }
 
 /** Chat messages waiting to be sent while offline. */
 export interface OutboxRecord {
   clientId: string;            // uuid
+  /** When it was written (queued); sent to the server as writtenAt. */
   createdAt: Date;
+  /** The household it was written for (Settings.lastPairing); unset before any pairing. */
+  householdId?: string;
   kind: 'text' | 'voice';
   text: string;
   transcript?: string;
@@ -264,7 +280,9 @@ export interface ChatMessageRecord {
   id: number;                  // server id
   clientId: string;
   memberId: string;
-  createdAt: string;           // ISO
+  createdAt: string;           // ISO, when the server got it
+  /** ISO, when the sender wrote it, if known. Show `writtenAt ?? createdAt`. */
+  writtenAt?: string;
   kind: 'text' | 'voice' | 'system';
   text: string;
   transcript?: string;

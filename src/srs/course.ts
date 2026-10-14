@@ -322,10 +322,18 @@ export interface CourseProgress {
   kanjiIntroduced: number;
   /**
    * Target for reaching the next phase, in the current phase's measure: basic
-   * kana (phase 1) or kanji introduced (phases 2–3). Null in phase 4.
+   * kana (phase 1) or the phase's own kanji (phases 2–3). Null in phase 4.
    */
   nextPhaseAt: number | null;
-  /** Progress toward nextPhaseAt, in the same measure. */
+  /**
+   * The current phase's size in its measure: basic kana (phase 1), or the kanji of
+   * this phase (phases 2–4), as the kanji library groups them.
+   */
+  phaseTarget: number;
+  /**
+   * Progress in the same measure. A kanji learned ahead of its phase counts in its
+   * own phase, as in the library, not in the current one.
+   */
   phaseDone: number;
 }
 
@@ -335,17 +343,19 @@ export function progressFor(s: PhaseInput): CourseProgress {
   const unitsIntroduced = s.curriculum.units.filter((u) => s.introduced.has(unitId(u))).length;
   const kanjiIntroduced = [...s.introduced].filter((id) => id.startsWith('kanji:')).length;
 
-  let nextPhaseAt: number | null = null;
-  let phaseDone = kanjiIntroduced;
+  let phaseTarget: number;
+  let phaseDone: number;
   if (phase === 1) {
     const known = knownScripts(s);
     const basic = s.kana.filter((k) => k.kind === 'basic');
-    nextPhaseAt = basic.length;
+    phaseTarget = basic.length;
     phaseDone = basic.filter((k) => known[k.script] || s.introduced.has(kanaId(k.char))).length;
-  } else if (phase < 4) {
-    const end = s.curriculum.phaseEnds[String(phase)] ?? s.curriculum.units.length;
-    nextPhaseAt = s.curriculum.units.filter((u) => u.type === 'kanji' && u.index < end).length;
+  } else {
+    const own = s.curriculum.units.filter((u) => u.type === 'kanji' && u.phase === phase);
+    phaseTarget = own.length;
+    phaseDone = own.filter((u) => s.introduced.has(unitId(u))).length;
   }
+  const nextPhaseAt = phase < 4 ? phaseTarget : null;
 
   return {
     phase,
@@ -355,6 +365,7 @@ export function progressFor(s: PhaseInput): CourseProgress {
     unitsTotal: s.curriculum.units.length,
     kanjiIntroduced,
     nextPhaseAt,
+    phaseTarget,
     phaseDone,
   };
 }

@@ -61,6 +61,37 @@ describe('messages', () => {
     assert.equal(ids.size, 1);
   });
 
+  it('keeps when a message was written, within a week before it arrived', async () => {
+    const own = await createTestServer({ now: () => new Date('2026-10-15T08:00:00.000Z') });
+    try {
+      const { deviceToken } = await own.register('Carter');
+      const post = (clientId: string, writtenAt?: string) =>
+        own.app.inject({
+          method: 'POST',
+          url: '/api/messages',
+          headers: bearer(deviceToken),
+          payload: { clientId, kind: 'text', text: 'おやすみ', ...(writtenAt ? { writtenAt } : {}) },
+        });
+      // Written last night, offline; delivered this morning.
+      const offline = (await post('w-1', '2026-10-14T21:30:00.000Z')).json<ChatMessage>();
+      assert.equal(offline.createdAt, '2026-10-15T08:00:00.000Z');
+      assert.equal(offline.writtenAt, '2026-10-14T21:30:00.000Z');
+      // A time zone offset is fine; it is stored in UTC.
+      assert.equal((await post('w-2', '2026-10-15T06:00:00+09:00')).json<ChatMessage>().writtenAt, '2026-10-14T21:00:00.000Z');
+      // A phone clock in the future, or one far in the past, is kept in range.
+      assert.equal((await post('w-3', '2026-10-16T00:00:00.000Z')).json<ChatMessage>().writtenAt, '2026-10-15T08:00:00.000Z');
+      assert.equal((await post('w-4', '2020-01-01T00:00:00.000Z')).json<ChatMessage>().writtenAt, '2026-10-08T08:00:00.000Z');
+      // Older phones don't say.
+      assert.equal('writtenAt' in (await post('w-5')).json<ChatMessage>(), false);
+
+      const listed = (await own.app.inject({ method: 'GET', url: '/api/messages', headers: bearer(deviceToken) })).json<ChatMessage[]>();
+      assert.equal(listed[0].writtenAt, '2026-10-14T21:30:00.000Z');
+      assert.equal((await post('w-6', 'last night')).statusCode, 400);
+    } finally {
+      await own.close();
+    }
+  });
+
   it('validates messages', async () => {
     const cases: [Record<string, unknown>, string][] = [
       [{ clientId: 'v-1', kind: 'text', text: '   ' }, 'text_required'],

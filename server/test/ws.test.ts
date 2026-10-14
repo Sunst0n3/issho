@@ -24,8 +24,11 @@ describe('websocket', () => {
   const isPresence = (memberId: string, online: boolean) => (e: ServerEvent) =>
     e.type === 'presence' && e.memberId === memberId && e.online === online;
 
-  it('rejects a bad token before upgrading', async () => {
-    await assert.rejects(openSocket(base, 'A'.repeat(43)));
+  it('closes a socket opened with an unknown token as unpaired', async () => {
+    // E.g. the server's data was reset: the phone must learn it should pair again.
+    const socket = await openSocket(base, 'A'.repeat(43));
+    assert.equal(await socket.closed, WS_CLOSE_UNPAIRED);
+    assert.equal(socket.events.all.length, 0);
   });
 
   it('tracks presence across connections', async () => {
@@ -105,6 +108,47 @@ describe('websocket', () => {
     await Promise.all([a.close(), a2.close(), b.close()]);
   });
 
+  it('stops sending household events to a revoked device at once', async () => {
+    // Long heartbeat and pairing check: only the check before each delivery can catch it.
+    const own = await createTestServer({ heartbeatMs: 60_000, pairingCheckMs: 60_000 });
+    try {
+      const ownBase = await listen(own);
+      const ken = await own.register('Ken');
+      const aiko = await own.register('Aiko');
+      const revoked = await openSocket(ownBase, ken.deviceToken);
+      const kept = await openSocket(ownBase, aiko.deviceToken);
+      await kept.events.next(isPresence(ken.memberId, true));
+
+      // `admin revoke Ken`, from another process, then Aiko writes right away.
+      own.store.revokeDevices(ken.memberId);
+      await own.app.inject({
+        method: 'POST',
+        url: '/api/messages',
+        headers: bearer(aiko.deviceToken),
+        payload: { clientId: 'after-revoke', kind: 'text', text: 'もしもし' },
+      });
+      assert.equal(await revoked.closed, WS_CLOSE_UNPAIRED);
+      assert.equal(revoked.events.all.some((e) => e.type === 'message'), false);
+      await kept.events.next((e) => e.type === 'message');
+      await kept.close();
+    } finally {
+      await own.close();
+    }
+  });
+
+  it('closes a revoked device within seconds even when nothing is sent', async () => {
+    const own = await createTestServer({ heartbeatMs: 60_000, pairingCheckMs: 20 });
+    try {
+      const ownBase = await listen(own);
+      const ken = await own.register('Ken');
+      const socket = await openSocket(ownBase, ken.deviceToken);
+      own.store.revokeDevices(ken.memberId);
+      assert.equal(await socket.closed, WS_CLOSE_UNPAIRED);
+    } finally {
+      await own.close();
+    }
+  });
+
   it('disconnects devices signed out with the admin CLI', async () => {
     const own = await createTestServer({ heartbeatMs: 20 });
     try {
@@ -113,13 +157,9 @@ describe('websocket', () => {
       const b = await own.register('Aiko');
       const kept = await openSocket(ownBase, a.deviceToken);
       const revoked = await openSocket(ownBase, b.deviceToken);
-      const code = new Promise<number>((resolve) =>
-        revoked.ws.addEventListener('close', (e) => resolve(e.code), { once: true }),
-      );
-
       // What `admin revoke` does, from another process.
       own.store.revokeDevices(b.memberId);
-      assert.equal(await code, WS_CLOSE_UNPAIRED);
+      assert.equal(await revoked.closed, WS_CLOSE_UNPAIRED);
       await kept.events.next(isPresence(b.memberId, false));
       await tick(60);
       assert.equal(kept.ws.readyState, WebSocket.OPEN);
@@ -127,6 +167,19 @@ describe('websocket', () => {
     } finally {
       await own.close();
     }
+  });
+
+  it('accepts sockets from pages on another origin', async () => {
+    // The app opened from one address can use the home server at another (Advanced: server address).
+    const { WebSocket: NodeWebSocket } = await import('ws');
+    const socket = new NodeWebSocket(`${base}/api/ws?token=${encodeURIComponent(carter.deviceToken)}`, {
+      headers: { origin: 'http://localhost:5173' },
+    });
+    await new Promise<void>((resolve, reject) => {
+      socket.once('open', () => resolve());
+      socket.once('error', reject);
+    });
+    socket.close();
   });
 
   it('closes sockets with 1001 when the server shuts down', async () => {

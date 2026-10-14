@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Switch } from '../components/home/controls.tsx';
 import { minutesForPace } from '../components/home/labels.ts';
 import { ConnectServerForm } from '../components/together/ConnectServerForm.tsx';
@@ -11,6 +11,29 @@ import '../components/home/home.css';
 
 type Step = 'welcome' | 'name' | 'kana' | 'pace' | 'connect';
 const STEPS: Step[] = ['welcome', 'name', 'kana', 'pace', 'connect'];
+
+/**
+ * Each step is its own history entry (/welcome?step=kana), so the phone's back
+ * gesture goes to the previous step like the on-screen Back, and a reload stays
+ * on the step. `depth` counts the steps pushed since onboarding opened.
+ */
+interface StepState {
+  onboardingDepth: number;
+  /** The step this entry was pushed from. */
+  from: Step;
+}
+
+const stepSearch = (step: Step) => (step === 'welcome' ? '' : `?step=${step}`);
+
+function stepOf(search: string): Step {
+  const step = new URLSearchParams(search).get('step') as Step | null;
+  return step && STEPS.includes(step) ? step : 'welcome';
+}
+
+function stepState(state: unknown): StepState | undefined {
+  const s = state as Partial<StepState> | null;
+  return s && typeof s.onboardingDepth === 'number' && s.from ? (s as StepState) : undefined;
+}
 
 const PACES = [
   { value: 3, title: 'Gentle', detail: 'Slow and steady, easy to keep up' },
@@ -49,7 +72,12 @@ function StepFrame({ hero, title, lead, children, footer }: {
 
 export default function Onboarding() {
   const navigate = useNavigate();
-  const [step, setStep] = useState<Step>('welcome');
+  const location = useLocation();
+  const step = stepOf(location.search);
+  const entry = stepState(location.state);
+  const depth = entry?.onboardingDepth ?? 0;
+  const [loaded, setLoaded] = useState(false);
+  const [done, setDone] = useState(false);
   const [name, setName] = useState('');
   const [knowsHiragana, setKnowsHiragana] = useState(false);
   const [knowsKatakana, setKnowsKatakana] = useState(false);
@@ -63,7 +91,9 @@ export default function Onboarding() {
   useEffect(() => {
     let live = true;
     void getSettings().then((s) => {
-      if (!live || edited.current) return;
+      if (!live) return;
+      setLoaded(true);
+      if (edited.current) return;
       setName(s.name);
       setKnowsHiragana(s.knowsHiragana);
       setKnowsKatakana(s.knowsKatakana);
@@ -73,8 +103,18 @@ export default function Onboarding() {
   }, []);
 
   const index = STEPS.indexOf(step);
-  const go = (to: Step) => { edited.current = true; setError(undefined); setStep(to); };
-  const back = () => go(STEPS[Math.max(0, index - 1)]);
+  const go = (to: Step) => {
+    edited.current = true;
+    setError(undefined);
+    navigate({ search: stepSearch(to) }, { state: { onboardingDepth: depth + 1, from: step } satisfies StepState });
+  };
+  const back = () => {
+    const previous = STEPS[Math.max(0, index - 1)];
+    setError(undefined);
+    // Same as the system back gesture when the previous entry is the previous step.
+    if (entry?.from === previous) navigate(-1);
+    else navigate({ search: stepSearch(previous) }, { replace: true, state: location.state });
+  };
 
   const choices = () => ({
     name: name.trim(),
@@ -105,7 +145,11 @@ export default function Onboarding() {
       if (knowsHiragana || knowsKatakana) await applyKnownKana();
       await updateSettings({ onboarded: true });
       void requestPersistentStorage();
-      navigate('/', { replace: true });
+      setDone(true);
+      // Back past the steps to where onboarding began, which then becomes Today
+      // (below), so the back gesture on Today doesn't walk through old steps.
+      if (depth > 0) navigate(-depth);
+      else navigate('/', { replace: true });
     } catch {
       finished.current = false;
       setFinishing(false);
@@ -117,6 +161,12 @@ export default function Onboarding() {
     e.preventDefault();
     if (name.trim()) void saveChoices('kana');
   };
+
+  if (done && depth === 0) return <Navigate to="/" replace />;
+  // Later steps need the name (pairing uses it): a reload or link there without one starts at the name.
+  if (loaded && !done && index > STEPS.indexOf('name') && !name.trim()) {
+    return <Navigate to={{ search: stepSearch('name') }} replace />;
+  }
 
   let body: ReactNode;
   switch (step) {

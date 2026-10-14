@@ -3,7 +3,8 @@
 //   docker compose exec issho node server/src/admin.ts list
 // It opens the server's own database and is safe while the server runs: SQLite's WAL mode lets
 // both read at once, and each waits its turn to write. Changes show on the phones at their next
-// refresh; revoked devices are cut off at their next request.
+// refresh; revoked devices are cut off at their next request, and their open connection (live
+// chat and presence) within a few seconds.
 
 import { existsSync } from 'node:fs';
 import { unlink } from 'node:fs/promises';

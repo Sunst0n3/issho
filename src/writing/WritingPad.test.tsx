@@ -1,6 +1,7 @@
 import { act, cleanup, fireEvent, render } from '@testing-library/react';
 import { createRef, StrictMode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { db, updateSettings } from '../lib/db.ts';
 import { STROKE_FIXTURES } from './fixtures.ts';
 import { samplePath, type Point } from './path.ts';
 import { WritingPad, type WritingPadHandle } from './WritingPad.tsx';
@@ -302,5 +303,33 @@ describe('WritingPad', () => {
       draw(svg, samplePath(d, 9).map((p) => ({ x: p.x + 2, y: p.y - 1.5 })));
     }
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ mistakes: 0, strokeCount: 4, gaveUp: false }));
+  });
+
+  it('is stricter for a stylus (Settings → I write with), unless a leniency is passed', async () => {
+    // 24 units to the right: close enough for a finger, not for a pen.
+    const shifted = strokePoints(HITO[0]).map((p) => ({ x: p.x + 24, y: p.y }));
+    const settle = () => act(async () => { await new Promise((r) => setTimeout(r, 30)); });
+    try {
+      const finger = setup();
+      await settle();
+      draw(finger.svg, shifted);
+      expect(finger.onStrokeResult).toHaveBeenLastCalledWith(0, true, expect.anything());
+      cleanup();
+
+      await updateSettings({ writingHand: 'stylus' });
+      const stylus = setup();
+      await settle();
+      draw(stylus.svg, shifted);
+      expect(stylus.onStrokeResult).toHaveBeenLastCalledWith(0, false, expect.anything());
+      cleanup();
+
+      const onStrokeResult = vi.fn();
+      const view = render(<WritingPad strokes={HITO} mode="trace" label="人" leniency={1} onStrokeResult={onStrokeResult} />);
+      await settle();
+      draw(view.getByRole('img'), shifted);
+      expect(onStrokeResult).toHaveBeenLastCalledWith(0, true, expect.anything());
+    } finally {
+      await db.settings.clear();
+    }
   });
 });

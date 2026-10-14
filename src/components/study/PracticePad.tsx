@@ -6,6 +6,8 @@ import { StrokeAnimation } from '../../writing/StrokeOrder.tsx';
 import { useStrokes } from '../../writing/useStrokes.ts';
 import { WritingPad, type WritingMode, type WritingPadHandle } from '../../writing/WritingPad.tsx';
 import { Icon } from '../ui.tsx';
+import { padLabel } from './learn/WriteSteps.tsx';
+import { useFocusHeading } from './focus.ts';
 import { CoachText, PadTools, useStrokeCoach } from './StrokeCoach.tsx';
 import { useStudyTimer } from './time.ts';
 
@@ -42,13 +44,22 @@ export function ModeSwitch({ mode, onChange }: { mode: PracticeMode; onChange: (
   );
 }
 
-export function PracticePad({ char, ask, target }: { char: string; ask: string; target: ReactNode }) {
+export function PracticePad({ char, ask, target, label }: {
+  char: string;
+  ask: string;
+  target: ReactNode;
+  /** `target` as plain text ('the kanji for "water" (みず)'), for the pad's accessible name. */
+  label?: string;
+}) {
   useStudyTimer();
   const { strokes, loading, missing, error } = useStrokes(char);
   const [mode, setMode] = useState<PracticeMode>(savedMode);
   const [revealed, setRevealed] = useState(false);
   const [done, setDone] = useState(false);
   const pad = useRef<WritingPadHandle>(null);
+  const root = useRef<HTMLElement>(null);
+  // Opened from a tile that is now gone: focus the prompt rather than leaving it on the page.
+  useFocusHeading(root, char);
   const padMode: WritingMode = mode === 'paper' ? 'memory' : mode;
   const coach = useStrokeCoach(strokes ?? NO_STROKES, padMode);
 
@@ -71,7 +82,7 @@ export function PracticePad({ char, ask, target }: { char: string; ask: string; 
 
   const noPad = !strokes || missing || error;
   return (
-    <section className="st-write" aria-label={`Practise writing ${char}`}>
+    <section className="st-write" aria-label={`Practice writing ${char}`} ref={root}>
       <div className="st-write-prompt">
         <h2 className="st-ask">{ask}</h2>
         <p className="st-write-target">{target}</p>
@@ -84,7 +95,12 @@ export function PracticePad({ char, ask, target }: { char: string; ask: string; 
         <div className="st-paper">
           {noPad && <p className="muted">There is no stroke guide for this character yet.</p>}
           {revealed && strokes ? (
-            <StrokeAnimation strokes={strokes} label={char} />
+            <>
+              <StrokeAnimation strokes={strokes} label={char} />
+              <button type="button" className="btn secondary block" onClick={() => setRevealed(false)}>
+                <Icon name="refresh" size={18} />Write it again
+              </button>
+            </>
           ) : (
             <>
               <p className="card st-paper-note">Write it on paper, then check it against the stroke order.</p>
@@ -98,7 +114,7 @@ export function PracticePad({ char, ask, target }: { char: string; ask: string; 
         </div>
       ) : (
         <>
-          <WritingPad ref={pad} strokes={strokes} mode={padMode} label={char}
+          <WritingPad ref={pad} strokes={strokes} mode={padMode} label={padLabel(char, padMode, label)}
             onStrokeResult={coach.onStrokeResult}
             onComplete={(r) => {
               setDone(true);
@@ -112,7 +128,7 @@ export function PracticePad({ char, ask, target }: { char: string; ask: string; 
               <Icon name="refresh" size={18} />Write it again
             </button>
           ) : (
-            <PadTools pad={pad} onClear={coach.reset} />
+            <PadTools pad={pad} coach={coach} onClear={coach.reset} />
           )}
         </>
       )}

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 import type { HealthResponse } from '../../shared/api.ts';
 import { bearerToken, hashToken, safeEqual } from '../src/auth.ts';
+import { WS_CLOSE_UNPAIRED } from '../src/hub.ts';
 import { bearer, createTestServer, HOUSEHOLD_CODE, type TestServer } from './helpers.ts';
 
 describe('auth helpers', () => {
@@ -175,11 +176,13 @@ describe('protected routes', () => {
     ['POST', '/api/quizzes/6f1c0b8e-6a7d-4d1e-9d55-0c1c7a1f4f00/result'],
     ['POST', '/api/ai/check'],
     ['POST', '/api/ai/translate'],
+    ['PATCH', '/api/me'],
+    ['POST', '/api/signout'],
   ];
 
   for (const [method, url] of routes) {
     it(`${method} ${url} needs a device token`, async () => {
-      const missing = await server.app.inject({ method: method as 'GET', url, payload: method === 'POST' ? {} : undefined });
+      const missing = await server.app.inject({ method: method as 'GET', url, payload: method === 'GET' ? undefined : {} });
       assert.equal(missing.statusCode, 401);
       assert.deepEqual(missing.json(), { error: 'unauthorized' });
 
@@ -198,9 +201,21 @@ describe('protected routes', () => {
     assert.equal(res.statusCode, 401);
   });
 
-  it('refuses WebSocket upgrades without a valid token', async () => {
-    await assert.rejects(server.app.injectWS('/api/ws'), /401/);
-    await assert.rejects(server.app.injectWS(`/api/ws?token=${'A'.repeat(43)}`), /401/);
+  it('closes WebSockets without a valid token as unpaired, which a browser can see', async () => {
+    // An HTTP 401 instead of the upgrade reaches a browser only as close code 1006, which looks
+    // like a network problem: the phone would retry forever instead of offering to pair again.
+    for (const url of ['/api/ws', `/api/ws?token=${'A'.repeat(43)}`, '/api/ws?token=short']) {
+      let closed!: Promise<number>;
+      await server.app.injectWS(url, {}, {
+        onInit(socket) {
+          closed = new Promise((resolve) => socket.once('close', (code) => resolve(code)));
+        },
+      });
+      assert.equal(await closed, WS_CLOSE_UNPAIRED, url);
+    }
+    // A plain GET (no upgrade) is still just unauthorized.
+    const plain = await server.app.inject({ method: 'GET', url: `/api/ws?token=${'A'.repeat(43)}` });
+    assert.equal(plain.statusCode, 401);
   });
 
   it('updates lastSeenAt on authenticated requests', async () => {

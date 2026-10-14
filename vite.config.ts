@@ -11,8 +11,11 @@ export default defineConfig({
     VitePWA({
       registerType: 'prompt',
       injectRegister: false,
-      includeAssets: ['icons/*.png', 'icons/*.svg'],
+      // The icons are precached by globPatterns below; listing them again (includeAssets, or
+      // the manifest's icons) would precache each twice.
+      includeManifestIcons: false,
       manifest: {
+        id: '/',
         name: 'Issho — Japanese together',
         short_name: 'Issho',
         description: 'Learn Japanese together: kanji writing, reviews, reading and chat.',
@@ -30,7 +33,11 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,webmanifest,json}'],
+        // manifest.webmanifest is added by the plugin itself.
+        globPatterns: ['**/*.{js,css,html,svg,png,json}'],
+        // On first install the new service worker takes over the open page, so the app works
+        // offline without a reload. Updates still wait for "Reload" (no skipWaiting).
+        clientsClaim: true,
         maximumFileSizeToCacheInBytes: 12 * 1024 * 1024,
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//],

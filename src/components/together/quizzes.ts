@@ -34,11 +34,18 @@ function readCache(): Pick<QuizzesState, 'data' | 'fetchedAt'> {
 let state: QuizzesState = { loading: false, ...readCache() };
 const listeners = new Set<() => void>();
 
+function notify() {
+  for (const cb of [...listeners]) cb();
+}
+
 function setState(patch: Partial<QuizzesState>) {
   state = { ...state, ...patch };
   if (patch.data) writeJson(STORAGE_KEYS.quizzes, { data: state.data, fetchedAt: state.fetchedAt });
-  for (const cb of [...listeners]) cb();
+  notify();
 }
+
+/** What became of scores that waited offline, once a flush delivered them or the server refused them. */
+const settled = new Map<string, 'sent' | 'failed'>();
 
 function pendingResults(): PendingResult[] {
   const list = readJson<unknown>(STORAGE_KEYS.quizResults, []);
@@ -86,12 +93,15 @@ export function flushQuizResults(): Promise<void> {
     for (const p of pendingResults()) {
       try {
         const saved = await submitQuizResult(p.id, { correct: p.correct, total: p.total, missed: p.missed });
+        settled.set(p.id, 'sent');
         savePendingResults(pendingResults().filter((x) => x.id !== p.id));
         await rememberQuiz(saved);
       } catch (e) {
         // A rejected result (say, the quiz is gone) will never go through; anything else waits for later.
         if (e instanceof ApiError && !e.transient && e.status !== 401 && e.code !== 'unpaired') {
+          settled.set(p.id, 'failed');
           savePendingResults(pendingResults().filter((x) => x.id !== p.id));
+          notify();
           continue;
         }
         return;
@@ -131,9 +141,27 @@ export async function finishQuiz(quiz: Quiz, result: QuizResultRequest): Promise
     return 'sent';
   } catch (e) {
     if (e instanceof ApiError && !e.transient && e.status !== 401 && e.code !== 'unpaired') throw e;
+    settled.delete(quiz.id);
     savePendingResults([...pendingResults().filter((p) => p.id !== quiz.id), { id: quiz.id, ...result, finishedAt }]);
     return 'queued';
   }
+}
+
+export type ResultDelivery = 'queued' | 'sent' | 'failed';
+
+/**
+ * Where a score that finishQuiz() queued stands now: still 'queued', then 'sent' once a
+ * flush delivered it, or 'failed' if the server refused it. Undefined if it never queued.
+ */
+export function resultDelivery(id: string): ResultDelivery | undefined {
+  if (pendingResults().some((p) => p.id === id)) return 'queued';
+  return settled.get(id);
+}
+
+/** resultDelivery(id), kept current while the screen is open. */
+export function useResultDelivery(id: string): ResultDelivery | undefined {
+  const read = () => resultDelivery(id);
+  return useSyncExternalStore(subscribe, read, read);
 }
 
 export function findQuiz(id: string): Quiz | undefined {
@@ -158,7 +186,8 @@ export function useQuizzes(): QuizzesState & { refresh: () => Promise<void> } {
 /** For tests: forget everything held in memory. */
 export function resetQuizzes(): void {
   state = { loading: false, ...readCache() };
-  for (const cb of [...listeners]) cb();
+  settled.clear();
+  notify();
 }
 
 onServerEvent((ev) => {

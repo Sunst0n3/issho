@@ -1,5 +1,5 @@
 // Public surface of the handwriting engine.
-export { WritingPad, AUTO_HINT_AFTER } from './WritingPad.tsx';
+export { WritingPad, AUTO_HINT_AFTER, STYLUS_LENIENCY } from './WritingPad.tsx';
 export type { WritingMode, WritingPadHandle, WritingPadProps, WritingResult } from './WritingPad.tsx';
 export { StrokeAnimation, StrokeOrderStrip } from './StrokeOrder.tsx';
 export { useStrokes } from './useStrokes.ts';

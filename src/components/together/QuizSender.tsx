@@ -1,11 +1,13 @@
 // "Quiz each other": sends the partner the kanji this learner misses most,
 // after showing exactly which ones will go.
 
-import { useId, useState, type ReactNode } from 'react';
+import { useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { hardestKanji } from '../../srs/progress.ts';
 import { ApiError, createQuiz } from '../../sync/client.ts';
 import { Glyph } from '../Glyph.tsx';
 import { Icon } from '../ui.tsx';
+import { focusLost } from './focus.ts';
+import { midSentence } from './household.ts';
 import { rememberQuiz } from './quizzes.ts';
 
 const QUIZ_SIZE = 5;
@@ -26,17 +28,38 @@ function sendErrorMessage(e: unknown): string {
   return "The quiz didn't send. Try again in a moment.";
 }
 
-export function QuizSender({ partnerId, partnerName, heading = 'Quiz each other', children }: {
+export function QuizSender({ partnerId, partnerName, heading = 'Quiz each other', householdKnown = true, children }: {
   partnerId?: string;
   partnerName: string;
   heading?: string;
+  /**
+   * Whether the household has been loaded at all. Without it (offline with nothing
+   * cached) a missing partnerId doesn't mean the partner hasn't joined.
+   */
+  householdKnown?: boolean;
   /** Quiz lists (inbox, results) shown under the sender. */
   children?: ReactNode;
 }) {
   const id = useId();
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' });
+  const them = midSentence(partnerName);
+
+  // Each step replaces or switches off the button that was pressed: keep focus in the card.
+  const touched = useRef(false);
+  const startRef = useRef<HTMLButtonElement>(null);
+  const questionRef = useRef<HTMLParagraphElement>(null);
+  const sendRef = useRef<HTMLButtonElement>(null);
+  useLayoutEffect(() => {
+    if (!touched.current || !focusLost()) return;
+    const target = phase.kind === 'confirm' ? questionRef.current
+      : phase.kind === 'error' && 'chars' in phase && phase.chars ? sendRef.current
+        : phase.kind === 'loading' || phase.kind === 'sending' ? null
+          : startRef.current;
+    target?.focus();
+  }, [phase]);
 
   const pick = async () => {
+    touched.current = true;
     setPhase({ kind: 'loading' });
     const hard = await hardestKanji(QUIZ_SIZE).catch(() => []);
     setPhase(hard.length ? { kind: 'confirm', chars: hard.map((k) => k.char) } : { kind: 'empty' });
@@ -68,12 +91,14 @@ export function QuizSender({ partnerId, partnerName, heading = 'Quiz each other'
           <h3 id={`${id}-title`}>{heading}</h3>
           <p>
             {partnerId
-              ? `Send ${partnerName} the ${QUIZ_SIZE} kanji you miss most.`
-              : 'Once your partner joins, you can send them the kanji you miss most.'}
+              ? `Send ${them} the ${QUIZ_SIZE} kanji you miss most.`
+              : householdKnown
+                ? 'Once your partner joins, you can send them the kanji you miss most.'
+                : 'Quizzes need your home server. You can send one once this phone connects.'}
           </p>
         </div>
         {!choosing && (
-          <button type="button" className="btn secondary small" onClick={pick}
+          <button ref={startRef} type="button" className="btn secondary small" onClick={pick}
             disabled={!partnerId || phase.kind === 'loading'}>
             {phase.kind === 'sent' ? 'Send more' : 'Send'}
           </button>
@@ -82,12 +107,12 @@ export function QuizSender({ partnerId, partnerName, heading = 'Quiz each other'
 
       {choosing && chars && (
         <div className="tg-quiz-confirm">
-          <p>Send {chars.length === 1 ? 'this kanji' : `these ${chars.length} kanji`} to {partnerName}?</p>
+          <p ref={questionRef} tabIndex={-1}>Send {chars.length === 1 ? 'this kanji' : `these ${chars.length} kanji`} to {them}?</p>
           <ul className="tg-kanji-row" aria-label="Kanji in the quiz">
             {chars.map((c) => <li key={c} className="tg-kanji-tile"><Glyph char={c} size={30} /></li>)}
           </ul>
           <div className="tg-button-row">
-            <button type="button" className="btn indigo small" onClick={() => send(chars)} disabled={phase.kind === 'sending'}>
+            <button ref={sendRef} type="button" className="btn indigo small" onClick={() => send(chars)} disabled={phase.kind === 'sending'}>
               {phase.kind === 'sending' ? 'Sending…' : 'Send quiz'}
             </button>
             <button type="button" className="btn ghost small" onClick={() => setPhase({ kind: 'idle' })}
@@ -103,7 +128,7 @@ export function QuizSender({ partnerId, partnerName, heading = 'Quiz each other'
       )}
       {phase.kind === 'sent' && (
         <p className="tg-quiz-note" role="status">
-          <Icon name="check" size={16} /> Sent to {partnerName}. Their score shows up here when they finish.
+          <Icon name="check" size={16} /> Sent to {them}. Their score shows up here when they finish.
         </p>
       )}
       {phase.kind === 'error' && <p className="tg-quiz-note tg-error" role="alert">{phase.message}</p>}

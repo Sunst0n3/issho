@@ -192,9 +192,14 @@ export async function importBackup(file: Blob): Promise<BackupImport> {
       const mergeChat = restoresChat(current);
       // Keep this device's pairing; an unpaired device stays unpaired (the backup
       // has no token, so its member details would be dangling).
+      // lastPairing says which household this phone's chat cache and outbox belong to, so it
+      // is this phone's too, in both cases.
       const pairing: Partial<Settings> = current.deviceToken
-        ? { serverUrl: current.serverUrl, deviceToken: current.deviceToken, memberId: current.memberId, householdName: current.householdName }
-        : { deviceToken: undefined, memberId: undefined, householdName: undefined };
+        ? {
+          serverUrl: current.serverUrl, deviceToken: current.deviceToken, memberId: current.memberId,
+          householdName: current.householdName, lastPairing: current.lastPairing,
+        }
+        : { deviceToken: undefined, memberId: undefined, householdName: undefined, lastPairing: current.lastPairing };
       // A backup made before onboarding has no settings row; keep this device's.
       const settings = backupSettings.length ? backupSettings.map((s) => ({ ...s, ...pairing })) : [current];
       await db.transaction('rw', db.tables, async () => {

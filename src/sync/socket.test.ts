@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { WS_CLOSE_UNPAIRED, type ServerEvent } from '../../shared/api.ts';
 import { db, getSettings, updateSettings } from '../lib/db.ts';
-import { wasRemoved } from './client.ts';
+import { serverReached, wasRemoved } from './client.ts';
 import {
   connectSocket,
   disconnectSocket,
@@ -122,6 +122,24 @@ describe('reconnecting', () => {
     expect(FakeSocket.instances).toHaveLength(count);
     vi.advanceTimersByTime(1);
     expect(FakeSocket.instances).toHaveLength(count + 1);
+  });
+
+  it('reconnects at once when the server answers an HTTP request (e.g. "Try again")', () => {
+    connectSocket(URL_A);
+    FakeSocket.latest().drop();
+    expect(getServerStatus()).toBe('offline');
+    serverReached();
+    expect(FakeSocket.instances).toHaveLength(2);
+    expect(getServerStatus()).toBe('connecting');
+    FakeSocket.latest().accept();
+    expect(getServerStatus()).toBe('online');
+
+    // Nothing to do while connected or connecting.
+    serverReached();
+    expect(FakeSocket.instances).toHaveLength(2);
+    // No double socket once the pending backoff timer fires.
+    vi.advanceTimersByTime(60_000);
+    expect(FakeSocket.instances).toHaveLength(2);
   });
 
   it('stops reconnecting after disconnectSocket()', () => {

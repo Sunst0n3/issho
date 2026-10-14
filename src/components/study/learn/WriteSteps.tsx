@@ -38,11 +38,21 @@ function PassSteps({ passes, at, done }: { passes: readonly WritingMode[]; at: n
   );
 }
 
-export function WriteSteps({ char, passes = ALL_PASSES, ask, target, onDone, onSkip }: {
+/**
+ * The pad's accessible name: the character while it is shown to trace, else
+ * what to write ('the kanji for "water" (みず)') so the name doesn't give it away.
+ */
+export function padLabel(char: string, mode: WritingMode, label?: string): string {
+  return mode === 'trace' || !label ? char : label;
+}
+
+export function WriteSteps({ char, passes = ALL_PASSES, ask, target, label, onDone, onSkip }: {
   char: string;
   passes?: readonly WritingMode[];
   ask: string;
   target: ReactNode;
+  /** `target` as plain text, for the pad's accessible name. */
+  label?: string;
   onDone: () => void;
   onSkip: () => void;
 }) {
@@ -100,10 +110,10 @@ export function WriteSteps({ char, passes = ALL_PASSES, ask, target, onDone, onS
         <p className="st-write-target">{target}</p>
       </div>
       <PassSteps passes={passes} at={at} done={status === 'done'} />
-      <WritingPad ref={pad} strokes={strokes} mode={mode} label={char}
+      <WritingPad ref={pad} strokes={strokes} mode={mode} label={padLabel(char, mode, label)}
         onStrokeResult={coach.onStrokeResult} onComplete={complete} disabled={status !== 'writing'} />
       <CoachText line={coach.line} />
-      <PadTools pad={pad} disabled={status !== 'writing'} onClear={coach.reset} />
+      <PadTools pad={pad} coach={coach} disabled={status !== 'writing'} onClear={coach.reset} />
       {mode === 'memory' && status === 'done' && (
         <details className="st-strip-peek">
           <summary>Stroke order</summary>

@@ -1,5 +1,5 @@
 // Settings: backup, restore and reset (Data), and About.
-import { useRef, useState, type ChangeEvent } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { version } from '../../../package.json';
 import { BackupError, backupFileName, exportBackup, importBackup, type BackupImport } from '../../lib/backup.ts';
 import { db, getSettings } from '../../lib/db.ts';
@@ -48,6 +48,23 @@ export function DataSection() {
   const [restore, setRestore] = useState<BackupImport>();
   const [resetOpen, setResetOpen] = useState(false);
   const [typed, setTyped] = useState('');
+  const resetWord = useRef<HTMLInputElement>(null);
+  const resetButton = useRef<HTMLButtonElement>(null);
+  const restoreTitle = useRef<HTMLParagraphElement>(null);
+  const wasResetOpen = useRef(false);
+
+  // The reset button is replaced by its confirmation: focus moves to the field
+  // to type in, and back to the button when the confirmation closes.
+  useEffect(() => {
+    if (resetOpen) resetWord.current?.focus();
+    else if (wasResetOpen.current) resetButton.current?.focus();
+    wasResetOpen.current = resetOpen;
+  }, [resetOpen]);
+
+  // A checked backup asks for confirmation: take focus there.
+  useEffect(() => {
+    if (restore) restoreTitle.current?.focus();
+  }, [restore]);
 
   const run = async (work: () => Promise<Message>) => {
     setBusy(true);
@@ -113,7 +130,9 @@ export function DataSection() {
 
       {restore && (
         <div className="set-row set-confirm" role="group" aria-labelledby="set-restore-title">
-          <p id="set-restore-title" className="hm-field-label">Restore the backup from {DATE.format(restore.exportedAt)}?</p>
+          <p id="set-restore-title" ref={restoreTitle} tabIndex={-1} className="hm-field-label set-confirm-title">
+            Restore the backup from {DATE.format(restore.exportedAt)}?
+          </p>
           <p className="hm-hint">
             This replaces all progress on this phone with the backup
             ({plural(restore.counts.items ?? 0, 'item')}, {plural(restore.counts.reviewLogs ?? 0, 'review')}).
@@ -140,7 +159,7 @@ export function DataSection() {
             </p>
             <div className="hm-field">
               <label className="hm-field-label" htmlFor="set-reset-word">Type “reset” to confirm</label>
-              <input id="set-reset-word" className="text-input" value={typed} autoComplete="off" autoCapitalize="none"
+              <input ref={resetWord} id="set-reset-word" className="text-input" value={typed} autoComplete="off" autoCapitalize="none"
                 autoCorrect="off" spellCheck={false} onChange={(e) => setTyped(e.target.value)} />
             </div>
             <div className="set-confirm-actions">
@@ -153,7 +172,7 @@ export function DataSection() {
             </div>
           </div>
         ) : (
-          <button type="button" className="btn secondary small set-danger"
+          <button ref={resetButton} type="button" className="btn secondary small set-danger"
             onClick={() => { setRestore(undefined); setMessage(undefined); setResetOpen(true); }}>
             Reset all progress
           </button>
@@ -183,16 +202,22 @@ export function AboutSection() {
         <p className="hm-field-label">Credits</p>
         <ul className="set-credits">
           <li>
-            Stroke order: <a href="https://kanjivg.tagaini.net/" {...ext}>KanjiVG</a> © Ulrich Apel,{' '}
-            <a href="https://creativecommons.org/licenses/by-sa/3.0/" {...ext}>CC BY-SA 3.0</a>
+            <p>Stroke order: KanjiVG © Ulrich Apel, CC BY-SA 3.0</p>
+            <p className="set-credit-links">
+              <a href="https://kanjivg.tagaini.net/" {...ext}>KanjiVG</a>
+              <a href="https://creativecommons.org/licenses/by-sa/3.0/" {...ext}>CC BY-SA 3.0</a>
+            </p>
           </li>
           <li>
-            Kanji and words: <a href="https://www.edrdg.org/wiki/index.php/KANJIDIC_Project" {...ext}>KANJIDIC2</a> and{' '}
-            <a href="https://www.edrdg.org/jmdict/j_jmdict.html" {...ext}>JMdict</a> ©{' '}
-            <a href="https://www.edrdg.org/" {...ext}>EDRDG</a>,{' '}
-            <a href="https://creativecommons.org/licenses/by-sa/4.0/" {...ext}>CC BY-SA 4.0</a>
+            <p>Kanji and words: KANJIDIC2 and JMdict © EDRDG, CC BY-SA 4.0</p>
+            <p className="set-credit-links">
+              <a href="https://www.edrdg.org/wiki/index.php/KANJIDIC_Project" {...ext}>KANJIDIC2</a>
+              <a href="https://www.edrdg.org/jmdict/j_jmdict.html" {...ext}>JMdict</a>
+              <a href="https://www.edrdg.org/" {...ext}>EDRDG</a>
+              <a href="https://creativecommons.org/licenses/by-sa/4.0/" {...ext}>CC BY-SA 4.0</a>
+            </p>
           </li>
-          <li>Fonts: Shippori Mincho and Zen Kaku Gothic New, SIL Open Font License</li>
+          <li><p>Fonts: Shippori Mincho and Zen Kaku Gothic New, SIL Open Font License</p></li>
         </ul>
       </div>
     </SettingsSection>

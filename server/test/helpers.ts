@@ -34,6 +34,9 @@ export interface TestServerOptions {
    */
   fileStore?: boolean;
   heartbeatMs?: number;
+  pairingCheckMs?: number;
+  /** Compress the built app's files in the background, as the real server does (default false). */
+  precompress?: boolean;
 }
 
 export async function createTestServer(options: TestServerOptions = {}): Promise<TestServer> {
@@ -52,6 +55,8 @@ export async function createTestServer(options: TestServerOptions = {}): Promise
     now: options.now,
     logger: captureLogs(options.logLines),
     heartbeatMs: options.heartbeatMs,
+    pairingCheckMs: options.pairingCheckMs,
+    precompress: options.precompress ?? false,
   });
   await app.ready();
 
@@ -132,7 +137,7 @@ export async function openSocket(base: string, token: string, path = '/api/ws') 
   const ws = new WebSocket(`${base}${path}?token=${encodeURIComponent(token)}`);
   // Subscribe before the socket opens: the server sends presence right after the upgrade.
   const events = collectEvents((onText) => ws.addEventListener('message', (e) => onText(String(e.data))));
-  const closed = new Promise<void>((resolve) => ws.addEventListener('close', () => resolve(), { once: true }));
+  const closed = new Promise<number>((resolve) => ws.addEventListener('close', (e) => resolve(e.code), { once: true }));
   await new Promise<void>((resolve, reject) => {
     ws.addEventListener('open', () => resolve(), { once: true });
     ws.addEventListener('error', () => reject(new Error('websocket failed to open')), { once: true });
@@ -140,6 +145,8 @@ export async function openSocket(base: string, token: string, path = '/api/ws') 
   return {
     ws,
     events,
+    /** Resolves with the close code once the socket closes. */
+    closed,
     send: (event: unknown) => ws.send(typeof event === 'string' ? event : JSON.stringify(event)),
     async close() {
       ws.close();

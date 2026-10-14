@@ -33,7 +33,11 @@ export function SessionPanel({ plan, todayDone, courseFinished }: {
       <section className="plan-panel" aria-labelledby="session-title">
         <p className="plan-eyebrow" lang="ja">おつかれさま</p>
         <h2 id="session-title" className="plan-title">Done for today</h2>
-        <p className="plan-copy">Nice work. Your next reviews will be waiting tomorrow.</p>
+        <p className="plan-copy">
+          {plan.reviews.length > 0
+            ? "Nice work: today's session is done. Extra reviews are up to you."
+            : 'Nice work. Your next reviews will be waiting tomorrow.'}
+        </p>
         {plan.reviews.length > 0 && (
           <Link to="/session" className="plan-more">
             {plural(plan.reviews.length, 'more review')} ready if you want to keep going
@@ -52,7 +56,9 @@ export function SessionPanel({ plan, todayDone, courseFinished }: {
           <>
             <h2 id="session-title" className="plan-title">You've met every kanji</h2>
             <p className="plan-copy">
-              That's the whole course. Reviews keep coming as they fall due, and there's always more to read.
+              {plan.backlog > 0
+                ? `You've reached today's review limit. ${plural(plan.backlog, 'more review')} will wait for tomorrow.`
+                : "Reviews keep coming as they fall due, and there's always more to read."}
             </p>
           </>
         ) : plan.backlog > 0 ? (

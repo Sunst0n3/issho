@@ -40,8 +40,8 @@ function PhaseCard({ progress, targets }: { progress: CourseProgress; targets: K
                 <span className="roadmap-detail">{phaseDetail(n, targets)}</span>
                 {n === current && (
                   <div className="roadmap-progress">
-                    <ProgressBar value={phaseFraction(progress, targets[4])} label={`Progress in phase ${n}`} />
-                    <span>{phaseProgressText(progress, targets[4])}</span>
+                    <ProgressBar value={phaseFraction(progress)} label={`Progress in phase ${n}`} />
+                    <span>{phaseProgressText(progress)}</span>
                   </div>
                 )}
               </div>
@@ -55,7 +55,8 @@ function PhaseCard({ progress, targets }: { progress: CourseProgress; targets: K
 
 function HubTile({ to, mark, title, sub, wide }: { to: string; mark: ReactNode; title: string; sub?: string; wide?: boolean }) {
   return (
-    <Link to={to} className={wide ? 'hub-tile wide' : 'hub-tile'}>
+    // Named explicitly: read from content, the title and the line under it run together.
+    <Link to={to} className={wide ? 'hub-tile wide' : 'hub-tile'} aria-label={sub ? `${title}, ${sub}` : title}>
       <span className="hub-mark" lang="ja" aria-hidden="true">{mark}</span>
       <span className="hub-text">
         <span className="hub-title">{title}</span>
@@ -100,9 +101,9 @@ export default function LearnHub() {
         <HubTile to="/kanji" mark="漢" title="Kanji library" wide
           sub={h ? `${plural(h.progress.kanjiIntroduced, 'kanji', 'kanji')} learned · ${h.targets[4].toLocaleString()} in all` : undefined} />
         <HubTile to="/kana" mark="あ" title="Kana chart"
-          sub={h ? `${h.progress.kanaIntroduced} of ${h.progress.kanaTotal} learned` : undefined} />
+          sub={h ? `${h.progress.kanaIntroduced} of ${h.progress.kanaTotal} kana learned` : undefined} />
         <HubTile to="/grammar" mark="は" title="Grammar"
-          sub={h ? `${h.grammarDone} of ${h.grammarTotal}` : undefined} />
+          sub={h ? `${h.grammarDone} of ${h.grammarTotal} learned` : undefined} />
         <HubTile to="/read" mark="読" title="Read & shadow" sub="Listen, read, say it back" />
         <HubTile to="/roleplay" mark="話" title="Role-plays"
           sub={h ? `${plural(h.rolePlays, 'scene')} to act out` : 'Scenes to act out'} />

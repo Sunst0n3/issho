@@ -17,11 +17,13 @@ import { Hub } from './hub.ts';
 import { RateLimiter } from './rate-limit.ts';
 import { aiRoutes } from './routes/ai.ts';
 import { healthRoutes } from './routes/health.ts';
+import { meRoutes } from './routes/me.ts';
 import { messageRoutes } from './routes/messages.ts';
 import { quizRoutes } from './routes/quizzes.ts';
 import { registerRoutes } from './routes/register.ts';
 import { statsRoutes } from './routes/stats.ts';
 import { voiceRoutes } from './routes/voice.ts';
+import { precompressStatic, removeStaleCopies } from './precompress.ts';
 import { notFoundHandler, registerStatic } from './static.ts';
 import { startVoiceCleanup } from './voice-cleanup.ts';
 import { websocketRoutes, WS_MAX_PAYLOAD, WS_PATH } from './ws.ts';
@@ -30,6 +32,8 @@ import { websocketRoutes, WS_MAX_PAYLOAD, WS_PATH } from './ws.ts';
 const JSON_BODY_LIMIT = 256 * 1024;
 const MINUTE = 60_000;
 const SOCKET_CLOSE_GRACE_MS = 2000;
+/** How long a browser may reuse a CORS preflight answer. */
+const PREFLIGHT_MAX_AGE_S = 600;
 
 const VERSION = (
   JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as { version: string }
@@ -44,6 +48,13 @@ export interface BuildAppOptions {
   logger?: FastifyServerOptions['logger'];
   /** WebSocket ping interval; tests shorten it. */
   heartbeatMs?: number;
+  /** How often open sockets are checked for revoked devices; tests shorten it. */
+  pairingCheckMs?: number;
+  /**
+   * Write compressed copies of the built app's text files in the background at startup
+   * (default true). Tests that compare compressed responses call precompressStatic() themselves.
+   */
+  precompress?: boolean;
 }
 
 /** pino options for Fastify: info level to stdout, with device tokens scrubbed from logged URLs. */
@@ -89,11 +100,25 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
   mkdirSync(ctx.voiceDir, { recursive: true });
 
   app.decorateRequest('member', null);
+  app.decorateRequest('deviceTokenHash', null);
   app.setErrorHandler(handleError);
-  app.addHook('onRequest', async (_request, reply) => {
+  app.addHook('onRequest', async (request, reply) => {
     reply.header('x-content-type-options', 'nosniff');
     reply.header('referrer-policy', 'no-referrer');
     reply.header('x-frame-options', 'DENY');
+    if (isApiPath(request.url)) allowAnyOrigin(request, reply);
+  });
+  // CORS preflight for every API route (see allowAnyOrigin).
+  app.options('/api/*', { logLevel: 'warn' }, async (request, reply) => {
+    reply
+      .header('access-control-allow-methods', 'GET, POST, PATCH, OPTIONS')
+      .header('access-control-allow-headers', 'authorization, content-type, accept')
+      .header('access-control-max-age', String(PREFLIGHT_MAX_AGE_S));
+    // Chrome asks before a public page may call a server on the home network.
+    if (request.headers['access-control-request-private-network'] === 'true') {
+      reply.header('access-control-allow-private-network', 'true');
+    }
+    return reply.code(204).send();
   });
 
   await app.register(fastifyWebsocket, {
@@ -120,6 +145,7 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
 
   await app.register(async (api) => {
     api.addHook('onRequest', authHook(ctx, (request) => bearerToken(request.headers.authorization)));
+    meRoutes(api, ctx);
     statsRoutes(api, ctx);
     messageRoutes(api, ctx);
     voiceRoutes(api, ctx);
@@ -130,11 +156,58 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
 
   const hasApp = await registerStatic(app, config.staticDir);
   app.setNotFoundHandler(notFoundHandler(hasApp));
+  if (hasApp && options.precompress !== false) await startPrecompressing(app, config.staticDir);
 
-  ctx.hub.startHeartbeat(options.heartbeatMs);
+  ctx.hub.startHeartbeat(options.heartbeatMs, options.pairingCheckMs);
   const voiceCleanup = await startVoiceCleanup({ store, voiceDir: ctx.voiceDir, now: ctx.now, log: app.log });
   app.addHook('onClose', async () => voiceCleanup.stop());
   return app;
+}
+
+function isApiPath(url: string): boolean {
+  const pathname = url.split('?')[0];
+  return pathname === '/api' || pathname.startsWith('/api/');
+}
+
+/**
+ * Lets a page from any origin read API responses, so the app opened at one address can use the
+ * home server at another ("Advanced: server address"). Safe for any origin: requests carry the
+ * device token as a bearer header, never a cookie, so another site can't act as a paired phone.
+ * Set before routing, so errors (a 401 that makes the phone pair again) are readable too.
+ */
+function allowAnyOrigin(request: FastifyRequest, reply: FastifyReply): void {
+  if (!request.headers.origin) return;
+  reply.header('access-control-allow-origin', '*');
+  reply.header('access-control-expose-headers', 'retry-after');
+}
+
+/**
+ * Compresses the built app's text files in the background (only missing or outdated copies), so
+ * the server answers at once. First, before it answers, it removes copies an older build left
+ * (quick: no compressing), so those are never served meanwhile. Can't write there (a read-only
+ * image)? Then it serves the copies made at build time, or the files as they are.
+ */
+async function startPrecompressing(app: FastifyInstance, root: string): Promise<void> {
+  try {
+    const removed = await removeStaleCopies(root);
+    if (removed > 0) app.log.info({ removed }, 'removed compressed copies of an older build');
+  } catch (e) {
+    const error = e as NodeJS.ErrnoException;
+    app.log.warn({ code: error.code, reason: error.message }, 'could not check the compressed app files');
+  }
+  const abort = new AbortController();
+  const done = precompressStatic(root, abort.signal).then(
+    ({ written }) => {
+      if (written > 0) app.log.info({ written }, 'compressed the app files');
+    },
+    (error: NodeJS.ErrnoException) => {
+      app.log.warn({ code: error.code, reason: error.message }, 'could not compress the app files; serving them as they are');
+    },
+  );
+  app.addHook('onClose', async () => {
+    abort.abort();
+    await done;
+  });
 }
 
 /** Asks every client to reconnect later (1001), then drops any that don't finish the close handshake. */

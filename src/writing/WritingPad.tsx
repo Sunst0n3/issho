@@ -15,8 +15,9 @@ import {
   type CSSProperties,
   type PointerEvent as ReactPointerEvent,
 } from 'react';
+import { useSettings } from '../lib/hooks.ts';
 import { mistakeMessage } from './describe.ts';
-import { estimateFrame, matchStrokeOf, type AcceptedStroke, type StrokeAttempt } from './matcher.ts';
+import { estimateFrame, matchStrokeOf, STYLUS_LENIENCY, type AcceptedStroke, type StrokeAttempt } from './matcher.ts';
 import { BOX, distance, inkWidth, pathLength, pathStart, polylineLength, smoothPath, startDirection, type Point } from './path.ts';
 import './writing.css';
 
@@ -60,7 +61,10 @@ export interface WritingPadProps {
   label?: string;
   /** Show the next stroke's start dot and direction arrow. Defaults to on, except in memory mode. */
   showStart?: boolean;
-  /** Matcher tolerance multiplier (see MatchOptions.leniency). */
+  /**
+   * Matcher tolerance multiplier (see MatchOptions.leniency). Defaults to the learner's
+   * Settings → I write with: STYLUS_LENIENCY for a stylus, 1 for a finger.
+   */
   leniency?: number;
   disabled?: boolean;
   className?: string;
@@ -68,6 +72,8 @@ export interface WritingPadProps {
 
 /** A second miss on the same stroke shows it automatically. */
 export const AUTO_HINT_AFTER = 2;
+
+export { STYLUS_LENIENCY };
 /**
  * Strokes shorter than this (box units) are taps: accepted when they are the
  * expected dot, otherwise ignored as stray touches and not counted as mistakes.
@@ -150,6 +156,8 @@ export const WritingPad = forwardRef<WritingPadHandle, WritingPadProps>(function
   { strokes, mode, onStrokeResult, onComplete, label, showStart, leniency, disabled = false, className },
   ref,
 ) {
+  const { writingHand } = useSettings();
+  const effectiveLeniency = leniency ?? (writingHand === 'stylus' ? STYLUS_LENIENCY : 1);
   const svgRef = useRef<SVGSVGElement>(null);
   const liveRef = useRef<SVGPathElement>(null);
   const attempt = useRef<Attempt>(freshAttempt());
@@ -261,7 +269,7 @@ export const WritingPad = forwardRef<WritingPadHandle, WritingPadProps>(function
 
     const index = at.accepted.length;
     const accepted: AcceptedStroke[] = at.accepted.map((pts, i) => ({ points: pts, target: strokes[i] }));
-    const result = matchStrokeOf(drawn, strokes, index, { frame: estimateFrame(accepted), leniency });
+    const result = matchStrokeOf(drawn, strokes, index, { frame: estimateFrame(accepted), leniency: effectiveLeniency });
     // A tap can be the expected dot; anywhere else it is a stray touch, not a mistake.
     if (!result.ok && polylineLength(drawn) < TAP_LENGTH) return;
 
@@ -295,7 +303,8 @@ export const WritingPad = forwardRef<WritingPadHandle, WritingPadProps>(function
     }, FLASH_MS);
     const autoHint = at.tries >= AUTO_HINT_AFTER;
     if (autoHint) showHint(at);
-    announce(at, `Stroke ${index + 1}: ${mistakeMessage(result, index)}${autoHint ? ` Showing stroke ${index + 1}.` : ''}`);
+    // "Watch the hint" only when a hint is drawn for this stroke.
+    announce(at, `Stroke ${index + 1}: ${mistakeMessage(result, index, autoHint || at.hintRun > 0)}${autoHint ? ` Showing stroke ${index + 1}.` : ''}`);
     rerender();
     callbacks.current.onStrokeResult?.(index, false, result);
   };

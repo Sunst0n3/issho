@@ -42,6 +42,10 @@ describe('quizzes', () => {
       [{ toMemberId: aiko.memberId, items: [] }, 'invalid_request'],
       [{ toMemberId: aiko.memberId, items: Array.from({ length: 51 }, () => ({ char: '水' })) }, 'invalid_request'],
       [{ toMemberId: 'nope', items: [{ char: '水' }] }, 'invalid_request'],
+      // One kanji per item: no kana, words or punctuation.
+      [{ toMemberId: aiko.memberId, items: [{ char: '日' }, { char: 'あ' }] }, 'invalid_request'],
+      [{ toMemberId: aiko.memberId, items: [{ char: '日本' }] }, 'invalid_request'],
+      [{ toMemberId: aiko.memberId, items: [{ char: '?' }] }, 'invalid_request'],
     ];
     for (const [payload, error] of cases) {
       const res = await create(carter.deviceToken, payload);
@@ -100,5 +104,18 @@ describe('quizzes', () => {
     assert.equal(unknown.statusCode, 404);
     const badId = await submit(aiko.deviceToken, 'not-a-uuid', { correct: 0, total: 0, missed: [] });
     assert.equal(badId.statusCode, 400);
+  });
+
+  it('asks each kanji once, and counts only its own kanji as missed', async () => {
+    const res = await create(carter.deviceToken, {
+      toMemberId: aiko.memberId,
+      items: [{ char: '日' }, { char: '月' }, { char: '日' }],
+    });
+    assert.equal(res.statusCode, 201);
+    const quiz = res.json<Quiz>();
+    assert.deepEqual(quiz.items, [{ char: '日' }, { char: '月' }]);
+
+    const done = await submit(aiko.deviceToken, quiz.id, { correct: 0, total: 2, missed: ['日', '日', '月', '水'] });
+    assert.deepEqual(done.json<Quiz>().result?.missed, ['日', '月']);
   });
 });

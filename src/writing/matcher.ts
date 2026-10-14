@@ -36,6 +36,13 @@ export interface Frame {
 
 export const IDENTITY_FRAME: Frame = { scale: 1, dx: 0, dy: 0, confidence: 0 };
 
+/**
+ * Leniency for Settings → I write with: Stylus. A pen wobbles far less than a finger, so the
+ * matcher can be stricter. Checked against matcher.test.ts: synthetic stylus strokes are all
+ * still accepted (finger strokes too, at ~99.7%), and fewer wrong strokes pass.
+ */
+export const STYLUS_LENIENCY = 0.85;
+
 export interface MatchOptions {
   /** Placement estimated from earlier strokes (see `estimateFrame`). */
   frame?: Frame;

@@ -1,5 +1,4 @@
 /* Settings screen. Colours are tokens only. */
-.set-title { font-size: 17px; font-weight: 700; }
 .set-section { display: flex; flex-direction: column; gap: 8px; }
 .set-card { display: flex; flex-direction: column; padding-top: 4px; padding-bottom: 4px; }
 .set-row { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; }
@@ -15,10 +14,10 @@
 .set-stepper .icon-btn[disabled] { opacity: 0.4; cursor: default; }
 .set-step-sign { font-size: 22px; line-height: 1; }
 
-.set-inline { display: flex; gap: 8px; align-items: center; }
+.set-inline { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .set-select {
-  flex: 1; min-width: 0; min-height: var(--tap); padding: 0 12px; border-radius: 12px;
-  border: 1px solid var(--line-strong); background: var(--card);
+  flex: 1 1 180px; min-width: 0; max-width: 100%; min-height: var(--tap); padding: 0 12px; border-radius: 12px;
+  border: 1px solid var(--line-input); background: var(--card); text-overflow: ellipsis;
 }
 .set-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
 .btn.set-danger { color: var(--shu-ink); align-self: flex-start; }
@@ -36,10 +35,19 @@
 
 .set-members { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .set-members li { display: flex; align-items: center; gap: 10px; }
+/* A long one-word name breaks inside the row instead of pushing the page sideways. */
+.set-member-name { min-width: 0; overflow-wrap: anywhere; }
+.set-members .chip { flex-shrink: 0; }
 .set-avatar {
   display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
   width: 32px; height: 32px; border-radius: 50%; background: var(--ai); color: var(--on-accent); font-size: 14px; font-weight: 700;
 }
 
-.set-credits { display: flex; flex-direction: column; gap: 6px; margin: 0; padding-left: 18px; font-size: 14px; color: var(--muted); }
-.set-credits a { color: var(--ai); }
+.set-credits { display: flex; flex-direction: column; gap: 10px; margin: 0; padding-left: 18px; font-size: 14px; color: var(--muted); }
+/* Credit links sit in their own row as 44px targets, not packed inside the sentence. */
+.set-credit-links { display: flex; flex-wrap: wrap; gap: 0 8px; margin-left: -8px; }
+.set-credit-links a {
+  display: inline-flex; align-items: center; justify-content: center; min-width: var(--tap); min-height: var(--tap);
+  padding: 0 8px; color: var(--ai); white-space: nowrap;
+}
+.set-confirm-title:focus { outline: none; }

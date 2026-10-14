@@ -35,25 +35,29 @@ export function WeekChart({ me, partner, partnerName }: {
           </div>
         ))}
       </div>
-      <table className="visually-hidden">
-        <caption>Minutes studied each day this week</caption>
-        <thead>
-          <tr>
-            <th scope="col">Day</th>
-            <th scope="col">You</th>
-            {partner && <th scope="col">{partnerName}</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {axis.map((date) => (
-            <tr key={date}>
-              <th scope="row">{weekdayLong(date)}</th>
-              <td>{minutes(mine, date)} min</td>
-              {partner && <td>{minutes(theirs, date)} min</td>}
+      {/* A table can't shrink to the hidden 1 px box, and a long partner name would then
+          widen the page; the div clips it instead. */}
+      <div className="visually-hidden">
+        <table>
+          <caption>Minutes studied each day this week</caption>
+          <thead>
+            <tr>
+              <th scope="col">Day</th>
+              <th scope="col">You</th>
+              {partner && <th scope="col">{partnerName}</th>}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {axis.map((date) => (
+              <tr key={date}>
+                <th scope="row">{weekdayLong(date)}</th>
+                <td>{minutes(mine, date)} min</td>
+                {partner && <td>{minutes(theirs, date)} min</td>}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

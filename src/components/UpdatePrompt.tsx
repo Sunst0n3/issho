@@ -1,8 +1,11 @@
 // "New version — Reload" bar for service-worker updates (vite-plugin-pwa, prompt mode).
 // Installed iOS PWAs rarely check for a new service worker on their own, so we
 // also check whenever the app returns to the foreground (at most every 30 min).
+// "Ready to use offline" shows once the service worker controls this page (it
+// claims the page on first install), not merely once it installed: until then
+// the page still loads from the network and going offline would break it.
 
-import { useEffect, useRef, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { Icon } from './ui.tsx';
 
@@ -43,13 +46,15 @@ export default function UpdatePrompt() {
     };
   }, []);
 
+  const controlled = useControlled(offlineReady);
+
   useEffect(() => {
-    if (!offlineReady) return;
+    if (!offlineReady || !controlled) return;
     const t = setTimeout(() => setOfflineReady(false), OFFLINE_READY_MS);
     return () => clearTimeout(t);
-  }, [offlineReady, setOfflineReady]);
+  }, [offlineReady, controlled, setOfflineReady]);
 
-  if (!needRefresh && !offlineReady) return null;
+  if (!needRefresh && !(offlineReady && controlled)) return null;
 
   return (
     <div role="status" aria-live="polite" style={barStyle}>
@@ -69,6 +74,20 @@ export default function UpdatePrompt() {
       )}
     </div>
   );
+}
+
+/** Whether a service worker controls this page; watched while `watch` is true. */
+function useControlled(watch: boolean): boolean {
+  const sw = typeof navigator !== 'undefined' ? navigator.serviceWorker : undefined;
+  const [controlled, setControlled] = useState(() => Boolean(sw?.controller));
+  useEffect(() => {
+    if (!watch || !sw) return;
+    const check = () => setControlled(Boolean(sw.controller));
+    check();
+    sw.addEventListener('controllerchange', check);
+    return () => sw.removeEventListener('controllerchange', check);
+  }, [watch, sw]);
+  return controlled;
 }
 
 const barStyle: CSSProperties = {

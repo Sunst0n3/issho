@@ -86,6 +86,22 @@ describe('importBackup', () => {
     expect((await db.items.toArray()).map((i) => i.id)).toEqual(['kanji:水']);
   });
 
+  it("keeps which household this phone's chat and outbox belong to", async () => {
+    await seed();
+    await updateSettings({ lastPairing: { householdId: 'h-old', memberId: 'm1', serverUrl: 'http://home:8787' } });
+    const file = await exportBackup();
+    await Promise.all(db.tables.map((t) => t.clear()));
+    const mine = { householdId: 'h-new', memberId: 'm9', serverUrl: 'http://new:8787' };
+    await updateSettings({ serverUrl: 'http://new:8787', deviceToken: 'this-device', memberId: 'm9', lastPairing: mine });
+    await (await importBackup(file)).apply();
+    expect((await getSettings()).lastPairing).toEqual(mine);
+
+    // An unpaired phone keeps its own last pairing too (or none).
+    await updateSettings({ deviceToken: undefined, memberId: undefined, lastPairing: undefined });
+    await (await importBackup(file)).apply();
+    expect((await getSettings()).lastPairing).toBeUndefined();
+  });
+
   it('leaves an unpaired device unpaired', async () => {
     await seed();
     const file = await exportBackup();

@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { db, updateSettings } from '../../lib/db.ts';
-import { ApiError } from '../../sync/client.ts';
+import { ApiError, INVALID_SERVER_URL_MESSAGE } from '../../sync/client.ts';
 import { ConnectServerForm, pairErrorMessage } from './ConnectServerForm.tsx';
 
 const mocks = vi.hoisted(() => ({
@@ -111,5 +111,13 @@ describe('pairErrorMessage', () => {
     expect(pairErrorMessage(new ApiError(404, 'not_found'), 'example.com')).toContain("example.com doesn't look like an Issho");
     expect(pairErrorMessage(new ApiError(200, 'bad_response'))).toContain('Add its address under Advanced');
     expect(pairErrorMessage(new Error('boom'))).toBe('Something went wrong. Try again.');
+  });
+
+  it('explains an address that cannot be one, and does not double punctuation after an address', () => {
+    expect(pairErrorMessage(new ApiError(0, 'invalid_server_url'), 'not a url!!')).toBe(INVALID_SERVER_URL_MESSAGE);
+    expect(pairErrorMessage(new ApiError(0, 'network'), '192.168.1.20:8787'))
+      .toBe("Couldn't reach the home server at 192.168.1.20:8787. Check it's running and this phone is on the same network.");
+    expect(pairErrorMessage(new ApiError(0, 'network'), 'issho.home.')).toContain('at issho.home. Check');
+    expect(pairErrorMessage(new ApiError(0, 'network'))).toContain("Couldn't reach the home server. Check");
   });
 });

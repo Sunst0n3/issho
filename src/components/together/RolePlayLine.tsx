@@ -1,7 +1,7 @@
 // One line of a role-play: your line to say (with reading, meaning, hint and a
 // speaking check), or your partner's line to listen to.
 
-import { useState } from 'react';
+import { forwardRef, useState } from 'react';
 import { useRubyShow } from '../../lib/hooks.ts';
 import { parseRuby } from '../../lib/ruby.ts';
 import type { RolePlay, RolePlayLine as Line } from '../../lib/types.ts';
@@ -9,7 +9,8 @@ import { SpeakButton } from '../SpeakButton.tsx';
 import { Icon, Ruby } from '../ui.tsx';
 import { SayIt, type Verdict } from './SayIt.tsx';
 
-export function RolePlayLine({ line, roles, mine, readingBoth, partnerLabel, onVerdict }: {
+/** The ref is the line's <article>, for moving focus to it when the line changes. */
+export const RolePlayLine = forwardRef<HTMLElement, {
   line: Line;
   roles: RolePlay['roles'];
   mine: boolean;
@@ -18,7 +19,7 @@ export function RolePlayLine({ line, roles, mine, readingBoth, partnerLabel, onV
   /** Who says the other lines: "your partner" on one phone, their name on two. */
   partnerLabel: string;
   onVerdict(verdict: Verdict): void;
-}) {
+}>(function RolePlayLine({ line, roles, mine, readingBoth, partnerLabel, onVerdict }, ref) {
   const rubyShow = useRubyShow();
   const [showReading, setShowReading] = useState(false);
   const [revealed, setRevealed] = useState(false);
@@ -27,7 +28,7 @@ export function RolePlayLine({ line, roles, mine, readingBoth, partnerLabel, onV
 
   if (mine) {
     return (
-      <article className="tg-rp-line tg-mine" aria-label={readingBoth ? `${speaker.name}'s line` : 'Your line'}>
+      <article ref={ref} tabIndex={-1} className="tg-rp-line tg-mine" aria-label={readingBoth ? `${speaker.name}'s line` : 'Your line'}>
         <p className="label">
           {readingBoth ? `${speaker.name}'s line` : `Your line · ${speaker.name}`}
         </p>
@@ -49,7 +50,7 @@ export function RolePlayLine({ line, roles, mine, readingBoth, partnerLabel, onV
   }
 
   return (
-    <article className="tg-rp-line tg-theirs" aria-label={`${speaker.name}'s line`}>
+    <article ref={ref} tabIndex={-1} className="tg-rp-line tg-theirs" aria-label={`${speaker.name}'s line`}>
       <p className="label">{speaker.name}'s line</p>
       <h2 className="tg-rp-listen">Listen to {partnerLabel}</h2>
       {revealed ? (
@@ -70,4 +71,4 @@ export function RolePlayLine({ line, roles, mine, readingBoth, partnerLabel, onV
       </div>
     </article>
   );
-}
+});

@@ -66,6 +66,40 @@ describe('content/grammar.json', () => {
     }
   });
 
+  it('never gives every drill of a point the same answer', () => {
+    for (const p of points) {
+      const answers = new Set(p.drills.map((d) => d.options[d.answer]));
+      expect(answers.size, `${p.id}: every drill is ${[...answers].join('')}`).toBeGreaterThan(1);
+    }
+  });
+
+  it('mixes particle drills between the new particle and particles taught before it', () => {
+    // QA: each of these had five drills that were all answered by its own particle.
+    const particleOf: Record<string, string> = {
+      'wa-desu': 'は',
+      'ka-question': 'か',
+      'no-possession': 'の',
+      'mo-also': 'も',
+      'wo-object': 'を',
+      'ni-time-place': 'に',
+      'he-direction': 'へ',
+      'de-place-means': 'で',
+      'to-with': 'と',
+    };
+    const taught = new Set<string>();
+    for (const p of points) {
+      const particle = particleOf[p.id];
+      if (!particle) continue;
+      taught.add(particle);
+      if (p.id === 'wa-desu' || p.id === 'ka-question') continue;
+      const answers = p.drills.map((d) => d.options[d.answer]);
+      const own = answers.filter((a) => a === particle).length;
+      expect(own, `${p.id}: ${answers.join(' ')}`).toBeGreaterThanOrEqual(2);
+      expect(own, `${p.id}: ${answers.join(' ')}`).toBeLessThan(answers.length);
+      for (const a of answers) expect(taught.has(a), `${p.id}: answer ${a} is not taught yet`).toBe(true);
+    }
+  });
+
   it('does not make claims later points contradict', () => {
     // と also follows whole sentences in とおもう (and the conditional と).
     if (points.some((p) => rubyToPlain(p.pattern).includes('と思う'))) {

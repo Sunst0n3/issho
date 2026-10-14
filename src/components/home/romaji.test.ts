@@ -17,6 +17,13 @@ describe('kanaToRomaji', () => {
     expect(kanaToRomaji(kana)).toBe(romaji);
   });
 
+  it('keeps a trailing small tsu, so ジッ and ジ differ', () => {
+    expect(kanaToRomaji('ジッ')).toBe('jit');
+    expect(kanaToRomaji('ジュッ')).toBe('jut');
+    expect(kanaToRomaji('ジ')).toBe('ji');
+    expect(kanaToRomaji('いっ.')).toBe('it.');
+  });
+
   it('passes through anything that is not kana', () => {
     expect(kanaToRomaji('た.べる')).toBe('ta.beru');
   });

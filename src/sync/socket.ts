@@ -8,7 +8,7 @@
 import { useSyncExternalStore } from 'react';
 import { WS_CLOSE_UNPAIRED, type ClientEvent, type ServerEvent } from '../../shared/api.ts';
 import { getSettings } from '../lib/db.ts';
-import { forgetRevokedPairing, socketUrl } from './client.ts';
+import { forgetRevokedPairing, onServerReachable, socketUrl } from './client.ts';
 
 export type ServerStatus = 'unpaired' | 'offline' | 'connecting' | 'online';
 
@@ -165,6 +165,16 @@ function scheduleReconnect() {
   clearTimeout(retryTimer);
   retryTimer = setTimeout(open, delay);
 }
+
+// The server just answered an HTTP request (e.g. "Try again"), so it is back: reconnect now
+// instead of waiting out the backoff, which would keep saying "offline" for up to 30 s. The
+// backoff isn't reset, so a server that answers HTTP but refuses sockets isn't hammered.
+onServerReachable(() => {
+  if (!target || ws || status !== 'offline') return;
+  clearTimeout(retryTimer);
+  retryTimer = undefined;
+  open();
+});
 
 /** Opens a fresh connection now, unless one is already open (or `force`). */
 export function reconnectNow(force = false) {

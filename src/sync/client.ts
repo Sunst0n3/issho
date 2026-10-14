@@ -12,24 +12,27 @@ import type {
   CreateQuizRequest,
   HealthResponse,
   HouseholdResponse,
+  Member,
   Quiz,
   QuizResultRequest,
   QuizzesResponse,
   RegisterRequest,
   RegisterResponse,
+  RenameMemberRequest,
   SendMessageRequest,
   SendMessageResponse,
   StatsUploadRequest,
   UploadVoiceResponse,
 } from '../../shared/api.ts';
 import { db, getSettings, updateSettings } from '../lib/db.ts';
-import type { Settings } from '../lib/types.ts';
+import type { LastPairing, OutboxRecord, Settings } from '../lib/types.ts';
 
 /**
  * A failed request. `status` is the HTTP status, or 0 when there was no response.
  * `code` is the server's `error` field, or one of the client-side codes:
- * 'network' (unreachable), 'timeout', 'unpaired' (no device token) and
- * 'bad_response' (unreadable body).
+ * 'network' (unreachable), 'timeout', 'unpaired' (no device token),
+ * 'bad_response' (unreadable body) and 'invalid_server_url' (the server address
+ * can't be one; its message says so in plain words).
  */
 export class ApiError extends Error {
   readonly status: number;
@@ -43,6 +46,7 @@ export class ApiError extends Error {
 
   /** Worth retrying later: no response, a timeout, rate limiting or a server-side failure. */
   get transient(): boolean {
+    if (this.code === 'invalid_server_url') return false;
     return this.status === 0 || this.status === 408 || this.status === 429 || this.status >= 500;
   }
 }
@@ -50,6 +54,10 @@ export class ApiError extends Error {
 export const DEFAULT_TIMEOUT_MS = 8_000;
 /** AI replies and voice uploads routinely take longer than the default. */
 const SLOW_TIMEOUT_MS = 45_000;
+/** Disconnecting waits this long at most for the server to sign the phone out. */
+const SIGN_OUT_TIMEOUT_MS = 3_000;
+
+export const INVALID_SERVER_URL_MESSAGE = "That doesn't look like a server address (for example 192.168.1.20:8787).";
 
 /**
  * Cleans up a server address typed by a person: trims, drops trailing slashes and
@@ -66,8 +74,55 @@ export function normalizeServerUrl(input: string): string {
   return `${local ? 'http' : 'https'}://${url}`;
 }
 
+/**
+ * Whether a typed server address can be one: '' (same origin), or http(s) with a host name or
+ * IP address and an optional port and path. Catches typos before they turn into a misleading
+ * "couldn't reach the home server".
+ */
+export function isServerUrl(input: string): boolean {
+  const url = normalizeServerUrl(input);
+  if (!url) return true;
+  // Host (a name, IPv4 or [IPv6]) and an optional port, then an optional path.
+  if (!/^https?:\/\/([a-z0-9_.-]+|\[[0-9a-f:.]+\])(:\d{1,5})?(\/[^?#]*)?$/i.test(url)) return false;
+  try {
+    const { hostname } = new URL(url);
+    return /^([a-z0-9_-]+(\.[a-z0-9_-]+)*\.?|\[[0-9a-f:.]+\])$/i.test(hostname);
+  } catch {
+    return false;
+  }
+}
+
 function endpoint(serverUrl: string | undefined, path: string): string {
+  if (!isServerUrl(serverUrl ?? '')) throw new ApiError(0, 'invalid_server_url', INVALID_SERVER_URL_MESSAGE);
   return `${normalizeServerUrl(serverUrl ?? '')}${path}`;
+}
+
+/**
+ * Why this page can't work offline, record voice or keep its storage, in plain words; null when
+ * it can. Browsers allow service workers, the microphone and persistent storage only on secure
+ * pages: https://, or http://localhost. A home server opened as http://192.168.1.20:8787 gets
+ * none of them, so the app would need the network on every load.
+ */
+export function secureContextProblem(): string | null {
+  if (typeof window === 'undefined' || window.isSecureContext !== false) return null;
+  return "This address isn't secure (it starts with http://), so your browser won't let Issho work offline, "
+    + 'record voice or keep your progress safe from clean-ups. Open Issho from its https:// address. '
+    + 'Whoever set up your home server can turn that on (see its setup notes).';
+}
+
+const reachableListeners = new Set<() => void>();
+
+/** Calls `cb` whenever the home server answered a request. Returns an unsubscribe function. */
+export function onServerReachable(cb: () => void): () => void {
+  reachableListeners.add(cb);
+  return () => { reachableListeners.delete(cb); };
+}
+
+/** Tells the onServerReachable() listeners; every successful request does. */
+export function serverReached(): void {
+  for (const cb of [...reachableListeners]) {
+    try { cb(); } catch (e) { console.error('server reachable listener failed', e); }
+  }
 }
 
 export function isPairedSettings(s: Pick<Settings, 'deviceToken'>): boolean {
@@ -79,6 +134,9 @@ export async function isPaired(): Promise<boolean> {
 }
 
 const REMOVED_KEY = 'issho.sync.removed';
+
+/** Device tokens unpair() signed out on purpose (see forgetRevokedPairing). */
+const signingOut = new Set<string>();
 
 /** The home server stopped accepting this phone (removed from the household) and it hasn't paired again since. */
 export function wasRemoved(): boolean {
@@ -96,17 +154,32 @@ export function wasRemoved(): boolean {
  * nothing when `token` is no longer this phone's, i.e. it has paired again since.
  */
 export async function forgetRevokedPairing(token: string): Promise<void> {
-  if (!token || (await getSettings()).deviceToken !== token) return;
+  // unpair() is signing this token out: the server then closes its socket as unpaired (and
+  // answers other requests with 401), which is expected, not "this phone was removed".
+  if (!token || signingOut.has(token) || (await getSettings()).deviceToken !== token) return;
   try {
     localStorage.setItem(REMOVED_KEY, '1');
   } catch {
     // Only the "this phone was disconnected" note is lost.
   }
-  await unpair();
+  await forgetPairing();
+}
+
+/**
+ * Clears the pairing on this device. Keeps `lastPairing`, which the chat cache and the outbox
+ * belong to, so pairing with the same household again keeps them.
+ */
+async function forgetPairing(): Promise<void> {
+  await db.transaction('rw', db.settings, async () => {
+    const s = await getSettings();
+    const lastPairing: LastPairing | undefined = s.lastPairing
+      ?? (s.memberId ? { memberId: s.memberId, serverUrl: normalizeServerUrl(s.serverUrl ?? '') } : undefined);
+    await updateSettings({ deviceToken: undefined, memberId: undefined, householdName: undefined, lastPairing });
+  });
 }
 
 interface RequestOptions {
-  method?: 'GET' | 'POST';
+  method?: 'GET' | 'POST' | 'PATCH';
   /** JSON-serialized unless it is FormData. */
   body?: unknown;
   /** Send the device token (default true). */
@@ -115,11 +188,14 @@ interface RequestOptions {
   /** Overrides settings.serverUrl (used while pairing). */
   serverUrl?: string;
   as?: 'json' | 'blob';
+  /** Forget the pairing when the server says 'unauthorized' (default true). */
+  forgetIfUnauthorized?: boolean;
 }
 
 async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
-  const { method = 'GET', body, auth = true, timeoutMs = DEFAULT_TIMEOUT_MS, as = 'json' } = opts;
+  const { method = 'GET', body, auth = true, timeoutMs = DEFAULT_TIMEOUT_MS, as = 'json', forgetIfUnauthorized = true } = opts;
   const settings = await getSettings();
+  const url = endpoint(opts.serverUrl ?? settings.serverUrl, path);
   const headers: Record<string, string> = { Accept: as === 'json' ? 'application/json' : '*/*' };
   if (auth) {
     if (!settings.deviceToken) throw new ApiError(0, 'unpaired', 'This device is not paired with the home server.');
@@ -137,7 +213,7 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   const timer = setTimeout(() => { timedOut = true; controller.abort(); }, timeoutMs);
   let res: Response;
   try {
-    res = await fetch(endpoint(opts.serverUrl ?? settings.serverUrl, path), {
+    res = await fetch(url, {
       method, headers, body: payload, signal: controller.signal, cache: 'no-store',
     });
   } catch (e) {
@@ -153,11 +229,12 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
         const err = (await res.json()) as { error?: unknown };
         if (typeof err?.error === 'string') code = err.error;
       } catch { /* non-JSON error body */ }
-      if (auth && code === 'unauthorized') {
+      if (auth && forgetIfUnauthorized && code === 'unauthorized') {
         await forgetRevokedPairing(settings.deviceToken!).catch((e: unknown) => console.error('could not forget the pairing', e));
       }
       throw new ApiError(res.status, code);
     }
+    serverReached();
     if (as === 'blob') return (await res.blob()) as T;
     const text = await res.text();
     if (!text) return undefined as T;
@@ -187,27 +264,63 @@ export function register(req: RegisterRequest, serverUrl?: string): Promise<Regi
   return request('/api/register', { method: 'POST', body: req, auth: false, serverUrl });
 }
 
+/** Outbox rows written for another household: they wait until the phone pairs with it again. */
+export const OTHER_HOUSEHOLD = 'other_household';
+
+const sameName = (a: string, b: string) => a.normalize('NFKC').trim().toLowerCase() === b.normalize('NFKC').trim().toLowerCase();
+
+/** Whether a new pairing is with the household `before` was (or last was) paired with. */
+function sameHousehold(before: Settings, serverUrl: string, res: RegisterResponse): boolean {
+  const last = before.lastPairing;
+  if (res.householdId && last?.householdId) return res.householdId === last.householdId;
+  // Without household ids (an older server or pairing): the same member at the same address.
+  const memberId = before.memberId ?? last?.memberId;
+  const lastUrl = before.memberId ? normalizeServerUrl(before.serverUrl ?? '') : last?.serverUrl;
+  return memberId === res.memberId && lastUrl === serverUrl;
+}
+
 /**
- * Joins the household and saves the server address and device token in settings.
- * Switching to a different server or member clears the local chat cache and
- * outbox, which belong to the old household.
+ * Joins the household and saves the server address, device token and name in settings.
+ * Pairing again as this phone's own name (after Disconnect, or after being signed out)
+ * signs in as the member it was, even if the name changed meanwhile.
+ *
+ * Unsent messages are never lost: rows written for this household (or before any pairing)
+ * are delivered now; rows written for another household are marked OTHER_HOUSEHOLD and
+ * wait, visible, until the phone pairs with that household again or the user resends them.
+ * The chat cache is dropped only when the household changed: it mirrors one server's
+ * history, whose message ids are the sync cursor.
  */
 export async function pair(opts: { serverUrl: string; householdCode: string; name: string }): Promise<RegisterResponse> {
   const serverUrl = normalizeServerUrl(opts.serverUrl);
-  const res = await register({ householdCode: opts.householdCode.trim(), name: opts.name.trim() }, serverUrl);
+  const name = opts.name.trim();
   const before = await getSettings();
-  if (before.memberId !== res.memberId || normalizeServerUrl(before.serverUrl ?? '') !== serverUrl) {
-    await db.transaction('rw', db.messages, db.outbox, async () => {
-      await db.messages.clear();
-      await db.outbox.clear();
+  const previous = before.memberId ?? before.lastPairing?.memberId;
+  const req: RegisterRequest = { householdCode: opts.householdCode.trim(), name };
+  if (previous && sameName(name, before.name)) req.memberId = previous;
+  const res = await register(req, serverUrl);
+
+  const household = sameHousehold(before, serverUrl, res);
+  await db.transaction('rw', db.messages, db.outbox, async () => {
+    if (!household) await db.messages.clear();
+    // An older server sends no household id: then every row goes out, as it always did.
+    if (!res.householdId) return;
+    await db.outbox.toCollection().modify((row: OutboxRecord) => {
+      if (!row.householdId) {
+        row.householdId = res.householdId;
+      } else if (row.householdId === res.householdId) {
+        if (row.failed === OTHER_HOUSEHOLD) delete row.failed;
+      } else if (!row.failed) {
+        row.failed = OTHER_HOUSEHOLD;
+      }
     });
-  }
+  });
   await updateSettings({
     serverUrl,
     deviceToken: res.deviceToken,
     memberId: res.memberId,
     householdName: res.householdName,
-    ...(before.name ? {} : { name: opts.name.trim() }),
+    name,
+    lastPairing: { householdId: res.householdId, memberId: res.memberId, serverUrl },
   });
   try {
     localStorage.removeItem(REMOVED_KEY);
@@ -217,9 +330,30 @@ export async function pair(opts: { serverUrl: string; householdCode: string; nam
   return res;
 }
 
-/** Forgets the pairing on this device (the chat cache stays until the next pair()). */
+/**
+ * Disconnects this phone: signs it out on the home server (best effort, briefly, so its
+ * token stops working there), then forgets the pairing. The chat cache and unsent
+ * messages stay for the next pairing with this household.
+ */
 export async function unpair(): Promise<void> {
-  await updateSettings({ deviceToken: undefined, memberId: undefined, householdName: undefined });
+  const token = (await getSettings()).deviceToken;
+  if (token) {
+    // Set before the request: the server closes this phone's socket as it signs it out, and
+    // that close may arrive before the answer. The token never works again, so it stays here.
+    signingOut.add(token);
+    await signOut().catch(() => { /* Unreachable or already signed out: `admin revoke` covers it. */ });
+  }
+  await forgetPairing();
+}
+
+/** POST /api/signout. Low level: prefer unpair(). */
+export async function signOut(): Promise<void> {
+  await request<unknown>('/api/signout', { method: 'POST', timeoutMs: SIGN_OUT_TIMEOUT_MS, forgetIfUnauthorized: false });
+}
+
+/** PATCH /api/me: renames this phone's member. 409 'name_taken' when another member has the name. */
+export function renameMember(name: string): Promise<Member> {
+  return request('/api/me', { method: 'PATCH', body: { name: name.trim() } satisfies RenameMemberRequest });
 }
 
 /** GET /api/household */

@@ -1,4 +1,5 @@
-import { cleanup, fireEvent, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getSettings, updateSettings } from '../../lib/db.ts';
 import Onboarding from '../../screens/Onboarding.tsx';
@@ -36,6 +37,26 @@ afterEach(() => {
 });
 
 const next = () => fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+/** Onboarding with the browser's own Back (the phone's back gesture) next to it. */
+function renderWithHistory(path: string) {
+  function BrowserBack() {
+    const navigate = useNavigate();
+    const { pathname, search } = useLocation();
+    return <button type="button" data-at={pathname + search} onClick={() => navigate(-1)}>Browser back</button>;
+  }
+  return render(
+    <MemoryRouter initialEntries={[path]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <Routes>
+        <Route path="/welcome" element={<Onboarding />} />
+        <Route path="/" element={<p>Home screen</p>} />
+      </Routes>
+      <BrowserBack />
+    </MemoryRouter>,
+  );
+}
+const browserBack = () => fireEvent.click(screen.getByRole('button', { name: 'Browser back' }));
+const at = () => screen.getByRole('button', { name: 'Browser back' }).getAttribute('data-at');
 
 describe('Onboarding', () => {
   it('walks through every step and saves the choices', async () => {
@@ -112,6 +133,52 @@ describe('Onboarding', () => {
 
     expect(await screen.findByText('Home screen')).toBeTruthy();
     expect(await getSettings()).toMatchObject({ onboarded: true, name: 'Sam', newPerDay: 3, knowsHiragana: true, deviceToken: 'token' });
+  });
+
+  it('puts each step in history, so the back gesture goes to the previous step', async () => {
+    renderWithHistory('/welcome');
+    fireEvent.click(await screen.findByRole('button', { name: 'Get started' }));
+    fireEvent.change(await screen.findByLabelText('Your name'), { target: { value: 'Kim' } });
+    next();
+    await screen.findByRole('heading', { name: 'Already know some kana?' });
+    expect(at()).toBe('/welcome?step=kana');
+
+    browserBack();
+    expect(((await screen.findByLabelText('Your name')) as HTMLInputElement).value).toBe('Kim');
+    expect(at()).toBe('/welcome?step=name');
+    browserBack();
+    expect(await screen.findByRole('heading', { name: 'Japanese, together' })).toBeTruthy();
+  });
+
+  it('stays on the same step after a reload', async () => {
+    await updateSettings({ name: 'Kim' });
+    renderWithHistory('/welcome?step=pace');
+    expect(await screen.findByRole('heading', { name: 'How much each day?' })).toBeTruthy();
+    expect(screen.getByText('Step 4 of 5')).toBeTruthy();
+  });
+
+  it('asks for the name first when a later step is opened without one', async () => {
+    renderWithHistory('/welcome?step=connect');
+    expect(await screen.findByRole('heading', { name: 'What should we call you?' })).toBeTruthy();
+    expect(at()).toBe('/welcome?step=name');
+  });
+
+  it('leaves no setup steps behind Today once finished', async () => {
+    renderWithHistory('/welcome');
+    fireEvent.click(await screen.findByRole('button', { name: 'Get started' }));
+    fireEvent.change(await screen.findByLabelText('Your name'), { target: { value: 'Kim' } });
+    next();
+    await screen.findByRole('heading', { name: 'Already know some kana?' });
+    next();
+    await screen.findByRole('heading', { name: 'How much each day?' });
+    next();
+    fireEvent.click(await screen.findByRole('button', { name: 'Not now' }));
+    expect(await screen.findByText('Home screen')).toBeTruthy();
+    expect(at()).toBe('/');
+
+    browserBack();
+    expect(screen.getByText('Home screen')).toBeTruthy();
+    expect(at()).toBe('/');
   });
 
   it('goes back a step without losing answers', async () => {

@@ -80,8 +80,12 @@ export function describeStroke(d: string): string {
   return `${where}, ${heading(start, bend.at)}, then ${heading(bend.at, end, true)}`;
 }
 
-/** One short sentence explaining why a stroke was not accepted. */
-export function mistakeMessage(attempt: StrokeAttempt, index: number): string {
+/**
+ * One short sentence explaining why a stroke was not accepted. `hintShown`
+ * when the pad is showing this stroke as a hint (Hint, or after repeated
+ * misses), so the advice can point at it.
+ */
+export function mistakeMessage(attempt: StrokeAttempt, index: number, hintShown = false): string {
   if (attempt.drewStroke !== undefined) {
     return attempt.drewStroke > index
       ? `That looks like stroke ${attempt.drewStroke + 1}. Stroke ${index + 1} comes first.`
@@ -95,7 +99,7 @@ export function mistakeMessage(attempt: StrokeAttempt, index: number): string {
     case 'position':
       return 'Close. Check where this stroke starts and ends.';
     case 'shape':
-      return 'The shape is off. Watch the hint and try again.';
+      return hintShown ? 'The shape is off. Watch the hint and try again.' : 'The shape is off. Try that stroke again.';
     default:
       return 'Not quite. Try that stroke again.';
   }

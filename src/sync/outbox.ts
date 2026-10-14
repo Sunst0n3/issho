@@ -1,7 +1,9 @@
 // Offline-first chat sending. Every message is written to db.outbox first, then
 // delivered in order: voice audio is uploaded, then the message is POSTed with
 // its clientId (the server dedupes on it, so a retry after a lost response is
-// safe). Delivered messages move into db.messages.
+// safe) and the time it was written. Delivered messages move into db.messages.
+// Rows are only ever removed once delivered or discarded by the user: unpairing
+// and pairing again keep them (see pair()).
 //
 // Flushes run on demand, when the browser comes online, when the socket connects,
 // and every 30 s while undelivered rows remain.
@@ -10,7 +12,7 @@ import type { Table } from 'dexie';
 import { db, getSettings } from '../lib/db.ts';
 import type { OutboxRecord } from '../lib/types.ts';
 import { storeLiveMessage } from './chat.ts';
-import { ApiError, isPairedSettings, sendMessage, uploadVoice } from './client.ts';
+import { ApiError, isPairedSettings, OTHER_HOUSEHOLD, sendMessage, uploadVoice } from './client.ts';
 import { onStatusChange } from './socket.ts';
 import { rememberVoice } from './voice.ts';
 
@@ -66,6 +68,9 @@ export async function queueChatMessage(msg: NewChatMessage): Promise<string> {
     text: msg.text,
     attempts: 0,
   };
+  // The household it is written for: the one this phone is (or was last) paired with.
+  const householdId = (await getSettings()).lastPairing?.householdId;
+  if (householdId) row.householdId = householdId;
   if (msg.transcript !== undefined) row.transcript = msg.transcript;
   if (msg.audio) row.audio = msg.audio;
   await outbox().add(row);
@@ -73,9 +78,16 @@ export async function queueChatMessage(msg: NewChatMessage): Promise<string> {
   return row.clientId;
 }
 
-/** Re-queues a message the server rejected earlier. */
+/**
+ * Re-queues a message the server rejected earlier, or one written for another household:
+ * resending that one here is the user's choice, so it now belongs to this phone's household.
+ */
 export async function retryMessage(clientId: string): Promise<void> {
-  await outbox().update(clientId, { failed: undefined, attempts: 0 });
+  const household = (await getSettings()).lastPairing?.householdId;
+  const row = await outbox().get(clientId);
+  if (!row) return;
+  const moved = row.failed === OTHER_HOUSEHOLD && household ? { householdId: household } : {};
+  await outbox().update(clientId, { failed: undefined, attempts: 0, ...moved });
   void flushOutbox();
 }
 
@@ -89,12 +101,19 @@ async function countWaiting(): Promise<number> {
 }
 
 async function flushOnce(): Promise<FlushResult> {
-  if (!isPairedSettings(await getSettings())) return { sent: 0, remaining: await countWaiting(), blocked: true };
+  const settings = await getSettings();
+  if (!isPairedSettings(settings)) return { sent: 0, remaining: await countWaiting(), blocked: true };
+  const household = settings.lastPairing?.householdId;
 
   const rows = await outbox().orderBy('createdAt').toArray();
   let sent = 0;
   for (const row of rows) {
     if (row.failed) continue;
+    if (household && row.householdId && row.householdId !== household) {
+      // Written for another household (pair() normally marks these): never send it here unasked.
+      await outbox().update(row.clientId, { failed: OTHER_HOUSEHOLD });
+      continue;
+    }
     try {
       let audioId = row.audioId;
       if (row.kind === 'voice' && !audioId) {
@@ -107,6 +126,7 @@ async function flushOnce(): Promise<FlushResult> {
       }
       const message = await sendMessage({
         clientId: row.clientId,
+        writtenAt: new Date(row.createdAt).toISOString(),
         kind: row.kind,
         text: row.text,
         ...(row.transcript !== undefined ? { transcript: row.transcript } : {}),

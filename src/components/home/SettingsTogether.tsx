@@ -1,10 +1,13 @@
 // Settings: the home-server connection, the household, and the AI helper.
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { Settings } from '../../lib/types.ts';
 import { health, isPairedSettings, unpair } from '../../sync/client.ts';
 import { useServerStatus, type ServerStatus } from '../../sync/socket.ts';
 import { refreshHousehold, resetHousehold, useHousehold } from '../../sync/stats.ts';
+import { useAiProblem, type AiProblem } from '../together/ai.ts';
 import { ConnectServerForm } from '../together/ConnectServerForm.tsx';
+import { focusLost } from '../together/focus.ts';
+import { syncMemberName } from './nameSync.ts';
 import { SettingsSection } from './SettingsStudy.tsx';
 
 const STATUS: Record<ServerStatus, string> = {
@@ -14,10 +17,12 @@ const STATUS: Record<ServerStatus, string> = {
   unpaired: 'Not connected',
 };
 
-type AiState = 'checking' | 'on' | 'off' | 'unknown';
+type AiState = 'checking' | 'on' | 'off' | 'unknown' | AiProblem;
 
 function useAiStatus(serverUrl: string | undefined, online: boolean): AiState {
   const [ai, setAi] = useState<AiState>('checking');
+  // The server can say the helper is on while the AI service refuses it: the chat found out.
+  const problem = useAiProblem();
   useEffect(() => {
     let live = true;
     setAi('checking');
@@ -27,7 +32,7 @@ function useAiStatus(serverUrl: string | undefined, online: boolean): AiState {
     );
     return () => { live = false; };
   }, [serverUrl, online]);
-  return ai;
+  return ai === 'on' && problem ? problem : ai;
 }
 
 const AI_TEXT: Record<AiState, string> = {
@@ -35,6 +40,8 @@ const AI_TEXT: Record<AiState, string> = {
   on: 'On: private tips on your messages and “how do I say…?” help.',
   off: 'Off. Add an Anthropic API key on the home server to turn it on.',
   unknown: "Can't check right now. It shows once the home server is reachable.",
+  ai_misconfigured: "Not working: the home server's API key (or model) was refused. Check ANTHROPIC_API_KEY on the server.",
+  ai_unavailable: 'Not working right now: the AI service is returning errors. Messages send without a check.',
 };
 
 function Paired({ settings }: { settings: Settings }) {
@@ -43,15 +50,34 @@ function Paired({ settings }: { settings: Settings }) {
   const ai = useAiStatus(settings.serverUrl, status === 'online');
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
+  const confirmTitle = useRef<HTMLParagraphElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const reopened = useRef(false);
 
+  // The trigger button is replaced by the confirmation: move focus into it, and back on Cancel.
+  useEffect(() => {
+    if (confirming) confirmTitle.current?.focus();
+    else if (reopened.current) trigger.current?.focus();
+    reopened.current = confirming;
+  }, [confirming]);
+
+  // The server still shows an older name (renamed while offline, or a rename
+  // that failed): send the one from Settings.
+  const serverName = data?.members.find((m) => m.member.id === data.me)?.member.name;
+  const localName = settings.name.trim();
+  useEffect(() => {
+    if (serverName !== undefined && localName && serverName !== localName) void syncMemberName(localName);
+  }, [serverName, localName]);
+
+  // Busy until this section turns into the connect form (unpair() waits up to 3 s for the server).
   const disconnect = async () => {
     setBusy(true);
     try {
       await unpair();
       resetHousehold();
-    } finally {
+    } catch (e) {
+      console.error('disconnect failed', e);
       setBusy(false);
-      setConfirming(false);
     }
   };
 
@@ -73,7 +99,7 @@ function Paired({ settings }: { settings: Settings }) {
             {data.members.map((m) => (
               <li key={m.member.id}>
                 <span className="set-avatar" aria-hidden="true">{(m.member.name || '?').slice(0, 1).toUpperCase()}</span>
-                <span>{m.member.name}</span>
+                <span className="set-member-name">{m.member.name}</span>
                 {m.member.id === me && <span className="chip ai">This phone</span>}
               </li>
             ))}
@@ -92,13 +118,15 @@ function Paired({ settings }: { settings: Settings }) {
       <div className="set-row">
         {confirming ? (
           <div className="set-confirm" role="group" aria-labelledby="set-unpair-title">
-            <p id="set-unpair-title" className="hm-field-label">Disconnect this phone?</p>
+            <p id="set-unpair-title" ref={confirmTitle} tabIndex={-1} className="hm-field-label set-confirm-title">Disconnect this phone?</p>
             <p className="hm-hint">
               Your progress stays on this phone. To reconnect later you'll need the household code.
+              Messages that haven't been sent yet wait here and go out when you connect again.
             </p>
             <div className="set-confirm-actions">
-              <button type="button" className="btn primary small" onClick={() => void disconnect()} disabled={busy}>
-                Disconnect
+              <button type="button" className="btn primary small" onClick={() => void disconnect()} disabled={busy}
+                aria-busy={busy}>
+                {busy ? 'Disconnecting…' : 'Disconnect'}
               </button>
               <button type="button" className="btn secondary small" onClick={() => setConfirming(false)} disabled={busy}>
                 Cancel
@@ -106,7 +134,7 @@ function Paired({ settings }: { settings: Settings }) {
             </div>
           </div>
         ) : (
-          <button type="button" className="btn secondary small set-danger" onClick={() => setConfirming(true)}>
+          <button ref={trigger} type="button" className="btn secondary small set-danger" onClick={() => setConfirming(true)}>
             Disconnect this phone
           </button>
         )}
@@ -116,13 +144,21 @@ function Paired({ settings }: { settings: Settings }) {
 }
 
 export function TogetherSection({ settings }: { settings: Settings }) {
+  const paired = isPairedSettings(settings);
+  // Disconnecting replaces the confirmation with the connect form: keep focus in this section.
+  const wasPaired = useRef(paired);
+  const intro = useRef<HTMLParagraphElement>(null);
+  useLayoutEffect(() => {
+    if (wasPaired.current && !paired && focusLost()) intro.current?.focus();
+    wasPaired.current = paired;
+  }, [paired]);
   return (
     <SettingsSection id="set-together" title="Together">
-      {isPairedSettings(settings) ? (
+      {paired ? (
         <Paired settings={settings} />
       ) : (
         <div className="set-row">
-          <p className="hm-hint set-intro">
+          <p ref={intro} tabIndex={-1} className="hm-hint set-intro">
             Connect to your home server to see each other's progress, chat in Japanese and quiz each other.
           </p>
           <ConnectServerForm compact onConnected={() => void refreshHousehold()} />

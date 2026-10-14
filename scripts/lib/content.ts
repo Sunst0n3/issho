@@ -1,13 +1,25 @@
 // Validation for the hand-authored files in content/ (grammar, sentences,
-// role-plays, survival words, mnemonics). Used by build-data and check-content.
+// role-plays, survival words, mnemonics, kana example words). Used by
+// build-data and check-content.
 
 import { isKanaOnly, isKanji, kanjiIn, parseRuby, validateRuby } from '../../src/lib/ruby.ts';
-import type { CurriculumUnit } from '../../src/lib/types.ts';
+import type { CurriculumUnit, KanaEntry } from '../../src/lib/types.ts';
+import { buildKanaTable } from './kana.ts';
 import { isCounterReading, toHiragana } from './readings.ts';
 
-export type ContentKind = 'grammar' | 'sentences' | 'roleplays' | 'survival-words' | 'mnemonics';
+export type ContentKind = 'grammar' | 'sentences' | 'roleplays' | 'survival-words' | 'mnemonics' | 'kana-examples';
 
-export const CONTENT_KINDS: readonly ContentKind[] = ['grammar', 'sentences', 'roleplays', 'survival-words', 'mnemonics'];
+export const CONTENT_KINDS: readonly ContentKind[] = [
+  'grammar',
+  'sentences',
+  'roleplays',
+  'survival-words',
+  'mnemonics',
+  'kana-examples',
+];
+
+/** Kinds authored as one object keyed by character instead of an array of entries. */
+const KEYED_KINDS: readonly ContentKind[] = ['mnemonics', 'kana-examples'];
 
 export function contentFileName(kind: ContentKind): string {
   return `${kind}.json`;
@@ -15,7 +27,7 @@ export function contentFileName(kind: ContentKind): string {
 
 /** What an absent content file is replaced with. */
 export function emptyContent(kind: ContentKind): unknown[] | Record<string, never> {
-  return kind === 'mnemonics' ? {} : [];
+  return KEYED_KINDS.includes(kind) ? {} : [];
 }
 
 /** A Japanese text field inside an entry. `ruby` fields use {漢字|かな} markup. */
@@ -265,12 +277,81 @@ function checkMnemonics(data: unknown, c: Checker): ContentItem[] {
   return items;
 }
 
+/** Small kana that merge with the kana before them into one sound: きゃ, ティ, ファ. */
+const COMBINING_SMALL_KANA = new Set([...'ぁぃぅぇぉゃゅょゎァィゥェォャュョヮ']);
+const HIRAGANA_RE = /[ぁ-ゖ]/;
+const KATAKANA_RE = /[ァ-ヺ]/;
+
+let courseKana: Map<string, KanaEntry> | undefined;
+
+/** The kana course (kana.json), by character. */
+export function kanaCourse(): ReadonlyMap<string, KanaEntry> {
+  courseKana ??= new Map(buildKanaTable().map((k) => [k.char, k]));
+  return courseKana;
+}
+
+/**
+ * Whether `word` uses `kana` as a sound of its own, not only as the first half
+ * of a yōon or extended sound: きゅう has no "ki" in it, ティー no "te".
+ */
+export function hasOwnKana(word: string, kana: string): boolean {
+  const chars = [...word];
+  return chars.some((ch, i) => ch === kana && !COMBINING_SMALL_KANA.has(chars[i + 1]));
+}
+
+/**
+ * content/kana-examples.json: { "け": { kana: "いけ", written?: "池", en: "pond" } }.
+ * Every basic, dakuten and handakuten kana of kana.json gets a short word that
+ * uses the kana's own sound, written in the kana's script.
+ */
+function checkKanaExamples(data: unknown, c: Checker): ContentItem[] {
+  if (!isObj(data)) {
+    c.error('file', 'must be an object mapping a kana to its example word');
+    return [];
+  }
+  const course = kanaCourse();
+  const items: ContentItem[] = [];
+  for (const [char, example] of Object.entries(data)) {
+    const where = `"${char}"`;
+    const known = course.get(char);
+    const entry = known && known.kind !== 'yoon' ? known : undefined;
+    if (!entry) c.error(where, 'keys must be basic, dakuten or handakuten kana from kana.json');
+    if (!isObj(example)) {
+      c.error(where, 'must be an object with "kana" and "en"');
+      continue;
+    }
+    const fields: ContentField[] = [];
+    const kana = c.string(example, 'kana', where);
+    if (kana !== undefined) {
+      fields.push({ path: `${where}.kana`, text: kana, ruby: false });
+      if (!isKanaOnly(kana)) c.error(where, `"kana" must be kana only, got "${kana}"`);
+      else if (!entry) {
+        // Reported above.
+      } else if (!hasOwnKana(kana, char)) {
+        c.error(where, `"${kana}" must use ${char} on its own${[...kana].includes(char) ? ', not only in a yōon' : ''}`);
+      } else if ((entry.script === 'hiragana' ? KATAKANA_RE : HIRAGANA_RE).test(kana)) {
+        c.error(where, `"${kana}" must be written in ${entry.script}, like ${char}`);
+      }
+    }
+    const written = c.string(example, 'written', where, true);
+    if (written !== undefined) fields.push({ path: `${where}.written`, text: written, ruby: false });
+    c.string(example, 'en', where);
+    items.push({ id: char, where, fields });
+  }
+  const missing = [...course.values()].filter((k) => k.kind !== 'yoon' && !Object.hasOwn(data, k.char));
+  if (missing.length > 0) {
+    c.warn('file', `no example word for ${missing.length} kana: ${missing.map((k) => k.char).join('')}`);
+  }
+  return items;
+}
+
 const CHECKS: Record<ContentKind, (data: unknown, c: Checker) => ContentItem[]> = {
   grammar: checkGrammar,
   sentences: checkSentences,
   roleplays: checkRolePlays,
   'survival-words': checkSurvivalWords,
   mnemonics: checkMnemonics,
+  'kana-examples': checkKanaExamples,
 };
 
 /** Structural and ruby checks for one content file's parsed JSON. */
@@ -311,7 +392,7 @@ export function mergeContent(kind: ContentKind, sources: readonly ContentSource[
     if (Array.isArray(data)) list.push(...data);
     else if (isObj(data)) Object.assign(map, data);
   }
-  return { data: kind === 'mnemonics' ? map : list, items, errors, warnings };
+  return { data: KEYED_KINDS.includes(kind) ? map : list, items, errors, warnings };
 }
 
 function declaredIds(data: unknown): string[] {
@@ -328,7 +409,8 @@ export function detectContentKind(fileName: string, data: unknown): ContentKind 
   if (base.includes('roleplay') || base.includes('role-play')) return 'roleplays';
   if (base.includes('survival')) return 'survival-words';
   if (base.includes('mnemonic')) return 'mnemonics';
-  if (isObj(data)) return 'mnemonics';
+  if (base.includes('kana-example')) return 'kana-examples';
+  if (isObj(data)) return Object.values(data).some(isObj) ? 'kana-examples' : 'mnemonics';
   const first = Array.isArray(data) ? data[0] : undefined;
   if (!isObj(first)) return undefined;
   if ('drills' in first) return 'grammar';
@@ -457,7 +539,7 @@ export interface ReadingMismatch {
  * complete a known word ({食|た}べたい) is skipped: its reading can't be judged.
  * A number with a counter may be read as one ({五分|ごふん}, not ごぶ "half"),
  * and a day count closing a range with にち ({二|に}、{三日|さんにち}).
- * Survival words compare their `written` form with their `kana`.
+ * Survival words and kana example words compare their `written` form with their `kana`.
  *
  * `words` are the spellings okurigana or a prefix may complete. With the full
  * JMdict as `readingsByWritten`, pass the common words only: JMdict also lists

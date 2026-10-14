@@ -8,7 +8,7 @@ import type { CardRecord } from '../../../lib/types.ts';
 import { toKana } from '../../../srs/answers.ts';
 import { previewDue } from '../../../srs/scheduler.ts';
 import { Icon } from '../../ui.tsx';
-import { shortInterval } from '../format.ts';
+import { shortInterval, untilText } from '../format.ts';
 import { useTypedPreference } from '../prefs.ts';
 
 /** Sizes a one-line Japanese prompt (class st-fit) so long words still fit the card. */
@@ -227,7 +227,8 @@ export function SelfGrade({ card, onGrade, intervals = true, prompt = 'How did y
       <p className="label">{prompt}</p>
       <div className="st-selfgrade-row">
         {GRADES.map(({ grade, label, tone }) => (
-          <button key={grade} type="button" className={`st-grade ${tone}`} onClick={() => onGrade(grade)}>
+          <button key={grade} type="button" className={`st-grade ${tone}`} onClick={() => onGrade(grade)}
+            aria-label={intervals ? `${label}, back ${untilText(due[grade], now)}` : undefined}>
             <span>{label}</span>
             {intervals && <span className="st-grade-when">{shortInterval(due[grade], now)}</span>}
           </button>

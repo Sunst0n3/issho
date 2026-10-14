@@ -41,7 +41,8 @@ export async function learnedToday(now: Date = new Date()): Promise<string[]> {
 // Streak
 // ---------------------------------------------------------------------------
 
-export type DayStatus = 'done' | 'rest' | 'missed' | 'today' | 'future';
+/** 'before': a past day before the learner's first day on this phone (neither done nor missed). */
+export type DayStatus = 'done' | 'rest' | 'missed' | 'today' | 'future' | 'before';
 
 export interface StreakInfo {
   /** Completed days in the current streak (rest days keep it alive but don't add to it). */
@@ -88,8 +89,12 @@ function walkStreak(doneDays: Iterable<string>, today: string): StreakWalk {
   return walk;
 }
 
-/** Streak figures from the keys of days with a completed session. */
-export function streakFromDays(doneDays: Iterable<string>, today: string): StreakInfo {
+/**
+ * Streak figures from the keys of days with a completed session. Past days
+ * before `startDay` (the learner's first day, see firstStudyDay) are 'before'
+ * rather than 'missed'.
+ */
+export function streakFromDays(doneDays: Iterable<string>, today: string, startDay?: string): StreakInfo {
   const done = new Set([...doneDays].filter((d) => d <= today));
   const walk = walkStreak(done, today);
   const rests = new Set(walk.rests);
@@ -100,6 +105,7 @@ export function streakFromDays(doneDays: Iterable<string>, today: string): Strea
     if (date > today) status = 'future';
     else if (done.has(date)) status = 'done';
     else if (date === today) status = 'today';
+    else if (startDay !== undefined && date < startDay) status = 'before';
     else status = rests.has(date) ? 'rest' : 'missed';
     return { date, status };
   });
@@ -116,8 +122,25 @@ async function completedDays(): Promise<string[]> {
   return (await db.days.filter((d) => d.sessionComplete).toArray()).map((d) => d.date);
 }
 
+/**
+ * The learner's first day on this phone: the earliest day with a record or an
+ * introduced item (kana marked known at onboarding count), else today.
+ */
+export async function firstStudyDay(now: Date = new Date()): Promise<string> {
+  const today = dayKey(now);
+  const [firstRecord, firstItem] = await Promise.all([
+    db.days.toCollection().first(),
+    db.items.orderBy('introducedAt').first(),
+  ]);
+  const candidates = [today];
+  if (firstRecord) candidates.push(firstRecord.date);
+  if (firstItem) candidates.push(dayKey(firstItem.introducedAt));
+  return candidates.sort()[0];
+}
+
 export async function streak(now: Date = new Date()): Promise<StreakInfo> {
-  return streakFromDays(await completedDays(), dayKey(now));
+  const [done, start] = await Promise.all([completedDays(), firstStudyDay(now)]);
+  return streakFromDays(done, dayKey(now), start);
 }
 
 /** Marks today's session complete (and records the rest days it relies on). */

@@ -76,6 +76,19 @@ describe('database file', () => {
     const next = store.insertMessage({ clientId: 'c-2', memberId: 'm-carter', createdAt: '2026-10-03T00:00:00.000Z', kind: 'text', text: 'ただいま' });
     assert.equal(next.id, 4);
 
+    // Messages from before the upgrade have no writtenAt.
+    assert.equal('writtenAt' in store.listMessages(0, 1)[0], false);
+    // Stats from before the upgrade stay until a device uploads; its own numbers then count.
+    store.saveStats(
+      'm-aiko',
+      'h-aiko',
+      { days: [{ date: '2026-10-02', studyMinutes: 5, reviews: 4, correct: 3, newItems: 1, sessionComplete: true }], streak: 1, kanjiKnown: 0, knownKanji: [], phase: 1 },
+      new Date('2026-10-02T12:00:00.000Z'),
+      '2026-10-02',
+    );
+    assert.deepEqual(store.memberSummary('m-aiko')?.knownKanji, []);
+    assert.equal(store.dayStats('m-aiko', '2026-10-02', '2026-10-02')[0]?.reviews, 4);
+
     assert.deepEqual(store.removeMember('m-aiko'), { devices: 1, messagesKept: 1, voiceFiles: ['v-unsent.webm'] });
     assert.equal(store.getMember('m-aiko'), undefined);
     assert.equal(store.memberSummary('m-aiko'), undefined);

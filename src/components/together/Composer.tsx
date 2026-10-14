@@ -8,7 +8,7 @@ import { micAvailable } from '../../speech/recorder.ts';
 import { aiCheck, ApiError } from '../../sync/client.ts';
 import { queueChatMessage } from '../../sync/outbox.ts';
 import { Icon, Ruby } from '../ui.tsx';
-import { TIMED_OUT, withTimeout } from './ai.ts';
+import { AI_BROKEN_NOTICE, aiProblemOf, markAiBroken, TIMED_OUT, withTimeout, type AiProblem } from './ai.ts';
 import { TIcon } from './icons.tsx';
 import { MicButton } from './MicButton.tsx';
 import { TranslateSheet } from './TranslateSheet.tsx';
@@ -88,11 +88,20 @@ export const Composer = forwardRef<ComposerHandle, {
       const run = ++checkRun.current;
       setChecking(true);
       let result: AiCheckResponse | typeof TIMED_OUT | undefined;
+      let broken: AiProblem | undefined;
       try {
         result = await withTimeout(aiCheck({ text: body, knownKanji, context: context.slice(-6) }), CHECK_TIMEOUT_MS);
       } catch (e) {
-        if (e instanceof ApiError && e.code === 'ai_disabled') onAiOff();
+        broken = aiProblemOf(e);
+        if (broken) {
+          // A refused key (or the API failing) won't fix itself: say so once, then stop checking.
+          markAiBroken(broken);
+          onAiOff();
+        } else if (e instanceof ApiError && e.code === 'ai_disabled') {
+          onAiOff();
+        }
       }
+      if (broken) setNotice(AI_BROKEN_NOTICE[broken]);
       // "Send now" was tapped while the helper was still thinking.
       if (run !== checkRun.current) return;
       setChecking(false);

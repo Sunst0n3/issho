@@ -89,7 +89,7 @@ export default function KanaChart() {
 
   return (
     <Screen label="Kana chart">
-      <TopBar back="/learn" title={<h1 className="lib-title">Kana chart</h1>} />
+      <TopBar back="/learn" title="Kana chart" />
       <Segmented label="Script" value={script} onChange={setScript}
         options={[
           { value: 'hiragana', label: <><span lang="ja">ひらがな</span> Hiragana</> },

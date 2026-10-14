@@ -128,9 +128,44 @@ export const MIGRATIONS: readonly string[] = [
     value TEXT NOT NULL
   ) WITHOUT ROWID;
   `,
+  `
+  -- Each device's latest upload, so a phone that was reset (or restored from an older backup) can
+  -- lower its own numbers. day_stats and member_stats stay the merged view per member: recomputed
+  -- from the member's current devices on every upload, and kept when a device is signed out.
+  CREATE TABLE device_day_stats (
+    token_hash TEXT NOT NULL REFERENCES devices(token_hash) ON DELETE CASCADE,
+    member_id TEXT NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    date TEXT NOT NULL,
+    study_minutes REAL NOT NULL,
+    reviews INTEGER NOT NULL,
+    correct INTEGER NOT NULL,
+    new_items INTEGER NOT NULL,
+    session_complete INTEGER NOT NULL,
+    PRIMARY KEY (token_hash, date)
+  ) WITHOUT ROWID;
+  CREATE INDEX device_day_stats_member ON device_day_stats(member_id, date);
+
+  CREATE TABLE device_stats (
+    token_hash TEXT PRIMARY KEY REFERENCES devices(token_hash) ON DELETE CASCADE,
+    member_id TEXT NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    streak INTEGER NOT NULL,
+    kanji_known INTEGER NOT NULL,
+    known_kanji TEXT NOT NULL,
+    phase INTEGER NOT NULL,
+    reported_day TEXT,
+    updated_at TEXT NOT NULL
+  );
+  CREATE INDEX device_stats_member ON device_stats(member_id);
+
+  -- When the sender wrote a message on their phone, which may be long before it reached the server.
+  ALTER TABLE messages ADD COLUMN written_at TEXT;
+  `,
 ];
 
 const HOUSEHOLD_NAME_SETTING = 'household_name';
+const HOUSEHOLD_ID_SETTING = 'household_id';
+/** How far back a message's writtenAt may go: about as long as a phone sits offline. */
+export const MAX_WRITTEN_BEFORE_MS = 7 * 24 * 60 * 60 * 1000;
 
 type MemberRow = { id: string; name: string; joined_at: string; last_seen_at: string | null };
 type DayRow = {
@@ -149,11 +184,13 @@ type MemberStatsRow = {
   reported_day: string | null;
   updated_at: string;
 };
+type DeviceStatsRow = MemberStatsRow & { token_hash: string };
 type MessageRow = {
   id: number;
   client_id: string;
   member_id: string;
   created_at: string;
+  written_at: string | null;
   kind: MessageKind;
   text: string;
   transcript: string | null;
@@ -205,6 +242,8 @@ export interface NewMessage {
   clientId: string;
   memberId: string;
   createdAt: string;
+  /** When it was written on the phone; the caller keeps it within MAX_WRITTEN_BEFORE_MS of createdAt. */
+  writtenAt?: string;
   kind: MessageKind;
   text: string;
   transcript?: string;
@@ -299,6 +338,11 @@ export class Store {
     return toMember(row);
   }
 
+  /** Signs out one device (its token stops working). Returns false when it wasn't paired. */
+  removeDevice(tokenHash: string): boolean {
+    return Number(this.sql('DELETE FROM devices WHERE token_hash = ?').run(tokenHash).changes) > 0;
+  }
+
   /** Signs out every device of a member. Returns how many there were. */
   revokeDevices(memberId: string): number {
     return Number(this.sql('DELETE FROM devices WHERE member_id = ?').run(memberId).changes);
@@ -337,24 +381,68 @@ export class Store {
     ).run(HOUSEHOLD_NAME_SETTING, name);
   }
 
+  /**
+   * A random id for this household's data, made on first use. It changes only when the data is
+   * started afresh, which tells a phone pairing again whether its cached chat still belongs here.
+   */
+  householdId(): string {
+    this.sql('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)').run(HOUSEHOLD_ID_SETTING, randomUUID());
+    const row = this.sql('SELECT value FROM settings WHERE key = ?').get(HOUSEHOLD_ID_SETTING) as { value: string };
+    return row.value;
+  }
+
   // Study stats
 
   /**
-   * Merges an upload into the member's stats. A member can study on two devices, each uploading
-   * its own numbers for the same days, so no device's upload may wipe out another's: each day
-   * keeps the larger value of every field. `reportedDay` is the uploading device's study day
-   * (null when unknown), which decides whose streak counts (see mergeSummary).
+   * Saves a device's upload and refreshes the member's merged stats. A member can study on two
+   * devices, each uploading its own numbers for the same days, so no device's upload may wipe out
+   * another's: each day keeps the largest value of every field across the member's current
+   * devices. A device's upload does replace its own earlier one, so a phone that was reset (or
+   * restored from an older backup) lowers what it reported before. Days a device no longer sends
+   * keep their merged values, so the history behind the shared streak survives. `reportedDay` is
+   * the uploading device's study day (null when unknown), which decides whose streak counts
+   * (see mergeDevices).
    */
-  saveStats(memberId: string, upload: StatsUploadRequest, now: Date, reportedDay: string | null): void {
-    const upsertDay = this.sql(`
+  saveStats(
+    memberId: string,
+    tokenHash: string,
+    upload: StatsUploadRequest,
+    now: Date,
+    reportedDay: string | null,
+  ): void {
+    const upsertDeviceDay = this.sql(`
+      INSERT INTO device_day_stats
+        (token_hash, member_id, date, study_minutes, reviews, correct, new_items, session_complete)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT (token_hash, date) DO UPDATE SET
+        study_minutes = excluded.study_minutes,
+        reviews = excluded.reviews,
+        correct = excluded.correct,
+        new_items = excluded.new_items,
+        session_complete = excluded.session_complete
+    `);
+    const mergeDay = this.sql(`
       INSERT INTO day_stats (member_id, date, study_minutes, reviews, correct, new_items, session_complete)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      SELECT member_id, date, MAX(study_minutes), MAX(reviews), MAX(correct), MAX(new_items), MAX(session_complete)
+      FROM device_day_stats WHERE member_id = ? AND date = ?
+      GROUP BY member_id, date
       ON CONFLICT (member_id, date) DO UPDATE SET
-        study_minutes = MAX(study_minutes, excluded.study_minutes),
-        reviews = MAX(reviews, excluded.reviews),
-        correct = MAX(correct, excluded.correct),
-        new_items = MAX(new_items, excluded.new_items),
-        session_complete = MAX(session_complete, excluded.session_complete)
+        study_minutes = excluded.study_minutes,
+        reviews = excluded.reviews,
+        correct = excluded.correct,
+        new_items = excluded.new_items,
+        session_complete = excluded.session_complete
+    `);
+    const upsertDevice = this.sql(`
+      INSERT INTO device_stats (token_hash, member_id, streak, kanji_known, known_kanji, phase, reported_day, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT (token_hash) DO UPDATE SET
+        streak = excluded.streak,
+        kanji_known = excluded.kanji_known,
+        known_kanji = excluded.known_kanji,
+        phase = excluded.phase,
+        reported_day = excluded.reported_day,
+        updated_at = excluded.updated_at
     `);
     const upsertSummary = this.sql(`
       INSERT INTO member_stats (member_id, streak, kanji_known, known_kanji, phase, reported_day, updated_at)
@@ -367,9 +455,11 @@ export class Store {
         reported_day = excluded.reported_day,
         updated_at = excluded.updated_at
     `);
+    const updatedAt = now.toISOString();
     this.transaction(() => {
       for (const day of upload.days) {
-        upsertDay.run(
+        upsertDeviceDay.run(
+          tokenHash,
           memberId,
           day.date,
           day.studyMinutes,
@@ -378,11 +468,23 @@ export class Store {
           day.newItems,
           day.sessionComplete ? 1 : 0,
         );
+        mergeDay.run(memberId, day.date);
       }
-      const stored = this.sql('SELECT * FROM member_stats WHERE member_id = ?').get(memberId) as
-        | MemberStatsRow
-        | undefined;
-      const summary = mergeSummary(stored, upload, reportedDay);
+      upsertDevice.run(
+        tokenHash,
+        memberId,
+        upload.streak,
+        upload.kanjiKnown,
+        JSON.stringify([...new Set(upload.knownKanji)]),
+        upload.phase,
+        reportedDay,
+        updatedAt,
+      );
+      const devices = this.sql(`
+        SELECT s.* FROM device_stats s JOIN devices d ON d.token_hash = s.token_hash
+        WHERE s.member_id = ? ORDER BY d.created_at, d.rowid
+      `).all(memberId) as DeviceStatsRow[];
+      const summary = mergeDevices(devices);
       upsertSummary.run(
         memberId,
         summary.streak,
@@ -390,7 +492,7 @@ export class Store {
         JSON.stringify(summary.knownKanji),
         summary.phase,
         summary.reportedDay,
-        now.toISOString(),
+        updatedAt,
       );
     });
   }
@@ -455,13 +557,14 @@ export class Store {
 
   insertMessage(message: NewMessage): ChatMessage {
     const row = this.sql(`
-      INSERT INTO messages (client_id, member_id, created_at, kind, text, transcript, audio_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO messages (client_id, member_id, created_at, written_at, kind, text, transcript, audio_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       RETURNING *
     `).get(
       message.clientId,
       message.memberId,
       message.createdAt,
+      message.writtenAt ?? null,
       message.kind,
       message.text,
       message.transcript ?? null,
@@ -626,34 +729,31 @@ interface Summary {
 }
 
 /**
- * Folds an upload into a member's stored summary. Known kanji and the phase only grow, so the union
- * and the larger values win; the count is never below the union's size. A streak drops when a day
- * is missed, so the device reporting the latest study day decides it; within one day it only grows,
- * so there the larger wins. An upload without a study day can't be ordered, so it keeps a dated streak.
+ * A member's summary from their devices' latest uploads (oldest device first). Known kanji are
+ * the union and the phase the highest; the count is never below the union's size. A streak drops
+ * when a day is missed, so the device reporting the latest study day decides it; within one day
+ * it only grows, so there the larger wins. A device that sent no study day can't be ordered, so
+ * it decides only when no device sent one (the latest upload wins then).
  */
-function mergeSummary(
-  stored: MemberStatsRow | undefined,
-  upload: StatsUploadRequest,
-  reportedDay: string | null,
-): Summary {
-  const storedKanji = stored ? (JSON.parse(stored.known_kanji) as string[]) : [];
-  const knownKanji = [...new Set([...storedKanji, ...upload.knownKanji])];
-  const merged: Summary = {
-    streak: upload.streak,
-    kanjiKnown: Math.max(upload.kanjiKnown, stored?.kanji_known ?? 0, knownKanji.length),
+function mergeDevices(devices: readonly DeviceStatsRow[]): Summary {
+  const knownKanji = [...new Set(devices.flatMap((device) => JSON.parse(device.known_kanji) as string[]))];
+  const dated = devices.filter((device) => device.reported_day !== null);
+  const latestDay = dated.reduce<string | null>(
+    (max, device) => (max === null || device.reported_day! > max ? device.reported_day : max),
+    null,
+  );
+  const streak =
+    latestDay !== null
+      ? Math.max(...dated.filter((device) => device.reported_day === latestDay).map((device) => device.streak))
+      : [...devices].sort((a, b) => (a.updated_at < b.updated_at ? -1 : a.updated_at > b.updated_at ? 1 : 0)).at(-1)
+          ?.streak ?? 0;
+  return {
+    streak,
+    kanjiKnown: Math.max(knownKanji.length, ...devices.map((device) => device.kanji_known)),
     knownKanji,
-    phase: Math.max(upload.phase, stored?.phase ?? 1),
-    reportedDay: reportedDay ?? stored?.reported_day ?? null,
+    phase: Math.max(1, ...devices.map((device) => device.phase)),
+    reportedDay: latestDay,
   };
-  if (stored?.reported_day) {
-    if (reportedDay === stored.reported_day) {
-      merged.streak = Math.max(upload.streak, stored.streak);
-    } else if (reportedDay === null || reportedDay < stored.reported_day) {
-      merged.streak = stored.streak;
-      merged.reportedDay = stored.reported_day;
-    }
-  }
-  return merged;
 }
 
 function toMember(row: MemberRow): Member {
@@ -669,6 +769,7 @@ function toMessage(row: MessageRow): ChatMessage {
     kind: row.kind,
     text: row.text,
   };
+  if (row.written_at !== null) message.writtenAt = row.written_at;
   if (row.transcript !== null) message.transcript = row.transcript;
   if (row.audio_id !== null) message.audioId = row.audio_id;
   return message;

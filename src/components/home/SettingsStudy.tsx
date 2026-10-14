@@ -1,12 +1,15 @@
 // Settings: You, Study, Kana and Appearance sections.
 import { useId, useState, type ReactNode } from 'react';
-import { updateSettings } from '../../lib/db.ts';
-import type { Settings } from '../../lib/types.ts';
+import { loadKana } from '../../lib/data.ts';
+import { getSettings, updateSettings } from '../../lib/db.ts';
+import type { KanaScript, Settings } from '../../lib/types.ts';
 import { applyKnownKana } from '../../srs/course.ts';
 import { speak, ttsAvailable, useJapaneseVoices } from '../../speech/tts.ts';
+import { isPairedSettings } from '../../sync/client.ts';
 import { Icon } from '../ui.tsx';
 import { Segmented, Switch } from './controls.tsx';
 import { minutesForPace } from './labels.ts';
+import { syncMemberName } from './nameSync.ts';
 import { setTheme, storedTheme, type ThemeChoice } from './theme.ts';
 import { useDraft } from './useDraft.ts';
 
@@ -19,18 +22,50 @@ export function SettingsSection({ id, title, children }: { id: string; title: st
   );
 }
 
+/**
+ * Saves a typed name. An empty name is never saved (onboarding requires one and
+ * pairing needs it), so the last name stays until a new one is typed. A paired
+ * phone also renames its member on the home server.
+ */
+async function saveName(value: string): Promise<void> {
+  if (!value.trim()) return;
+  const saved = await updateSettings({ name: value });
+  if (isPairedSettings(saved)) await syncMemberName(value);
+}
+
 export function YouSection({ settings }: { settings: Settings }) {
-  const [name, setName] = useDraft(settings.name, (v: string) => updateSettings({ name: v }), 500);
+  const [name, setName] = useDraft(settings.name, saveName, 500);
+  const empty = !name.trim();
   return (
     <SettingsSection id="set-you" title="You">
       <div className="hm-field set-row">
         <label className="hm-field-label" htmlFor="set-name">Your name</label>
         <input id="set-name" className="text-input" value={name} maxLength={40} autoComplete="given-name"
+          aria-invalid={empty || undefined} aria-describedby="set-name-hint"
           onChange={(e) => setName(e.target.value)}
-          onBlur={() => { if (name.trim() !== name) setName(name.trim()); }} />
+          onBlur={() => {
+            // Leaving the field empty puts the saved name back.
+            if (empty) void getSettings().then((s) => setName(s.name));
+            else if (name.trim() !== name) setName(name.trim());
+          }} />
+        {empty
+          ? <p id="set-name-hint" className="hm-error" role="status">Add a name. Your partner sees it when you study together.</p>
+          : <p id="set-name-hint" className="hm-hint">Your partner sees this when you study together.</p>}
       </div>
     </SettingsSection>
   );
+}
+
+/**
+ * A shorter voice name for the picker: "Flo (Japanese (Japan))" → "Flo",
+ * "Microsoft Nanami Online (Natural) - Japanese (Japan)" → "Microsoft Nanami Online (Natural)".
+ */
+export function voiceLabel(name: string): string {
+  const short = name
+    .replace(/\s*[-–]\s*(Japanese|日本語).*$/i, '')
+    .replace(/\s*\((Japanese|日本語)(\s*\([^()]*\)|[^()])*\)\s*$/i, '')
+    .trim();
+  return short || name;
 }
 
 function RangeRow({ label, hint, min, max, step, value, format, onChange }: {
@@ -68,6 +103,10 @@ const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v
 
 function VoicePicker({ settings }: { settings: Settings }) {
   const voices = useJapaneseVoices();
+  const labels = voices.map((v) => voiceLabel(v.name));
+  // Two voices that shorten to the same name keep their full names.
+  const labelOf = (v: SpeechSynthesisVoice, i: number) =>
+    labels.indexOf(labels[i]) === labels.lastIndexOf(labels[i]) ? labels[i] : v.name;
   const [testing, setTesting] = useState(false);
   if (!ttsAvailable()) {
     return <p className="hm-hint set-row">This browser can't speak Japanese, so audio stays off.</p>;
@@ -87,7 +126,7 @@ function VoicePicker({ settings }: { settings: Settings }) {
         <select id="set-voice" className="set-select" value={settings.ttsVoice ?? ''}
           onChange={(e) => void updateSettings({ ttsVoice: e.target.value || undefined })}>
           <option value="">Best available</option>
-          {voices.map((v) => <option key={v.voiceURI} value={v.voiceURI}>{v.name}</option>)}
+          {voices.map((v, i) => <option key={v.voiceURI} value={v.voiceURI}>{labelOf(v, i)}</option>)}
         </select>
         <button type="button" className="btn secondary small" onClick={() => void test()} disabled={testing}>
           <Icon name="speaker" size={16} />{testing ? 'Playing' : 'Test'}
@@ -173,14 +212,16 @@ export function KanaSection({ settings }: { settings: Settings }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string }>();
 
-  const change = async (patch: Pick<Settings, 'knowsHiragana'> | Pick<Settings, 'knowsKatakana'>, on: boolean) => {
+  const change = async (script: KanaScript, on: boolean) => {
     setBusy(true);
     setMessage(undefined);
     try {
-      await updateSettings(patch);
+      await updateSettings(script === 'hiragana' ? { knowsHiragana: on } : { knowsKatakana: on });
       if (on) {
-        const count = await applyKnownKana();
-        setMessage({ ok: true, text: `Done: ${count} kana are now in your reviews as known.` });
+        await applyKnownKana();
+        // applyKnownKana covers every known script; the message is about the one just turned on.
+        const count = (await loadKana()).filter((k) => k.script === script).length;
+        setMessage({ ok: true, text: `Done: ${count} ${script} are now in your reviews as known.` });
       } else {
         setMessage({ ok: true, text: "Kana you've already learned stay in your reviews." });
       }
@@ -195,11 +236,11 @@ export function KanaSection({ settings }: { settings: Settings }) {
     <SettingsSection id="set-kana" title="Kana">
       <div className="set-row">
         <Switch label="I already know hiragana" hint="Skips the hiragana lessons." disabled={busy}
-          checked={settings.knowsHiragana} onChange={(v) => void change({ knowsHiragana: v }, v)} />
+          checked={settings.knowsHiragana} onChange={(v) => void change('hiragana', v)} />
       </div>
       <div className="set-row">
         <Switch label="I already know katakana" hint="Skips the katakana lessons." disabled={busy}
-          checked={settings.knowsKatakana} onChange={(v) => void change({ knowsKatakana: v }, v)} />
+          checked={settings.knowsKatakana} onChange={(v) => void change('katakana', v)} />
       </div>
       {message && <p className={message.ok ? 'hm-ok' : 'hm-error'} role="status">{message.text}</p>}
     </SettingsSection>

@@ -4,11 +4,17 @@ import { WS_CLOSE_UNPAIRED, type ServerEvent } from '../../shared/api.ts';
 export { WS_CLOSE_UNPAIRED };
 
 const HEARTBEAT_MS = 30_000;
+/**
+ * How often open sockets are checked against the devices table. A phone revoked or removed with
+ * the admin CLI (another process) is cut off within this long, even when nothing is broadcast.
+ */
+const PAIRING_CHECK_MS = 5_000;
 
 export interface HubOptions {
   /**
-   * Whether a device (its token hash) is still paired. Checked on every heartbeat, so a phone
-   * revoked or removed with the admin CLI (another process) stops receiving the household's events.
+   * Whether a device (its token hash) is still paired. Checked before every delivery and every
+   * few seconds, so a phone revoked or removed with the admin CLI (another process) stops
+   * receiving the household's events at once.
    */
   isPaired?: (tokenHash: string) => boolean;
 }
@@ -20,6 +26,7 @@ export class Hub {
   private readonly devices = new WeakMap<WebSocket, string>();
   private readonly isPaired: (tokenHash: string) => boolean;
   private heartbeat: NodeJS.Timeout | undefined;
+  private pairingCheck: NodeJS.Timeout | undefined;
 
   constructor(options: HubOptions = {}) {
     this.isPaired = options.isPaired ?? (() => true);
@@ -60,7 +67,7 @@ export class Hub {
   broadcast(event: ServerEvent, options: { exceptMemberId?: string } = {}): void {
     const data = JSON.stringify(event);
     for (const [memberId, set] of this.sockets) {
-      if (memberId !== options.exceptMemberId) deliver(set, data);
+      if (memberId !== options.exceptMemberId) this.deliver(set, data);
     }
   }
 
@@ -68,19 +75,35 @@ export class Hub {
     const data = JSON.stringify(event);
     for (const memberId of new Set(memberIds)) {
       const set = this.sockets.get(memberId);
-      if (set) deliver(set, data);
+      if (set) this.deliver(set, data);
     }
   }
 
   send(socket: WebSocket, event: ServerEvent): void {
-    deliver([socket], JSON.stringify(event));
+    this.deliver([socket], JSON.stringify(event));
+  }
+
+  /** Closes the sockets of a device that was just signed out. */
+  closeDevice(tokenHash: string): void {
+    for (const set of this.sockets.values()) {
+      for (const socket of set) {
+        if (this.devices.get(socket) === tokenHash) unpaired(socket);
+      }
+    }
+  }
+
+  /** Closes every socket whose device is no longer paired. */
+  checkPairings(): void {
+    for (const set of this.sockets.values()) {
+      for (const socket of set) this.stillPaired(socket);
+    }
   }
 
   /**
-   * Pings every socket periodically, drops the ones that stopped answering (phones that slept)
-   * and closes the ones whose device is no longer paired.
+   * Pings every socket periodically and drops the ones that stopped answering (phones that
+   * slept); checks more often that every socket's device is still paired.
    */
-  startHeartbeat(intervalMs = HEARTBEAT_MS): void {
+  startHeartbeat(intervalMs = HEARTBEAT_MS, pairingCheckMs = PAIRING_CHECK_MS): void {
     this.stopHeartbeat();
     this.heartbeat = setInterval(() => {
       for (const set of this.sockets.values()) {
@@ -89,26 +112,40 @@ export class Hub {
             socket.terminate();
             continue;
           }
-          if (!this.isPaired(this.devices.get(socket)!)) {
-            socket.close(WS_CLOSE_UNPAIRED, 'device not paired');
-            continue;
-          }
+          if (!this.stillPaired(socket)) continue;
           this.alive.delete(socket);
           socket.ping();
         }
       }
     }, intervalMs);
     this.heartbeat.unref();
+    this.pairingCheck = setInterval(() => this.checkPairings(), pairingCheckMs);
+    this.pairingCheck.unref();
   }
 
   stopHeartbeat(): void {
     clearInterval(this.heartbeat);
+    clearInterval(this.pairingCheck);
     this.heartbeat = undefined;
+    this.pairingCheck = undefined;
+  }
+
+  private deliver(sockets: Iterable<WebSocket>, data: string): void {
+    for (const socket of sockets) {
+      if (socket.readyState === socket.OPEN && this.stillPaired(socket)) socket.send(data);
+    }
+  }
+
+  /** False (after closing it) when the socket's device was signed out or removed. */
+  private stillPaired(socket: WebSocket): boolean {
+    if (socket.readyState !== socket.OPEN) return false;
+    const tokenHash = this.devices.get(socket);
+    if (tokenHash !== undefined && this.isPaired(tokenHash)) return true;
+    unpaired(socket);
+    return false;
   }
 }
 
-function deliver(sockets: Iterable<WebSocket>, data: string): void {
-  for (const socket of sockets) {
-    if (socket.readyState === socket.OPEN) socket.send(data);
-  }
+function unpaired(socket: WebSocket): void {
+  if (socket.readyState === socket.OPEN) socket.close(WS_CLOSE_UNPAIRED, 'device not paired');
 }

@@ -6,8 +6,10 @@ import { dayKey } from '../../lib/db.ts';
 import { wasRemoved } from '../../sync/client.ts';
 import { useServerStatus } from '../../sync/socket.ts';
 import { useHousehold } from '../../sync/stats.ts';
+import { splitHousehold } from '../together/household.ts';
 import { Icon } from '../ui.tsx';
-import { agoText, plural } from './labels.ts';
+import { agoText, plural, streakText } from './labels.ts';
+import { worksOffline } from './SecureNotice.tsx';
 
 const STALE_MS = 10 * 60_000;
 
@@ -22,7 +24,7 @@ function partnerLines(partner: MemberStats, today: string): { title: string; det
   if (!studied(day)) {
     return {
       title: `${name} hasn't studied yet today`,
-      detail: partner.streak > 0 ? `${plural(partner.streak, 'day')} streak so far` : 'Say hi in Japanese',
+      detail: partner.streak > 0 ? `${streakText(partner.streak)} so far` : 'Say hi in Japanese',
     };
   }
   const parts = [`${day.newItems} new`, plural(day.reviews, 'review')];
@@ -33,28 +35,36 @@ function partnerLines(partner: MemberStats, today: string): { title: string; det
   };
 }
 
+/**
+ * The link's name from its separate lines. Read from content, the stacked spans
+ * would run together ("Ken finished today5 new").
+ */
+const linkName = (...lines: Array<string | false | undefined>) => lines.filter(Boolean).join('. ');
+
 /** For a paired phone: the partner's day. Works offline from the last household copy. */
 export function PartnerCard() {
   const { data, fetchedAt, loading, error } = useHousehold();
 
   if (!data) {
+    const detail = loading || !error ? 'Checking in with your home server…' : "Can't reach your home server right now";
     return (
-      <Link to="/together" className="today-partner quiet">
+      <Link to="/together" className="today-partner quiet" aria-label={linkName('Together', detail)}>
         <span className="today-partner-text">
           <span className="today-partner-title">Together</span>
-          <span className="today-partner-detail">
-            {loading || !error ? 'Checking in with your home server…' : "Can't reach your home server right now"}
-          </span>
+          <span className="today-partner-detail">{detail}</span>
         </span>
         <Icon name="forward" size={20} />
       </Link>
     );
   }
 
-  const partner = data.members.find((m) => m.member.id !== data.me);
+  // The other member seen most recently, as on the Together tab: a leftover (ghost) member
+  // from before re-pairing reused members would otherwise hide the real partner.
+  const { partner } = splitHousehold(data);
   if (!partner) {
     return (
-      <Link to="/together" className="today-partner">
+      <Link to="/together" className="today-partner"
+        aria-label={linkName('Waiting for your partner', 'They join with the same household code')}>
         <span className="today-partner-avatar" aria-hidden="true"><Icon name="people" size={20} /></span>
         <span className="today-partner-text">
           <span className="today-partner-title">Waiting for your partner</span>
@@ -67,13 +77,14 @@ export function PartnerCard() {
 
   const { title, detail } = partnerLines(partner, dayKey());
   const stale = fetchedAt !== undefined && Date.now() - fetchedAt > STALE_MS;
+  const staleText = stale && fetchedAt !== undefined ? `Last update ${agoText(fetchedAt)}` : undefined;
   return (
-    <Link to="/together" className="today-partner">
+    <Link to="/together" className="today-partner" aria-label={linkName(title, detail, staleText)}>
       <span className="today-partner-avatar" aria-hidden="true">{(partner.member.name || '?').slice(0, 1).toUpperCase()}</span>
       <span className="today-partner-text">
         <span className="today-partner-title">{title}</span>
         <span className="today-partner-detail">{detail}</span>
-        {stale && fetchedAt !== undefined && <span className="today-partner-stale">Last update {agoText(fetchedAt)}</span>}
+        {staleText && <span className="today-partner-stale">{staleText}</span>}
       </span>
       <Icon name="forward" size={20} />
     </Link>
@@ -99,7 +110,8 @@ export function SyncFooter({ paired }: { paired: boolean }) {
   return (
     <footer className="today-footer">
       <Icon name="check" size={16} />
-      <span>Works offline · progress saved on this phone</span>
+      {/* Without a secure address the app can't run offline, so it doesn't claim to. */}
+      <span>{worksOffline() ? 'Works offline · progress saved on this phone' : 'Progress saved on this phone'}</span>
       {sync && <span className={`today-sync ${status}`} role="status">{sync}</span>}
     </footer>
   );

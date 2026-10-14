@@ -138,8 +138,25 @@ describe('Chat', () => {
     expect(failed.textContent).toContain('Not sent');
     fireEvent.click(within(failed).getByRole('button', { name: 'Retry' }));
     expect(mocks.retryMessage).toHaveBeenCalledWith('p2');
+
+    // Deleting can't be undone, so it asks first; Keep backs out.
+    fireEvent.click(within(failed).getByRole('button', { name: 'Delete' }));
+    expect(mocks.discardMessage).not.toHaveBeenCalled();
+    expect(failed.textContent).toContain("Delete this message? It can't be undone.");
+    expect(document.activeElement).toBe(within(failed).getByRole('button', { name: 'Keep' }));
+    fireEvent.click(within(failed).getByRole('button', { name: 'Keep' }));
+    expect(failed.textContent).toContain('Not sent');
+    expect(document.activeElement).toBe(within(failed).getByRole('button', { name: 'Delete' }));
+
+    fireEvent.click(within(failed).getByRole('button', { name: 'Delete' }));
     fireEvent.click(within(failed).getByRole('button', { name: 'Delete' }));
     expect(mocks.discardMessage).toHaveBeenCalledWith('p2');
+  });
+
+  it('gives the screen a heading: who the chat is with', async () => {
+    renderChat();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Ken' })).toBeTruthy();
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
   it('explains why nothing sends once this phone was removed, and offers to connect again', async () => {
@@ -281,6 +298,31 @@ describe('Chat', () => {
     await waitFor(() => expect(mocks.queueChatMessage).toHaveBeenCalledWith({ kind: 'text', text: 'おやすみ' }));
     expect(mocks.aiCheck).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole('button', { name: /Stuck\?/ })).toBeNull();
+  });
+
+  it.each([
+    ['ai_misconfigured', "The AI helper isn't working — check the server's API key."],
+    // The API itself erroring isn't a setup problem: don't send anyone to check the key.
+    ['ai_unavailable', "The AI helper isn't answering right now, so messages send without a check."],
+  ] as const)('says once that the helper is broken (%s), then sends without checking', async (code, notice) => {
+    const { ApiError } = await import('../../sync/client.ts');
+    const { aiProblem } = await import('./ai.ts');
+    mocks.aiCheck.mockRejectedValue(new ApiError(code === 'ai_misconfigured' ? 503 : 502, code));
+    renderChat();
+    await screen.findByRole('button', { name: /Stuck\?/ });
+
+    await typeAndSend('ただいま');
+    await waitFor(() => expect(mocks.queueChatMessage).toHaveBeenCalledWith({ kind: 'text', text: 'ただいま' }));
+    expect((await screen.findByRole('status')).textContent).toBe(notice);
+    expect(screen.queryByRole('button', { name: /Stuck\?/ })).toBeNull();
+    expect(aiProblem()).toBe(code);
+
+    // The rest of the session: no check, no waiting, and the notice isn't repeated.
+    await typeAndSend('おやすみ');
+    await waitFor(() => expect(mocks.queueChatMessage).toHaveBeenCalledWith({ kind: 'text', text: 'おやすみ' }));
+    expect(mocks.aiCheck).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText(/Checking your message/)).toBeNull();
+    expect(screen.queryByText(notice)).toBeNull();
   });
 
   it('turns readings for unknown kanji on and off', async () => {

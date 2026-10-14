@@ -1,6 +1,6 @@
 // Shared UI primitives. Styling lives in src/styles/global.css.
 import type { ReactNode } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { parseRuby } from '../lib/ruby.ts';
 
 // ---- Icons: inline stroke SVG, 24×24 viewBox, currentColor ----
@@ -75,15 +75,44 @@ export function Screen({ children, tabs = false, label }: { children: ReactNode;
   return <main className={tabs ? 'screen with-tabs' : 'screen'} aria-label={label}>{children}</main>;
 }
 
-/** Header row with a back (or close) button, a title and optional right-side content. */
-export function TopBar({ title, back, close, right }: {
+/**
+ * True when this page was reached by navigating inside the app, so history back
+ * stays in the app. The first page of a visit (a bookmark, a reload of the
+ * start page, a link from elsewhere) has React Router's 'default' key.
+ */
+export function useHasInAppHistory(): boolean {
+  return useLocation().key !== 'default';
+}
+
+/** Reloads the app. A function of its own so tests, where jsdom can't navigate, can replace it. */
+export function reloadPage(): void {
+  window.location.reload();
+}
+
+/**
+ * Header row with a back (or close) button, a title and optional right-side content.
+ * The title is the screen's h1 unless `heading` is false.
+ */
+export function TopBar({ title, back, close, right, heading = true }: {
   title?: ReactNode;
-  /** Path to go back to; `true` = history back. */
+  /**
+   * Where Back leads. A path is the fallback: Back goes back in history when the
+   * page was opened from inside the app (so the system back gesture and this
+   * button agree), and replaces the page with the path otherwise (a bookmark or
+   * a reload). `true` always goes back in history.
+   */
   back?: string | true;
   close?: string;
   right?: ReactNode;
+  /**
+   * Render the title as the screen's h1 (default). Pass false when the screen
+   * has its own h1, or when the title is not text (a progress bar).
+   */
+  heading?: boolean;
 }) {
   const navigate = useNavigate();
+  const inApp = useHasInAppHistory();
+  const Title = heading && title !== undefined && title !== null && title !== false ? 'h1' : 'div';
   return (
     <div className="topbar">
       {back === true && (
@@ -92,12 +121,19 @@ export function TopBar({ title, back, close, right }: {
         </button>
       )}
       {typeof back === 'string' && (
-        <Link className="icon-btn" aria-label="Back" to={back}><Icon name="back" size={22} /></Link>
+        <Link className="icon-btn" aria-label="Back" to={back} replace
+          onClick={(e) => {
+            if (!inApp || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+            e.preventDefault();
+            navigate(-1);
+          }}>
+          <Icon name="back" size={22} />
+        </Link>
       )}
       {close && (
         <Link className="icon-btn" aria-label="Close" to={close}><Icon name="close" size={22} /></Link>
       )}
-      <div className="title">{title}</div>
+      <Title className="title">{title}</Title>
       {right}
     </div>
   );

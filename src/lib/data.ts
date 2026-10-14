@@ -17,6 +17,16 @@ import type {
 
 const BASE = `${import.meta.env.BASE_URL}data/`;
 
+/** A short word on a kana's learn card (content/kana-examples.json). */
+export interface KanaExample {
+  kana: string;            // 'いけ'; katakana kana get loanwords: 'ケーキ'
+  written?: string;        // usual kanji spelling, if any: '池'
+  en: string;
+}
+
+/** content/kana-examples.json: one example per basic, dakuten and handakuten kana, keyed by the kana. */
+export type KanaExamplesFile = Record<string, KanaExample>;
+
 const cache = new Map<string, Promise<unknown>>();
 
 function load<T>(file: string): Promise<T> {
@@ -43,6 +53,7 @@ export const loadSurvivalWords = () => load<SurvivalWord[]>('content/survival-wo
 export const loadGrammar = () => load<GrammarPoint[]>('content/grammar.json');
 export const loadSentences = () => load<SentenceEntry[]>('content/sentences.json');
 export const loadRolePlays = () => load<RolePlay[]>('content/roleplays.json');
+export const loadKanaExamples = () => load<KanaExamplesFile>('content/kana-examples.json');
 
 let wordIndex: Promise<Map<string, WordEntry>> | undefined;
 export function loadWordIndex(): Promise<Map<string, WordEntry>> {

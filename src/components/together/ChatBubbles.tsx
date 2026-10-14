@@ -1,8 +1,9 @@
 // Chat message bubbles: text (with optional readings), voice, delivery state.
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { discardMessage, retryMessage } from '../../sync/outbox.ts';
 import type { ChatItem } from '../../sync/chat.ts';
+import { OTHER_HOUSEHOLD } from '../../sync/client.ts';
 import { useVoiceUrl } from '../../sync/voice.ts';
 import { Icon } from '../ui.tsx';
 import type { FuriganaDict } from './furigana.ts';
@@ -13,6 +14,14 @@ type Show = 'all' | 'none' | ((base: string) => boolean);
 
 export function timeOf(iso: string): string {
   return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+}
+
+/**
+ * When a message was written: the time on the writer's phone (a message written
+ * offline is delivered later), else when the server got it.
+ */
+export function shownAt(m: { createdAt: string; writtenAt?: string }): string {
+  return m.writtenAt ?? m.createdAt;
 }
 
 /** Local calendar day of a timestamp, for day separators. */
@@ -98,16 +107,46 @@ const FAILURE_REASONS: Record<string, string> = {
   too_large: 'It was too big to send.',
   missing_audio: 'The recording was lost.',
   invalid_request: "The server couldn't accept it.",
+  [OTHER_HOUSEHOLD]: 'It was written for another household. Retry sends it here.',
 };
 
 function Delivery({ item, online }: { item: ChatItem; online: boolean }) {
+  // Deleting an unsent message can't be undone, so it asks once more.
+  const [confirming, setConfirming] = useState(false);
+  const keepRef = useRef<HTMLButtonElement>(null);
+  const deleteRef = useRef<HTMLButtonElement>(null);
+  /** Set by a tap on Delete or Keep: keyboard focus stays on the row as its buttons swap. */
+  const refocus = useRef<'keep' | 'delete'>();
+  const ask = (yes: boolean) => {
+    refocus.current = yes ? 'keep' : 'delete';
+    setConfirming(yes);
+  };
+  useEffect(() => {
+    const target = refocus.current === 'keep' ? keepRef.current : refocus.current === 'delete' ? deleteRef.current : null;
+    refocus.current = undefined;
+    target?.focus();
+  }, [confirming]);
+
   if (item.status === 'failed') {
     return (
       <div className="tg-bubble-meta tg-failed" role="alert">
         <TIcon name="alert" size={14} />
-        <span>Not sent{item.error && FAILURE_REASONS[item.error] ? `. ${FAILURE_REASONS[item.error]}` : ''}</span>
-        <button type="button" className="tg-link-btn" onClick={() => void retryMessage(item.clientId)}>Retry</button>
-        <button type="button" className="tg-link-btn" onClick={() => void discardMessage(item.clientId)}>Delete</button>
+        {confirming ? (
+          <>
+            <span>Delete this message? It can't be undone.</span>
+            <button type="button" className="tg-link-btn" onClick={() => {
+              // The row goes away with its buttons: carry on writing in the composer.
+              void discardMessage(item.clientId).then(() => document.querySelector<HTMLElement>('.tg-composer-input')?.focus());
+            }}>Delete</button>
+            <button ref={keepRef} type="button" className="tg-link-btn" onClick={() => ask(false)}>Keep</button>
+          </>
+        ) : (
+          <>
+            <span>Not sent{item.error && FAILURE_REASONS[item.error] ? `. ${FAILURE_REASONS[item.error]}` : ''}</span>
+            <button type="button" className="tg-link-btn" onClick={() => void retryMessage(item.clientId)}>Retry</button>
+            <button ref={deleteRef} type="button" className="tg-link-btn" onClick={() => ask(true)}>Delete</button>
+          </>
+        )}
       </div>
     );
   }
@@ -119,17 +158,20 @@ function Delivery({ item, online }: { item: ChatItem; online: boolean }) {
   );
 }
 
-export function MessageBubble({ item, dict, show, online, showTime, senderName }: {
+export function MessageBubble({ item, dict, show, online, showTime, withDate = false, senderName }: {
   item: ChatItem;
   dict?: FuriganaDict;
   show: Show;
   online: boolean;
   /** Show the time under this bubble (last of a run from one person). */
   showTime: boolean;
+  /** Written on another day than the separator above it says (it was delivered late). */
+  withDate?: boolean;
   senderName: string;
 }) {
   if (item.kind === 'system') return <p className="tg-chat-system">{item.text}</p>;
   const side = item.mine ? 'mine' : 'theirs';
+  const at = shownAt(item);
   return (
     <div className={`tg-bubble-row tg-${side}${item.status === 'sent' ? '' : ` tg-${item.status}`}`}>
       <div className={`tg-bubble tg-${side}${item.kind === 'voice' ? ' tg-voice-bubble' : ''}`}>
@@ -142,7 +184,55 @@ export function MessageBubble({ item, dict, show, online, showTime, senderName }
       </div>
       {item.status !== 'sent'
         ? <Delivery item={item} online={online} />
-        : showTime && <time className="tg-bubble-meta" dateTime={item.createdAt}>{timeOf(item.createdAt)}</time>}
+        : (showTime || withDate) && (
+          <time className="tg-bubble-meta" dateTime={at}>{withDate ? `${dayLabel(at)}, ${timeOf(at)}` : timeOf(at)}</time>
+        )}
     </div>
   );
+}
+
+/** Messages from one person this close together share one time label. */
+const GROUP_GAP_MS = 5 * 60_000;
+
+/** Local midnight before `iso` (ms epoch). */
+function startOfDay(iso: string): number {
+  const d = new Date(iso);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+/** The conversation: bubbles in delivery order, with day separators and grouped times. */
+export function MessageList({ messages, dict, show, online, senderName }: {
+  messages: ChatItem[];
+  dict?: FuriganaDict;
+  show: Show;
+  online: boolean;
+  senderName: (memberId: string) => string;
+}) {
+  const rows = [];
+  // The day of the last separator. Messages stay in delivery order, so one written
+  // offline can come after newer ones: it goes under the current separator with its
+  // own date, and separators only ever move forward (one per day).
+  let day = '';
+  let dayStart = -Infinity;
+  for (let i = 0; i < messages.length; i++) {
+    const m = messages[i];
+    const at = shownAt(m);
+    const d = localDay(at);
+    const start = startOfDay(at);
+    if (start > dayStart) {
+      day = d;
+      dayStart = start;
+      rows.push(<p key={`day-${d}`} className="tg-day-sep"><span>{dayLabel(at)}</span></p>);
+    }
+    const next = messages[i + 1];
+    const nextAt = next ? shownAt(next) : '';
+    const showTime = !next || next.mine !== m.mine || localDay(nextAt) !== d
+      || Math.abs(Date.parse(nextAt) - Date.parse(at)) > GROUP_GAP_MS;
+    rows.push(
+      <MessageBubble key={m.key} item={m} dict={dict} show={show} online={online} showTime={showTime}
+        withDate={d !== day} senderName={senderName(m.memberId)} />,
+    );
+  }
+  return <>{rows}</>;
 }

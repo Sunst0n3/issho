@@ -1,0 +1,5824 @@
+[
+  {
+    "id": "adjective-past",
+    "order": 31,
+    "level": "N5",
+    "title": "〜かったです・〜でした — \"it was …\"",
+    "pattern": "〜かったです・〜でした",
+    "register": "polite",
+    "prerequisites": [
+      "i-adjectives",
+      "na-adjectives",
+      "deshita"
+    ],
+    "contrastWith": [
+      "deshita"
+    ],
+    "explanation": "To say something was a certain way, an い-adjective swaps its last い for かったです: たのしい → たのしかったです (\"it was fun\"), and くないです becomes くなかったです (\"it wasn't\"). いい is irregular: よかったです and よくなかったです. な-adjectives work like nouns, with でした and じゃなかったです (ひまでした). い-adjectives never take でした, so don't say おいしいでした. These are the polite forms; the casual versions (たのしかった, ひまだった) come with the plain past.",
+    "examples": [
+      {
+        "jp": "{昨日|きのう}の{晩|ばん}ご{飯|はん}はおいしかったです。",
+        "en": "Last night's dinner was delicious."
+      },
+      {
+        "jp": "{旅行|りょこう}はとても{楽|たの}しかったです。",
+        "en": "The trip was a lot of fun."
+      },
+      {
+        "jp": "{今日|きょう}の{仕事|しごと}は{大変|たいへん}でした。",
+        "en": "Work was tough today."
+      },
+      {
+        "jp": "{昨日|きのう}は{寒|さむ}かったですね。",
+        "en": "It was cold yesterday, wasn't it?"
+      },
+      {
+        "jp": "その{映画|えいが}は{面白|おもしろ}くなかったです。",
+        "en": "That movie wasn't interesting."
+      },
+      {
+        "jp": "{週末|しゅうまつ}は{暇|ひま}でした。",
+        "en": "I was free at the weekend."
+      },
+      {
+        "jp": "あのホテルはきれいじゃなかったです。",
+        "en": "That hotel wasn't clean."
+      },
+      {
+        "jp": "{京都|きょうと}はどうでしたか。 — とてもよかったです。",
+        "en": "How was Kyoto? — It was really good."
+      },
+      {
+        "jp": "あのレストランは{静|しず}かでした。",
+        "en": "That restaurant was quiet."
+      },
+      {
+        "jp": "{天気|てんき}はよくなかったです。",
+        "en": "The weather wasn't good."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "The trip was a lot of fun.",
+        "jp": "{旅行|りょこう}はとても{楽|たの}しかったです。",
+        "tiles": [
+          "旅行は",
+          "とても",
+          "楽しかったです。"
+        ],
+        "alternatives": [
+          "旅行はとても楽しかった。",
+          "旅行はすごく楽しかったです。"
+        ]
+      },
+      {
+        "en": "Last night's dinner was delicious.",
+        "jp": "{昨日|きのう}の{晩|ばん}ご{飯|はん}はおいしかったです。",
+        "tiles": [
+          "昨日の",
+          "晩ご飯は",
+          "おいしかったです。"
+        ],
+        "alternatives": [
+          "昨日の晩ご飯はおいしかった。",
+          "昨日の夜ご飯はおいしかったです。"
+        ]
+      },
+      {
+        "en": "That movie wasn't interesting.",
+        "jp": "その{映画|えいが}は{面白|おもしろ}くなかったです。",
+        "tiles": [
+          "その映画は",
+          "面白く",
+          "なかったです。"
+        ],
+        "alternatives": [
+          "その映画は面白くありませんでした。",
+          "その映画は面白くなかった。",
+          "あの映画は面白くなかったです。"
+        ]
+      },
+      {
+        "en": "That hotel wasn't clean.",
+        "jp": "あのホテルはきれいじゃなかったです。",
+        "tiles": [
+          "あのホテルは",
+          "きれい",
+          "じゃなかったです。"
+        ],
+        "alternatives": [
+          "あのホテルはきれいではありませんでした。",
+          "あのホテルはきれいじゃありませんでした。",
+          "あのホテルはきれいではなかったです。",
+          "あのホテルはきれいじゃなかった。"
+        ]
+      },
+      {
+        "en": "Were you busy yesterday?",
+        "jp": "{昨日|きのう}は{忙|いそが}しかったですか。",
+        "tiles": [
+          "昨日は",
+          "忙しかった",
+          "ですか。"
+        ],
+        "alternatives": [
+          "昨日、忙しかったですか。",
+          "昨日は忙しかった？"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{旅行|りょこう}は{楽|たの}し＿＿。",
+        "options": [
+          "かったです",
+          "かったでした",
+          "いでした"
+        ],
+        "answer": 0,
+        "en": "The trip was fun."
+      },
+      {
+        "prompt": "{週末|しゅうまつ}は{暇|ひま}＿＿。",
+        "options": [
+          "くなかったです",
+          "でした",
+          "かったです"
+        ],
+        "answer": 1,
+        "en": "I was free at the weekend."
+      },
+      {
+        "prompt": "その{映画|えいが}は{面白|おもしろ}＿＿。",
+        "options": [
+          "じゃなかったです",
+          "いでした",
+          "くなかったです"
+        ],
+        "answer": 2,
+        "en": "That movie wasn't interesting."
+      },
+      {
+        "prompt": "{天気|てんき}は＿＿です。",
+        "options": [
+          "よかった",
+          "よくた",
+          "いかった"
+        ],
+        "answer": 0,
+        "en": "The weather was good."
+      },
+      {
+        "prompt": "あのホテルはきれい＿＿。",
+        "options": [
+          "かったです",
+          "じゃなかったです",
+          "くなかったです"
+        ],
+        "answer": 1,
+        "en": "That hotel wasn't clean."
+      },
+      {
+        "prompt": "{昨日|きのう}は{寒|さむ}＿＿ね。",
+        "options": [
+          "でした",
+          "くです",
+          "いでした",
+          "かったです"
+        ],
+        "answer": 3,
+        "en": "It was cold yesterday, wasn't it?"
+      }
+    ]
+  },
+  {
+    "id": "he-direction",
+    "order": 32,
+    "level": "N5",
+    "title": "〜へ — \"toward\"",
+    "pattern": "〜へ{行|い}きます",
+    "register": "both",
+    "prerequisites": [
+      "ni-time-place"
+    ],
+    "contrastWith": [
+      "ni-time-place"
+    ],
+    "explanation": "へ (written with the kana he but said \"e\") marks the direction you are heading, with moving verbs like いく, くる and かえる. There it can swap with に: にほんへいきます and にほんにいきます mean the same thing, and へ just feels a little more like \"toward\". You'll also see it on signs and cards: にほんへようこそ (\"welcome to Japan\"), ゆいさんへ (\"to Yui\"). に still does the jobs へ can't, such as times (しちじに) and where things are. Both are fine in polite and casual speech.",
+    "examples": [
+      {
+        "jp": "{来年|らいねん}、{日本|にほん}へ{行|い}きます。",
+        "en": "We're going to Japan next year."
+      },
+      {
+        "jp": "{日本|にほん}へようこそ！",
+        "en": "Welcome to Japan!"
+      },
+      {
+        "jp": "{何時|なんじ}に{家|うち}へ{帰|かえ}りますか。",
+        "en": "What time will you be home?"
+      },
+      {
+        "jp": "{週末|しゅうまつ}、どこへ{行|い}きたいですか。",
+        "en": "Where do you want to go this weekend?"
+      },
+      {
+        "jp": "{妻|つま}と{京都|きょうと}へ{行|い}きました。",
+        "en": "I went to Kyoto with my wife."
+      },
+      {
+        "jp": "{両親|りょうしん}は{明日|あした}うちへ{来|き}ます。",
+        "en": "My parents are coming to our place tomorrow."
+      },
+      {
+        "jp": "{今日|きょう}は{六時|ろくじ}に{家|うち}へ{帰|かえ}ります。",
+        "en": "I'm going home at six today."
+      },
+      {
+        "jp": "{今日|きょう}はどこへ{行|い}く？",
+        "en": "Where are you off to today?"
+      },
+      {
+        "jp": "ゆいさんへ　お{誕生日|たんじょうび}おめでとう！",
+        "en": "To Yui: happy birthday!"
+      },
+      {
+        "jp": "このバスは{駅|えき}へ{行|い}きますか。",
+        "en": "Does this bus go to the station?"
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I'm going home at six today.",
+        "jp": "{今日|きょう}は{六時|ろくじ}に{家|うち}へ{帰|かえ}ります。",
+        "tiles": [
+          "今日は",
+          "六時に",
+          "家へ",
+          "帰ります。"
+        ],
+        "alternatives": [
+          "今日は六時に家に帰ります。",
+          "今日は6時に家へ帰ります。",
+          "今日は6時に家に帰ります。",
+          "今日は六時に家へ帰る。",
+          "今日は六時にうちへ帰ります。"
+        ]
+      },
+      {
+        "en": "We're going to Japan next year.",
+        "jp": "{来年|らいねん}、{日本|にほん}へ{行|い}きます。",
+        "tiles": [
+          "来年、",
+          "日本へ",
+          "行きます。"
+        ],
+        "alternatives": [
+          "来年、日本に行きます。",
+          "来年は日本へ行きます。",
+          "来年、日本へ行く。"
+        ]
+      },
+      {
+        "en": "Where do you want to go this weekend?",
+        "jp": "{週末|しゅうまつ}、どこへ{行|い}きたいですか。",
+        "tiles": [
+          "週末、",
+          "どこへ",
+          "行きたい",
+          "ですか。"
+        ],
+        "alternatives": [
+          "週末、どこに行きたいですか。",
+          "週末はどこへ行きたいですか。",
+          "週末、どこへ行きたい？",
+          "週末、どこに行きたい？"
+        ]
+      },
+      {
+        "en": "I went to Kyoto with my wife.",
+        "jp": "{妻|つま}と{一緒|いっしょ}に{京都|きょうと}へ{行|い}きました。",
+        "tiles": [
+          "妻と",
+          "一緒に",
+          "京都へ",
+          "行きました。"
+        ],
+        "alternatives": [
+          "妻と京都へ行きました。",
+          "妻と一緒に京都に行きました。",
+          "妻と京都に行きました。",
+          "妻と一緒に京都へ行った。"
+        ]
+      },
+      {
+        "en": "Does this bus go to the station?",
+        "jp": "このバスは{駅|えき}へ{行|い}きますか。",
+        "tiles": [
+          "この",
+          "バスは",
+          "駅へ",
+          "行きますか。"
+        ],
+        "alternatives": [
+          "このバスは駅に行きますか。",
+          "このバス、駅へ行く？",
+          "このバス、駅に行く？"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{七時|しちじ}＿＿{起|お}きます。",
+        "options": [
+          "へ",
+          "を",
+          "に"
+        ],
+        "answer": 2,
+        "en": "I get up at seven."
+      },
+      {
+        "prompt": "{日本|にほん}＿＿ようこそ！",
+        "options": [
+          "へ",
+          "で",
+          "を"
+        ],
+        "answer": 0,
+        "en": "Welcome to Japan!"
+      },
+      {
+        "prompt": "{来週|らいしゅう}、{大阪|おおさか}＿＿{行|い}きます。",
+        "options": [
+          "で",
+          "を",
+          "へ"
+        ],
+        "answer": 2,
+        "en": "I'm going to Osaka next week."
+      },
+      {
+        "prompt": "{何時|なんじ}＿＿{家|うち}へ{帰|かえ}りますか。",
+        "options": [
+          "に",
+          "で",
+          "へ"
+        ],
+        "answer": 0,
+        "en": "What time will you be home?"
+      },
+      {
+        "prompt": "このバスは{駅|えき}＿＿{行|い}きますか。",
+        "options": [
+          "で",
+          "へ",
+          "を",
+          "が"
+        ],
+        "answer": 1,
+        "en": "Does this bus go to the station?"
+      }
+    ]
+  },
+  {
+    "id": "casual-speech",
+    "order": 33,
+    "level": "N5",
+    "title": "Casual speech — talking with your partner",
+    "pattern": "〜る・〜い・〜だ・〜よ・〜ね",
+    "register": "plain",
+    "prerequisites": [
+      "dictionary-form",
+      "ne-yo",
+      "na-adjectives"
+    ],
+    "contrastWith": [],
+    "explanation": "With your partner, family and close friends, Japanese drops です and ます. Verbs use the dictionary form (たべます → たべる), い-adjectives just lose です (おいしい, never おいしいだ), and nouns and な-adjectives take だ or nothing at all (やすみだよ). Questions have no か and usually no だ: just let your voice rise at the end (いく？, げんき？), and は and を often drop out too (コーヒーのむ？). Add ね, よ, だよ or だね to sound warm, and keep です and ます for strangers, shop staff and the role-plays.",
+    "examples": [
+      {
+        "jp": "{今日|きょう}は{何時|なんじ}に{帰|かえ}る？",
+        "en": "What time are you coming home today?"
+      },
+      {
+        "jp": "これ、おいしいね。",
+        "en": "This is good, isn't it?"
+      },
+      {
+        "jp": "{明日|あした}は{休|やす}みだよ。",
+        "en": "I'm off tomorrow, you know."
+      },
+      {
+        "jp": "うん、{一緒|いっしょ}に{行|い}く！",
+        "en": "Yeah, I'll come with you!"
+      },
+      {
+        "jp": "{元気|げんき}？ — うん、{元気|げんき}だよ。",
+        "en": "You okay? — Yeah, I'm good."
+      },
+      {
+        "jp": "{今日|きょう}は{家|うち}にいる？",
+        "en": "Are you home today?"
+      },
+      {
+        "jp": "{今日|きょう}は{寒|さむ}いね。",
+        "en": "It's cold today, isn't it?"
+      },
+      {
+        "jp": "それ、{私|わたし}のかばんだよ。",
+        "en": "That's my bag, you know."
+      },
+      {
+        "jp": "{暇|ひま}？ — ううん、{今|いま}ちょっと{忙|いそが}しい。",
+        "en": "Are you free? — No, I'm a bit busy right now."
+      },
+      {
+        "jp": "この{店|みせ}、{静|しず}かだね。",
+        "en": "This place is quiet, isn't it?"
+      },
+      {
+        "jp": "{日曜日|にちようび}、{映画|えいが}{見|み}る？",
+        "en": "Want to watch a movie on Sunday?"
+      },
+      {
+        "jp": "じゃあ、{寝|ね}るね。おやすみ。",
+        "en": "Okay, I'm going to bed. Night."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "Shall we have coffee together?",
+        "jp": "{一緒|いっしょ}にコーヒー{飲|の}む？",
+        "tiles": [
+          "一緒に",
+          "コーヒー",
+          "飲む？"
+        ],
+        "alternatives": [
+          "一緒にコーヒーを飲む？",
+          "コーヒー一緒に飲む？",
+          "一緒にコーヒーを飲みませんか。"
+        ]
+      },
+      {
+        "en": "I'm off tomorrow, you know.",
+        "jp": "{明日|あした}は{休|やす}みだよ。",
+        "tiles": [
+          "明日は",
+          "休み",
+          "だよ。"
+        ],
+        "alternatives": [
+          "明日、休みだよ。",
+          "明日は休みですよ。"
+        ]
+      },
+      {
+        "en": "This is good, isn't it?",
+        "jp": "これ、おいしいね。",
+        "tiles": [
+          "これ、",
+          "おいしい",
+          "ね。"
+        ],
+        "alternatives": [
+          "これはおいしいね。",
+          "これ、おいしいですね。",
+          "これはおいしいですね。"
+        ]
+      },
+      {
+        "en": "What shall we eat today?",
+        "jp": "{今日|きょう}、{何|なに}{食|た}べる？",
+        "tiles": [
+          "今日、",
+          "何",
+          "食べる？"
+        ],
+        "alternatives": [
+          "今日、何を食べる？",
+          "今日は何食べる？",
+          "今日は何を食べる？",
+          "今日、何を食べますか。"
+        ]
+      },
+      {
+        "en": "This place is quiet, isn't it?",
+        "jp": "この{店|みせ}、{静|しず}かだね。",
+        "tiles": [
+          "この店、",
+          "静か",
+          "だね。"
+        ],
+        "alternatives": [
+          "この店は静かだね。",
+          "この店、静かですね。",
+          "この店は静かですね。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{明日|あした}、{一緒|いっしょ}に{行|い}＿＿？",
+        "options": [
+          "きだ",
+          "くだ",
+          "く"
+        ],
+        "answer": 2,
+        "en": "Want to go together tomorrow?"
+      },
+      {
+        "prompt": "これ、おいしい＿＿。",
+        "options": [
+          "ね",
+          "だね",
+          "なね"
+        ],
+        "answer": 0,
+        "en": "This is good, isn't it?"
+      },
+      {
+        "prompt": "{明日|あした}は{休|やす}み＿＿よ。",
+        "options": [
+          "い",
+          "だ",
+          "の"
+        ],
+        "answer": 1,
+        "en": "I'm off tomorrow, you know."
+      },
+      {
+        "prompt": "コーヒー、{飲|の}＿＿？",
+        "options": [
+          "むだ",
+          "む",
+          "みだ"
+        ],
+        "answer": 1,
+        "en": "Want some coffee?"
+      },
+      {
+        "prompt": "この{店|みせ}、{静|しず}か＿＿ね。",
+        "options": [
+          "い",
+          "く",
+          "な",
+          "だ"
+        ],
+        "answer": 3,
+        "en": "This place is quiet, isn't it?"
+      },
+      {
+        "prompt": "{今日|きょう}は{寒|さむ}＿＿ね。",
+        "options": [
+          "いだ",
+          "かだ",
+          "い"
+        ],
+        "answer": 2,
+        "en": "It's cold today, isn't it?"
+      }
+    ]
+  },
+  {
+    "id": "position-words",
+    "order": 34,
+    "level": "N5",
+    "title": "〜のうえ・〜のなか — where things are",
+    "pattern": "〜の{上|うえ}に・〜の{中|なか}に・〜の{隣|となり}に",
+    "register": "both",
+    "prerequisites": [
+      "arimasu-imasu",
+      "no-possession"
+    ],
+    "contrastWith": [
+      "arimasu-imasu",
+      "ga-subject"
+    ],
+    "explanation": "To say where something is, name the reference point first and join the position word with の: テーブルのうえ is \"on the table\" (literally \"the table's top\"). The common ones are うえ (on, above), した (under), なか (in), まえ (in front of), うしろ (behind), となり (next to), よこ (beside) and ちかく (near). Add に and あります or います: for something new, use が (テーブルのうえにかぎがあります), and for something you're already talking about, use は and put it first (かぎはテーブルのうえにあります). In polite and casual speech alike you can also just end with です or だ: かぎはテーブルのうえです.",
+    "examples": [
+      {
+        "jp": "{鍵|かぎ}はテーブルの{上|うえ}にありますよ。",
+        "en": "The keys are on the table."
+      },
+      {
+        "jp": "{冷蔵庫|れいぞうこ}の{中|なか}にビールがあります。",
+        "en": "There's beer in the fridge."
+      },
+      {
+        "jp": "スマホ、どこ？ — ソファーの{上|うえ}にあるよ。",
+        "en": "Where's my phone? — It's on the sofa."
+      },
+      {
+        "jp": "{猫|ねこ}はベッドの{下|した}にいます。",
+        "en": "The cat is under the bed."
+      },
+      {
+        "jp": "{駅|えき}の{前|まえ}にコンビニがあります。",
+        "en": "There's a convenience store in front of the station."
+      },
+      {
+        "jp": "うちの{近|ちか}くに{公園|こうえん}があります。",
+        "en": "There's a park near our place."
+      },
+      {
+        "jp": "{銀行|ぎんこう}は{郵便局|ゆうびんきょく}の{隣|となり}です。",
+        "en": "The bank is next to the post office."
+      },
+      {
+        "jp": "{自転車|じてんしゃ}は{家|いえ}の{後|うし}ろにあります。",
+        "en": "The bike is behind the house."
+      },
+      {
+        "jp": "{財布|さいふ}はかばんの{中|なか}ですか。",
+        "en": "Is your wallet in your bag?"
+      },
+      {
+        "jp": "テレビの{横|よこ}に{写真|しゃしん}があります。",
+        "en": "There's a photo beside the TV."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "The keys are on the table.",
+        "jp": "{鍵|かぎ}はテーブルの{上|うえ}にあります。",
+        "tiles": [
+          "鍵は",
+          "テーブルの",
+          "上に",
+          "あります。"
+        ],
+        "alternatives": [
+          "鍵はテーブルの上です。",
+          "鍵はテーブルの上にある。",
+          "鍵はテーブルの上にあるよ。",
+          "鍵はテーブルの上にありますよ。"
+        ]
+      },
+      {
+        "en": "There's beer in the fridge.",
+        "jp": "{冷蔵庫|れいぞうこ}の{中|なか}にビールがあります。",
+        "tiles": [
+          "冷蔵庫の",
+          "中に",
+          "ビールが",
+          "あります。"
+        ],
+        "alternatives": [
+          "冷蔵庫の中にビールがある。",
+          "冷蔵庫にビールがあります。",
+          "冷蔵庫にビールがある。"
+        ]
+      },
+      {
+        "en": "The cat is under the bed.",
+        "jp": "{猫|ねこ}はベッドの{下|した}にいます。",
+        "tiles": [
+          "猫は",
+          "ベッドの",
+          "下に",
+          "います。"
+        ],
+        "alternatives": [
+          "猫はベッドの下です。",
+          "猫はベッドの下にいる。",
+          "猫はベッドの下にいるよ。"
+        ]
+      },
+      {
+        "en": "There's a park near our place.",
+        "jp": "うちの{近|ちか}くに{公園|こうえん}があります。",
+        "tiles": [
+          "うちの",
+          "近くに",
+          "公園が",
+          "あります。"
+        ],
+        "alternatives": [
+          "うちの近くに公園がある。",
+          "家の近くに公園があります。",
+          "家の近くに公園がある。"
+        ]
+      },
+      {
+        "en": "The bank is next to the station.",
+        "jp": "{銀行|ぎんこう}は{駅|えき}の{隣|となり}にあります。",
+        "tiles": [
+          "銀行は",
+          "駅の",
+          "隣に",
+          "あります。"
+        ],
+        "alternatives": [
+          "銀行は駅の隣です。",
+          "銀行は駅の隣にある。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "テーブルの{上|うえ}＿＿{鍵|かぎ}があります。",
+        "options": [
+          "で",
+          "に",
+          "を"
+        ],
+        "answer": 1,
+        "en": "There are keys on the table."
+      },
+      {
+        "prompt": "{鍵|かぎ}はどこですか。 — {鍵|かぎ}＿＿テーブルの{上|うえ}にあります。",
+        "options": [
+          "が",
+          "を",
+          "は"
+        ],
+        "answer": 2,
+        "en": "Where are the keys? — The keys are on the table."
+      },
+      {
+        "prompt": "{猫|ねこ}はベッド＿＿{下|した}にいます。",
+        "options": [
+          "の",
+          "に",
+          "と"
+        ],
+        "answer": 0,
+        "en": "The cat is under the bed."
+      },
+      {
+        "prompt": "{駅|えき}の{前|まえ}にコンビニが＿＿。",
+        "options": [
+          "あります",
+          "です",
+          "います"
+        ],
+        "answer": 0,
+        "en": "There's a convenience store in front of the station."
+      },
+      {
+        "prompt": "{子|こ}どもたちは{車|くるま}の{後|うし}ろに＿＿。",
+        "options": [
+          "あります",
+          "います",
+          "です"
+        ],
+        "answer": 1,
+        "en": "The kids are behind the car."
+      },
+      {
+        "prompt": "{財布|さいふ}はかばんの＿＿です。",
+        "options": [
+          "なかに",
+          "なかで",
+          "なか"
+        ],
+        "answer": 2,
+        "en": "Your wallet is in your bag."
+      }
+    ]
+  },
+  {
+    "id": "te-form",
+    "order": 35,
+    "level": "N5",
+    "title": "〜て — the て-form, \"and then\"",
+    "pattern": "〜て、〜",
+    "register": "both",
+    "prerequisites": [
+      "dictionary-form"
+    ],
+    "contrastWith": [
+      "te-kara",
+      "adjectives-te",
+      "tari-tari"
+    ],
+    "explanation": "The て-form links actions in order, like \"and then\": おきて、シャワーをあびます (\"I get up and take a shower\"). The last verb sets the tense and the politeness for the whole sentence, so the て-form itself works in both polite and casual speech. る-verbs swap る for て (たべる → たべて), and う-verbs change by their last sound: う, つ, る → って; む, ぶ, ぬ → んで; く → いて; ぐ → いで; す → して. The odd ones are いく → いって, する → して and くる → きて. Many later patterns are built on it, such as てから (\"after doing\") and くて for joining adjectives.",
+    "examples": [
+      {
+        "jp": "{朝|あさ}{起|お}きて、シャワーを{浴|あ}びます。",
+        "en": "In the morning I get up and take a shower."
+      },
+      {
+        "jp": "{駅|えき}に{行|い}って、{電車|でんしゃ}に{乗|の}りました。",
+        "en": "I went to the station and got on the train."
+      },
+      {
+        "jp": "{家|うち}に{帰|かえ}って、{晩|ばん}ご{飯|はん}を{作|つく}ります。",
+        "en": "I'll go home and make dinner."
+      },
+      {
+        "jp": "{本|ほん}を{読|よ}んで、{寝|ね}ました。",
+        "en": "I read a book and went to sleep."
+      },
+      {
+        "jp": "{昨日|きのう}は{友達|ともだち}と{会|あ}って、{一緒|いっしょ}にご{飯|はん}を{食|た}べました。",
+        "en": "Yesterday I met up with a friend and we had a meal together."
+      },
+      {
+        "jp": "{手|て}を{洗|あら}って、{食|た}べましょう。",
+        "en": "Let's wash our hands and eat."
+      },
+      {
+        "jp": "スーパーで{肉|にく}を{買|か}って、{帰|かえ}ります。",
+        "en": "I'll buy some meat at the supermarket and head home."
+      },
+      {
+        "jp": "{歯|は}を{磨|みが}いて、{寝|ね}る。",
+        "en": "I'm going to brush my teeth and go to bed."
+      },
+      {
+        "jp": "{日曜日|にちようび}は{洗濯|せんたく}して、{掃除|そうじ}して、{散歩|さんぽ}しました。",
+        "en": "On Sunday I did the laundry, cleaned and went for a walk."
+      },
+      {
+        "jp": "{電気|でんき}を{消|け}して、{寝|ね}ましょう。",
+        "en": "Let's turn off the light and go to sleep."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I'll go home and make dinner.",
+        "jp": "{家|うち}に{帰|かえ}って、{晩|ばん}ご{飯|はん}を{作|つく}ります。",
+        "tiles": [
+          "家に",
+          "帰って、",
+          "晩ご飯を",
+          "作ります。"
+        ],
+        "alternatives": [
+          "家に帰って、晩ご飯を作る。",
+          "家へ帰って、晩ご飯を作ります。",
+          "うちに帰って、晩ご飯を作ります。"
+        ]
+      },
+      {
+        "en": "Let's turn off the light and go to sleep.",
+        "jp": "{電気|でんき}を{消|け}して、{寝|ね}ましょう。",
+        "tiles": [
+          "電気を",
+          "消して、",
+          "寝ましょう。"
+        ],
+        "alternatives": [
+          "電気を消して、寝よう。"
+        ]
+      },
+      {
+        "en": "I read a book and went to sleep.",
+        "jp": "{本|ほん}を{読|よ}んで、{寝|ね}ました。",
+        "tiles": [
+          "本を",
+          "読んで、",
+          "寝ました。"
+        ],
+        "alternatives": [
+          "本を読んで、寝た。"
+        ]
+      },
+      {
+        "en": "I got up at seven and took a shower.",
+        "jp": "{七時|しちじ}に{起|お}きて、シャワーを{浴|あ}びました。",
+        "tiles": [
+          "七時に",
+          "起きて、",
+          "シャワーを",
+          "浴びました。"
+        ],
+        "alternatives": [
+          "7時に起きて、シャワーを浴びました。",
+          "七時に起きて、シャワーを浴びた。",
+          "7時に起きて、シャワーを浴びた。"
+        ]
+      },
+      {
+        "en": "On Sunday I did the laundry and cleaned.",
+        "jp": "{日曜日|にちようび}は{洗濯|せんたく}して、{掃除|そうじ}しました。",
+        "tiles": [
+          "日曜日は",
+          "洗濯して、",
+          "掃除しました。"
+        ],
+        "alternatives": [
+          "日曜日に洗濯して、掃除しました。",
+          "日曜日は洗濯をして、掃除をしました。",
+          "日曜日は洗濯して、掃除した。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{朝|あさ}{起|お}き＿＿、シャワーを{浴|あ}びます。",
+        "options": [
+          "って",
+          "て",
+          "いて"
+        ],
+        "answer": 1,
+        "en": "In the morning I get up and take a shower."
+      },
+      {
+        "prompt": "{本|ほん}を{読|よ}＿＿、{寝|ね}ました。",
+        "options": [
+          "って",
+          "んで",
+          "みて"
+        ],
+        "answer": 1,
+        "en": "I read a book and went to sleep."
+      },
+      {
+        "prompt": "{駅|えき}に{行|い}＿＿、{電車|でんしゃ}に{乗|の}りました。",
+        "options": [
+          "って",
+          "いて",
+          "きて"
+        ],
+        "answer": 0,
+        "en": "I went to the station and got on the train."
+      },
+      {
+        "prompt": "{家|うち}に{帰|かえ}＿＿、{晩|ばん}ご{飯|はん}を{作|つく}ります。",
+        "options": [
+          "て",
+          "りて",
+          "って"
+        ],
+        "answer": 2,
+        "en": "I'll go home and make dinner."
+      },
+      {
+        "prompt": "{名前|なまえ}を{書|か}＿＿、{待|ま}ちます。",
+        "options": [
+          "いて",
+          "って",
+          "んで"
+        ],
+        "answer": 0,
+        "en": "I'll write my name down and wait."
+      },
+      {
+        "prompt": "{洗濯|せんたく}＿＿、{掃除|そうじ}しました。",
+        "options": [
+          "しって",
+          "すて",
+          "して"
+        ],
+        "answer": 2,
+        "en": "I did the laundry and cleaned."
+      }
+    ]
+  },
+  {
+    "id": "kara-made",
+    "order": 36,
+    "level": "N5",
+    "title": "〜から〜まで — \"from … to\"",
+    "pattern": "〜から〜まで",
+    "register": "both",
+    "prerequisites": [
+      "time-telling"
+    ],
+    "contrastWith": [
+      "kara-because"
+    ],
+    "explanation": "から means \"from\" and まで means \"until\" or \"as far as\", for both times and places: くじからごじまで (\"from nine to five\"), うちからえきまで (\"from home to the station\"). Each one also works alone: なんじまで？ (\"until what time?\"), あしたから (\"from tomorrow\"). This から marks a starting point; a different から meaning \"because\" comes later, and that one follows a whole sentence instead of a time or a place. Both are fine in polite and casual speech.",
+    "examples": [
+      {
+        "jp": "{仕事|しごと}は{九時|くじ}から{五時|ごじ}までです。",
+        "en": "I work from nine to five."
+      },
+      {
+        "jp": "{銀行|ぎんこう}は{何時|なんじ}までですか。",
+        "en": "Until what time is the bank open?"
+      },
+      {
+        "jp": "うちから{駅|えき}まで{歩|ある}きます。",
+        "en": "I walk from home to the station."
+      },
+      {
+        "jp": "{月曜日|げつようび}から{金曜日|きんようび}まで{働|はたら}きます。",
+        "en": "I work Monday to Friday."
+      },
+      {
+        "jp": "{明日|あした}から{休|やす}みです。",
+        "en": "My time off starts tomorrow."
+      },
+      {
+        "jp": "このお{店|みせ}は{夜|よる}{十時|じゅうじ}までです。",
+        "en": "This shop is open until ten at night."
+      },
+      {
+        "jp": "{駅|えき}までバスで{行|い}きましょう。",
+        "en": "Let's take the bus to the station."
+      },
+      {
+        "jp": "{明日|あした}、{何時|なんじ}から{仕事|しごと}？",
+        "en": "What time do you start work tomorrow?"
+      },
+      {
+        "jp": "{昼|ひる}{休|やす}みは{十二時|じゅうにじ}から{一時|いちじ}までです。",
+        "en": "Lunch break is from twelve to one."
+      },
+      {
+        "jp": "{東京|とうきょう}から{京都|きょうと}まで{新幹線|しんかんせん}で{行|い}きました。",
+        "en": "We took the shinkansen from Tokyo to Kyoto."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I work from nine to five.",
+        "jp": "{仕事|しごと}は{九時|くじ}から{五時|ごじ}までです。",
+        "tiles": [
+          "仕事は",
+          "九時から",
+          "五時まで",
+          "です。"
+        ],
+        "alternatives": [
+          "仕事は9時から5時までです。",
+          "仕事は九時から五時までだよ。",
+          "九時から五時まで働きます。",
+          "9時から5時まで働きます。"
+        ]
+      },
+      {
+        "en": "Until what time is the bank open?",
+        "jp": "{銀行|ぎんこう}は{何時|なんじ}までですか。",
+        "tiles": [
+          "銀行は",
+          "何時",
+          "までですか。"
+        ],
+        "alternatives": [
+          "銀行は何時まで？",
+          "銀行、何時まで？"
+        ]
+      },
+      {
+        "en": "My time off starts tomorrow.",
+        "jp": "{明日|あした}から{休|やす}みです。",
+        "tiles": [
+          "明日",
+          "から",
+          "休みです。"
+        ],
+        "alternatives": [
+          "明日から休みだよ。",
+          "明日から休み。",
+          "明日から休みだ。"
+        ]
+      },
+      {
+        "en": "I walk from home to the station.",
+        "jp": "うちから{駅|えき}まで{歩|ある}きます。",
+        "tiles": [
+          "うちから",
+          "駅まで",
+          "歩きます。"
+        ],
+        "alternatives": [
+          "家から駅まで歩きます。",
+          "うちから駅まで歩く。",
+          "家から駅まで歩く。"
+        ]
+      },
+      {
+        "en": "We took the shinkansen from Tokyo to Kyoto.",
+        "jp": "{東京|とうきょう}から{京都|きょうと}まで{新幹線|しんかんせん}で{行|い}きました。",
+        "tiles": [
+          "東京から",
+          "京都まで",
+          "新幹線で",
+          "行きました。"
+        ],
+        "alternatives": [
+          "東京から京都まで新幹線で行った。",
+          "新幹線で東京から京都まで行きました。",
+          "東京から京都へ新幹線で行きました。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{仕事|しごと}は{九時|くじ}＿＿{五時|ごじ}までです。",
+        "options": [
+          "から",
+          "に",
+          "まで"
+        ],
+        "answer": 0,
+        "en": "I work from nine to five."
+      },
+      {
+        "prompt": "{銀行|ぎんこう}は{何時|なんじ}＿＿ですか。",
+        "options": [
+          "まで",
+          "に",
+          "で"
+        ],
+        "answer": 0,
+        "en": "Until what time is the bank open?"
+      },
+      {
+        "prompt": "うちから{駅|えき}＿＿{歩|ある}きます。",
+        "options": [
+          "の",
+          "まで",
+          "が"
+        ],
+        "answer": 1,
+        "en": "I walk from home to the station."
+      },
+      {
+        "prompt": "{月曜日|げつようび}＿＿{金曜日|きんようび}まで{働|はたら}きます。",
+        "options": [
+          "と",
+          "から",
+          "の"
+        ],
+        "answer": 1,
+        "en": "I work Monday to Friday."
+      },
+      {
+        "prompt": "{明日|あした}＿＿{休|やす}みです。",
+        "options": [
+          "で",
+          "を",
+          "から"
+        ],
+        "answer": 2,
+        "en": "My time off starts tomorrow."
+      },
+      {
+        "prompt": "{東京|とうきょう}から{京都|きょうと}まで{新幹線|しんかんせん}＿＿{行|い}きました。",
+        "options": [
+          "まで",
+          "を",
+          "で"
+        ],
+        "answer": 2,
+        "en": "We took the shinkansen from Tokyo to Kyoto."
+      }
+    ]
+  },
+  {
+    "id": "adverbs-degree",
+    "order": 37,
+    "level": "N5",
+    "title": "とても・あまり — how much",
+    "pattern": "とても〜・あまり〜くない・ぜんぜん〜くない",
+    "register": "both",
+    "prerequisites": [
+      "i-adjectives"
+    ],
+    "contrastWith": [
+      "adverbs-frequency"
+    ],
+    "explanation": "These words say how much. とても means \"very\" and すごく is its casual twin; ちょっと and すこし mean \"a little\". あまり (\"not very\") and ぜんぜん (\"not at all\") need a negative after them: あまりたかくないです, ぜんぜんさむくない. They work with both kinds of adjective (とてもしずかです, あまりひまじゃないです). Don't mix them up with the how-often words (いつも, よく, ときどき), which go with verbs.",
+    "examples": [
+      {
+        "jp": "このラーメンはとてもおいしいです。",
+        "en": "This ramen is really good."
+      },
+      {
+        "jp": "{今日|きょう}はすごく{暑|あつ}いね。",
+        "en": "It's so hot today."
+      },
+      {
+        "jp": "このカレーはちょっと{辛|から}いです。",
+        "en": "This curry is a little spicy."
+      },
+      {
+        "jp": "このゲームはあまり{難|むずか}しくないです。",
+        "en": "This game isn't very difficult."
+      },
+      {
+        "jp": "{今|いま}、ぜんぜん{眠|ねむ}くない。",
+        "en": "I'm not sleepy at all right now."
+      },
+      {
+        "jp": "この{部屋|へや}は{少|すこ}し{寒|さむ}いですね。",
+        "en": "This room is a little cold, isn't it?"
+      },
+      {
+        "jp": "{今週|こんしゅう}はあまり{忙|いそが}しくないです。",
+        "en": "I'm not very busy this week."
+      },
+      {
+        "jp": "あの{店|みせ}はぜんぜん{静|しず}かじゃないです。",
+        "en": "That restaurant isn't quiet at all."
+      },
+      {
+        "jp": "その{映画|えいが}はあまり{面白|おもしろ}くなかったです。",
+        "en": "That movie wasn't very good."
+      },
+      {
+        "jp": "このホテル、すごくきれい！",
+        "en": "This hotel is so nice!"
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "This curry is a little spicy.",
+        "jp": "このカレーはちょっと{辛|から}いです。",
+        "tiles": [
+          "このカレーは",
+          "ちょっと",
+          "辛いです。"
+        ],
+        "alternatives": [
+          "このカレーは少し辛いです。",
+          "このカレー、ちょっと辛い。",
+          "このカレーはちょっと辛い。"
+        ]
+      },
+      {
+        "en": "I'm not very busy this week.",
+        "jp": "{今週|こんしゅう}はあまり{忙|いそが}しくないです。",
+        "tiles": [
+          "今週は",
+          "あまり",
+          "忙しく",
+          "ないです。"
+        ],
+        "alternatives": [
+          "今週はあまり忙しくありません。",
+          "今週はあまり忙しくない。"
+        ]
+      },
+      {
+        "en": "I'm not sleepy at all.",
+        "jp": "ぜんぜん{眠|ねむ}くないです。",
+        "tiles": [
+          "ぜんぜん",
+          "眠く",
+          "ないです。"
+        ],
+        "alternatives": [
+          "全然眠くないです。",
+          "ぜんぜん眠くない。",
+          "全然眠くない。",
+          "ぜんぜん眠くありません。"
+        ]
+      },
+      {
+        "en": "It's very hot today.",
+        "jp": "{今日|きょう}はとても{暑|あつ}いです。",
+        "tiles": [
+          "今日は",
+          "とても",
+          "暑いです。"
+        ],
+        "alternatives": [
+          "今日はすごく暑いです。",
+          "今日はとても暑い。",
+          "今日はすごく暑い。"
+        ]
+      },
+      {
+        "en": "That restaurant isn't quiet at all.",
+        "jp": "あの{店|みせ}はぜんぜん{静|しず}かじゃないです。",
+        "tiles": [
+          "あの店は",
+          "ぜんぜん",
+          "静か",
+          "じゃないです。"
+        ],
+        "alternatives": [
+          "あの店は全然静かじゃないです。",
+          "あの店はぜんぜん静かではありません。",
+          "あの店はぜんぜん静かじゃない。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "このゲームは＿＿{難|むずか}しくないです。",
+        "options": [
+          "あまり",
+          "とても",
+          "すごく"
+        ],
+        "answer": 0,
+        "en": "This game isn't very difficult."
+      },
+      {
+        "prompt": "{今日|きょう}は＿＿{暑|あつ}いです。",
+        "options": [
+          "あまり",
+          "ぜんぜん",
+          "とても"
+        ],
+        "answer": 2,
+        "en": "It's very hot today."
+      },
+      {
+        "prompt": "{今|いま}、ぜんぜん{眠|ねむ}＿＿。",
+        "options": [
+          "くないです",
+          "かったです",
+          "いです"
+        ],
+        "answer": 0,
+        "en": "I'm not sleepy at all right now."
+      },
+      {
+        "prompt": "このカレーは＿＿{辛|から}いです。",
+        "options": [
+          "ぜんぜん",
+          "ちょっと",
+          "あまり"
+        ],
+        "answer": 1,
+        "en": "This curry is a little spicy."
+      },
+      {
+        "prompt": "あの{店|みせ}はあまり{静|しず}か＿＿。",
+        "options": [
+          "でした",
+          "くないです",
+          "じゃないです"
+        ],
+        "answer": 2,
+        "en": "That restaurant isn't very quiet."
+      },
+      {
+        "prompt": "その{映画|えいが}はあまり{面白|おもしろ}く＿＿。",
+        "options": [
+          "かったです",
+          "なかったです",
+          "でした"
+        ],
+        "answer": 1,
+        "en": "That movie wasn't very good."
+      }
+    ]
+  },
+  {
+    "id": "nai-form",
+    "order": 38,
+    "level": "N5",
+    "title": "〜ない — plain \"don't\"",
+    "pattern": "〜ない",
+    "register": "plain",
+    "prerequisites": [
+      "dictionary-form",
+      "casual-speech"
+    ],
+    "contrastWith": [
+      "ja-nai-desu"
+    ],
+    "explanation": "The ない-form is the plain way to say \"don't\" or \"won't\", used with your partner instead of 〜ません. る-verbs swap る for ない (たべる → たべない); う-verbs change their last sound from u to a and add ない (のむ → のまない), and a final う becomes わ (かう → かわない). The odd ones are する → しない, くる → こない, and ある, which becomes just ない. Adjectives and nouns simply drop です from the polite negative: おいしくない, しずかじゃない, やすみじゃない. Said with a rising voice, ない？ is a friendly invitation: さんぽしない？ (\"want to go for a walk?\").",
+    "examples": [
+      {
+        "jp": "{今日|きょう}はお{酒|さけ}を{飲|の}まない。",
+        "en": "I'm not drinking today."
+      },
+      {
+        "jp": "{明日|あした}は{会社|かいしゃ}に{行|い}かない。",
+        "en": "I'm not going to the office tomorrow."
+      },
+      {
+        "jp": "{一緒|いっしょ}に{散歩|さんぽ}しない？",
+        "en": "Want to go for a walk together?"
+      },
+      {
+        "jp": "{冷蔵庫|れいぞうこ}に{牛乳|ぎゅうにゅう}がない。",
+        "en": "There's no milk in the fridge."
+      },
+      {
+        "jp": "このカレー、ぜんぜん{辛|から}くない。",
+        "en": "This curry isn't spicy at all."
+      },
+      {
+        "jp": "{今日|きょう}は{休|やす}みじゃない。",
+        "en": "Today isn't my day off."
+      },
+      {
+        "jp": "{友達|ともだち}は{今日|きょう}{来|こ}ないよ。",
+        "en": "Our friend isn't coming today."
+      },
+      {
+        "jp": "テレビはあまり{見|み}ない。",
+        "en": "I don't watch much TV."
+      },
+      {
+        "jp": "{今晩|こんばん}、{外|そと}で{食|た}べない？",
+        "en": "Want to eat out tonight?"
+      },
+      {
+        "jp": "そのかばんは{買|か}わない。",
+        "en": "I'm not buying that bag."
+      },
+      {
+        "jp": "この{部屋|へや}、{静|しず}かじゃないね。",
+        "en": "This room isn't quiet, is it?"
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I'm not drinking today.",
+        "jp": "{今日|きょう}はお{酒|さけ}を{飲|の}まない。",
+        "tiles": [
+          "今日は",
+          "お酒を",
+          "飲まない。"
+        ],
+        "alternatives": [
+          "今日はお酒飲まない。",
+          "今日はお酒を飲みません。"
+        ]
+      },
+      {
+        "en": "Want to eat out tonight?",
+        "jp": "{今晩|こんばん}、{外|そと}で{食|た}べない？",
+        "tiles": [
+          "今晩、",
+          "外で",
+          "食べない？"
+        ],
+        "alternatives": [
+          "今晩、外で食べませんか。",
+          "今夜、外で食べない？"
+        ]
+      },
+      {
+        "en": "There's no milk in the fridge.",
+        "jp": "{冷蔵庫|れいぞうこ}に{牛乳|ぎゅうにゅう}がない。",
+        "tiles": [
+          "冷蔵庫に",
+          "牛乳が",
+          "ない。"
+        ],
+        "alternatives": [
+          "冷蔵庫に牛乳がありません。",
+          "冷蔵庫の中に牛乳がない。",
+          "冷蔵庫に牛乳ない。"
+        ]
+      },
+      {
+        "en": "I'm not going to the office tomorrow.",
+        "jp": "{明日|あした}は{会社|かいしゃ}に{行|い}かない。",
+        "tiles": [
+          "明日は",
+          "会社に",
+          "行かない。"
+        ],
+        "alternatives": [
+          "明日は会社に行きません。",
+          "明日は会社へ行かない。",
+          "明日、会社に行かない。"
+        ]
+      },
+      {
+        "en": "Today isn't my day off.",
+        "jp": "{今日|きょう}は{休|やす}みじゃない。",
+        "tiles": [
+          "今日は",
+          "休み",
+          "じゃない。"
+        ],
+        "alternatives": [
+          "今日は休みじゃないです。",
+          "今日は休みではありません。",
+          "今日は休みじゃありません。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{今日|きょう}はお{酒|さけ}を{飲|の}＿＿。",
+        "options": [
+          "むない",
+          "まない",
+          "みない"
+        ],
+        "answer": 1,
+        "en": "I'm not drinking today."
+      },
+      {
+        "prompt": "そのかばんは{買|か}＿＿。",
+        "options": [
+          "いない",
+          "あない",
+          "わない"
+        ],
+        "answer": 2,
+        "en": "I'm not buying that bag."
+      },
+      {
+        "prompt": "{友達|ともだち}は{今日|きょう}＿＿よ。",
+        "options": [
+          "こない",
+          "きない",
+          "くない"
+        ],
+        "answer": 0,
+        "en": "Our friend isn't coming today."
+      },
+      {
+        "prompt": "{冷蔵庫|れいぞうこ}に{牛乳|ぎゅうにゅう}が＿＿。",
+        "options": [
+          "ない",
+          "いない",
+          "あらない"
+        ],
+        "answer": 0,
+        "en": "There's no milk in the fridge."
+      },
+      {
+        "prompt": "{今日|きょう}は{休|やす}み＿＿。",
+        "options": [
+          "くない",
+          "じゃない",
+          "だない"
+        ],
+        "answer": 1,
+        "en": "Today isn't my day off."
+      },
+      {
+        "prompt": "{一緒|いっしょ}に{散歩|さんぽ}＿＿？",
+        "options": [
+          "すない",
+          "さない",
+          "しない"
+        ],
+        "answer": 2,
+        "en": "Want to go for a walk together?"
+      }
+    ]
+  },
+  {
+    "id": "te-kudasai",
+    "order": 39,
+    "level": "N5",
+    "title": "〜てください — \"please do …\"",
+    "pattern": "〜てください",
+    "register": "both",
+    "prerequisites": [
+      "te-form"
+    ],
+    "contrastWith": [
+      "wo-kudasai",
+      "naide-kudasai"
+    ],
+    "explanation": "て-form + ください asks someone to do something: まってください (\"please wait\"). Start with すみません or ちょっと to sound softer. With your partner, the て-form on its own is the casual request: ちょっとまって, これみて. Two lifesavers use it: もういちどいってください and ゆっくりはなしてください. Don't mix it up with 〜をください, which asks for a thing (コーヒーをください); \"please don't\" is a separate pattern that comes later.",
+    "examples": [
+      {
+        "jp": "すみません、ちょっと{待|ま}ってください。",
+        "en": "Excuse me, could you wait a moment?"
+      },
+      {
+        "jp": "もう{一度|いちど}{言|い}ってください。",
+        "en": "Please say that again."
+      },
+      {
+        "jp": "ゆっくり{話|はな}してください。",
+        "en": "Please speak slowly."
+      },
+      {
+        "jp": "ちょっと{待|ま}って！",
+        "en": "Wait a sec!"
+      },
+      {
+        "jp": "これ{見|み}て！",
+        "en": "Look at this!"
+      },
+      {
+        "jp": "{窓|まど}を{開|あ}けてください。",
+        "en": "Please open the window."
+      },
+      {
+        "jp": "{電気|でんき}、{消|け}して。",
+        "en": "Turn off the light, would you?"
+      },
+      {
+        "jp": "ここに{名前|なまえ}を{書|か}いてください。",
+        "en": "Please write your name here."
+      },
+      {
+        "jp": "{駅|えき}まで{行|い}ってください。",
+        "en": "To the station, please. (in a taxi)"
+      },
+      {
+        "jp": "{塩|しお}、{取|と}って。",
+        "en": "Pass the salt."
+      },
+      {
+        "jp": "すみません、{写真|しゃしん}を{撮|と}ってください。",
+        "en": "Excuse me, could you take our picture?"
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "Please say that again.",
+        "jp": "もう{一度|いちど}{言|い}ってください。",
+        "tiles": [
+          "もう一度",
+          "言って",
+          "ください。"
+        ],
+        "alternatives": [
+          "もう一回言ってください。",
+          "もう一度言って。",
+          "もう一回言って。"
+        ]
+      },
+      {
+        "en": "Please speak slowly.",
+        "jp": "ゆっくり{話|はな}してください。",
+        "tiles": [
+          "ゆっくり",
+          "話して",
+          "ください。"
+        ],
+        "alternatives": [
+          "ゆっくり話して。"
+        ]
+      },
+      {
+        "en": "Please open the window.",
+        "jp": "{窓|まど}を{開|あ}けてください。",
+        "tiles": [
+          "窓を",
+          "開けて",
+          "ください。"
+        ],
+        "alternatives": [
+          "窓を開けて。",
+          "窓、開けて。"
+        ]
+      },
+      {
+        "en": "Excuse me, could you wait a moment?",
+        "jp": "すみません、ちょっと{待|ま}ってください。",
+        "tiles": [
+          "すみません、",
+          "ちょっと",
+          "待って",
+          "ください。"
+        ],
+        "alternatives": [
+          "すみません、少し待ってください。"
+        ]
+      },
+      {
+        "en": "Please write your name here.",
+        "jp": "ここに{名前|なまえ}を{書|か}いてください。",
+        "tiles": [
+          "ここに",
+          "名前を",
+          "書いて",
+          "ください。"
+        ],
+        "alternatives": [
+          "名前をここに書いてください。",
+          "ここに名前を書いて。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "ちょっと{待|ま}＿＿ください。",
+        "options": [
+          "いて",
+          "んで",
+          "って"
+        ],
+        "answer": 2,
+        "en": "Please wait a moment."
+      },
+      {
+        "prompt": "ゆっくり{話|はな}＿＿ください。",
+        "options": [
+          "いて",
+          "して",
+          "って"
+        ],
+        "answer": 1,
+        "en": "Please speak slowly."
+      },
+      {
+        "prompt": "これ、{見|み}＿＿！",
+        "options": [
+          "って",
+          "んで",
+          "て"
+        ],
+        "answer": 2,
+        "en": "Look at this!"
+      },
+      {
+        "prompt": "コーヒー＿＿ください。",
+        "options": [
+          "を",
+          "て",
+          "に"
+        ],
+        "answer": 0,
+        "en": "Coffee, please."
+      },
+      {
+        "prompt": "{窓|まど}を{開|あ}け＿＿。",
+        "options": [
+          "てください",
+          "をください",
+          "ください"
+        ],
+        "answer": 0,
+        "en": "Please open the window."
+      },
+      {
+        "prompt": "ここに{名前|なまえ}を{書|か}＿＿ください。",
+        "options": [
+          "きて",
+          "いて",
+          "って"
+        ],
+        "answer": 1,
+        "en": "Please write your name here."
+      }
+    ]
+  },
+  {
+    "id": "ga-subject",
+    "order": 40,
+    "level": "N5",
+    "title": "〜が — the subject particle",
+    "pattern": "{誰|だれ}が〜・〜が〜",
+    "register": "both",
+    "prerequisites": [
+      "wa-desu",
+      "arimasu-imasu"
+    ],
+    "contrastWith": [
+      "wa-desu",
+      "arimasu-imasu",
+      "position-words",
+      "wa-ga-description",
+      "wa-contrast"
+    ],
+    "explanation": "が marks the subject when it is the new information, especially the answer to \"who?\" or \"which?\". Question words like だれ, なに and どれ take が, never は, when they are the subject: だれがつくりましたか (\"who made this?\"). The answer keeps が, because that is the new part: おっとがつくりました (\"my husband did\"). は does a different job: it marks a topic you both already know, and the new information comes after it (これはなんですか). Both particles are used in polite and casual speech; more uses of は and が come in later lessons.",
+    "examples": [
+      {
+        "jp": "{誰|だれ}が{作|つく}りましたか。 — {夫|おっと}が{作|つく}りました。",
+        "en": "Who made it? — My husband did."
+      },
+      {
+        "jp": "{何|なに}がいいですか。",
+        "en": "What would you like?"
+      },
+      {
+        "jp": "どれがおいしいですか。",
+        "en": "Which one is good?"
+      },
+      {
+        "jp": "{誰|だれ}が{来|き}ますか。",
+        "en": "Who's coming?"
+      },
+      {
+        "jp": "{昨日|きのう}は{妻|つま}が{晩|ばん}ご{飯|はん}を{作|つく}りました。",
+        "en": "Yesterday my wife made dinner."
+      },
+      {
+        "jp": "あ、バスが{来|き}ましたよ。",
+        "en": "Oh, the bus is here."
+      },
+      {
+        "jp": "{誰|だれ}がお{風呂|ふろ}を{掃除|そうじ}しますか。 — {私|わたし}がします。",
+        "en": "Who's going to clean the bath? — I will."
+      },
+      {
+        "jp": "どこがいいですか。",
+        "en": "Where would be good?"
+      },
+      {
+        "jp": "{何|なに}が{食|た}べたい？",
+        "en": "What do you feel like eating?"
+      },
+      {
+        "jp": "{誰|だれ}がケーキを{食|た}べましたか。 — {私|わたし}じゃないです！",
+        "en": "Who ate the cake? — Not me!"
+      },
+      {
+        "jp": "これは{何|なん}ですか。",
+        "en": "What is this?"
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "Who made this?",
+        "jp": "{誰|だれ}がこれを{作|つく}りましたか。",
+        "tiles": [
+          "誰が",
+          "これを",
+          "作りましたか。"
+        ],
+        "alternatives": [
+          "これは誰が作りましたか。",
+          "誰がこれを作った？",
+          "これ、誰が作った？"
+        ]
+      },
+      {
+        "en": "My husband made dinner.",
+        "jp": "{夫|おっと}が{晩|ばん}ご{飯|はん}を{作|つく}りました。",
+        "tiles": [
+          "夫が",
+          "晩ご飯を",
+          "作りました。"
+        ],
+        "alternatives": [
+          "晩ご飯は夫が作りました。",
+          "夫が晩ご飯を作った。"
+        ]
+      },
+      {
+        "en": "Who's coming tomorrow?",
+        "jp": "{明日|あした}は{誰|だれ}が{来|き}ますか。",
+        "tiles": [
+          "明日は",
+          "誰が",
+          "来ますか。"
+        ],
+        "alternatives": [
+          "明日、誰が来ますか。",
+          "明日は誰が来る？",
+          "誰が明日来ますか。"
+        ]
+      },
+      {
+        "en": "Which one is tasty?",
+        "jp": "どれがおいしいですか。",
+        "tiles": [
+          "どれが",
+          "おいしい",
+          "ですか。"
+        ],
+        "alternatives": [
+          "どれがおいしい？"
+        ]
+      },
+      {
+        "en": "I'll clean the bath (answering \"who?\").",
+        "jp": "{私|わたし}がお{風呂|ふろ}を{掃除|そうじ}します。",
+        "tiles": [
+          "私が",
+          "お風呂を",
+          "掃除します。"
+        ],
+        "alternatives": [
+          "お風呂は私が掃除します。",
+          "私がお風呂を掃除する。",
+          "私がお風呂の掃除をします。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{誰|だれ}＿＿{来|き}ますか。",
+        "options": [
+          "は",
+          "が",
+          "を"
+        ],
+        "answer": 1,
+        "en": "Who's coming?"
+      },
+      {
+        "prompt": "{何|なに}＿＿いいですか。",
+        "options": [
+          "を",
+          "は",
+          "が"
+        ],
+        "answer": 2,
+        "en": "What would you like?"
+      },
+      {
+        "prompt": "{誰|だれ}が{作|つく}りましたか。 — {夫|おっと}＿＿{作|つく}りました。",
+        "options": [
+          "を",
+          "が",
+          "は"
+        ],
+        "answer": 1,
+        "en": "Who made it? — My husband did."
+      },
+      {
+        "prompt": "どれ＿＿おいしいですか。",
+        "options": [
+          "が",
+          "は",
+          "の"
+        ],
+        "answer": 0,
+        "en": "Which one is good?"
+      },
+      {
+        "prompt": "あ、バス＿＿{来|き}ましたよ。",
+        "options": [
+          "が",
+          "を",
+          "に"
+        ],
+        "answer": 0,
+        "en": "Oh, the bus is here."
+      },
+      {
+        "prompt": "これ＿＿{何|なん}ですか。",
+        "options": [
+          "を",
+          "が",
+          "は"
+        ],
+        "answer": 2,
+        "en": "What is this?"
+      }
+    ]
+  },
+  {
+    "id": "dates-days",
+    "order": 41,
+    "level": "N5",
+    "title": "なんようび・なんにち — days and dates",
+    "pattern": "{何曜日|なんようび}・〜{月|がつ}〜{日|にち}・いつ",
+    "register": "both",
+    "prerequisites": [
+      "numbers-prices",
+      "ni-time-place"
+    ],
+    "contrastWith": [
+      "time-telling"
+    ],
+    "explanation": "Days of the week end in ようび: げつようび (Monday), かようび, すいようび, もくようび, きんようび, どようび and にちようび (Sunday), and なんようび asks which day it is. Months are a number plus がつ (watch しがつ, しちがつ and くがつ), and dates are a number plus にち, except the 1st to the 10th, the 14th, the 20th and the 24th, which have their own readings: ついたち, ふつか, みっか, よっか, いつか, むいか, なのか, ようか, ここのか, とおか, じゅうよっか, はつか, にじゅうよっか. Ask \"when?\" with いつ, and put に after a day or a date when something happens on it (どようびにあいましょう), but not after words like あした or らいしゅう. All of this works the same in polite and casual speech; clock times (〜じ) were a separate lesson.",
+    "examples": [
+      {
+        "jp": "{今日|きょう}は{何曜日|なんようび}ですか。 — {水曜日|すいようび}です。",
+        "en": "What day is it today? — It's Wednesday."
+      },
+      {
+        "jp": "{誕生日|たんじょうび}はいつですか。",
+        "en": "When is your birthday?"
+      },
+      {
+        "jp": "{私|わたし}の{誕生日|たんじょうび}は{四月|しがつ}{八日|ようか}です。",
+        "en": "My birthday is April 8th."
+      },
+      {
+        "jp": "{結婚記念日|けっこんきねんび}は{六月|ろくがつ}{二十日|はつか}です。",
+        "en": "Our wedding anniversary is June 20th."
+      },
+      {
+        "jp": "{土曜日|どようび}に{映画|えいが}を{見|み}ませんか。",
+        "en": "Shall we see a movie on Saturday?"
+      },
+      {
+        "jp": "{来月|らいげつ}の{一日|ついたち}に{日本|にほん}へ{行|い}きます。",
+        "en": "We're going to Japan on the 1st of next month."
+      },
+      {
+        "jp": "{今日|きょう}は{何日|なんにち}？ — {十日|とおか}だよ。",
+        "en": "What's the date today? — It's the 10th."
+      },
+      {
+        "jp": "{金曜日|きんようび}の{夜|よる}は{外|そと}で{食|た}べましょう。",
+        "en": "Let's eat out on Friday night."
+      },
+      {
+        "jp": "{九月|くがつ}{三日|みっか}は{日曜日|にちようび}です。",
+        "en": "September 3rd is a Sunday."
+      },
+      {
+        "jp": "{休|やす}みは{七月|しちがつ}{二十四日|にじゅうよっか}から{三十一日|さんじゅういちにち}までです。",
+        "en": "My vacation is from July 24th to the 31st."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "What day is it today?",
+        "jp": "{今日|きょう}は{何曜日|なんようび}ですか。",
+        "tiles": [
+          "今日は",
+          "何曜日",
+          "ですか。"
+        ],
+        "alternatives": [
+          "今日は何曜日？",
+          "今日、何曜日？"
+        ]
+      },
+      {
+        "en": "When is your birthday?",
+        "jp": "{誕生日|たんじょうび}はいつですか。",
+        "tiles": [
+          "誕生日は",
+          "いつ",
+          "ですか。"
+        ],
+        "alternatives": [
+          "誕生日はいつ？",
+          "お誕生日はいつですか。"
+        ]
+      },
+      {
+        "en": "My birthday is April 8th.",
+        "jp": "{私|わたし}の{誕生日|たんじょうび}は{四月|しがつ}{八日|ようか}です。",
+        "tiles": [
+          "私の",
+          "誕生日は",
+          "四月八日",
+          "です。"
+        ],
+        "alternatives": [
+          "私の誕生日は4月8日です。",
+          "誕生日は四月八日です。",
+          "誕生日は4月8日です。",
+          "私の誕生日は四月八日だよ。"
+        ]
+      },
+      {
+        "en": "Shall we see a movie on Saturday?",
+        "jp": "{土曜日|どようび}に{映画|えいが}を{見|み}ませんか。",
+        "tiles": [
+          "土曜日に",
+          "映画を",
+          "見ませんか。"
+        ],
+        "alternatives": [
+          "土曜日、映画を見ませんか。",
+          "土曜日に映画を見ない？",
+          "土曜日に映画を見ましょうか。"
+        ]
+      },
+      {
+        "en": "Our wedding anniversary is June 20th.",
+        "jp": "{結婚記念日|けっこんきねんび}は{六月|ろくがつ}{二十日|はつか}です。",
+        "tiles": [
+          "結婚記念日は",
+          "六月",
+          "二十日",
+          "です。"
+        ],
+        "alternatives": [
+          "結婚記念日は6月20日です。",
+          "記念日は六月二十日です。",
+          "記念日は6月20日です。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{今日|きょう}は＿＿ですか。 — {金曜日|きんようび}です。",
+        "options": [
+          "いくら",
+          "なんじ",
+          "なんようび"
+        ],
+        "answer": 2,
+        "en": "What day is it today? — It's Friday."
+      },
+      {
+        "prompt": "{誕生日|たんじょうび}は＿＿ですか。",
+        "options": [
+          "いつ",
+          "だれ",
+          "どこ"
+        ],
+        "answer": 0,
+        "en": "When is your birthday?"
+      },
+      {
+        "prompt": "{四月|しがつ}＿＿は{日曜日|にちようび}です。",
+        "options": [
+          "ひとつ",
+          "ついたち",
+          "いちにち"
+        ],
+        "answer": 1,
+        "en": "April 1st is a Sunday."
+      },
+      {
+        "prompt": "{土曜日|どようび}＿＿{会|あ}いましょう。",
+        "options": [
+          "を",
+          "に",
+          "で"
+        ],
+        "answer": 1,
+        "en": "Let's meet on Saturday."
+      },
+      {
+        "prompt": "{結婚記念日|けっこんきねんび}は{六月|ろくがつ}＿＿です。",
+        "options": [
+          "はつか",
+          "はたち",
+          "にじゅうにち"
+        ],
+        "answer": 0,
+        "en": "Our wedding anniversary is June 20th."
+      },
+      {
+        "prompt": "{明日|あした}＿＿{日本|にほん}へ{行|い}きます。",
+        "options": [
+          "を",
+          "に",
+          "は"
+        ],
+        "answer": 2,
+        "en": "I'm going to Japan tomorrow."
+      }
+    ]
+  },
+  {
+    "id": "ni-iku-purpose",
+    "order": 42,
+    "level": "N5",
+    "title": "〜にいく — going to do something",
+    "pattern": "〜に{行|い}きます（{食|た}べに・{買|か}いに）",
+    "register": "both",
+    "prerequisites": [
+      "ni-time-place",
+      "tai-want"
+    ],
+    "contrastWith": [],
+    "explanation": "To say you're going somewhere to do something, take the ます-form, drop ます and add に before いく, くる or かえる: たべにいきます (\"go to eat\"), かいにいく (\"go to buy\"). With する-nouns like かいもの and さんぽ, the noun alone is enough: かいものにいく. The place can sit in the same sentence with its own に or へ: スーパーにかいものにいきます. It works in polite and casual speech, and it makes an easy invitation: えいがをみにいきませんか。",
+    "examples": [
+      {
+        "jp": "{映画|えいが}を{見|み}に{行|い}きませんか。",
+        "en": "Would you like to go see a movie?"
+      },
+      {
+        "jp": "スーパーに{買|か}い{物|もの}に{行|い}きます。",
+        "en": "I'm going to the supermarket to do some shopping."
+      },
+      {
+        "jp": "{昼|ひる}ご{飯|はん}を{食|た}べに{行|い}きましょう。",
+        "en": "Let's go get lunch."
+      },
+      {
+        "jp": "コンビニに{牛乳|ぎゅうにゅう}を{買|か}いに{行|い}く。",
+        "en": "I'm popping to the convenience store to buy milk."
+      },
+      {
+        "jp": "{週末|しゅうまつ}、{両親|りょうしん}が{遊|あそ}びに{来|き}ます。",
+        "en": "My parents are coming to visit this weekend."
+      },
+      {
+        "jp": "{昼|ひる}はご{飯|はん}を{食|た}べに{家|うち}へ{帰|かえ}ります。",
+        "en": "At lunchtime I go home to eat."
+      },
+      {
+        "jp": "{公園|こうえん}へ{散歩|さんぽ}に{行|い}かない？",
+        "en": "Want to go for a walk in the park?"
+      },
+      {
+        "jp": "{京都|きょうと}へ{何|なに}をしに{行|い}きますか。",
+        "en": "What are you going to Kyoto to do?"
+      },
+      {
+        "jp": "{駅|えき}まで{妻|つま}を{迎|むか}えに{行|い}きます。",
+        "en": "I'm going to the station to pick up my wife."
+      },
+      {
+        "jp": "{日本|にほん}へ{日本語|にほんご}を{勉強|べんきょう}しに{行|い}きたいです。",
+        "en": "I want to go to Japan to study Japanese."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "Would you like to go see a movie?",
+        "jp": "{映画|えいが}を{見|み}に{行|い}きませんか。",
+        "tiles": [
+          "映画を",
+          "見に",
+          "行きませんか。"
+        ],
+        "alternatives": [
+          "映画を見に行かない？",
+          "映画見に行かない？"
+        ]
+      },
+      {
+        "en": "Let's go get lunch.",
+        "jp": "{昼|ひる}ご{飯|はん}を{食|た}べに{行|い}きましょう。",
+        "tiles": [
+          "昼ご飯を",
+          "食べに",
+          "行きましょう。"
+        ],
+        "alternatives": [
+          "昼ご飯を食べに行こう。",
+          "お昼を食べに行きましょう。",
+          "お昼ご飯を食べに行きましょう。"
+        ]
+      },
+      {
+        "en": "I'm going to the supermarket to do some shopping.",
+        "jp": "スーパーに{買|か}い{物|もの}に{行|い}きます。",
+        "tiles": [
+          "スーパーに",
+          "買い物に",
+          "行きます。"
+        ],
+        "alternatives": [
+          "スーパーへ買い物に行きます。",
+          "スーパーに買い物に行く。",
+          "買い物にスーパーへ行きます。",
+          "買い物にスーパーに行きます。"
+        ]
+      },
+      {
+        "en": "I'm going to the convenience store to buy milk.",
+        "jp": "コンビニに{牛乳|ぎゅうにゅう}を{買|か}いに{行|い}きます。",
+        "tiles": [
+          "コンビニに",
+          "牛乳を",
+          "買いに",
+          "行きます。"
+        ],
+        "alternatives": [
+          "コンビニへ牛乳を買いに行きます。",
+          "コンビニに牛乳を買いに行く。",
+          "牛乳を買いにコンビニに行きます。",
+          "牛乳を買いにコンビニへ行きます。"
+        ]
+      },
+      {
+        "en": "My parents are coming to visit this weekend.",
+        "jp": "{週末|しゅうまつ}、{両親|りょうしん}が{遊|あそ}びに{来|き}ます。",
+        "tiles": [
+          "週末、",
+          "両親が",
+          "遊びに",
+          "来ます。"
+        ],
+        "alternatives": [
+          "週末に両親が遊びに来ます。",
+          "週末、両親が遊びに来る。",
+          "週末は両親が遊びに来ます。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{映画|えいが}を{見|み}＿＿{行|い}きませんか。",
+        "options": [
+          "で",
+          "を",
+          "に"
+        ],
+        "answer": 2,
+        "en": "Would you like to go see a movie?"
+      },
+      {
+        "prompt": "スーパーに{牛乳|ぎゅうにゅう}を{買|か}＿＿{行|い}きます。",
+        "options": [
+          "うに",
+          "いに",
+          "わに"
+        ],
+        "answer": 1,
+        "en": "I'm going to the supermarket to buy milk."
+      },
+      {
+        "prompt": "{昼|ひる}ご{飯|はん}を＿＿{行|い}きましょう。",
+        "options": [
+          "たべに",
+          "たべてに",
+          "たべるに"
+        ],
+        "answer": 0,
+        "en": "Let's go get lunch."
+      },
+      {
+        "prompt": "{公園|こうえん}へ{散歩|さんぽ}＿＿{行|い}きます。",
+        "options": [
+          "を",
+          "に",
+          "で"
+        ],
+        "answer": 1,
+        "en": "I'm going to the park for a walk."
+      },
+      {
+        "prompt": "{両親|りょうしん}がうちに{遊|あそ}び＿＿{来|き}ます。",
+        "options": [
+          "に",
+          "を",
+          "で"
+        ],
+        "answer": 0,
+        "en": "My parents are coming over to visit."
+      },
+      {
+        "prompt": "{京都|きょうと}へ{何|なに}を＿＿に{行|い}きますか。",
+        "options": [
+          "する",
+          "して",
+          "し"
+        ],
+        "answer": 2,
+        "en": "What are you going to Kyoto to do?"
+      }
+    ]
+  },
+  {
+    "id": "te-imasu",
+    "order": 43,
+    "level": "N5",
+    "title": "〜ています — \"is doing\"",
+    "pattern": "〜ています",
+    "register": "both",
+    "prerequisites": [
+      "te-form"
+    ],
+    "contrastWith": [
+      "te-iru-state",
+      "tokoro"
+    ],
+    "explanation": "て-form + います describes an action happening right now: いま、りょうりしています (\"I'm cooking now\"). It also describes a habit over a stretch of time: まいあさジョギングしています (\"I go jogging every morning these days\"). In casual speech, ている usually shrinks to てる: なにしてる？ (\"what are you doing?\"). Some verbs use ている for a state instead, like \"married\" or \"knowing\"; that is a separate lesson later, so stick to actions here.",
+    "examples": [
+      {
+        "jp": "{今|いま}、{料理|りょうり}しています。",
+        "en": "I'm cooking now."
+      },
+      {
+        "jp": "{何|なに}してる？ — テレビ{見|み}てる。",
+        "en": "What are you doing? — Watching TV."
+      },
+      {
+        "jp": "{夫|おっと}は{今|いま}、お{風呂|ふろ}に{入|はい}っています。",
+        "en": "My husband is in the bath right now."
+      },
+      {
+        "jp": "{毎朝|まいあさ}ジョギングしています。",
+        "en": "I go jogging every morning these days."
+      },
+      {
+        "jp": "{外|そと}は{雨|あめ}が{降|ふ}っています。",
+        "en": "It's raining outside."
+      },
+      {
+        "jp": "{妻|つま}は{電話|でんわ}で{話|はな}しています。",
+        "en": "My wife is on the phone."
+      },
+      {
+        "jp": "{今|いま}、{駅|えき}で{待|ま}ってるよ。",
+        "en": "I'm waiting at the station now."
+      },
+      {
+        "jp": "{最近|さいきん}、{毎晩|まいばん}{日本語|にほんご}を{勉強|べんきょう}しています。",
+        "en": "These days I study Japanese every night."
+      },
+      {
+        "jp": "{子|こ}どもたちは{公園|こうえん}で{遊|あそ}んでいます。",
+        "en": "The kids are playing in the park."
+      },
+      {
+        "jp": "{今|いま}、{何|なに}を{読|よ}んでいますか。",
+        "en": "What are you reading at the moment?"
+      },
+      {
+        "jp": "ちょっと{待|ま}って。{今|いま}、{洗濯|せんたく}してる。",
+        "en": "Hang on, I'm doing the laundry."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I'm cooking now.",
+        "jp": "{今|いま}、{料理|りょうり}しています。",
+        "tiles": [
+          "今、",
+          "料理",
+          "しています。"
+        ],
+        "alternatives": [
+          "今、料理してる。",
+          "今、料理をしています。",
+          "今、料理している。"
+        ]
+      },
+      {
+        "en": "What are you doing now?",
+        "jp": "{今|いま}、{何|なに}してる？",
+        "tiles": [
+          "今、",
+          "何",
+          "してる？"
+        ],
+        "alternatives": [
+          "今、何をしていますか。",
+          "今、何をしてる？",
+          "今、何している？"
+        ]
+      },
+      {
+        "en": "It's raining outside.",
+        "jp": "{外|そと}は{雨|あめ}が{降|ふ}っています。",
+        "tiles": [
+          "外は",
+          "雨が",
+          "降って",
+          "います。"
+        ],
+        "alternatives": [
+          "外は雨が降ってる。",
+          "外、雨が降ってる。",
+          "外は雨が降っている。"
+        ]
+      },
+      {
+        "en": "I'm waiting at the station.",
+        "jp": "{駅|えき}で{待|ま}っています。",
+        "tiles": [
+          "駅で",
+          "待って",
+          "います。"
+        ],
+        "alternatives": [
+          "駅で待ってる。",
+          "駅で待ってるよ。",
+          "駅で待っているよ。"
+        ]
+      },
+      {
+        "en": "The kids are playing in the park.",
+        "jp": "{子|こ}どもたちは{公園|こうえん}で{遊|あそ}んでいます。",
+        "tiles": [
+          "子どもたちは",
+          "公園で",
+          "遊んで",
+          "います。"
+        ],
+        "alternatives": [
+          "子どもたちは公園で遊んでる。",
+          "子どもは公園で遊んでいます。",
+          "子供たちは公園で遊んでいます。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{今|いま}、{料理|りょうり}し＿＿。",
+        "options": [
+          "ってます",
+          "ています",
+          "ますています"
+        ],
+        "answer": 1,
+        "en": "I'm cooking now."
+      },
+      {
+        "prompt": "{外|そと}は{雨|あめ}が{降|ふ}＿＿います。",
+        "options": [
+          "いて",
+          "んで",
+          "って"
+        ],
+        "answer": 2,
+        "en": "It's raining outside."
+      },
+      {
+        "prompt": "{子|こ}どもたちは{公園|こうえん}で{遊|あそ}＿＿います。",
+        "options": [
+          "って",
+          "んで",
+          "いて"
+        ],
+        "answer": 1,
+        "en": "The kids are playing in the park."
+      },
+      {
+        "prompt": "{何|なに}し＿＿？ — テレビ{見|み}てる。",
+        "options": [
+          "てい",
+          "る",
+          "てる"
+        ],
+        "answer": 2,
+        "en": "What are you doing? — Watching TV."
+      },
+      {
+        "prompt": "{妻|つま}は{電話|でんわ}で{話|はな}し＿＿。",
+        "options": [
+          "ています",
+          "っています",
+          "でいます"
+        ],
+        "answer": 0,
+        "en": "My wife is on the phone."
+      },
+      {
+        "prompt": "{毎朝|まいあさ}、{駅|えき}まで{歩|ある}＿＿います。",
+        "options": [
+          "いて",
+          "んで",
+          "って"
+        ],
+        "answer": 0,
+        "en": "I walk to the station every morning these days."
+      }
+    ]
+  },
+  {
+    "id": "casual-past",
+    "order": 44,
+    "level": "N5",
+    "title": "〜た — plain past \"did\"",
+    "pattern": "〜た・〜なかった",
+    "register": "plain",
+    "prerequisites": [
+      "te-form",
+      "nai-form",
+      "adjective-past"
+    ],
+    "contrastWith": [],
+    "explanation": "The plain past is easy once you know the て-form: swap て for た and で for だ (たべて → たべた, よんで → よんだ, いって → いった). For \"didn't\", ない becomes なかった (たべなかった). い-adjectives are the polite past minus です (たのしかった), and nouns and な-adjectives use だった and じゃなかった (ひまだった). Use these with your partner instead of 〜ました and 〜でした; どうだった？ (\"how was it?\") will be your everyday question.",
+    "examples": [
+      {
+        "jp": "{今日|きょう}、どうだった？",
+        "en": "How was your day?"
+      },
+      {
+        "jp": "{昨日|きのう}の{映画|えいが}、{面白|おもしろ}かった。",
+        "en": "The movie yesterday was good."
+      },
+      {
+        "jp": "{昼|ひる}ご{飯|はん}、{何|なに}{食|た}べた？",
+        "en": "What did you have for lunch?"
+      },
+      {
+        "jp": "{駅|えき}で{友達|ともだち}と{会|あ}った。",
+        "en": "I met a friend at the station."
+      },
+      {
+        "jp": "{昨日|きのう}の{夜|よる}は、ぜんぜん{寝|ね}なかった。",
+        "en": "I didn't sleep at all last night."
+      },
+      {
+        "jp": "{週末|しゅうまつ}は{暇|ひま}だった。",
+        "en": "I was free at the weekend."
+      },
+      {
+        "jp": "{先週|せんしゅう}はあまり{忙|いそが}しくなかった。",
+        "en": "Last week wasn't very busy."
+      },
+      {
+        "jp": "{昨日|きのう}は{雨|あめ}だった。",
+        "en": "It rained yesterday."
+      },
+      {
+        "jp": "{財布|さいふ}、{家|うち}に{忘|わす}れた！",
+        "en": "I left my wallet at home!"
+      },
+      {
+        "jp": "{旅行|りょこう}、{楽|たの}しかったね。",
+        "en": "The trip was fun, wasn't it?"
+      },
+      {
+        "jp": "{昨日|きのう}、{何|なに}した？ — {家|うち}で{映画|えいが}{見|み}た。",
+        "en": "What did you do yesterday? — Watched a movie at home."
+      },
+      {
+        "jp": "あの{店|みせ}、{静|しず}かじゃなかったね。",
+        "en": "That restaurant wasn't quiet, was it?"
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "How was your day?",
+        "jp": "{今日|きょう}、どうだった？",
+        "tiles": [
+          "今日、",
+          "どう",
+          "だった？"
+        ],
+        "alternatives": [
+          "今日はどうだった？",
+          "今日はどうでしたか。"
+        ]
+      },
+      {
+        "en": "What did you have for lunch?",
+        "jp": "{昼|ひる}ご{飯|はん}、{何|なに}{食|た}べた？",
+        "tiles": [
+          "昼ご飯、",
+          "何",
+          "食べた？"
+        ],
+        "alternatives": [
+          "昼ご飯は何を食べた？",
+          "昼ご飯に何を食べましたか。",
+          "お昼、何食べた？",
+          "昼ご飯、何を食べた？"
+        ]
+      },
+      {
+        "en": "I left my wallet at home!",
+        "jp": "{財布|さいふ}を{家|うち}に{忘|わす}れた！",
+        "tiles": [
+          "財布を",
+          "家に",
+          "忘れた！"
+        ],
+        "alternatives": [
+          "財布、家に忘れた！",
+          "財布をうちに忘れた！",
+          "財布を家に忘れました！"
+        ]
+      },
+      {
+        "en": "I was free at the weekend.",
+        "jp": "{週末|しゅうまつ}は{暇|ひま}だった。",
+        "tiles": [
+          "週末は",
+          "暇",
+          "だった。"
+        ],
+        "alternatives": [
+          "週末は暇でした。",
+          "週末、暇だった。"
+        ]
+      },
+      {
+        "en": "The trip was fun, wasn't it?",
+        "jp": "{旅行|りょこう}、{楽|たの}しかったね。",
+        "tiles": [
+          "旅行、",
+          "楽しかった",
+          "ね。"
+        ],
+        "alternatives": [
+          "旅行は楽しかったね。",
+          "旅行は楽しかったですね。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{昼|ひる}ご{飯|はん}、{何|なに}{食|た}べ＿＿？",
+        "options": [
+          "た",
+          "だ",
+          "った"
+        ],
+        "answer": 0,
+        "en": "What did you have for lunch?"
+      },
+      {
+        "prompt": "{昨日|きのう}は{本|ほん}を{読|よ}＿＿。",
+        "options": [
+          "いた",
+          "った",
+          "んだ"
+        ],
+        "answer": 2,
+        "en": "I read a book yesterday."
+      },
+      {
+        "prompt": "{週末|しゅうまつ}は{暇|ひま}＿＿。",
+        "options": [
+          "くなかった",
+          "だった",
+          "かった"
+        ],
+        "answer": 1,
+        "en": "I was free at the weekend."
+      },
+      {
+        "prompt": "{財布|さいふ}を{家|うち}に{忘|わす}れ＿＿！",
+        "options": [
+          "った",
+          "た",
+          "だ"
+        ],
+        "answer": 1,
+        "en": "I left my wallet at home!"
+      },
+      {
+        "prompt": "{昨日|きのう}の{夜|よる}は、ぜんぜん{寝|ね}＿＿。",
+        "options": [
+          "ないだった",
+          "なかった",
+          "なくた"
+        ],
+        "answer": 1,
+        "en": "I didn't sleep at all last night."
+      },
+      {
+        "prompt": "{今日|きょう}、どう＿＿？",
+        "options": [
+          "た",
+          "かった",
+          "だった"
+        ],
+        "answer": 2,
+        "en": "How was your day?"
+      },
+      {
+        "prompt": "{駅|えき}で{友達|ともだち}と{会|あ}＿＿。",
+        "options": [
+          "った",
+          "んだ",
+          "いた"
+        ],
+        "answer": 0,
+        "en": "I met a friend at the station."
+      }
+    ]
+  },
+  {
+    "id": "kara-because",
+    "order": 45,
+    "level": "N5",
+    "title": "〜から — \"because, so\"",
+    "pattern": "〜から、〜",
+    "register": "both",
+    "prerequisites": [
+      "casual-speech",
+      "casual-past"
+    ],
+    "contrastWith": [
+      "kara-made",
+      "node",
+      "shi-reasons"
+    ],
+    "explanation": "Put から after a reason to mean \"because\" or \"so\": つかれたから、ねる (\"I'm tired, so I'm going to bed\"). The reason comes first and the result second, the opposite order to English \"because\". The reason can be plain or polite (さむいから or さむいですから), but nouns and な-adjectives need だ or です before から (あめだから). Ask why with どうして or casual なんで, and you can answer with just the reason plus から: おもしろいから (\"because it's funny\"). This is not the から that means \"from\", which comes after a time or a place; a softer \"because\", ので, comes later.",
+    "examples": [
+      {
+        "jp": "{疲|つか}れたから、{寝|ね}るね。",
+        "en": "I'm tired, so I'm going to bed."
+      },
+      {
+        "jp": "{寒|さむ}いから、{窓|まど}を{閉|し}めて。",
+        "en": "It's cold, so close the window, would you?"
+      },
+      {
+        "jp": "{明日|あした}は{休|やす}みだから、{一緒|いっしょ}に{出|で}かけない？",
+        "en": "I'm off tomorrow, so do you want to go out together?"
+      },
+      {
+        "jp": "どうして{日本語|にほんご}を{勉強|べんきょう}していますか。 — {日本|にほん}が{好|す}きですから。",
+        "en": "Why are you studying Japanese? — Because I like Japan."
+      },
+      {
+        "jp": "なんで{笑|わら}ってる？ — {面白|おもしろ}いから。",
+        "en": "Why are you laughing? — Because it's funny."
+      },
+      {
+        "jp": "{雨|あめ}だから、タクシーで{行|い}きましょう。",
+        "en": "It's raining, so let's take a taxi."
+      },
+      {
+        "jp": "{高|たか}いですから、{買|か}いません。",
+        "en": "It's expensive, so I won't buy it."
+      },
+      {
+        "jp": "{今日|きょう}は{暇|ひま}だから、{掃除|そうじ}する。",
+        "en": "I'm free today, so I'll clean."
+      },
+      {
+        "jp": "お{金|かね}、{貸|か}して。{財布|さいふ}を{忘|わす}れたから。",
+        "en": "Can you lend me some money? I forgot my wallet."
+      },
+      {
+        "jp": "{駅|えき}が{近|ちか}いから、{便利|べんり}です。",
+        "en": "The station is close, so it's convenient."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I'm tired, so I'm going to bed.",
+        "jp": "{疲|つか}れたから、{寝|ね}るね。",
+        "tiles": [
+          "疲れた",
+          "から、",
+          "寝るね。"
+        ],
+        "alternatives": [
+          "疲れたから寝る。",
+          "疲れたから、寝ます。",
+          "疲れましたから、寝ます。"
+        ]
+      },
+      {
+        "en": "It's cold, so please close the window.",
+        "jp": "{寒|さむ}いから、{窓|まど}を{閉|し}めてください。",
+        "tiles": [
+          "寒い",
+          "から、",
+          "窓を",
+          "閉めてください。"
+        ],
+        "alternatives": [
+          "寒いですから、窓を閉めてください。",
+          "寒いから、窓を閉めて。",
+          "寒いから窓閉めて。"
+        ]
+      },
+      {
+        "en": "It's raining, so let's take a taxi.",
+        "jp": "{雨|あめ}だから、タクシーで{行|い}きましょう。",
+        "tiles": [
+          "雨",
+          "だから、",
+          "タクシーで",
+          "行きましょう。"
+        ],
+        "alternatives": [
+          "雨ですから、タクシーで行きましょう。",
+          "雨だから、タクシーで行こう。"
+        ]
+      },
+      {
+        "en": "It's expensive, so I won't buy it.",
+        "jp": "{高|たか}いから、{買|か}いません。",
+        "tiles": [
+          "高い",
+          "から、",
+          "買いません。"
+        ],
+        "alternatives": [
+          "高いですから、買いません。",
+          "高いから、買わない。"
+        ]
+      },
+      {
+        "en": "I'm free today, so I'll clean.",
+        "jp": "{今日|きょう}は{暇|ひま}だから、{掃除|そうじ}する。",
+        "tiles": [
+          "今日は",
+          "暇",
+          "だから、",
+          "掃除する。"
+        ],
+        "alternatives": [
+          "今日は暇だから、掃除します。",
+          "今日は暇ですから、掃除します。",
+          "今日は暇だから掃除をする。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{疲|つか}れた＿＿、{寝|ね}るね。",
+        "options": [
+          "でも",
+          "から",
+          "まで"
+        ],
+        "answer": 1,
+        "en": "I'm tired, so I'm going to bed."
+      },
+      {
+        "prompt": "{雨|あめ}＿＿から、タクシーで{行|い}きましょう。",
+        "options": [
+          "な",
+          "い",
+          "だ"
+        ],
+        "answer": 2,
+        "en": "It's raining, so let's take a taxi."
+      },
+      {
+        "prompt": "なんで{笑|わら}ってる？ — {面白|おもしろ}い＿＿。",
+        "options": [
+          "まで",
+          "だから",
+          "から"
+        ],
+        "answer": 2,
+        "en": "Why are you laughing? — Because it's funny."
+      },
+      {
+        "prompt": "＿＿{日本語|にほんご}を{勉強|べんきょう}していますか。 — {日本|にほん}が{好|す}きですから。",
+        "options": [
+          "どうして",
+          "だれ",
+          "どこ"
+        ],
+        "answer": 0,
+        "en": "Why are you studying Japanese? — Because I like Japan."
+      },
+      {
+        "prompt": "{今日|きょう}は{暇|ひま}＿＿、{掃除|そうじ}する。",
+        "options": [
+          "だから",
+          "から",
+          "いから"
+        ],
+        "answer": 0,
+        "en": "I'm free today, so I'll clean."
+      },
+      {
+        "prompt": "{寒|さむ}い＿＿、{窓|まど}を{閉|し}めてください。",
+        "options": [
+          "だから",
+          "から",
+          "なから"
+        ],
+        "answer": 1,
+        "en": "It's cold, so please close the window."
+      }
+    ]
+  },
+  {
+    "id": "wa-ga-description",
+    "order": 46,
+    "level": "N5",
+    "title": "〜は〜が〜 — \"X has long hair\"",
+    "pattern": "〜は〜が〜",
+    "register": "both",
+    "prerequisites": [
+      "ga-subject",
+      "i-adjectives"
+    ],
+    "contrastWith": [
+      "ga-subject"
+    ],
+    "explanation": "To describe a feature of someone or something, Japanese says \"as for X, Y is …\": つまはかみがながい (literally \"as for my wife, hair is long\", so \"my wife has long hair\"). は marks who or what you're describing, and が marks the part or feature. It's how you talk about places (このみせはパスタがおいしい), the body (あたまがいたい, where わたしは is usually left out) and abilities (わたしはにほんごがすこしわかります). The が here marks the feature, not the answer to \"who?\" as in the earlier が lesson, and the pattern works the same in polite and casual speech.",
+    "examples": [
+      {
+        "jp": "{妻|つま}は{髪|かみ}が{長|なが}いです。",
+        "en": "My wife has long hair."
+      },
+      {
+        "jp": "この{店|みせ}はパスタがおいしいです。",
+        "en": "The pasta at this restaurant is good."
+      },
+      {
+        "jp": "{頭|あたま}が{痛|いた}い。",
+        "en": "I have a headache."
+      },
+      {
+        "jp": "{私|わたし}は{日本語|にほんご}が{少|すこ}しわかります。",
+        "en": "I understand a little Japanese."
+      },
+      {
+        "jp": "{夫|おっと}は{背|せ}が{高|たか}いです。",
+        "en": "My husband is tall."
+      },
+      {
+        "jp": "{東京|とうきょう}は{人|ひと}が{多|おお}いですね。",
+        "en": "There are so many people in Tokyo, aren't there?"
+      },
+      {
+        "jp": "この{部屋|へや}は{窓|まど}が{大|おお}きいです。",
+        "en": "This room has big windows."
+      },
+      {
+        "jp": "{今日|きょう}はお{腹|なか}が{痛|いた}いです。",
+        "en": "My stomach hurts today."
+      },
+      {
+        "jp": "うちの{猫|ねこ}は{目|め}がきれいだね。",
+        "en": "Our cat has beautiful eyes, doesn't she?"
+      },
+      {
+        "jp": "{京都|きょうと}はお{寺|てら}が{多|おお}いです。",
+        "en": "Kyoto has a lot of temples."
+      },
+      {
+        "jp": "{夫|おっと}は{料理|りょうり}が{上手|じょうず}です。",
+        "en": "My husband is a good cook."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "My wife has long hair.",
+        "jp": "{妻|つま}は{髪|かみ}が{長|なが}いです。",
+        "tiles": [
+          "妻は",
+          "髪が",
+          "長いです。"
+        ],
+        "alternatives": [
+          "妻は髪が長い。"
+        ]
+      },
+      {
+        "en": "I have a headache.",
+        "jp": "{頭|あたま}が{痛|いた}いです。",
+        "tiles": [
+          "頭が",
+          "痛い",
+          "です。"
+        ],
+        "alternatives": [
+          "頭が痛い。",
+          "私は頭が痛いです。"
+        ]
+      },
+      {
+        "en": "The pasta at this restaurant is good.",
+        "jp": "この{店|みせ}はパスタがおいしいです。",
+        "tiles": [
+          "この店は",
+          "パスタが",
+          "おいしいです。"
+        ],
+        "alternatives": [
+          "この店はパスタがおいしい。",
+          "この店のパスタはおいしいです。",
+          "この店のパスタはおいしい。"
+        ]
+      },
+      {
+        "en": "I understand a little Japanese.",
+        "jp": "{私|わたし}は{日本語|にほんご}が{少|すこ}しわかります。",
+        "tiles": [
+          "私は",
+          "日本語が",
+          "少し",
+          "わかります。"
+        ],
+        "alternatives": [
+          "日本語が少しわかります。",
+          "私は日本語がちょっとわかります。",
+          "日本語が少しわかる。"
+        ]
+      },
+      {
+        "en": "There are a lot of people in Tokyo.",
+        "jp": "{東京|とうきょう}は{人|ひと}が{多|おお}いです。",
+        "tiles": [
+          "東京は",
+          "人が",
+          "多いです。"
+        ],
+        "alternatives": [
+          "東京は人が多い。",
+          "東京は人が多いですね。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{妻|つま}は{髪|かみ}＿＿{長|なが}いです。",
+        "options": [
+          "を",
+          "が",
+          "に"
+        ],
+        "answer": 1,
+        "en": "My wife has long hair."
+      },
+      {
+        "prompt": "{私|わたし}＿＿{日本語|にほんご}が{少|すこ}しわかります。",
+        "options": [
+          "は",
+          "を",
+          "で"
+        ],
+        "answer": 0,
+        "en": "I understand a little Japanese."
+      },
+      {
+        "prompt": "{頭|あたま}＿＿{痛|いた}いです。",
+        "options": [
+          "を",
+          "が",
+          "で"
+        ],
+        "answer": 1,
+        "en": "I have a headache."
+      },
+      {
+        "prompt": "この{店|みせ}＿＿パスタがおいしいです。",
+        "options": [
+          "を",
+          "に",
+          "は"
+        ],
+        "answer": 2,
+        "en": "The pasta at this restaurant is good."
+      },
+      {
+        "prompt": "{東京|とうきょう}は{人|ひと}＿＿{多|おお}いです。",
+        "options": [
+          "が",
+          "の",
+          "を"
+        ],
+        "answer": 0,
+        "en": "There are a lot of people in Tokyo."
+      },
+      {
+        "prompt": "{夫|おっと}は{料理|りょうり}＿＿{上手|じょうず}です。",
+        "options": [
+          "を",
+          "に",
+          "が"
+        ],
+        "answer": 2,
+        "en": "My husband is a good cook."
+      }
+    ]
+  },
+  {
+    "id": "temo-ii",
+    "order": 47,
+    "level": "N5",
+    "title": "〜てもいい — \"it's okay to …\"",
+    "pattern": "〜てもいいですか",
+    "register": "both",
+    "prerequisites": [
+      "te-form"
+    ],
+    "contrastWith": [
+      "tewa-ikenai",
+      "nakutemo-ii",
+      "temo-even-if"
+    ],
+    "explanation": "て-form + もいいですか asks for permission: すわってもいいですか (\"may I sit here?\", literally \"is it fine even if I sit?\"). With your partner, drop ですか and let your voice rise: これ、たべてもいい？ Say yes with どうぞ, いいですよ or casual いいよ, and say no gently with ちょっと… . Without the question, it gives permission: ここでまってもいいですよ (\"you can wait here\"). \"Must not\" (〜てはいけない) and \"don't have to\" (〜なくてもいい) look similar but come in their own lessons.",
+    "examples": [
+      {
+        "jp": "ここに{座|すわ}ってもいいですか。 — どうぞ。",
+        "en": "May I sit here? — Go ahead."
+      },
+      {
+        "jp": "これ、{食|た}べてもいい？ — いいよ。",
+        "en": "Can I eat this? — Sure."
+      },
+      {
+        "jp": "{窓|まど}を{開|あ}けてもいいですか。",
+        "en": "Is it okay if I open the window?"
+      },
+      {
+        "jp": "{写真|しゃしん}を{撮|と}ってもいいですか。 — すみません、ちょっと…。",
+        "en": "May I take a photo? — Sorry, I'd rather you didn't."
+      },
+      {
+        "jp": "テレビ、{消|け}してもいい？",
+        "en": "Okay if I turn off the TV?"
+      },
+      {
+        "jp": "お{風呂|ふろ}に{入|はい}ってもいい？",
+        "en": "Okay if I take a bath?"
+      },
+      {
+        "jp": "ここで{待|ま}ってもいいですよ。",
+        "en": "You can wait here."
+      },
+      {
+        "jp": "{明日|あした}、{友達|ともだち}がうちに{来|き}てもいい？",
+        "en": "Is it okay if a friend comes over tomorrow?"
+      },
+      {
+        "jp": "このペン、{使|つか}ってもいいですか。",
+        "en": "Can I use this pen?"
+      },
+      {
+        "jp": "カードで{払|はら}ってもいいですか。",
+        "en": "Can I pay by card?"
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "May I sit here?",
+        "jp": "ここに{座|すわ}ってもいいですか。",
+        "tiles": [
+          "ここに",
+          "座っても",
+          "いいですか。"
+        ],
+        "alternatives": [
+          "ここに座ってもいい？",
+          "ここ、座ってもいいですか。",
+          "ここ、座ってもいい？"
+        ]
+      },
+      {
+        "en": "Can I eat this?",
+        "jp": "これ、{食|た}べてもいい？",
+        "tiles": [
+          "これ、",
+          "食べても",
+          "いい？"
+        ],
+        "alternatives": [
+          "これを食べてもいいですか。",
+          "これ食べてもいい？",
+          "これを食べてもいい？",
+          "これ、食べてもいいですか。"
+        ]
+      },
+      {
+        "en": "Is it okay if I open the window?",
+        "jp": "{窓|まど}を{開|あ}けてもいいですか。",
+        "tiles": [
+          "窓を",
+          "開けても",
+          "いいですか。"
+        ],
+        "alternatives": [
+          "窓、開けてもいい？",
+          "窓を開けてもいい？"
+        ]
+      },
+      {
+        "en": "Can I pay by card?",
+        "jp": "カードで{払|はら}ってもいいですか。",
+        "tiles": [
+          "カードで",
+          "払っても",
+          "いいですか。"
+        ],
+        "alternatives": [
+          "カードで払ってもいい？"
+        ]
+      },
+      {
+        "en": "You can wait here.",
+        "jp": "ここで{待|ま}ってもいいですよ。",
+        "tiles": [
+          "ここで",
+          "待っても",
+          "いいですよ。"
+        ],
+        "alternatives": [
+          "ここで待ってもいいよ。",
+          "ここで待ってもいいです。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "ここに{座|すわ}っ＿＿いいですか。",
+        "options": [
+          "てから",
+          "ては",
+          "ても"
+        ],
+        "answer": 2,
+        "en": "May I sit here?"
+      },
+      {
+        "prompt": "{窓|まど}を{開|あ}け＿＿もいいですか。",
+        "options": [
+          "いて",
+          "って",
+          "て"
+        ],
+        "answer": 2,
+        "en": "Is it okay if I open the window?"
+      },
+      {
+        "prompt": "{写真|しゃしん}を{撮|と}＿＿もいいですか。",
+        "options": [
+          "って",
+          "いて",
+          "んで"
+        ],
+        "answer": 0,
+        "en": "May I take a photo?"
+      },
+      {
+        "prompt": "カード＿＿{払|はら}ってもいいですか。",
+        "options": [
+          "で",
+          "に",
+          "が"
+        ],
+        "answer": 0,
+        "en": "Can I pay by card?"
+      },
+      {
+        "prompt": "テレビ、{消|け}しても＿＿？",
+        "options": [
+          "いる",
+          "いい",
+          "ある"
+        ],
+        "answer": 1,
+        "en": "Okay if I turn off the TV?"
+      },
+      {
+        "prompt": "{友達|ともだち}がうちに＿＿もいい？",
+        "options": [
+          "こて",
+          "きて",
+          "くて"
+        ],
+        "answer": 1,
+        "en": "Is it okay if a friend comes over?"
+      }
+    ]
+  },
+  {
+    "id": "to-omou",
+    "order": 48,
+    "level": "N5",
+    "title": "〜とおもう — \"I think that …\"",
+    "pattern": "〜と{思|おも}う",
+    "register": "both",
+    "prerequisites": [
+      "casual-speech",
+      "casual-past"
+    ],
+    "contrastWith": [
+      "to-iu"
+    ],
+    "explanation": "Put とおもう (polite: とおもいます) after a plain-form sentence to give an opinion or a guess: おいしいとおもう (\"I think it's tasty\"). Nouns and な-adjectives need だ before と: あしたはあめだとおもう. For \"I don't think …\", make the sentence before と negative, not おもう: こないとおもう (\"I don't think he'll come\"). It softens your opinions with your partner and in polite conversation alike. Reporting what someone said (〜という) comes a little later and uses the same と.",
+    "examples": [
+      {
+        "jp": "これ、{似合|にあ}うと{思|おも}う。",
+        "en": "I think this suits you."
+      },
+      {
+        "jp": "{明日|あした}は{雨|あめ}だと{思|おも}います。",
+        "en": "I think it'll rain tomorrow."
+      },
+      {
+        "jp": "あの{店|みせ}はおいしいと{思|おも}う。",
+        "en": "I think that restaurant is good."
+      },
+      {
+        "jp": "{友達|ともだち}は{来|こ}ないと{思|おも}う。",
+        "en": "I don't think our friend is coming."
+      },
+      {
+        "jp": "この{部屋|へや}は{静|しず}かだと{思|おも}います。",
+        "en": "I think this room is quiet."
+      },
+      {
+        "jp": "{鍵|かぎ}は{車|くるま}の{中|なか}にあると{思|おも}う。",
+        "en": "I think the keys are in the car."
+      },
+      {
+        "jp": "{妻|つま}は{寝|ね}たと{思|おも}います。",
+        "en": "I think my wife has gone to bed."
+      },
+      {
+        "jp": "その{映画|えいが}は{面白|おもしろ}くないと{思|おも}う。",
+        "en": "I don't think that movie is any good."
+      },
+      {
+        "jp": "{日本語|にほんご}は{面白|おもしろ}いと{思|おも}います。",
+        "en": "I think Japanese is interesting."
+      },
+      {
+        "jp": "{駅|えき}は{近|ちか}いと{思|おも}いますよ。",
+        "en": "I think the station is close."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I think it'll rain tomorrow.",
+        "jp": "{明日|あした}は{雨|あめ}だと{思|おも}います。",
+        "tiles": [
+          "明日は",
+          "雨だ",
+          "と",
+          "思います。"
+        ],
+        "alternatives": [
+          "明日は雨だと思う。",
+          "明日、雨だと思う。",
+          "明日は雨が降ると思います。",
+          "明日は雨が降ると思う。"
+        ]
+      },
+      {
+        "en": "I think this suits you.",
+        "jp": "これ、{似合|にあ}うと{思|おも}う。",
+        "tiles": [
+          "これ、",
+          "似合う",
+          "と",
+          "思う。"
+        ],
+        "alternatives": [
+          "これは似合うと思います。",
+          "これ、似合うと思います。",
+          "これは似合うと思う。"
+        ]
+      },
+      {
+        "en": "I don't think he's coming.",
+        "jp": "{彼|かれ}は{来|こ}ないと{思|おも}います。",
+        "tiles": [
+          "彼は",
+          "来ない",
+          "と",
+          "思います。"
+        ],
+        "alternatives": [
+          "彼は来ないと思う。"
+        ]
+      },
+      {
+        "en": "I think that restaurant is good.",
+        "jp": "あの{店|みせ}はおいしいと{思|おも}います。",
+        "tiles": [
+          "あの店は",
+          "おいしい",
+          "と",
+          "思います。"
+        ],
+        "alternatives": [
+          "あの店はおいしいと思う。"
+        ]
+      },
+      {
+        "en": "I think the keys are in the car.",
+        "jp": "{鍵|かぎ}は{車|くるま}の{中|なか}にあると{思|おも}う。",
+        "tiles": [
+          "鍵は",
+          "車の中に",
+          "ある",
+          "と思う。"
+        ],
+        "alternatives": [
+          "鍵は車の中にあると思います。",
+          "鍵は車にあると思う。",
+          "鍵は車にあると思います。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{明日|あした}は{雨|あめ}＿＿と{思|おも}います。",
+        "options": [
+          "の",
+          "だ",
+          "な"
+        ],
+        "answer": 1,
+        "en": "I think it'll rain tomorrow."
+      },
+      {
+        "prompt": "あの{店|みせ}はおいしい＿＿{思|おも}う。",
+        "options": [
+          "が",
+          "と",
+          "を"
+        ],
+        "answer": 1,
+        "en": "I think that restaurant is good."
+      },
+      {
+        "prompt": "この{部屋|へや}は{静|しず}か＿＿と{思|おも}います。",
+        "options": [
+          "な",
+          "の",
+          "だ"
+        ],
+        "answer": 2,
+        "en": "I think this room is quiet."
+      },
+      {
+        "prompt": "{彼|かれ}は＿＿と{思|おも}います。",
+        "options": [
+          "こない",
+          "こないです",
+          "きません"
+        ],
+        "answer": 0,
+        "en": "I don't think he's coming."
+      },
+      {
+        "prompt": "これ、{似合|にあ}う＿＿{思|おも}う。",
+        "options": [
+          "と",
+          "だと",
+          "に"
+        ],
+        "answer": 0,
+        "en": "I think this suits you."
+      },
+      {
+        "prompt": "{鍵|かぎ}は{車|くるま}の{中|なか}に＿＿と{思|おも}う。",
+        "options": [
+          "あります",
+          "あるだ",
+          "ある"
+        ],
+        "answer": 2,
+        "en": "I think the keys are in the car."
+      }
+    ]
+  },
+  {
+    "id": "ni-target",
+    "order": 49,
+    "level": "N5",
+    "title": "〜に — \"to someone\"",
+    "pattern": "〜に{会|あ}う・〜に{電話|でんわ}する",
+    "register": "both",
+    "prerequisites": [
+      "ni-time-place"
+    ],
+    "contrastWith": [
+      "ni-time-place"
+    ],
+    "explanation": "に also marks the person on the receiving end of an action: ともだちにあう (\"meet a friend\"), ははにでんわする (\"call my mother\"). Verbs that use this に include あう, でんわする, メールする, きく (ask), おしえる, おくる and はなす. Compare と, which means doing something together: おっととはなす is \"talk with my husband\", while おっとにはなす is \"tell my husband\". It's the same に you know for times and places, now pointed at a person, and it works in polite and casual speech.",
+    "examples": [
+      {
+        "jp": "{明日|あした}、{友達|ともだち}に{会|あ}います。",
+        "en": "I'm meeting a friend tomorrow."
+      },
+      {
+        "jp": "{毎週|まいしゅう}、{母|はは}に{電話|でんわ}します。",
+        "en": "I call my mother every week."
+      },
+      {
+        "jp": "{妻|つま}にメッセージを{送|おく}りました。",
+        "en": "I sent my wife a message."
+      },
+      {
+        "jp": "{駅|えき}の{人|ひと}に{聞|き}きましょう。",
+        "en": "Let's ask the station staff."
+      },
+      {
+        "jp": "{夫|おっと}に{日本語|にほんご}を{教|おし}えています。",
+        "en": "I'm teaching my husband Japanese."
+      },
+      {
+        "jp": "それ、{誰|だれ}に{聞|き}いた？",
+        "en": "Who did you hear that from?"
+      },
+      {
+        "jp": "{先生|せんせい}に{話|はな}しましたか。",
+        "en": "Did you tell the teacher?"
+      },
+      {
+        "jp": "{両親|りょうしん}に{写真|しゃしん}を{送|おく}りました。",
+        "en": "I sent the photos to my parents."
+      },
+      {
+        "jp": "{夫|おっと}と{話|はな}しました。",
+        "en": "I talked it over with my husband."
+      },
+      {
+        "jp": "{店|みせ}の{人|ひと}におすすめを{聞|き}きました。",
+        "en": "I asked the staff what they recommend."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I call my mother every week.",
+        "jp": "{毎週|まいしゅう}、{母|はは}に{電話|でんわ}します。",
+        "tiles": [
+          "毎週、",
+          "母に",
+          "電話",
+          "します。"
+        ],
+        "alternatives": [
+          "毎週、母に電話する。",
+          "毎週、母に電話をします。"
+        ]
+      },
+      {
+        "en": "I'm meeting a friend tomorrow.",
+        "jp": "{明日|あした}、{友達|ともだち}に{会|あ}います。",
+        "tiles": [
+          "明日、",
+          "友達に",
+          "会います。"
+        ],
+        "alternatives": [
+          "明日、友達と会います。",
+          "明日、友達に会う。",
+          "明日、友達と会う。"
+        ]
+      },
+      {
+        "en": "I sent the photos to my parents.",
+        "jp": "{両親|りょうしん}に{写真|しゃしん}を{送|おく}りました。",
+        "tiles": [
+          "両親に",
+          "写真を",
+          "送りました。"
+        ],
+        "alternatives": [
+          "写真を両親に送りました。",
+          "両親に写真を送った。"
+        ]
+      },
+      {
+        "en": "I'm teaching my husband Japanese.",
+        "jp": "{夫|おっと}に{日本語|にほんご}を{教|おし}えています。",
+        "tiles": [
+          "夫に",
+          "日本語を",
+          "教えて",
+          "います。"
+        ],
+        "alternatives": [
+          "夫に日本語を教えてる。",
+          "日本語を夫に教えています。"
+        ]
+      },
+      {
+        "en": "I asked the staff what they recommend.",
+        "jp": "{店|みせ}の{人|ひと}におすすめを{聞|き}きました。",
+        "tiles": [
+          "店の人に",
+          "おすすめを",
+          "聞きました。"
+        ],
+        "alternatives": [
+          "店の人におすすめを聞いた。",
+          "お店の人におすすめを聞きました。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{毎週|まいしゅう}、{母|はは}＿＿{電話|でんわ}します。",
+        "options": [
+          "で",
+          "に",
+          "を"
+        ],
+        "answer": 1,
+        "en": "I call my mother every week."
+      },
+      {
+        "prompt": "{両親|りょうしん}＿＿{写真|しゃしん}を{送|おく}りました。",
+        "options": [
+          "に",
+          "で",
+          "を"
+        ],
+        "answer": 0,
+        "en": "I sent the photos to my parents."
+      },
+      {
+        "prompt": "{夫|おっと}に{日本語|にほんご}＿＿{教|おし}えています。",
+        "options": [
+          "に",
+          "が",
+          "を"
+        ],
+        "answer": 2,
+        "en": "I'm teaching my husband Japanese."
+      },
+      {
+        "prompt": "それ、{誰|だれ}＿＿{聞|き}いた？",
+        "options": [
+          "に",
+          "を",
+          "で"
+        ],
+        "answer": 0,
+        "en": "Who did you hear that from?"
+      },
+      {
+        "prompt": "{駅|えき}の{人|ひと}＿＿{聞|き}きましょう。",
+        "options": [
+          "で",
+          "を",
+          "に"
+        ],
+        "answer": 2,
+        "en": "Let's ask the station staff."
+      },
+      {
+        "prompt": "{夫|おっと}＿＿{話|はな}しました。",
+        "options": [
+          "で",
+          "と",
+          "を"
+        ],
+        "answer": 1,
+        "en": "I talked it over with my husband."
+      }
+    ]
+  },
+  {
+    "id": "ya-nado",
+    "order": 50,
+    "level": "N5",
+    "title": "〜や〜 — \"things like …\"",
+    "pattern": "〜や〜（など）",
+    "register": "both",
+    "prerequisites": [
+      "to-with"
+    ],
+    "contrastWith": [
+      "to-with",
+      "ka-or-ni-suru",
+      "tari-tari"
+    ],
+    "explanation": "や joins nouns like と does, but it means the list is just a few examples out of more: にくややさいをかいました (\"I bought meat, vegetables and so on\"). と gives the complete list: にくとやさい means exactly those two things. You can close a や list with など (\"and so on\"): パンやたまごなど. や only joins nouns, and listing actions (\"I did things like cleaning and shopping\") has its own pattern later; both や and など are fine in polite and casual speech.",
+    "examples": [
+      {
+        "jp": "スーパーで{肉|にく}や{野菜|やさい}を{買|か}いました。",
+        "en": "I bought meat, vegetables and other things at the supermarket."
+      },
+      {
+        "jp": "{冷蔵庫|れいぞうこ}に{卵|たまご}や{牛乳|ぎゅうにゅう}があります。",
+        "en": "There are eggs, milk and stuff in the fridge."
+      },
+      {
+        "jp": "{朝|あさ}はパンやヨーグルトを{食|た}べます。",
+        "en": "In the morning I eat things like bread and yogurt."
+      },
+      {
+        "jp": "{京都|きょうと}や{大阪|おおさか}に{行|い}きたいです。",
+        "en": "I want to go to places like Kyoto and Osaka."
+      },
+      {
+        "jp": "かばんの{中|なか}に{財布|さいふ}やスマホなどがあります。",
+        "en": "In my bag there's my wallet, my phone and so on."
+      },
+      {
+        "jp": "ラーメンや{寿司|すし}が{好|す}きです。",
+        "en": "I like things like ramen and sushi."
+      },
+      {
+        "jp": "{部屋|へや}にテーブルや{椅子|いす}などがあります。",
+        "en": "The room has a table, chairs and so on."
+      },
+      {
+        "jp": "{友達|ともだち}や{家族|かぞく}に{写真|しゃしん}を{送|おく}りました。",
+        "en": "I sent the photos to friends, family and others."
+      },
+      {
+        "jp": "パーティーにはビールやワインがありました。",
+        "en": "There was beer, wine and so on at the party."
+      },
+      {
+        "jp": "{肉|にく}と{野菜|やさい}を{買|か}いました。",
+        "en": "I bought meat and vegetables (just those two)."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I bought things like meat and vegetables.",
+        "jp": "{肉|にく}や{野菜|やさい}を{買|か}いました。",
+        "tiles": [
+          "肉や",
+          "野菜を",
+          "買いました。"
+        ],
+        "alternatives": [
+          "肉や野菜などを買いました。",
+          "肉や野菜を買った。"
+        ]
+      },
+      {
+        "en": "There are eggs, milk and so on in the fridge.",
+        "jp": "{冷蔵庫|れいぞうこ}に{卵|たまご}や{牛乳|ぎゅうにゅう}などがあります。",
+        "tiles": [
+          "冷蔵庫に",
+          "卵や",
+          "牛乳などが",
+          "あります。"
+        ],
+        "alternatives": [
+          "冷蔵庫に卵や牛乳などがある。",
+          "冷蔵庫には卵や牛乳などがあります。",
+          "冷蔵庫に卵や牛乳があります。"
+        ]
+      },
+      {
+        "en": "I want to go to places like Kyoto and Osaka.",
+        "jp": "{京都|きょうと}や{大阪|おおさか}に{行|い}きたいです。",
+        "tiles": [
+          "京都や",
+          "大阪に",
+          "行きたい",
+          "です。"
+        ],
+        "alternatives": [
+          "京都や大阪へ行きたいです。",
+          "京都や大阪に行きたい。",
+          "京都や大阪などに行きたいです。"
+        ]
+      },
+      {
+        "en": "I like things like ramen and sushi.",
+        "jp": "ラーメンや{寿司|すし}が{好|す}きです。",
+        "tiles": [
+          "ラーメンや",
+          "寿司が",
+          "好きです。"
+        ],
+        "alternatives": [
+          "ラーメンや寿司などが好きです。",
+          "ラーメンや寿司が好き。"
+        ]
+      },
+      {
+        "en": "In the morning I eat things like bread and yogurt.",
+        "jp": "{朝|あさ}はパンやヨーグルトを{食|た}べます。",
+        "tiles": [
+          "朝は",
+          "パンや",
+          "ヨーグルトを",
+          "食べます。"
+        ],
+        "alternatives": [
+          "朝はパンやヨーグルトを食べる。",
+          "朝、パンやヨーグルトを食べます。",
+          "朝はパンやヨーグルトなどを食べます。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "スーパーで{肉|にく}＿＿{野菜|やさい}などを{買|か}いました。",
+        "options": [
+          "が",
+          "や",
+          "を"
+        ],
+        "answer": 1,
+        "en": "I bought meat, vegetables and so on at the supermarket."
+      },
+      {
+        "prompt": "{冷蔵庫|れいぞうこ}に{卵|たまご}や{牛乳|ぎゅうにゅう}＿＿があります。",
+        "options": [
+          "や",
+          "など",
+          "も"
+        ],
+        "answer": 1,
+        "en": "There are eggs, milk and so on in the fridge."
+      },
+      {
+        "prompt": "{朝|あさ}はパン＿＿ヨーグルトを{食|た}べます。",
+        "options": [
+          "や",
+          "を",
+          "が"
+        ],
+        "answer": 0,
+        "en": "In the morning I eat things like bread and yogurt."
+      },
+      {
+        "prompt": "{昨日|きのう}は{肉|にく}＿＿{魚|さかな}を{買|か}いました。",
+        "options": [
+          "も",
+          "や",
+          "と"
+        ],
+        "answer": 2,
+        "en": "Yesterday I bought meat and fish (just those two)."
+      },
+      {
+        "prompt": "{京都|きょうと}や{大阪|おおさか}＿＿{行|い}きたいです。",
+        "options": [
+          "や",
+          "を",
+          "に"
+        ],
+        "answer": 2,
+        "en": "I want to go to places like Kyoto and Osaka."
+      },
+      {
+        "prompt": "かばんの{中|なか}に{財布|さいふ}＿＿スマホなどがあります。",
+        "options": [
+          "や",
+          "が",
+          "を"
+        ],
+        "answer": 0,
+        "en": "In my bag there's my wallet, my phone and so on."
+      }
+    ]
+  },
+  {
+    "id": "tewa-ikenai",
+    "order": 51,
+    "level": "N5",
+    "title": "〜てはいけない — \"must not\"",
+    "pattern": "〜てはいけません・〜ちゃだめ",
+    "register": "both",
+    "prerequisites": [
+      "te-form"
+    ],
+    "contrastWith": [
+      "temo-ii",
+      "naide-kudasai",
+      "nakereba-naranai"
+    ],
+    "explanation": "て-form + はいけません states a rule, \"you must not\": ここでしゃしんをとってはいけません (\"you mustn't take photos here\"). It's strong, so it's for signs, rules and customs (shoes in the house, the onsen, the train) rather than for telling your partner off. In casual speech you'll hear 〜ちゃだめ and 〜じゃだめ (たべちゃだめ！ \"don't eat that!\"); just recognise those for now. It's the opposite of 〜てもいい (\"it's okay to\"), and a softer \"please don't\" (〜ないでください) comes later.",
+    "examples": [
+      {
+        "jp": "ここで{写真|しゃしん}を{撮|と}ってはいけません。",
+        "en": "You mustn't take photos here."
+      },
+      {
+        "jp": "{家|いえ}の{中|なか}で{靴|くつ}を{履|は}いてはいけません。",
+        "en": "You mustn't wear shoes in the house."
+      },
+      {
+        "jp": "{電車|でんしゃ}の{中|なか}で{電話|でんわ}で{話|はな}してはいけません。",
+        "en": "You shouldn't talk on the phone on the train."
+      },
+      {
+        "jp": "お{風呂|ふろ}にタオルを{入|い}れてはいけません。",
+        "en": "You mustn't put your towel in the bath."
+      },
+      {
+        "jp": "それ、{食|た}べちゃだめ！",
+        "en": "Don't eat that!"
+      },
+      {
+        "jp": "ここに{車|くるま}を{止|と}めてはいけません。",
+        "en": "You can't park here."
+      },
+      {
+        "jp": "{美術館|びじゅつかん}で{写真|しゃしん}を{撮|と}ってもいいですか。 — いいえ、{撮|と}ってはいけません。",
+        "en": "Can I take photos in the museum? — No, you mustn't."
+      },
+      {
+        "jp": "{病院|びょういん}でたばこを{吸|す}ってはいけません。",
+        "en": "You mustn't smoke at the hospital."
+      },
+      {
+        "jp": "{夜|よる}{十時|じゅうじ}からは{洗濯機|せんたくき}を{使|つか}ってはいけません。",
+        "en": "You can't use the washing machine after 10 p.m."
+      },
+      {
+        "jp": "ここで{遊|あそ}んじゃだめだよ。",
+        "en": "You can't play here, okay?"
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "You mustn't take photos here.",
+        "jp": "ここで{写真|しゃしん}を{撮|と}ってはいけません。",
+        "tiles": [
+          "ここで",
+          "写真を",
+          "撮っては",
+          "いけません。"
+        ],
+        "alternatives": [
+          "ここで写真を撮ってはいけない。",
+          "ここで写真を撮っちゃだめ。",
+          "ここで写真を撮ってはだめです。"
+        ]
+      },
+      {
+        "en": "You mustn't wear shoes in the house.",
+        "jp": "{家|いえ}の{中|なか}で{靴|くつ}を{履|は}いてはいけません。",
+        "tiles": [
+          "家の中で",
+          "靴を",
+          "履いては",
+          "いけません。"
+        ],
+        "alternatives": [
+          "家の中で靴を履いてはいけない。",
+          "うちの中で靴を履いてはいけません。",
+          "家の中で靴を履いちゃだめ。"
+        ]
+      },
+      {
+        "en": "You can't use the washing machine after 10 p.m.",
+        "jp": "{夜|よる}{十時|じゅうじ}からは{洗濯機|せんたくき}を{使|つか}ってはいけません。",
+        "tiles": [
+          "夜十時からは",
+          "洗濯機を",
+          "使っては",
+          "いけません。"
+        ],
+        "alternatives": [
+          "夜十時から洗濯機を使ってはいけません。",
+          "夜10時からは洗濯機を使ってはいけません。",
+          "夜十時からは洗濯機を使ってはいけない。"
+        ]
+      },
+      {
+        "en": "You mustn't put your towel in the bath.",
+        "jp": "お{風呂|ふろ}にタオルを{入|い}れてはいけません。",
+        "tiles": [
+          "お風呂に",
+          "タオルを",
+          "入れては",
+          "いけません。"
+        ],
+        "alternatives": [
+          "お風呂にタオルを入れてはいけない。",
+          "タオルをお風呂に入れてはいけません。"
+        ]
+      },
+      {
+        "en": "You mustn't smoke at the hospital.",
+        "jp": "{病院|びょういん}でたばこを{吸|す}ってはいけません。",
+        "tiles": [
+          "病院で",
+          "たばこを",
+          "吸っては",
+          "いけません。"
+        ],
+        "alternatives": [
+          "病院でたばこを吸ってはいけない。",
+          "病院の中でたばこを吸ってはいけません。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "ここで{写真|しゃしん}を{撮|と}って＿＿いけません。",
+        "options": [
+          "を",
+          "も",
+          "は"
+        ],
+        "answer": 2,
+        "en": "You mustn't take photos here."
+      },
+      {
+        "prompt": "{家|いえ}の{中|なか}で{靴|くつ}を{履|は}＿＿はいけません。",
+        "options": [
+          "いて",
+          "んで",
+          "って"
+        ],
+        "answer": 0,
+        "en": "You mustn't wear shoes in the house."
+      },
+      {
+        "prompt": "{病院|びょういん}でたばこを{吸|す}っては＿＿。",
+        "options": [
+          "いいです",
+          "いけません",
+          "ください"
+        ],
+        "answer": 1,
+        "en": "You mustn't smoke at the hospital."
+      },
+      {
+        "prompt": "それ、{食|た}べ＿＿だめ！",
+        "options": [
+          "ちゃ",
+          "じゃ",
+          "て"
+        ],
+        "answer": 0,
+        "en": "Don't eat that!"
+      },
+      {
+        "prompt": "{夜|よる}{十時|じゅうじ}からは{洗濯機|せんたくき}＿＿{使|つか}ってはいけません。",
+        "options": [
+          "が",
+          "を",
+          "に"
+        ],
+        "answer": 1,
+        "en": "You can't use the washing machine after 10 p.m."
+      },
+      {
+        "prompt": "{電車|でんしゃ}の{中|なか}＿＿{電話|でんわ}で{話|はな}してはいけません。",
+        "options": [
+          "を",
+          "に",
+          "で"
+        ],
+        "answer": 2,
+        "en": "You shouldn't talk on the phone on the train."
+      }
+    ]
+  },
+  {
+    "id": "no-ga-suki",
+    "order": 52,
+    "level": "N5",
+    "title": "〜のがすき — liking doing things",
+    "pattern": "〜のが{好|す}き・〜のが{上手|じょうず}",
+    "register": "both",
+    "prerequisites": [
+      "suki-kirai",
+      "dictionary-form"
+    ],
+    "contrastWith": [
+      "no-possession",
+      "suki-kirai",
+      "n-desu",
+      "koto-ga-dekiru",
+      "no-one"
+    ],
+    "explanation": "To talk about liking or being good at an activity, turn the verb into a thing with の: dictionary form + の + が + すき, as in りょうりするのがすきです (\"I like cooking\"). The same pattern works with きらい, じょうず (good at), へた (bad at), とくい (my strong point) and にがて (my weak point). Use じょうず about other people and とくい about yourself, because calling yourself じょうず sounds like boasting. To name a hobby, use しゅみは〜ことです (\"my hobby is …ing\"). This の is not the \"X's\" の; it just turns an action into a thing, in polite or casual speech.",
+    "examples": [
+      {
+        "jp": "{料理|りょうり}するのが{好|す}きです。",
+        "en": "I like cooking."
+      },
+      {
+        "jp": "{夫|おっと}は{歌|うた}を{歌|うた}うのが{上手|じょうず}です。",
+        "en": "My husband is good at singing."
+      },
+      {
+        "jp": "{朝|あさ}{起|お}きるのが{苦手|にがて}です。",
+        "en": "I'm not good at getting up in the morning."
+      },
+      {
+        "jp": "{私|わたし}は{掃除|そうじ}するのが{嫌|きら}いです。",
+        "en": "I hate cleaning."
+      },
+      {
+        "jp": "{日本語|にほんご}を{話|はな}すのが{下手|へた}です。",
+        "en": "I'm bad at speaking Japanese."
+      },
+      {
+        "jp": "{一緒|いっしょ}に{散歩|さんぽ}するのが{好|す}き。",
+        "en": "I love going for walks together."
+      },
+      {
+        "jp": "{趣味|しゅみ}は{映画|えいが}を{見|み}ることです。",
+        "en": "My hobby is watching movies."
+      },
+      {
+        "jp": "{妻|つま}は{人|ひと}の{名前|なまえ}を{覚|おぼ}えるのが{上手|じょうず}です。",
+        "en": "My wife is good at remembering people's names."
+      },
+      {
+        "jp": "{本|ほん}を{読|よ}むのが{好|す}きですか。",
+        "en": "Do you like reading?"
+      },
+      {
+        "jp": "{私|わたし}は{人|ひと}と{話|はな}すのが{得意|とくい}です。",
+        "en": "Talking to people is my strong point."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I like cooking.",
+        "jp": "{料理|りょうり}するのが{好|す}きです。",
+        "tiles": [
+          "料理する",
+          "のが",
+          "好きです。"
+        ],
+        "alternatives": [
+          "料理するのが好き。",
+          "料理をするのが好きです。",
+          "料理が好きです。"
+        ]
+      },
+      {
+        "en": "I'm not good at getting up in the morning.",
+        "jp": "{朝|あさ}{起|お}きるのが{苦手|にがて}です。",
+        "tiles": [
+          "朝",
+          "起きるのが",
+          "苦手です。"
+        ],
+        "alternatives": [
+          "朝起きるのが苦手。"
+        ]
+      },
+      {
+        "en": "My hobby is watching movies.",
+        "jp": "{趣味|しゅみ}は{映画|えいが}を{見|み}ることです。",
+        "tiles": [
+          "趣味は",
+          "映画を",
+          "見る",
+          "ことです。"
+        ],
+        "alternatives": [
+          "私の趣味は映画を見ることです。",
+          "趣味は映画を見ること。"
+        ]
+      },
+      {
+        "en": "My husband is good at singing.",
+        "jp": "{夫|おっと}は{歌|うた}を{歌|うた}うのが{上手|じょうず}です。",
+        "tiles": [
+          "夫は",
+          "歌を",
+          "歌うのが",
+          "上手です。"
+        ],
+        "alternatives": [
+          "夫は歌うのが上手です。",
+          "夫は歌が上手です。",
+          "夫は歌を歌うのが上手。"
+        ]
+      },
+      {
+        "en": "Do you like reading?",
+        "jp": "{本|ほん}を{読|よ}むのが{好|す}きですか。",
+        "tiles": [
+          "本を",
+          "読むのが",
+          "好きですか。"
+        ],
+        "alternatives": [
+          "本を読むのが好き？"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{料理|りょうり}する＿＿{好|す}きです。",
+        "options": [
+          "がの",
+          "のを",
+          "のが"
+        ],
+        "answer": 2,
+        "en": "I like cooking."
+      },
+      {
+        "prompt": "{朝|あさ}{起|お}き＿＿のが{苦手|にがて}です。",
+        "options": [
+          "た",
+          "て",
+          "る"
+        ],
+        "answer": 2,
+        "en": "I'm not good at getting up in the morning."
+      },
+      {
+        "prompt": "{趣味|しゅみ}は{映画|えいが}を{見|み}る＿＿です。",
+        "options": [
+          "もの",
+          "こと",
+          "の"
+        ],
+        "answer": 1,
+        "en": "My hobby is watching movies."
+      },
+      {
+        "prompt": "{夫|おっと}は{歌|うた}を{歌|うた}うの＿＿{上手|じょうず}です。",
+        "options": [
+          "が",
+          "に",
+          "を"
+        ],
+        "answer": 0,
+        "en": "My husband is good at singing."
+      },
+      {
+        "prompt": "{私|わたし}は{人|ひと}と{話|はな}すのが＿＿です。",
+        "options": [
+          "へた",
+          "とくい",
+          "きらい"
+        ],
+        "answer": 1,
+        "en": "Talking to people is my strong point."
+      },
+      {
+        "prompt": "{本|ほん}を＿＿のが{好|す}きですか。",
+        "options": [
+          "よむ",
+          "よみます",
+          "よんで"
+        ],
+        "answer": 0,
+        "en": "Do you like reading?"
+      }
+    ]
+  },
+  {
+    "id": "relative-clauses",
+    "order": 53,
+    "level": "N5",
+    "title": "Describing nouns with sentences",
+    "pattern": "〜た＋N・〜る＋N",
+    "register": "both",
+    "prerequisites": [
+      "casual-past"
+    ],
+    "contrastWith": [],
+    "explanation": "In Japanese, a whole sentence can sit in front of a noun to describe it: きのうみたえいが (\"the movie we saw yesterday\"). The describing part always comes before the noun and ends in a plain form, even in polite speech: えきのちかくにあるみせ (\"the shop near the station\"). な-adjectives keep their な (りょうりがじょうずなひと), and the doer inside the describing part takes が, not は: つまがつくったケーキ (\"the cake my wife made\"). Keep it to one describing sentence per noun for now.",
+    "examples": [
+      {
+        "jp": "{昨日|きのう}{見|み}た{映画|えいが}、{面白|おもしろ}かったね。",
+        "en": "The movie we saw yesterday was good, wasn't it?"
+      },
+      {
+        "jp": "{妻|つま}が{作|つく}ったケーキはとてもおいしいです。",
+        "en": "The cake my wife made is really good."
+      },
+      {
+        "jp": "{駅|えき}の{近|ちか}くにある{店|みせ}に{行|い}きましょう。",
+        "en": "Let's go to the shop near the station."
+      },
+      {
+        "jp": "{料理|りょうり}が{上手|じょうず}な{人|ひと}が{好|す}きです。",
+        "en": "I like people who are good at cooking."
+      },
+      {
+        "jp": "あそこで{待|ま}っている{人|ひと}は{誰|だれ}ですか。",
+        "en": "Who's the person waiting over there?"
+      },
+      {
+        "jp": "{昨日|きのう}{買|か}ったパン、どこ？",
+        "en": "Where's the bread I bought yesterday?"
+      },
+      {
+        "jp": "{日曜日|にちようび}に{行|い}った{公園|こうえん}はきれいだったね。",
+        "en": "The park we went to on Sunday was nice, wasn't it?"
+      },
+      {
+        "jp": "{夫|おっと}が{好|す}きな{食|た}べ{物|もの}はカレーです。",
+        "en": "My husband's favorite food is curry."
+      },
+      {
+        "jp": "{来週|らいしゅう}{来|く}る{友達|ともだち}は{大阪|おおさか}の{人|ひと}です。",
+        "en": "The friend who's coming next week is from Osaka."
+      },
+      {
+        "jp": "これは{京都|きょうと}で{撮|と}った{写真|しゃしん}です。",
+        "en": "This is a photo we took in Kyoto."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "The cake my wife made is delicious.",
+        "jp": "{妻|つま}が{作|つく}ったケーキはおいしいです。",
+        "tiles": [
+          "妻が",
+          "作った",
+          "ケーキは",
+          "おいしいです。"
+        ],
+        "alternatives": [
+          "妻の作ったケーキはおいしいです。",
+          "妻が作ったケーキはおいしい。"
+        ]
+      },
+      {
+        "en": "Let's go to the shop near the station.",
+        "jp": "{駅|えき}の{近|ちか}くにある{店|みせ}に{行|い}きましょう。",
+        "tiles": [
+          "駅の近くに",
+          "ある",
+          "店に",
+          "行きましょう。"
+        ],
+        "alternatives": [
+          "駅の近くにある店へ行きましょう。",
+          "駅の近くにある店に行こう。",
+          "駅の近くの店に行きましょう。"
+        ]
+      },
+      {
+        "en": "Where's the bread I bought yesterday?",
+        "jp": "{昨日|きのう}{買|か}ったパン、どこ？",
+        "tiles": [
+          "昨日",
+          "買った",
+          "パン、",
+          "どこ？"
+        ],
+        "alternatives": [
+          "昨日買ったパンはどこ？",
+          "昨日買ったパンはどこですか。"
+        ]
+      },
+      {
+        "en": "This is a photo we took in Kyoto.",
+        "jp": "これは{京都|きょうと}で{撮|と}った{写真|しゃしん}です。",
+        "tiles": [
+          "これは",
+          "京都で",
+          "撮った",
+          "写真です。"
+        ],
+        "alternatives": [
+          "これは京都で撮った写真だよ。",
+          "これ、京都で撮った写真。"
+        ]
+      },
+      {
+        "en": "Who's the person waiting over there?",
+        "jp": "あそこで{待|ま}っている{人|ひと}は{誰|だれ}ですか。",
+        "tiles": [
+          "あそこで",
+          "待っている",
+          "人は",
+          "誰ですか。"
+        ],
+        "alternatives": [
+          "あそこで待ってる人は誰？",
+          "あそこで待っている人は誰？"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{昨日|きのう}＿＿{映画|えいが}、{面白|おもしろ}かったね。",
+        "options": [
+          "みました",
+          "みた",
+          "みて"
+        ],
+        "answer": 1,
+        "en": "The movie we saw yesterday was good, wasn't it?"
+      },
+      {
+        "prompt": "{妻|つま}＿＿{作|つく}ったケーキはおいしいです。",
+        "options": [
+          "が",
+          "を",
+          "は"
+        ],
+        "answer": 0,
+        "en": "The cake my wife made is delicious."
+      },
+      {
+        "prompt": "{料理|りょうり}が{上手|じょうず}＿＿{人|ひと}が{好|す}きです。",
+        "options": [
+          "な",
+          "だ",
+          "の"
+        ],
+        "answer": 0,
+        "en": "I like people who are good at cooking."
+      },
+      {
+        "prompt": "{駅|えき}の{近|ちか}くに＿＿{店|みせ}に{行|い}きましょう。",
+        "options": [
+          "あります",
+          "いる",
+          "ある"
+        ],
+        "answer": 2,
+        "en": "Let's go to the shop near the station."
+      },
+      {
+        "prompt": "{夫|おっと}が{好|す}き＿＿{食|た}べ{物|もの}はカレーです。",
+        "options": [
+          "の",
+          "な",
+          "だ"
+        ],
+        "answer": 1,
+        "en": "My husband's favorite food is curry."
+      },
+      {
+        "prompt": "あそこで{待|ま}って＿＿{人|ひと}は{誰|だれ}ですか。",
+        "options": [
+          "います",
+          "いて",
+          "いる"
+        ],
+        "answer": 2,
+        "en": "Who's the person waiting over there?"
+      }
+    ]
+  },
+  {
+    "id": "kedo-but",
+    "order": 54,
+    "level": "N5",
+    "title": "〜けど・〜が — \"but\"",
+    "pattern": "〜けど、〜・〜が、〜",
+    "register": "both",
+    "prerequisites": [
+      "casual-speech",
+      "casual-past"
+    ],
+    "contrastWith": [
+      "noni"
+    ],
+    "explanation": "けど joins two sentences that pull against each other: たかいけど、おいしい (\"it's expensive, but it's good\"). が does the same job but sounds more polite and is common in writing: たかいですが、おいしいです. Nouns and な-adjectives need だ or です first: あめだけど. At the very end of a sentence, けど softens it and leaves something unsaid, which is how Japanese politely hints \"no\": ちょっとたかいですけど… . To start a new sentence with \"but\", use でも instead; a stronger \"even though\" (のに) comes later.",
+    "examples": [
+      {
+        "jp": "{高|たか}いけど、おいしい。",
+        "en": "It's expensive, but it's good."
+      },
+      {
+        "jp": "この{部屋|へや}は{狭|せま}いですが、{明|あか}るいです。",
+        "en": "This room is small, but it's bright."
+      },
+      {
+        "jp": "{日本語|にほんご}は{難|むずか}しいけど、{楽|たの}しい。",
+        "en": "Japanese is hard, but it's fun."
+      },
+      {
+        "jp": "{雨|あめ}だけど、{散歩|さんぽ}に{行|い}く？",
+        "en": "It's raining, but do you want to go for a walk?"
+      },
+      {
+        "jp": "{行|い}きたいですけど、{明日|あした}は{仕事|しごと}です。",
+        "en": "I'd like to go, but I have work tomorrow."
+      },
+      {
+        "jp": "ちょっと{高|たか}いですけど…。",
+        "en": "It's a bit expensive, though..."
+      },
+      {
+        "jp": "{昨日|きのう}は{疲|つか}れたけど、{楽|たの}しかった。",
+        "en": "I was tired yesterday, but it was fun."
+      },
+      {
+        "jp": "{肉|にく}は{好|す}きですが、{魚|さかな}はあまり{好|す}きじゃないです。",
+        "en": "I like meat, but I'm not really into fish."
+      },
+      {
+        "jp": "{料理|りょうり}は{下手|へた}だけど、{作|つく}るのが{好|す}き。",
+        "en": "I'm not good at cooking, but I enjoy it."
+      },
+      {
+        "jp": "{今日|きょう}は{日曜日|にちようび}ですが、{仕事|しごと}に{行|い}きます。",
+        "en": "It's Sunday today, but I'm going to work."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "It's expensive, but it's good.",
+        "jp": "{高|たか}いけど、おいしい。",
+        "tiles": [
+          "高い",
+          "けど、",
+          "おいしい。"
+        ],
+        "alternatives": [
+          "高いですが、おいしいです。",
+          "高いですけど、おいしいです。",
+          "高いけど、おいしいです。"
+        ]
+      },
+      {
+        "en": "Japanese is hard, but it's fun.",
+        "jp": "{日本語|にほんご}は{難|むずか}しいけど、{楽|たの}しい。",
+        "tiles": [
+          "日本語は",
+          "難しい",
+          "けど、",
+          "楽しい。"
+        ],
+        "alternatives": [
+          "日本語は難しいですが、楽しいです。",
+          "日本語は難しいけど、楽しいです。",
+          "日本語は難しいですけど、楽しいです。"
+        ]
+      },
+      {
+        "en": "It's raining, but do you want to go for a walk?",
+        "jp": "{雨|あめ}だけど、{散歩|さんぽ}に{行|い}く？",
+        "tiles": [
+          "雨",
+          "だけど、",
+          "散歩に",
+          "行く？"
+        ],
+        "alternatives": [
+          "雨ですけど、散歩に行きませんか。",
+          "雨だけど、散歩に行かない？",
+          "雨ですが、散歩に行きませんか。"
+        ]
+      },
+      {
+        "en": "This room is small, but it's bright.",
+        "jp": "この{部屋|へや}は{狭|せま}いですが、{明|あか}るいです。",
+        "tiles": [
+          "この部屋は",
+          "狭いですが、",
+          "明るいです。"
+        ],
+        "alternatives": [
+          "この部屋は狭いけど、明るい。",
+          "この部屋は狭いけど、明るいです。",
+          "この部屋は狭いですけど、明るいです。"
+        ]
+      },
+      {
+        "en": "I'd like to go, but I have work tomorrow.",
+        "jp": "{行|い}きたいですけど、{明日|あした}は{仕事|しごと}です。",
+        "tiles": [
+          "行きたいですけど、",
+          "明日は",
+          "仕事です。"
+        ],
+        "alternatives": [
+          "行きたいけど、明日は仕事。",
+          "行きたいですが、明日は仕事です。",
+          "行きたいけど、明日は仕事です。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{高|たか}い＿＿、おいしい。",
+        "options": [
+          "でも",
+          "だけど",
+          "けど"
+        ],
+        "answer": 2,
+        "en": "It's expensive, but it's good."
+      },
+      {
+        "prompt": "{雨|あめ}＿＿けど、{散歩|さんぽ}に{行|い}く？",
+        "options": [
+          "だ",
+          "い",
+          "な"
+        ],
+        "answer": 0,
+        "en": "It's raining, but do you want to go for a walk?"
+      },
+      {
+        "prompt": "この{部屋|へや}は{狭|せま}いです＿＿、{明|あか}るいです。",
+        "options": [
+          "が",
+          "でも",
+          "を"
+        ],
+        "answer": 0,
+        "en": "This room is small, but it's bright."
+      },
+      {
+        "prompt": "{料理|りょうり}は{下手|へた}＿＿けど、{作|つく}るのが{好|す}き。",
+        "options": [
+          "の",
+          "だ",
+          "な"
+        ],
+        "answer": 1,
+        "en": "I'm not good at cooking, but I enjoy it."
+      },
+      {
+        "prompt": "ちょっと{高|たか}いです＿＿…。",
+        "options": [
+          "でも",
+          "けど",
+          "だけど"
+        ],
+        "answer": 1,
+        "en": "It's a bit expensive, though..."
+      },
+      {
+        "prompt": "{行|い}きたいです＿＿、{明日|あした}は{仕事|しごと}です。",
+        "options": [
+          "だが",
+          "を",
+          "けど"
+        ],
+        "answer": 2,
+        "en": "I'd like to go, but I have work tomorrow."
+      }
+    ]
+  },
+  {
+    "id": "te-kara",
+    "order": 55,
+    "level": "N5",
+    "title": "〜てから — \"after doing\"",
+    "pattern": "〜てから、〜",
+    "register": "both",
+    "prerequisites": [
+      "te-form"
+    ],
+    "contrastWith": [
+      "te-form",
+      "mae-ni-ato-de"
+    ],
+    "explanation": "て-form + から means \"after doing\" or \"once I've done\": ごはんをたべてから、でかけます (\"I'll go out after I eat\"). The plain て-form just lists actions in order; てから stresses that the first one is finished before the second starts. As with the plain て-form, the last verb sets the tense and the politeness. With a starting point in time it can also mean \"since\": にほんごをはじめてから (\"since I started Japanese\"). Don't confuse it with から \"because\", which follows a plain or polite form (たべたから), not a て-form.",
+    "examples": [
+      {
+        "jp": "ご{飯|はん}を{食|た}べてから、{出|で}かけます。",
+        "en": "I'll go out after I eat."
+      },
+      {
+        "jp": "{手|て}を{洗|あら}ってから、{食|た}べてね。",
+        "en": "Wash your hands before you eat, okay?"
+      },
+      {
+        "jp": "シャワーを{浴|あ}びてから、{寝|ね}ます。",
+        "en": "I'll take a shower and then go to bed."
+      },
+      {
+        "jp": "{仕事|しごと}が{終|お}わってから、{電話|でんわ}するね。",
+        "en": "I'll call you after work."
+      },
+      {
+        "jp": "{家|うち}に{帰|かえ}ってから、{晩|ばん}ご{飯|はん}を{作|つく}りました。",
+        "en": "After I got home, I made dinner."
+      },
+      {
+        "jp": "{日本語|にほんご}を{始|はじ}めてから、{毎日|まいにち}{楽|たの}しいです。",
+        "en": "Since I started Japanese, every day has been fun."
+      },
+      {
+        "jp": "コーヒーを{飲|の}んでから、{掃除|そうじ}しましょう。",
+        "en": "Let's have a coffee and then clean."
+      },
+      {
+        "jp": "{歯|は}を{磨|みが}いてから、{寝|ね}てください。",
+        "en": "Brush your teeth before you go to bed."
+      },
+      {
+        "jp": "メニューを{見|み}てから、{決|き}めます。",
+        "en": "I'll decide after I look at the menu."
+      },
+      {
+        "jp": "{駅|えき}に{着|つ}いてから、{電話|でんわ}してください。",
+        "en": "Please call me once you get to the station."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I'll go out after I eat.",
+        "jp": "ご{飯|はん}を{食|た}べてから、{出|で}かけます。",
+        "tiles": [
+          "ご飯を",
+          "食べてから、",
+          "出かけます。"
+        ],
+        "alternatives": [
+          "ご飯を食べてから出かける。",
+          "ご飯食べてから出かける。"
+        ]
+      },
+      {
+        "en": "I'll call you after work.",
+        "jp": "{仕事|しごと}が{終|お}わってから、{電話|でんわ}するね。",
+        "tiles": [
+          "仕事が",
+          "終わってから、",
+          "電話",
+          "するね。"
+        ],
+        "alternatives": [
+          "仕事が終わってから、電話します。",
+          "仕事が終わってから電話する。"
+        ]
+      },
+      {
+        "en": "Let's have a coffee and then clean.",
+        "jp": "コーヒーを{飲|の}んでから、{掃除|そうじ}しましょう。",
+        "tiles": [
+          "コーヒーを",
+          "飲んでから、",
+          "掃除",
+          "しましょう。"
+        ],
+        "alternatives": [
+          "コーヒーを飲んでから、掃除しよう。",
+          "コーヒーを飲んでから掃除をしましょう。"
+        ]
+      },
+      {
+        "en": "I'll decide after I look at the menu.",
+        "jp": "メニューを{見|み}てから、{決|き}めます。",
+        "tiles": [
+          "メニューを",
+          "見てから、",
+          "決めます。"
+        ],
+        "alternatives": [
+          "メニューを見てから決める。"
+        ]
+      },
+      {
+        "en": "After I got home, I made dinner.",
+        "jp": "{家|うち}に{帰|かえ}ってから、{晩|ばん}ご{飯|はん}を{作|つく}りました。",
+        "tiles": [
+          "家に",
+          "帰ってから、",
+          "晩ご飯を",
+          "作りました。"
+        ],
+        "alternatives": [
+          "うちに帰ってから、晩ご飯を作りました。",
+          "家に帰ってから晩ご飯を作った。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "ご{飯|はん}を{食|た}べて＿＿、{出|で}かけます。",
+        "options": [
+          "けど",
+          "に",
+          "から"
+        ],
+        "answer": 2,
+        "en": "I'll go out after I eat."
+      },
+      {
+        "prompt": "{手|て}を{洗|あら}＿＿から、{食|た}べてね。",
+        "options": [
+          "いて",
+          "て",
+          "って"
+        ],
+        "answer": 2,
+        "en": "Wash your hands before you eat, okay?"
+      },
+      {
+        "prompt": "コーヒーを{飲|の}＿＿から、{掃除|そうじ}しましょう。",
+        "options": [
+          "んで",
+          "って",
+          "いて"
+        ],
+        "answer": 0,
+        "en": "Let's have a coffee and then clean."
+      },
+      {
+        "prompt": "{仕事|しごと}が{終|お}わって＿＿、{電話|でんわ}するね。",
+        "options": [
+          "を",
+          "から",
+          "で"
+        ],
+        "answer": 1,
+        "en": "I'll call you after work."
+      },
+      {
+        "prompt": "シャワーを{浴|あ}び＿＿、{寝|ね}ます。",
+        "options": [
+          "てまで",
+          "てから",
+          "をから"
+        ],
+        "answer": 1,
+        "en": "I'll take a shower and then go to bed."
+      },
+      {
+        "prompt": "{駅|えき}に{着|つ}い＿＿から、{電話|でんわ}してください。",
+        "options": [
+          "て",
+          "って",
+          "で"
+        ],
+        "answer": 0,
+        "en": "Please call me once you get to the station."
+      }
+    ]
+  },
+  {
+    "id": "mou-mada",
+    "order": 56,
+    "level": "N5",
+    "title": "もう・まだ — \"already\", \"not yet\"",
+    "pattern": "もう〜た・まだ〜ていない",
+    "register": "both",
+    "prerequisites": [
+      "masu-past",
+      "te-imasu",
+      "casual-past"
+    ],
+    "contrastWith": [],
+    "explanation": "もう with a past verb means \"already\": もうたべた？ (\"have you eaten yet?\") — うん、もうたべた. \"Not yet\" is まだです, or in full まだ〜ていない (casual まだたべてない); don't use なかった here, because that means it simply didn't happen. まだ with ている means \"still\" (まだねている, \"still asleep\"), and もう with a negative means \"not any more\" (もうたべない, \"I won't eat any more\"). Both words work in polite and casual speech.",
+    "examples": [
+      {
+        "jp": "もう{食|た}べた？ — ううん、まだ{食|た}べてない。",
+        "en": "Have you eaten yet? — No, not yet."
+      },
+      {
+        "jp": "もう{晩|ばん}ご{飯|はん}を{作|つく}りましたか。 — いいえ、まだです。",
+        "en": "Have you made dinner yet? — No, not yet."
+      },
+      {
+        "jp": "{夫|おっと}はまだ{寝|ね}ています。",
+        "en": "My husband is still asleep."
+      },
+      {
+        "jp": "もうお{腹|なか}いっぱい。",
+        "en": "I'm already full."
+      },
+      {
+        "jp": "もう{雨|あめ}は{降|ふ}ってないよ。",
+        "en": "It's not raining any more."
+      },
+      {
+        "jp": "まだ{仕事|しごと}をしています。",
+        "en": "I'm still working."
+      },
+      {
+        "jp": "もう{七時|しちじ}ですよ！",
+        "en": "It's already seven!"
+      },
+      {
+        "jp": "{電気|でんき}はもう{消|け}しました。",
+        "en": "I've already turned off the lights."
+      },
+      {
+        "jp": "あの{店|みせ}にはもう{行|い}かない。",
+        "en": "I'm not going to that restaurant any more."
+      },
+      {
+        "jp": "{日本語|にほんご}はまだ{下手|へた}です。",
+        "en": "My Japanese is still poor."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "Have you eaten dinner yet?",
+        "jp": "もう{晩|ばん}ご{飯|はん}{食|た}べた？",
+        "tiles": [
+          "もう",
+          "晩ご飯",
+          "食べた？"
+        ],
+        "alternatives": [
+          "もう晩ご飯を食べた？",
+          "晩ご飯、もう食べた？",
+          "もう晩ご飯を食べましたか。",
+          "晩ご飯はもう食べましたか。"
+        ]
+      },
+      {
+        "en": "No, I haven't eaten yet.",
+        "jp": "ううん、まだ{食|た}べてない。",
+        "tiles": [
+          "ううん、",
+          "まだ",
+          "食べて",
+          "ない。"
+        ],
+        "alternatives": [
+          "ううん、まだ食べていない。",
+          "いいえ、まだ食べていません。",
+          "ううん、まだ。"
+        ]
+      },
+      {
+        "en": "My husband is still asleep.",
+        "jp": "{夫|おっと}はまだ{寝|ね}ています。",
+        "tiles": [
+          "夫は",
+          "まだ",
+          "寝て",
+          "います。"
+        ],
+        "alternatives": [
+          "夫はまだ寝てる。",
+          "夫はまだ寝ている。"
+        ]
+      },
+      {
+        "en": "I've already turned off the lights.",
+        "jp": "{電気|でんき}はもう{消|け}しました。",
+        "tiles": [
+          "電気は",
+          "もう",
+          "消しました。"
+        ],
+        "alternatives": [
+          "電気はもう消した。",
+          "もう電気を消しました。",
+          "もう電気を消した。"
+        ]
+      },
+      {
+        "en": "I'm not going to that restaurant any more.",
+        "jp": "あの{店|みせ}にはもう{行|い}かない。",
+        "tiles": [
+          "あの店には",
+          "もう",
+          "行かない。"
+        ],
+        "alternatives": [
+          "あの店にはもう行きません。",
+          "もうあの店には行かない。",
+          "もうあの店には行きません。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "＿＿{食|た}べた？ — うん、{食|た}べた。",
+        "options": [
+          "もう",
+          "いつも",
+          "まだ"
+        ],
+        "answer": 0,
+        "en": "Have you eaten yet? — Yeah, I have."
+      },
+      {
+        "prompt": "ううん、まだ{食|た}べ＿＿。",
+        "options": [
+          "てない",
+          "た",
+          "なかった"
+        ],
+        "answer": 0,
+        "en": "No, I haven't eaten yet."
+      },
+      {
+        "prompt": "{夫|おっと}はまだ{寝|ね}て＿＿。",
+        "options": [
+          "ください",
+          "います",
+          "あります"
+        ],
+        "answer": 1,
+        "en": "My husband is still asleep."
+      },
+      {
+        "prompt": "もう{晩|ばん}ご{飯|はん}を{作|つく}りましたか。 — いいえ、＿＿です。",
+        "options": [
+          "あと",
+          "もう",
+          "まだ"
+        ],
+        "answer": 2,
+        "en": "Have you made dinner yet? — No, not yet."
+      },
+      {
+        "prompt": "お{腹|なか}いっぱい。＿＿{食|た}べない。",
+        "options": [
+          "すぐ",
+          "まだ",
+          "もう"
+        ],
+        "answer": 2,
+        "en": "I'm full. I won't eat any more."
+      },
+      {
+        "prompt": "{日本語|にほんご}は＿＿{下手|へた}です。",
+        "options": [
+          "もう",
+          "まだ",
+          "あまり"
+        ],
+        "answer": 1,
+        "en": "My Japanese is still poor."
+      }
+    ]
+  },
+  {
+    "id": "to-iu",
+    "order": 57,
+    "level": "N5",
+    "title": "〜という — \"say\", \"called\"",
+    "pattern": "〜と{言|い}う・〜という〜",
+    "register": "both",
+    "prerequisites": [
+      "to-omou"
+    ],
+    "contrastWith": [
+      "to-omou",
+      "tte-quote"
+    ],
+    "explanation": "いう means \"say\", and what was said goes before と. To report what someone said, put a plain form before と: つまはつかれたといいました (\"my wife said she was tired\"); for someone's exact words, put them in 「」 brackets. いっていました (\"was saying\") is the everyday way to pass on a message: ともだちはこないといっていました. いう also names things: noun + という + noun means \"a … called …\" (さくらというみせ), and 〜はにほんごでなんといいますか asks \"how do you say … in Japanese?\". It uses the same と as とおもう, and it works in polite and casual speech; the casual って comes later.",
+    "examples": [
+      {
+        "jp": "{妻|つま}は{疲|つか}れたと{言|い}いました。",
+        "en": "My wife said she was tired."
+      },
+      {
+        "jp": "{夫|おっと}は「{行|い}ってきます」と{言|い}いました。",
+        "en": "My husband said, \"I'm off!\""
+      },
+      {
+        "jp": "{友達|ともだち}は{今日|きょう}{来|こ}ないと{言|い}っていました。",
+        "en": "Our friend said she isn't coming today."
+      },
+      {
+        "jp": "{駅|えき}の{近|ちか}くに「さくら」という{店|みせ}があります。",
+        "en": "There's a place called \"Sakura\" near the station."
+      },
+      {
+        "jp": "「Thank you」は{日本語|にほんご}で{何|なん}と{言|い}いますか。",
+        "en": "How do you say \"thank you\" in Japanese?"
+      },
+      {
+        "jp": "これは「{好|す}き」という{意味|いみ}です。",
+        "en": "This means \"like\"."
+      },
+      {
+        "jp": "{母|はは}は{日曜日|にちようび}に{来|く}ると{言|い}っていました。",
+        "en": "My mom said she'd come on Sunday."
+      },
+      {
+        "jp": "{店|みせ}の{人|ひと}は{明日|あした}は{休|やす}みだと{言|い}いました。",
+        "en": "The shop staff said they're closed tomorrow."
+      },
+      {
+        "jp": "{子|こ}どもは「おやすみ」と{言|い}って、{寝|ね}ました。",
+        "en": "Our child said \"good night\" and went to bed."
+      },
+      {
+        "jp": "「いただきます」と{言|い}ってから、{食|た}べます。",
+        "en": "We say \"itadakimasu\" before we eat."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "My wife said she was tired.",
+        "jp": "{妻|つま}は{疲|つか}れたと{言|い}いました。",
+        "tiles": [
+          "妻は",
+          "疲れた",
+          "と",
+          "言いました。"
+        ],
+        "alternatives": [
+          "妻は疲れたと言っていました。",
+          "妻は「疲れた」と言いました。",
+          "妻は疲れたと言ってた。"
+        ]
+      },
+      {
+        "en": "There's a shop called Sakura near the station.",
+        "jp": "{駅|えき}の{近|ちか}くにさくらという{店|みせ}があります。",
+        "tiles": [
+          "駅の近くに",
+          "さくらという",
+          "店が",
+          "あります。"
+        ],
+        "alternatives": [
+          "駅の近くに「さくら」という店があります。",
+          "駅の近くにさくらという店がある。",
+          "駅の近くにさくらというお店があります。"
+        ]
+      },
+      {
+        "en": "How do you say this in Japanese?",
+        "jp": "これは{日本語|にほんご}で{何|なん}と{言|い}いますか。",
+        "tiles": [
+          "これは",
+          "日本語で",
+          "何と",
+          "言いますか。"
+        ],
+        "alternatives": [
+          "これ、日本語で何と言う？",
+          "これは日本語で何て言いますか。",
+          "これ、日本語で何て言う？"
+        ]
+      },
+      {
+        "en": "Our friend said she isn't coming today.",
+        "jp": "{友達|ともだち}は{今日|きょう}{来|こ}ないと{言|い}っていました。",
+        "tiles": [
+          "友達は",
+          "今日",
+          "来ないと",
+          "言っていました。"
+        ],
+        "alternatives": [
+          "友達は今日来ないと言いました。",
+          "友達は今日来ないと言ってた。",
+          "友達が今日来ないと言っていました。"
+        ]
+      },
+      {
+        "en": "This means \"like\".",
+        "jp": "これは「{好|す}き」という{意味|いみ}です。",
+        "tiles": [
+          "これは",
+          "「好き」という",
+          "意味です。"
+        ],
+        "alternatives": [
+          "これは好きという意味です。",
+          "これは「好き」という意味だよ。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{妻|つま}は{疲|つか}れた＿＿{言|い}いました。",
+        "options": [
+          "と",
+          "が",
+          "を"
+        ],
+        "answer": 0,
+        "en": "My wife said she was tired."
+      },
+      {
+        "prompt": "{駅|えき}の{近|ちか}くに「さくら」＿＿{店|みせ}があります。",
+        "options": [
+          "を",
+          "という",
+          "と"
+        ],
+        "answer": 1,
+        "en": "There's a place called \"Sakura\" near the station."
+      },
+      {
+        "prompt": "これは{日本語|にほんご}で{何|なん}と＿＿か。",
+        "options": [
+          "はなします",
+          "いいます",
+          "いきます"
+        ],
+        "answer": 1,
+        "en": "How do you say this in Japanese?"
+      },
+      {
+        "prompt": "{友達|ともだち}は{今日|きょう}＿＿と{言|い}っていました。",
+        "options": [
+          "こない",
+          "こなく",
+          "こないだ"
+        ],
+        "answer": 0,
+        "en": "Our friend said she isn't coming today."
+      },
+      {
+        "prompt": "{店|みせ}の{人|ひと}は{明日|あした}は{休|やす}み＿＿と{言|い}いました。",
+        "options": [
+          "の",
+          "な",
+          "だ"
+        ],
+        "answer": 2,
+        "en": "The shop staff said they're closed tomorrow."
+      },
+      {
+        "prompt": "「いただきます」＿＿{言|い}ってから、{食|た}べます。",
+        "options": [
+          "に",
+          "が",
+          "と"
+        ],
+        "answer": 2,
+        "en": "We say \"itadakimasu\" before we eat."
+      }
+    ]
+  },
+  {
+    "id": "de-amount",
+    "order": 58,
+    "level": "N5",
+    "title": "〜で — \"as a group\", \"in total\"",
+    "pattern": "{二人|ふたり}で・{一人|ひとり}で・{全部|ぜんぶ}で",
+    "register": "both",
+    "prerequisites": [
+      "de-place-means",
+      "counters-people"
+    ],
+    "contrastWith": [
+      "de-place-means"
+    ],
+    "explanation": "で after a number of people or an amount says how many do something together, or what the total is: ふたりでいく (\"go, the two of us\"), ひとりでかいものにいった (\"went shopping by myself\"), ぜんぶでいくらですか (\"how much is it altogether?\"). みんなで (\"all together\") and じぶんで (\"by myself, on my own\") work the same way, in polite and casual speech. This is a different job from で for places and tools. It also differs from と, which names the person you're with: つまといく (\"go with my wife\") vs ふたりでいく (\"go as a pair\"), and you can use both at once: つまとふたりでいく.",
+    "examples": [
+      {
+        "jp": "{週末|しゅうまつ}は{二人|ふたり}で{温泉|おんせん}に{行|い}きます。",
+        "en": "This weekend the two of us are going to a hot spring."
+      },
+      {
+        "jp": "{全部|ぜんぶ}でいくらですか。",
+        "en": "How much is it altogether?"
+      },
+      {
+        "jp": "{一人|ひとり}で{買|か}い{物|もの}に{行|い}きました。",
+        "en": "I went shopping by myself."
+      },
+      {
+        "jp": "みんなでご{飯|はん}を{食|た}べましょう。",
+        "en": "Let's all eat together."
+      },
+      {
+        "jp": "これは{自分|じぶん}で{作|つく}りました。",
+        "en": "I made this myself."
+      },
+      {
+        "jp": "{全部|ぜんぶ}で{三千円|さんぜんえん}です。",
+        "en": "That's 3,000 yen altogether."
+      },
+      {
+        "jp": "{昨日|きのう}は{一人|ひとり}で{晩|ばん}ご{飯|はん}を{食|た}べた。",
+        "en": "I ate dinner alone yesterday."
+      },
+      {
+        "jp": "{二人|ふたり}で{料理|りょうり}するのが{好|す}き。",
+        "en": "I love cooking together, just the two of us."
+      },
+      {
+        "jp": "{三人|さんにん}で{行|い}きませんか。",
+        "en": "Shall we go, the three of us?"
+      },
+      {
+        "jp": "{夫|おっと}と{二人|ふたり}で{旅行|りょこう}しました。",
+        "en": "My husband and I went on a trip, just the two of us."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "How much is it altogether?",
+        "jp": "{全部|ぜんぶ}でいくらですか。",
+        "tiles": [
+          "全部で",
+          "いくら",
+          "ですか。"
+        ],
+        "alternatives": [
+          "全部でいくら？",
+          "全部でいくらになりますか。"
+        ]
+      },
+      {
+        "en": "I went shopping by myself.",
+        "jp": "{一人|ひとり}で{買|か}い{物|もの}に{行|い}きました。",
+        "tiles": [
+          "一人で",
+          "買い物に",
+          "行きました。"
+        ],
+        "alternatives": [
+          "一人で買い物に行った。"
+        ]
+      },
+      {
+        "en": "Let's all eat together.",
+        "jp": "みんなでご{飯|はん}を{食|た}べましょう。",
+        "tiles": [
+          "みんなで",
+          "ご飯を",
+          "食べましょう。"
+        ],
+        "alternatives": [
+          "みんなでご飯を食べよう。",
+          "みんなでご飯食べよう。"
+        ]
+      },
+      {
+        "en": "I made this myself.",
+        "jp": "これは{自分|じぶん}で{作|つく}りました。",
+        "tiles": [
+          "これは",
+          "自分で",
+          "作りました。"
+        ],
+        "alternatives": [
+          "これ、自分で作った。",
+          "これは自分で作った。",
+          "自分でこれを作りました。"
+        ]
+      },
+      {
+        "en": "The two of us are going to a hot spring this weekend.",
+        "jp": "{週末|しゅうまつ}は{二人|ふたり}で{温泉|おんせん}に{行|い}きます。",
+        "tiles": [
+          "週末は",
+          "二人で",
+          "温泉に",
+          "行きます。"
+        ],
+        "alternatives": [
+          "週末、二人で温泉に行きます。",
+          "週末は二人で温泉へ行きます。",
+          "週末は二人で温泉に行く。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{全部|ぜんぶ}＿＿いくらですか。",
+        "options": [
+          "を",
+          "に",
+          "で"
+        ],
+        "answer": 2,
+        "en": "How much is it altogether?"
+      },
+      {
+        "prompt": "{一人|ひとり}＿＿{買|か}い{物|もの}に{行|い}きました。",
+        "options": [
+          "を",
+          "で",
+          "に"
+        ],
+        "answer": 1,
+        "en": "I went shopping by myself."
+      },
+      {
+        "prompt": "これは{自分|じぶん}＿＿{作|つく}りました。",
+        "options": [
+          "を",
+          "で",
+          "に"
+        ],
+        "answer": 1,
+        "en": "I made this myself."
+      },
+      {
+        "prompt": "{夫|おっと}＿＿{二人|ふたり}で{旅行|りょこう}しました。",
+        "options": [
+          "で",
+          "を",
+          "と"
+        ],
+        "answer": 2,
+        "en": "My husband and I went on a trip, just the two of us."
+      },
+      {
+        "prompt": "みんな＿＿ご{飯|はん}を{食|た}べましょう。",
+        "options": [
+          "で",
+          "を",
+          "に"
+        ],
+        "answer": 0,
+        "en": "Let's all eat together."
+      },
+      {
+        "prompt": "{週末|しゅうまつ}は{二人|ふたり}で{温泉|おんせん}＿＿{行|い}きます。",
+        "options": [
+          "に",
+          "を",
+          "で"
+        ],
+        "answer": 0,
+        "en": "This weekend the two of us are going to a hot spring."
+      }
+    ]
+  },
+  {
+    "id": "te-iru-state",
+    "order": 59,
+    "level": "N5",
+    "title": "〜ている — states: married, living, knowing",
+    "pattern": "{結婚|けっこん}している・{住|す}んでいる・{知|し}っている",
+    "register": "both",
+    "prerequisites": [
+      "te-imasu"
+    ],
+    "contrastWith": [
+      "te-imasu"
+    ],
+    "explanation": "Some verbs describe a change that happens in a moment, like getting married, moving somewhere or getting to know something. With these, ている describes the state left afterwards, not an action in progress: けっこんしています means \"I'm married\", not \"I'm getting married\". Learn the common ones as set phrases: すんでいます (live), しっています (know), もっています (have), つかれています (be tired), and for clothes きています, はいています and かけています (be wearing). Watch the odd one out: \"I don't know\" is しりません (casual しらない), not しっていません. In casual speech they shrink the same way as before: しってる？ すんでる.",
+    "examples": [
+      {
+        "jp": "{東京|とうきょう}に{住|す}んでいます。",
+        "en": "We live in Tokyo."
+      },
+      {
+        "jp": "{私|わたし}たちは{結婚|けっこん}しています。",
+        "en": "We're married."
+      },
+      {
+        "jp": "あの{店|みせ}、{知|し}ってる？ — ううん、{知|し}らない。",
+        "en": "Do you know that restaurant? — No, I don't."
+      },
+      {
+        "jp": "うちは{車|くるま}を{持|も}っていません。",
+        "en": "We don't have a car."
+      },
+      {
+        "jp": "{今日|きょう}はちょっと{疲|つか}れています。",
+        "en": "I'm a bit tired today."
+      },
+      {
+        "jp": "{妻|つま}は{赤|あか}いセーターを{着|き}ています。",
+        "en": "My wife is wearing a red sweater."
+      },
+      {
+        "jp": "{夫|おっと}はめがねをかけています。",
+        "en": "My husband wears glasses."
+      },
+      {
+        "jp": "まだ{起|お}きてる？",
+        "en": "Are you still awake?"
+      },
+      {
+        "jp": "{鍵|かぎ}、{持|も}ってる？",
+        "en": "Have you got the keys?"
+      },
+      {
+        "jp": "{田中|たなか}さんを{知|し}っていますか。 — いいえ、{知|し}りません。",
+        "en": "Do you know Mr. Tanaka? — No, I don't."
+      },
+      {
+        "jp": "{両親|りょうしん}は{大阪|おおさか}に{住|す}んでいます。",
+        "en": "My parents live in Osaka."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "We live in Tokyo.",
+        "jp": "{私|わたし}たちは{東京|とうきょう}に{住|す}んでいます。",
+        "tiles": [
+          "私たちは",
+          "東京に",
+          "住んで",
+          "います。"
+        ],
+        "alternatives": [
+          "東京に住んでいます。",
+          "私たちは東京に住んでる。",
+          "東京に住んでる。"
+        ]
+      },
+      {
+        "en": "Do you know that restaurant?",
+        "jp": "あの{店|みせ}を{知|し}っていますか。",
+        "tiles": [
+          "あの店を",
+          "知って",
+          "いますか。"
+        ],
+        "alternatives": [
+          "あの店、知ってる？",
+          "あの店を知ってる？",
+          "あの店、知っていますか。",
+          "あの店は知っていますか。"
+        ]
+      },
+      {
+        "en": "I don't know his name.",
+        "jp": "{彼|かれ}の{名前|なまえ}は{知|し}りません。",
+        "tiles": [
+          "彼の",
+          "名前は",
+          "知りません。"
+        ],
+        "alternatives": [
+          "彼の名前は知らない。",
+          "彼の名前を知りません。",
+          "彼の名前を知らない。"
+        ]
+      },
+      {
+        "en": "My husband wears glasses.",
+        "jp": "{夫|おっと}はめがねをかけています。",
+        "tiles": [
+          "夫は",
+          "めがねを",
+          "かけて",
+          "います。"
+        ],
+        "alternatives": [
+          "夫はめがねをかけてる。",
+          "夫は眼鏡をかけています。"
+        ]
+      },
+      {
+        "en": "I'm a bit tired today.",
+        "jp": "{今日|きょう}はちょっと{疲|つか}れています。",
+        "tiles": [
+          "今日は",
+          "ちょっと",
+          "疲れて",
+          "います。"
+        ],
+        "alternatives": [
+          "今日はちょっと疲れてる。",
+          "今日は少し疲れています。",
+          "今日はちょっと疲れている。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{東京|とうきょう}に{住|す}ん＿＿います。",
+        "options": [
+          "って",
+          "で",
+          "て"
+        ],
+        "answer": 1,
+        "en": "We live in Tokyo."
+      },
+      {
+        "prompt": "{田中|たなか}さんを{知|し}っていますか。 — いいえ、＿＿。",
+        "options": [
+          "しっています",
+          "しっていません",
+          "しりません"
+        ],
+        "answer": 2,
+        "en": "Do you know Mr. Tanaka? — No, I don't."
+      },
+      {
+        "prompt": "{夫|おっと}はめがねを＿＿います。",
+        "options": [
+          "はいて",
+          "かけて",
+          "きて"
+        ],
+        "answer": 1,
+        "en": "My husband wears glasses."
+      },
+      {
+        "prompt": "{私|わたし}たちは{結婚|けっこん}＿＿。",
+        "options": [
+          "しっています",
+          "するています",
+          "しています"
+        ],
+        "answer": 2,
+        "en": "We're married."
+      },
+      {
+        "prompt": "{妻|つま}は{赤|あか}いセーターを＿＿います。",
+        "options": [
+          "きて",
+          "かけて",
+          "はいて"
+        ],
+        "answer": 0,
+        "en": "My wife is wearing a red sweater."
+      },
+      {
+        "prompt": "{鍵|かぎ}、{持|も}＿＿る？",
+        "options": [
+          "って",
+          "いて",
+          "んで"
+        ],
+        "answer": 0,
+        "en": "Have you got the keys?"
+      }
+    ]
+  },
+  {
+    "id": "hoshii",
+    "order": 60,
+    "level": "N5",
+    "title": "〜がほしい — \"I want (a thing)\"",
+    "pattern": "〜がほしい",
+    "register": "both",
+    "prerequisites": [
+      "ga-subject",
+      "tai-want"
+    ],
+    "contrastWith": [
+      "tai-want",
+      "te-hoshii"
+    ],
+    "explanation": "ほしい means \"want\" for things: noun + が + ほしい (polite: ほしいです), as in あたらしいスマホがほしいです (\"I want a new smartphone\"). It's an い-adjective, so it changes like one: ほしかった (wanted), ほしくない (don't want). Use it about yourself, or to ask your partner (たんじょうび、なにがほしい？), but not to state what someone else wants: Japanese avoids speaking directly about other people's feelings. For wanting to do something, use 〜たい instead; wanting someone else to do something (〜てほしい) comes later.",
+    "examples": [
+      {
+        "jp": "{新|あたら}しいスマホがほしいです。",
+        "en": "I want a new smartphone."
+      },
+      {
+        "jp": "{誕生日|たんじょうび}、{何|なに}がほしい？",
+        "en": "What do you want for your birthday?"
+      },
+      {
+        "jp": "{時間|じかん}がほしい。",
+        "en": "I wish I had more time."
+      },
+      {
+        "jp": "ずっと{犬|いぬ}がほしかったです。",
+        "en": "I've always wanted a dog."
+      },
+      {
+        "jp": "{大|おお}きい{車|くるま}はほしくないです。",
+        "en": "I don't want a big car."
+      },
+      {
+        "jp": "{新|あたら}しいソファーがほしいね。",
+        "en": "We could do with a new sofa, couldn't we?"
+      },
+      {
+        "jp": "どんなかばんがほしいですか。",
+        "en": "What kind of bag do you want?"
+      },
+      {
+        "jp": "もっと{大|おお}きい{部屋|へや}がほしいです。",
+        "en": "I want a bigger room."
+      },
+      {
+        "jp": "{甘|あま}いものがほしい。",
+        "en": "I want something sweet."
+      },
+      {
+        "jp": "{時計|とけい}がほしかったけど、{高|たか}かった。",
+        "en": "I wanted a watch, but it was expensive."
+      },
+      {
+        "jp": "{休|やす}みがほしいです。",
+        "en": "I need a break."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I want a new smartphone.",
+        "jp": "{新|あたら}しいスマホがほしいです。",
+        "tiles": [
+          "新しい",
+          "スマホが",
+          "ほしいです。"
+        ],
+        "alternatives": [
+          "新しいスマホがほしい。",
+          "新しいスマホが欲しいです。",
+          "新しいスマホが欲しい。"
+        ]
+      },
+      {
+        "en": "What do you want for your birthday?",
+        "jp": "{誕生日|たんじょうび}、{何|なに}がほしい？",
+        "tiles": [
+          "誕生日、",
+          "何が",
+          "ほしい？"
+        ],
+        "alternatives": [
+          "誕生日に何がほしいですか。",
+          "誕生日は何がほしい？",
+          "誕生日に何がほしい？",
+          "誕生日、何が欲しい？"
+        ]
+      },
+      {
+        "en": "I don't want a big car.",
+        "jp": "{大|おお}きい{車|くるま}はほしくないです。",
+        "tiles": [
+          "大きい",
+          "車は",
+          "ほしく",
+          "ないです。"
+        ],
+        "alternatives": [
+          "大きい車はほしくない。",
+          "大きい車はほしくありません。",
+          "大きい車は欲しくないです。"
+        ]
+      },
+      {
+        "en": "I've always wanted a dog.",
+        "jp": "ずっと{犬|いぬ}がほしかったです。",
+        "tiles": [
+          "ずっと",
+          "犬が",
+          "ほしかったです。"
+        ],
+        "alternatives": [
+          "ずっと犬がほしかった。",
+          "ずっと犬が欲しかったです。"
+        ]
+      },
+      {
+        "en": "I want a bigger room.",
+        "jp": "もっと{大|おお}きい{部屋|へや}がほしいです。",
+        "tiles": [
+          "もっと",
+          "大きい",
+          "部屋が",
+          "ほしいです。"
+        ],
+        "alternatives": [
+          "もっと大きい部屋がほしい。",
+          "もっと広い部屋がほしいです。",
+          "もっと大きい部屋が欲しいです。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{新|あたら}しいスマホ＿＿ほしいです。",
+        "options": [
+          "に",
+          "が",
+          "で"
+        ],
+        "answer": 1,
+        "en": "I want a new smartphone."
+      },
+      {
+        "prompt": "{誕生日|たんじょうび}、{何|なに}が＿＿？",
+        "options": [
+          "ほしい",
+          "ほしいだ",
+          "たい"
+        ],
+        "answer": 0,
+        "en": "What do you want for your birthday?"
+      },
+      {
+        "prompt": "{大|おお}きい{車|くるま}はほし＿＿です。",
+        "options": [
+          "いない",
+          "じゃない",
+          "くない"
+        ],
+        "answer": 2,
+        "en": "I don't want a big car."
+      },
+      {
+        "prompt": "ずっと{犬|いぬ}がほし＿＿です。",
+        "options": [
+          "かった",
+          "くた",
+          "いでした"
+        ],
+        "answer": 0,
+        "en": "I've always wanted a dog."
+      },
+      {
+        "prompt": "{日本|にほん}へ{行|い}き＿＿です。",
+        "options": [
+          "たく",
+          "ほしい",
+          "たい"
+        ],
+        "answer": 2,
+        "en": "I want to go to Japan."
+      },
+      {
+        "prompt": "{甘|あま}いもの＿＿ほしい。",
+        "options": [
+          "で",
+          "が",
+          "に"
+        ],
+        "answer": 1,
+        "en": "I want something sweet."
+      }
+    ]
+  }
+]

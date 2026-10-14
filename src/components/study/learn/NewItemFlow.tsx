@@ -6,7 +6,8 @@ import { useRef, useState } from 'react';
 import { db } from '../../../lib/db.ts';
 import { introducePlanItem, type NewItemPlan } from '../../../srs/course.ts';
 import type { IntroduceResult } from '../../../srs/items.ts';
-import { KanaTarget } from '../cards/KanaWriteCard.tsx';
+import { KanaTarget, kanaTargetLabel } from '../cards/KanaWriteCard.tsx';
+import { kanjiTargetLabel } from '../cards/KanjiWriteCard.tsx';
 import { writePromptReading } from '../cards/prepare.ts';
 import { useFocusHeading, useScrollToTop } from '../focus.ts';
 import { sharedSoundRow } from '../format.ts';
@@ -26,20 +27,25 @@ export interface LearnedItem {
 
 function WritingFor({ data, onDone }: { data: LessonData; onDone: () => void }) {
   switch (data.kind) {
-    case 'kanji':
+    case 'kanji': {
+      const reading = writePromptReading(data.kanji, data.words);
       return (
         <WriteSteps char={data.kanji.char} ask="Write the kanji for" onDone={onDone} onSkip={onDone}
-          target={<>{data.kanji.meanings[0]} <span lang="ja" className="st-write-reading">{writePromptReading(data.kanji, data.words)}</span></>} />
+          target={<>{data.kanji.meanings[0]} <span lang="ja" className="st-write-reading">{reading}</span></>}
+          label={kanjiTargetLabel(data.kanji.meanings[0], reading)} />
       );
-    case 'kana':
+    }
+    case 'kana': {
+      const row = sharedSoundRow(data.kana, data.all);
       return (
         <WriteSteps char={data.kana.char} ask={`Write the ${data.kana.script} for`} onDone={onDone} onSkip={onDone}
-          target={<KanaTarget romaji={data.kana.romaji} row={sharedSoundRow(data.kana, data.all)} />} />
+          target={<KanaTarget romaji={data.kana.romaji} row={row} />} label={kanaTargetLabel(data.kana.script, data.kana.romaji, row)} />
       );
+    }
     case 'radical':
       return (
         <WriteSteps char={data.radical.char} passes={ALL_PASSES.slice(0, 1)} ask="Trace the part for" onDone={onDone} onSkip={onDone}
-          target={data.radical.meaning} />
+          target={data.radical.meaning} label={`the part for "${data.radical.meaning}"`} />
       );
     default:
       return null;

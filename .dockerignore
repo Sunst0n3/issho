@@ -16,3 +16,10 @@ issho-data
 .git
 *.log
 .DS_Store
+
+# Editor, agent and tool folders, and the tests (the image runs no tests).
+.claude
+.tools
+.vscode
+.idea
+server/test

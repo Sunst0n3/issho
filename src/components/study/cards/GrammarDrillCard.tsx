@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { gradeFor } from '../../../srs/answers.ts';
 import { DrillSentence, filledDrill } from '../DrillPractice.tsx';
+import { MixedText } from '../MixedText.tsx';
 import { ChoiceGrid, Question } from './parts.tsx';
 import type { CardProps } from './types.ts';
 
@@ -18,7 +19,7 @@ export function GrammarDrillCard({ prepared, onAnswer }: CardProps<'grammar-dril
       grade: gradeFor({ correct }),
       mode: 'choice',
       correct,
-      feedback: { expected: answer, expectedLang: 'ja', note: point.title, speak: filledDrill(drill) },
+      feedback: { expected: answer, expectedLang: 'ja', note: <MixedText text={point.title} />, speak: filledDrill(drill) },
     });
   };
 

@@ -3,7 +3,7 @@
 
 import { useId, useRef, useState, type FormEvent } from 'react';
 import { useSettings } from '../../lib/hooks.ts';
-import { ApiError, pair, wasRemoved } from '../../sync/client.ts';
+import { ApiError, INVALID_SERVER_URL_MESSAGE, pair, wasRemoved } from '../../sync/client.ts';
 import { connectFromSettings } from '../../sync/socket.ts';
 import { pushStats } from '../../sync/stats.ts';
 import { Icon } from '../ui.tsx';
@@ -11,6 +11,9 @@ import { TIcon } from './icons.tsx';
 import './together.css';
 
 const OFFLINE = "You're offline. Join your home Wi-Fi, then try again.";
+
+/** Ends a sentence after `text`, without doubling punctuation it already ends with ("…local." or "…!!"). */
+const endSentence = (text: string) => (/[.!?]$/.test(text) ? text : `${text}.`);
 
 /** Turns a pairing failure into a sentence that says what to do next. */
 export function pairErrorMessage(e: unknown, serverUrl = ''): string {
@@ -24,8 +27,10 @@ export function pairErrorMessage(e: unknown, serverUrl = ''): string {
   switch (e.code) {
     case 'invalid_code':
       return "That household code didn't work. Check it with whoever set up the home server.";
+    case 'invalid_server_url':
+      return INVALID_SERVER_URL_MESSAGE;
     case 'network':
-      return `Couldn't reach the home server${where}. Check it's running and this phone is on the same network.`;
+      return `${endSentence(`Couldn't reach the home server${where}`)} Check it's running and this phone is on the same network.`;
     case 'timeout':
       return `The home server${where} took too long to answer. Check it's running, then try again.`;
     case 'rate_limited':

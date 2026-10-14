@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ChatMessage, SendMessageRequest } from '../../shared/api.ts';
 import { db, getSettings, updateSettings } from '../lib/db.ts';
 import { storeMessages } from './chat.ts';
+import { OTHER_HOUSEHOLD, pair, unpair } from './client.ts';
 import {
   discardMessage,
   flushOutbox,
@@ -24,6 +25,9 @@ function fakeServer() {
   let nextId = 1;
   const posts: SendMessageRequest[] = [];
   const uploads: string[] = [];
+  const signouts: string[] = [];
+  /** What POST /api/register answers: this household's id. */
+  let householdId = 'house-1';
   /** Everything the server has stored, for GET /api/messages. */
   const history: ChatMessage[] = [];
   const routes = {
@@ -48,6 +52,13 @@ function fakeServer() {
       history.push(msg);
       return json(msg);
     }
+    if (url.pathname === '/api/register') {
+      return json({ deviceToken: `tok-${householdId}`, memberId: 'me', householdName: 'Home', householdId });
+    }
+    if (url.pathname === '/api/signout') {
+      signouts.push(String((init?.headers as Record<string, string>).Authorization));
+      return json({ ok: true });
+    }
     if (url.pathname === '/api/messages') {
       const after = Number(url.searchParams.get('after'));
       const limit = Number(url.searchParams.get('limit'));
@@ -59,7 +70,8 @@ function fakeServer() {
     history.push({ id, clientId: `p${id}`, memberId: 'partner', createdAt: new Date().toISOString(), kind: 'text', text });
     nextId = id + 1;
   };
-  return { fetchMock, posts, uploads, routes, history, partnerSends };
+  const setHousehold = (id: string) => { householdId = id; };
+  return { fetchMock, posts, uploads, signouts, routes, history, partnerSends, setHousehold };
 }
 
 let server: ReturnType<typeof fakeServer>;
@@ -69,7 +81,13 @@ const audioBlob = (text = 'sound') => new Blob([text], { type: 'audio/mp4' });
 beforeEach(async () => {
   await flushOutbox(); // let any run from a previous test settle
   await Promise.all(db.tables.map((t) => t.clear()));
-  await updateSettings({ serverUrl: 'http://home:8787', deviceToken: 'tok', memberId: 'me' });
+  await updateSettings({
+    name: 'Ken',
+    serverUrl: 'http://home:8787',
+    deviceToken: 'tok',
+    memberId: 'me',
+    lastPairing: { householdId: 'house-1', memberId: 'me', serverUrl: 'http://home:8787' },
+  });
   server = fakeServer();
   vi.stubGlobal('fetch', server.fetchMock);
 });
@@ -85,7 +103,9 @@ describe('queueChatMessage + flushOutbox', () => {
     const clientId = await queueChatMessage({ kind: 'text', text: 'ただいま' });
     const result = await flushOutbox();
 
-    expect(server.posts).toEqual([{ clientId, kind: 'text', text: 'ただいま' }]);
+    const [row] = await pendingRows();
+    expect(server.posts).toEqual([{ clientId, writtenAt: expect.any(String), kind: 'text', text: 'ただいま' }]);
+    expect(row).toBeUndefined();
     expect(result).toMatchObject({ remaining: 0, blocked: false });
     expect(await db.outbox.count()).toBe(0);
     const stored = await db.messages.toArray();
@@ -98,7 +118,7 @@ describe('queueChatMessage + flushOutbox', () => {
     await flushOutbox();
 
     expect(server.uploads).toHaveLength(1);
-    expect(server.posts).toEqual([{ clientId, kind: 'voice', text: '', transcript: 'おかえり', audioId: 'audio-1' }]);
+    expect(server.posts).toEqual([{ clientId, writtenAt: expect.any(String), kind: 'voice', text: '', transcript: 'おかえり', audioId: 'audio-1' }]);
     expect(server.fetchMock.mock.calls.map(([u]) => String(u))).toEqual([
       'http://home:8787/api/voice',
       'http://home:8787/api/messages',
@@ -205,7 +225,7 @@ describe('queueChatMessage + flushOutbox', () => {
 
   it('keeps a message for after pairing again when the server no longer accepts this phone', async () => {
     server.routes.message = () => json({ error: 'unauthorized' }, 401);
-    await queueChatMessage({ kind: 'text', text: 'hi' });
+    const clientId = await queueChatMessage({ kind: 'text', text: '取り消し後のメッセージ' });
     const result = await flushOutbox();
     expect(result.blocked).toBe(true);
     expect((await pendingRows())[0].failed).toBeUndefined();
@@ -214,6 +234,76 @@ describe('queueChatMessage + flushOutbox', () => {
     server.fetchMock.mockClear();
     expect(await flushOutbox()).toEqual({ sent: 0, remaining: 1, blocked: true });
     expect(server.fetchMock).not.toHaveBeenCalled();
+
+    // Pairing again with the same household delivers it, as the connect form promises.
+    server.routes.message = () => null;
+    await pair({ serverUrl: 'http://home:8787', householdCode: 'code', name: 'Ken' });
+    expect(await pendingRows()).toMatchObject([{ clientId }]);
+    await flushOutbox();
+    expect(server.posts.at(-1)).toMatchObject({ clientId, text: '取り消し後のメッセージ' });
+    expect(await db.outbox.count()).toBe(0);
+  });
+
+  it('never loses unsent messages when this phone disconnects and connects again', async () => {
+    // The home server is down when the message is written.
+    server.routes.message = () => new TypeError('Failed to fetch');
+    const before = Date.now();
+    const clientId = await queueChatMessage({ kind: 'text', text: '切断テスト' });
+    await flushOutbox();
+    await db.messages.put({ id: 1, clientId: 'old', memberId: 'partner', createdAt: '2026-10-14T00:00:00Z', kind: 'text', text: '前の' });
+
+    await unpair();
+    expect(server.signouts).toEqual(['Bearer tok']);
+    expect((await getSettings()).deviceToken).toBeUndefined();
+    expect(await pendingRows()).toMatchObject([{ clientId, text: '切断テスト' }]);
+
+    server.routes.message = () => null;
+    await pair({ serverUrl: 'http://home:8787', householdCode: 'code', name: 'Ken' });
+    const [row] = await pendingRows();
+    expect(row).toMatchObject({ clientId, householdId: 'house-1' });
+    expect(row.failed).toBeUndefined();
+    // Same household: the chat cache stays too.
+    expect(await db.messages.get(1)).toMatchObject({ text: '前の' });
+
+    await flushOutbox();
+    const posted = server.posts.at(-1)!;
+    expect(posted).toMatchObject({ clientId, text: '切断テスト' });
+    // It says when it was written, not when it finally went out.
+    expect(Date.parse(posted.writtenAt!)).toBeGreaterThanOrEqual(before - 1);
+    expect(Date.parse(posted.writtenAt!)).toBeLessThanOrEqual(Date.now());
+    expect(await db.outbox.count()).toBe(0);
+  });
+
+  it("keeps another household's unsent messages waiting, without sending them here", async () => {
+    await updateSettings({ deviceToken: undefined, memberId: undefined });
+    const clientId = await queueChatMessage({ kind: 'text', text: 'for house 1' });
+    await db.messages.put({ id: 9, clientId: 'h1', memberId: 'partner', createdAt: '2026-10-14T00:00:00Z', kind: 'text', text: 'house 1 chat' });
+
+    server.setHousehold('house-2');
+    await pair({ serverUrl: 'http://elsewhere:8787', householdCode: 'code', name: 'Ken' });
+    await flushOutbox();
+    expect(server.posts).toEqual([]);
+    expect(await pendingRows()).toMatchObject([{ clientId, failed: OTHER_HOUSEHOLD, householdId: 'house-1' }]);
+    // The cached chat was another household's.
+    expect(await db.messages.count()).toBe(0);
+
+    // Back with the first household, it goes out on its own.
+    server.setHousehold('house-1');
+    await pair({ serverUrl: 'http://home:8787', householdCode: 'code', name: 'Ken' });
+    await flushOutbox();
+    expect(server.posts.map((p) => p.clientId)).toEqual([clientId]);
+    expect(await db.outbox.count()).toBe(0);
+  });
+
+  it('sends a message written for another household here once the user retries it', async () => {
+    await db.outbox.add({ clientId: 'elsewhere', createdAt: new Date(), kind: 'text', text: 'resend', attempts: 0, householdId: 'house-0' });
+    await flushOutbox();
+    expect(server.posts).toEqual([]);
+    expect(await pendingRows()).toMatchObject([{ clientId: 'elsewhere', failed: OTHER_HOUSEHOLD }]);
+
+    await retryMessage('elsewhere');
+    await flushOutbox();
+    expect(server.posts.map((p) => p.clientId)).toEqual(['elsewhere']);
   });
 
   it('sends nothing while unpaired', async () => {

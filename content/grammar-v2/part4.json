@@ -1,0 +1,4470 @@
+[
+  {
+    "id": "te-shimau",
+    "order": 91,
+    "level": "N4",
+    "title": "〜てしまう — \"ended up\", \"all of it\"",
+    "pattern": "〜てしまう・〜ちゃう",
+    "register": "both",
+    "prerequisites": [
+      "te-form"
+    ],
+    "contrastWith": [
+      "te-oku"
+    ],
+    "explanation": "Add しまう to the て-form to say an action is completely finished, or that something happened that you didn't want: さいふをわすれてしまった, \"I (went and) forgot my wallet\". It often carries a feeling of \"oops\" or regret, which makes it perfect for apologies. In casual speech てしまう shrinks to ちゃう (たべちゃった), and でしまう becomes じゃう (のんじゃった); in polite speech say てしまいました. Don't mix it up with ておく, which is for doing something on purpose, ahead of time.",
+    "examples": [
+      {
+        "jp": "{財布|さいふ}を{忘|わす}れてしまいました。",
+        "en": "I (went and) forgot my wallet."
+      },
+      {
+        "jp": "ごめん、{冷蔵庫|れいぞうこ}のケーキ、{食|た}べちゃった。",
+        "en": "Sorry, I ate the cake that was in the fridge."
+      },
+      {
+        "jp": "{電車|でんしゃ}で{寝|ね}ちゃった。",
+        "en": "I fell asleep on the train."
+      },
+      {
+        "jp": "この{本|ほん}、もう{読|よ}んでしまいました。",
+        "en": "I've already finished reading this book."
+      },
+      {
+        "jp": "{鍵|かぎ}をなくしてしまった。どうしよう。",
+        "en": "I've lost my key. What am I going to do?"
+      },
+      {
+        "jp": "{夜中|よなか}にラーメンを{食|た}べちゃった。",
+        "en": "I ended up eating ramen in the middle of the night."
+      },
+      {
+        "jp": "{洗濯|せんたく}、{先|さき}にやっちゃうね。",
+        "en": "I'll get the laundry out of the way first, okay?"
+      },
+      {
+        "jp": "{大事|だいじ}なお{皿|さら}を{割|わ}っちゃった…。",
+        "en": "I broke the good plate…"
+      },
+      {
+        "jp": "{妻|つま}の{誕生日|たんじょうび}を{忘|わす}れてしまった。",
+        "en": "I forgot my wife's birthday."
+      },
+      {
+        "jp": "{雨|あめ}で{靴|くつ}がぬれてしまいました。",
+        "en": "My shoes got wet in the rain."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I forgot my wallet.",
+        "jp": "{財布|さいふ}を{忘|わす}れてしまいました。",
+        "tiles": [
+          "財布を",
+          "忘れて",
+          "しまいました。"
+        ],
+        "alternatives": [
+          "財布を忘れてしまった。",
+          "財布を忘れちゃった。",
+          "財布を忘れちゃいました。"
+        ]
+      },
+      {
+        "en": "Sorry, I ate the cake.",
+        "jp": "ごめん、ケーキを{食|た}べちゃった。",
+        "tiles": [
+          "ごめん、",
+          "ケーキを",
+          "食べ",
+          "ちゃった。"
+        ],
+        "alternatives": [
+          "ごめん、ケーキを食べてしまった。",
+          "ごめんなさい、ケーキを食べてしまいました。",
+          "ごめん、ケーキ食べちゃった。"
+        ]
+      },
+      {
+        "en": "I fell asleep on the train.",
+        "jp": "{電車|でんしゃ}で{寝|ね}てしまいました。",
+        "tiles": [
+          "電車で",
+          "寝て",
+          "しまいました。"
+        ],
+        "alternatives": [
+          "電車で寝てしまった。",
+          "電車で寝ちゃった。",
+          "電車で寝ちゃいました。"
+        ]
+      },
+      {
+        "en": "I lost my key.",
+        "jp": "{鍵|かぎ}をなくしちゃった。",
+        "tiles": [
+          "鍵を",
+          "なくし",
+          "ちゃった。"
+        ],
+        "alternatives": [
+          "鍵をなくしてしまった。",
+          "鍵をなくしてしまいました。",
+          "鍵をなくしちゃいました。"
+        ]
+      },
+      {
+        "en": "I'll get the laundry done first.",
+        "jp": "{先|さき}に{洗濯|せんたく}をしてしまいます。",
+        "tiles": [
+          "先に",
+          "洗濯を",
+          "して",
+          "しまいます。"
+        ],
+        "alternatives": [
+          "先に洗濯をしてしまう。",
+          "先に洗濯しちゃう。",
+          "先に洗濯をしちゃう。",
+          "洗濯を先にしてしまいます。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{財布|さいふ}を{忘|わす}れて＿＿。",
+        "options": [
+          "おきました",
+          "しまいました",
+          "みました"
+        ],
+        "answer": 1,
+        "en": "I (went and) forgot my wallet."
+      },
+      {
+        "prompt": "ごめん、ケーキ{食|た}べ＿＿。",
+        "options": [
+          "じゃった",
+          "ちゃう",
+          "ちゃった"
+        ],
+        "answer": 2,
+        "en": "Sorry, I ate the cake."
+      },
+      {
+        "prompt": "{夜中|よなか}にビールを{飲|の}ん＿＿。",
+        "options": [
+          "じゃった",
+          "ちゃった",
+          "しまった"
+        ],
+        "answer": 0,
+        "en": "I ended up drinking beer in the middle of the night."
+      },
+      {
+        "prompt": "{電車|でんしゃ}で＿＿しまいました。",
+        "options": [
+          "ねって",
+          "ねて",
+          "ねんで"
+        ],
+        "answer": 1,
+        "en": "I fell asleep on the train."
+      },
+      {
+        "prompt": "{大事|だいじ}なお{皿|さら}を{割|わ}って＿＿。",
+        "options": [
+          "しまった",
+          "みた",
+          "あげた"
+        ],
+        "answer": 0,
+        "en": "I (accidentally) broke the good plate."
+      }
+    ]
+  },
+  {
+    "id": "tara-conditional",
+    "order": 92,
+    "level": "N4",
+    "title": "〜たら — \"if\", \"when\"",
+    "pattern": "〜たら",
+    "register": "both",
+    "prerequisites": [
+      "casual-past"
+    ],
+    "contrastWith": [
+      "toki-when",
+      "ba-conditional",
+      "to-conditional",
+      "nara",
+      "temo-even-if"
+    ],
+    "explanation": "Take the plain past form and add ら to say \"if\" or \"once (this happens)\": いえについたら、でんわして, \"call me when you get home\"; あめだったら, \"if it's raining\"; さむかったら, \"if you're cold\". The たら part always happens first, and the second part can be anything, including a request, a wish or \"let's\"; 〜たらどう？ means \"why don't you …?\". It is the most general \"if\" and works in casual and polite speech alike, since the end of the sentence sets the politeness. とき just means \"at the time when\", ても means \"even if\", and ば, と and なら are narrower kinds of \"if\" that come later.",
+    "examples": [
+      {
+        "jp": "{家|いえ}に{着|つ}いたら、{電話|でんわ}して。",
+        "en": "Call me when you get home."
+      },
+      {
+        "jp": "{雨|あめ}だったら、{家|うち}で{映画|えいが}を{見|み}ましょう。",
+        "en": "If it's raining, let's watch a film at home."
+      },
+      {
+        "jp": "お{金|かね}があったら、{日本|にほん}に{住|す}みたいです。",
+        "en": "If I had the money, I'd like to live in Japan."
+      },
+      {
+        "jp": "{疲|つか}れたら、{休|やす}んでね。",
+        "en": "If you get tired, take a break, okay?"
+      },
+      {
+        "jp": "{仕事|しごと}が{終|お}わったら、{駅|えき}で{会|あ}おう。",
+        "en": "Once work's over, let's meet at the station."
+      },
+      {
+        "jp": "{暇|ひま}だったら、{一緒|いっしょ}に{買|か}い{物|もの}に{行|い}かない？",
+        "en": "If you're free, do you want to go shopping together?"
+      },
+      {
+        "jp": "{寒|さむ}かったら、エアコンをつけて。",
+        "en": "If you're cold, put the air con on."
+      },
+      {
+        "jp": "{頭|あたま}が{痛|いた}いの？{薬|くすり}を{飲|の}んだらどう？",
+        "en": "Have you got a headache? Why don't you take some medicine?"
+      },
+      {
+        "jp": "{明日|あした}{晴|は}れたら、{公園|こうえん}に{行|い}きませんか。",
+        "en": "If it's sunny tomorrow, shall we go to the park?"
+      },
+      {
+        "jp": "{日本語|にほんご}が{上手|じょうず}になったら、{日本|にほん}を{旅行|りょこう}しよう。",
+        "en": "Once our Japanese is good, let's travel around Japan."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "Call me when you get home.",
+        "jp": "{家|いえ}に{着|つ}いたら、{電話|でんわ}して。",
+        "tiles": [
+          "家に",
+          "着いたら、",
+          "電話して。"
+        ],
+        "alternatives": [
+          "家に着いたら、電話してください。",
+          "家に着いたら電話して。",
+          "家に着いたら、電話してね。"
+        ]
+      },
+      {
+        "en": "If it's raining, let's stay at home.",
+        "jp": "{雨|あめ}だったら、{家|うち}にいましょう。",
+        "tiles": [
+          "雨",
+          "だったら、",
+          "家に",
+          "いましょう。"
+        ],
+        "alternatives": [
+          "雨だったら、家にいよう。",
+          "雨が降ったら、家にいましょう。",
+          "雨が降ったら、家にいよう。",
+          "雨だったら家にいましょう。"
+        ]
+      },
+      {
+        "en": "If you get tired, please take a break.",
+        "jp": "{疲|つか}れたら、{休|やす}んでください。",
+        "tiles": [
+          "疲れたら、",
+          "休んで",
+          "ください。"
+        ],
+        "alternatives": [
+          "疲れたら、休んで。",
+          "疲れたら、休んでね。",
+          "疲れたら休んでください。"
+        ]
+      },
+      {
+        "en": "Why don't you take some medicine?",
+        "jp": "{薬|くすり}を{飲|の}んだらどう？",
+        "tiles": [
+          "薬を",
+          "飲んだら",
+          "どう？"
+        ],
+        "alternatives": [
+          "薬を飲んだらどうですか。",
+          "薬飲んだらどう？",
+          "薬を飲んだら？"
+        ]
+      },
+      {
+        "en": "If you're free, shall we go shopping?",
+        "jp": "{暇|ひま}だったら、{買|か}い{物|もの}に{行|い}きませんか。",
+        "tiles": [
+          "暇",
+          "だったら、",
+          "買い物に",
+          "行きませんか。"
+        ],
+        "alternatives": [
+          "暇だったら、買い物に行かない？",
+          "暇だったら買い物に行きませんか。",
+          "暇だったら、買い物に行きましょうか。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{家|いえ}に{着|つ}い＿＿、{電話|でんわ}して。",
+        "options": [
+          "たり",
+          "たら",
+          "ら"
+        ],
+        "answer": 1,
+        "en": "Call me when you get home."
+      },
+      {
+        "prompt": "{雨|あめ}＿＿、{家|うち}で{映画|えいが}を{見|み}よう。",
+        "options": [
+          "だったら",
+          "かったら",
+          "たら"
+        ],
+        "answer": 0,
+        "en": "If it's raining, let's watch a film at home."
+      },
+      {
+        "prompt": "{寒|さむ}＿＿、エアコンをつけてね。",
+        "options": [
+          "いたら",
+          "だったら",
+          "かったら"
+        ],
+        "answer": 2,
+        "en": "If you're cold, put the air con on, okay?"
+      },
+      {
+        "prompt": "{暇|ひま}＿＿、{一緒|いっしょ}に{行|い}かない？",
+        "options": [
+          "かったら",
+          "だったら",
+          "ったら"
+        ],
+        "answer": 1,
+        "en": "If you're free, do you want to come along?"
+      },
+      {
+        "prompt": "{薬|くすり}を{飲|の}ん＿＿どう？",
+        "options": [
+          "だら",
+          "たら",
+          "でら",
+          "だり"
+        ],
+        "answer": 0,
+        "en": "Why don't you take some medicine?"
+      }
+    ]
+  },
+  {
+    "id": "kureru",
+    "order": 93,
+    "level": "N4",
+    "title": "くれる — someone gives to me",
+    "pattern": "〜が〜をくれる",
+    "register": "both",
+    "prerequisites": [
+      "ageru-morau"
+    ],
+    "contrastWith": [
+      "ageru-morau",
+      "te-kureru"
+    ],
+    "explanation": "くれる also means \"give\", but only when the gift comes toward you or someone on your side, like your partner or family: つまがネクタイをくれた, \"my wife gave me a tie\". The giver takes が (or は) and the receiver, if you say it, takes に (わたしに). Think of the direction: あげる goes out from you, くれる comes in toward you, and もらう tells the same story from the receiver's side (つまにネクタイをもらった). Use くれます in polite speech and くれる with your partner; doing favours (〜てくれる) is the next step.",
+    "examples": [
+      {
+        "jp": "{妻|つま}がネクタイをくれました。",
+        "en": "My wife gave me a tie."
+      },
+      {
+        "jp": "{夫|おっと}が{誕生日|たんじょうび}に{花|はな}をくれた。",
+        "en": "My husband gave me flowers for my birthday."
+      },
+      {
+        "jp": "これ、{母|はは}がくれたの。",
+        "en": "My mum gave me this."
+      },
+      {
+        "jp": "{隣|となり}の{人|ひと}がりんごをくれました。",
+        "en": "The neighbours gave us some apples."
+      },
+      {
+        "jp": "{友達|ともだち}が{私|わたし}にお{土産|みやげ}をくれた。",
+        "en": "A friend gave me a souvenir."
+      },
+      {
+        "jp": "{誰|だれ}がこのチョコをくれたの？",
+        "en": "Who gave you this chocolate?"
+      },
+      {
+        "jp": "{父|ちち}は{私|わたし}に{古|ふる}いカメラをくれました。",
+        "en": "My father gave me his old camera."
+      },
+      {
+        "jp": "それ、{私|わたし}にくれるの？ありがとう！",
+        "en": "Is that for me? Thank you!"
+      },
+      {
+        "jp": "{会社|かいしゃ}の{先輩|せんぱい}がコンサートのチケットを{二枚|にまい}くれた。",
+        "en": "A senior colleague gave me two concert tickets."
+      },
+      {
+        "jp": "{妻|つま}にネクタイをもらいました。",
+        "en": "I got a tie from my wife. (the same gift, told with もらう)"
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "My wife gave me a tie.",
+        "jp": "{妻|つま}がネクタイをくれました。",
+        "tiles": [
+          "妻が",
+          "ネクタイを",
+          "くれました。"
+        ],
+        "alternatives": [
+          "妻がネクタイをくれた。",
+          "妻が私にネクタイをくれました。",
+          "妻は私にネクタイをくれました。",
+          "妻はネクタイをくれました。"
+        ]
+      },
+      {
+        "en": "My husband gave me flowers.",
+        "jp": "{夫|おっと}が{花|はな}をくれた。",
+        "tiles": [
+          "夫が",
+          "花を",
+          "くれた。"
+        ],
+        "alternatives": [
+          "夫が花をくれました。",
+          "夫が私に花をくれた。",
+          "夫は花をくれた。"
+        ]
+      },
+      {
+        "en": "My mother gave me this.",
+        "jp": "これは{母|はは}がくれました。",
+        "tiles": [
+          "これは",
+          "母が",
+          "くれました。"
+        ],
+        "alternatives": [
+          "これは母がくれた。",
+          "これ、母がくれたの。",
+          "母がこれをくれました。",
+          "母がこれをくれた。"
+        ]
+      },
+      {
+        "en": "A friend gave me a souvenir.",
+        "jp": "{友達|ともだち}がお{土産|みやげ}をくれました。",
+        "tiles": [
+          "友達が",
+          "お土産を",
+          "くれました。"
+        ],
+        "alternatives": [
+          "友達がお土産をくれた。",
+          "友達が私にお土産をくれました。"
+        ]
+      },
+      {
+        "en": "Are you giving that to me?",
+        "jp": "それ、{私|わたし}にくれるの？",
+        "tiles": [
+          "それ、",
+          "私に",
+          "くれるの？"
+        ],
+        "alternatives": [
+          "それ、私にくれるんですか。",
+          "それを私にくれるの？"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{妻|つま}がネクタイを＿＿。",
+        "options": [
+          "あげました",
+          "くれました",
+          "もらいました"
+        ],
+        "answer": 1,
+        "en": "My wife gave me a tie."
+      },
+      {
+        "prompt": "{妻|つま}＿＿ネクタイをもらいました。",
+        "options": [
+          "が",
+          "を",
+          "に"
+        ],
+        "answer": 2,
+        "en": "I got a tie from my wife."
+      },
+      {
+        "prompt": "{私|わたし}は{夫|おっと}にコーヒーを＿＿。",
+        "options": [
+          "あげました",
+          "くれました",
+          "もらいました"
+        ],
+        "answer": 0,
+        "en": "I gave my husband a coffee."
+      },
+      {
+        "prompt": "{隣|となり}の{人|ひと}がりんごを＿＿。",
+        "options": [
+          "くれた",
+          "あげた",
+          "もらった"
+        ],
+        "answer": 0,
+        "en": "The neighbours gave us some apples."
+      },
+      {
+        "prompt": "{友達|ともだち}＿＿{私|わたし}にお{土産|みやげ}をくれた。",
+        "options": [
+          "に",
+          "を",
+          "が"
+        ],
+        "answer": 2,
+        "en": "A friend gave me a souvenir."
+      }
+    ]
+  },
+  {
+    "id": "sugiru",
+    "order": 94,
+    "level": "N4",
+    "title": "〜すぎる — \"too much\"",
+    "pattern": "〜すぎる",
+    "register": "both",
+    "prerequisites": [
+      "i-adjectives",
+      "ni-iku-purpose"
+    ],
+    "contrastWith": [],
+    "explanation": "Add すぎる to say something is \"too …\" or that you did something \"too much\". With verbs, use the ます-stem, the part before ます: たべすぎた, \"I ate too much\". With い-adjectives drop the final い (たかい → たかすぎる), with な-adjectives just add すぎる (しずかすぎる), and いい becomes よすぎる. すぎる itself works like a る-verb: すぎます and すぎました in polite speech, すぎる, すぎた and すぎない in casual talk, and すぎて to link a reason (からすぎて、たべられない, \"it's too spicy to eat\"). It usually sounds like a complaint, so you'll hear it after big dinners and in shops.",
+    "examples": [
+      {
+        "jp": "{昨日|きのう}は{食|た}べすぎました。",
+        "en": "I ate too much yesterday."
+      },
+      {
+        "jp": "このコート、ちょっと{高|たか}すぎる。",
+        "en": "This coat is a bit too expensive."
+      },
+      {
+        "jp": "お{酒|さけ}を{飲|の}みすぎないでね。",
+        "en": "Don't drink too much, okay?"
+      },
+      {
+        "jp": "この{部屋|へや}は{静|しず}かすぎて、ちょっと{寂|さび}しい。",
+        "en": "This room is too quiet; it feels a bit lonely."
+      },
+      {
+        "jp": "カレーが{辛|から}すぎて、{食|た}べられない。",
+        "en": "The curry is too spicy; I can't eat it."
+      },
+      {
+        "jp": "{最近|さいきん}、{仕事|しごと}が{忙|いそが}しすぎます。",
+        "en": "Work has been far too busy lately."
+      },
+      {
+        "jp": "このシャツは{私|わたし}には{大|おお}きすぎます。",
+        "en": "This shirt is too big for me."
+      },
+      {
+        "jp": "{昨日|きのう}、ゲームをしすぎて、{目|め}が{痛|いた}い。",
+        "en": "I played games too much yesterday, and my eyes hurt."
+      },
+      {
+        "jp": "{天気|てんき}がよすぎて、{家|うち}にいたくない。",
+        "en": "The weather's too nice to stay at home."
+      },
+      {
+        "jp": "ちょっと{言|い}いすぎた。ごめんね。",
+        "en": "I went a bit too far (with what I said). Sorry."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I ate too much yesterday.",
+        "jp": "{昨日|きのう}は{食|た}べすぎました。",
+        "tiles": [
+          "昨日は",
+          "食べ",
+          "すぎました。"
+        ],
+        "alternatives": [
+          "昨日は食べすぎた。",
+          "昨日、食べすぎました。",
+          "昨日食べすぎた。"
+        ]
+      },
+      {
+        "en": "This coat is too expensive.",
+        "jp": "このコートは{高|たか}すぎます。",
+        "tiles": [
+          "この",
+          "コートは",
+          "高",
+          "すぎます。"
+        ],
+        "alternatives": [
+          "このコートは高すぎる。",
+          "このコート、高すぎる。",
+          "このコート、高すぎます。"
+        ]
+      },
+      {
+        "en": "The curry is too spicy.",
+        "jp": "カレーが{辛|から}すぎます。",
+        "tiles": [
+          "カレーが",
+          "辛",
+          "すぎます。"
+        ],
+        "alternatives": [
+          "カレーが辛すぎる。",
+          "カレー、辛すぎる。",
+          "カレーは辛すぎます。"
+        ]
+      },
+      {
+        "en": "Please don't drink too much.",
+        "jp": "{飲|の}みすぎないでください。",
+        "tiles": [
+          "飲み",
+          "すぎ",
+          "ないで",
+          "ください。"
+        ],
+        "alternatives": [
+          "飲みすぎないで。",
+          "飲みすぎないでね。",
+          "お酒を飲みすぎないでください。"
+        ]
+      },
+      {
+        "en": "This room is too quiet.",
+        "jp": "この{部屋|へや}は{静|しず}かすぎます。",
+        "tiles": [
+          "この",
+          "部屋は",
+          "静か",
+          "すぎます。"
+        ],
+        "alternatives": [
+          "この部屋は静かすぎる。",
+          "この部屋、静かすぎる。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{昨日|きのう}は{食|た}べ＿＿ました。",
+        "options": [
+          "すぎ",
+          "すぎて",
+          "すぎる"
+        ],
+        "answer": 0,
+        "en": "I ate too much yesterday."
+      },
+      {
+        "prompt": "このコート、ちょっと＿＿すぎる。",
+        "options": [
+          "たかい",
+          "たかく",
+          "たか"
+        ],
+        "answer": 2,
+        "en": "This coat is a bit too expensive."
+      },
+      {
+        "prompt": "お{酒|さけ}を＿＿すぎないでね。",
+        "options": [
+          "のむ",
+          "のみ",
+          "のん"
+        ],
+        "answer": 1,
+        "en": "Don't drink too much, okay?"
+      },
+      {
+        "prompt": "{天気|てんき}が＿＿すぎて、{家|うち}にいたくない。",
+        "options": [
+          "いい",
+          "い",
+          "よ",
+          "よく"
+        ],
+        "answer": 2,
+        "en": "The weather's too nice to stay at home."
+      },
+      {
+        "prompt": "この{部屋|へや}は＿＿すぎて、ちょっと{寂|さび}しい。",
+        "options": [
+          "しずかな",
+          "しずか",
+          "しずかに"
+        ],
+        "answer": 1,
+        "en": "This room is too quiet; it feels a bit lonely."
+      },
+      {
+        "prompt": "カレーが{辛|から}すぎ＿＿、{食|た}べられない。",
+        "options": [
+          "て",
+          "くて",
+          "ない"
+        ],
+        "answer": 0,
+        "en": "The curry is too spicy; I can't eat it."
+      }
+    ]
+  },
+  {
+    "id": "no-one",
+    "order": 95,
+    "level": "N5",
+    "title": "〜の — \"the … one\"",
+    "pattern": "〜の（{赤|あか}いの・{大|おお}きいの）",
+    "register": "both",
+    "prerequisites": [
+      "relative-clauses"
+    ],
+    "contrastWith": [
+      "no-possession",
+      "no-ga-suki"
+    ],
+    "explanation": "When you both know what kind of thing you mean, you can replace it with の, just like English \"one\": あかいの, \"the red one\"; もっとやすいの, \"a cheaper one\"; きのうかったの, \"the one I bought yesterday\". の goes straight after an い-adjective or a plain-form verb, while な-adjectives keep な (きれいなの). Don't confuse it with the の of ownership (わたしの, \"mine\") or with the の in のがすき, which turns a verb into \"doing\". It works in both casual and polite speech and is especially handy in shops.",
+    "examples": [
+      {
+        "jp": "{赤|あか}いのをください。",
+        "en": "The red one, please."
+      },
+      {
+        "jp": "もっと{安|やす}いのはありますか。",
+        "en": "Do you have a cheaper one?"
+      },
+      {
+        "jp": "{昨日|きのう}{買|か}ったのはどこ？",
+        "en": "Where's the one I bought yesterday?"
+      },
+      {
+        "jp": "{大|おお}きいのと{小|ちい}さいの、どっちがいい？",
+        "en": "The big one or the small one — which do you want?"
+      },
+      {
+        "jp": "{甘|あま}くないのがいいな。",
+        "en": "I'd like one that isn't sweet."
+      },
+      {
+        "jp": "{私|わたし}が{作|つく}ったのを{食|た}べてみて。",
+        "en": "Try the one I made."
+      },
+      {
+        "jp": "{同|おな}じのを{二|ふた}つください。",
+        "en": "Two of the same, please."
+      },
+      {
+        "jp": "きれいなのを{選|えら}んでね。",
+        "en": "Pick a nice-looking one, okay?"
+      },
+      {
+        "jp": "{冷|つめ}たいのが{飲|の}みたい。",
+        "en": "I want something cold to drink."
+      },
+      {
+        "jp": "このシャツ、{青|あお}いのもありますか。",
+        "en": "Do you have this shirt in blue too?"
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "The red one, please.",
+        "jp": "{赤|あか}いのをください。",
+        "tiles": [
+          "赤い",
+          "の",
+          "を",
+          "ください。"
+        ],
+        "alternatives": [
+          "赤いのをお願いします。",
+          "赤いの、ください。"
+        ]
+      },
+      {
+        "en": "Do you have a cheaper one?",
+        "jp": "もっと{安|やす}いのはありますか。",
+        "tiles": [
+          "もっと",
+          "安い",
+          "の",
+          "は",
+          "ありますか。"
+        ],
+        "alternatives": [
+          "もっと安いのはある？",
+          "もっと安いの、ありますか。",
+          "もっと安いのがありますか。"
+        ]
+      },
+      {
+        "en": "Where's the one I bought yesterday?",
+        "jp": "{昨日|きのう}{買|か}ったのはどこ？",
+        "tiles": [
+          "昨日",
+          "買った",
+          "の",
+          "は",
+          "どこ？"
+        ],
+        "alternatives": [
+          "昨日買ったのはどこですか。",
+          "昨日買ったの、どこ？"
+        ]
+      },
+      {
+        "en": "I want something cold to drink.",
+        "jp": "{冷|つめ}たいのが{飲|の}みたい。",
+        "tiles": [
+          "冷たい",
+          "の",
+          "が",
+          "飲みたい。"
+        ],
+        "alternatives": [
+          "冷たいのが飲みたいです。",
+          "冷たいのを飲みたい。",
+          "冷たいのを飲みたいです。"
+        ]
+      },
+      {
+        "en": "Two of the same, please.",
+        "jp": "{同|おな}じのを{二|ふた}つください。",
+        "tiles": [
+          "同じ",
+          "の",
+          "を",
+          "二つ",
+          "ください。"
+        ],
+        "alternatives": [
+          "同じのを二つお願いします。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{赤|あか}い＿＿をください。",
+        "options": [
+          "の",
+          "な",
+          "のの"
+        ],
+        "answer": 0,
+        "en": "The red one, please."
+      },
+      {
+        "prompt": "きれい＿＿を{選|えら}んでね。",
+        "options": [
+          "の",
+          "なの",
+          "いの"
+        ],
+        "answer": 1,
+        "en": "Pick a nice-looking one, okay?"
+      },
+      {
+        "prompt": "{昨日|きのう}{買|か}った＿＿はどこ？",
+        "options": [
+          "な",
+          "の",
+          "を"
+        ],
+        "answer": 1,
+        "en": "Where's the one I bought yesterday?"
+      },
+      {
+        "prompt": "もっと＿＿のはありますか。",
+        "options": [
+          "やすいな",
+          "やすく",
+          "やすい"
+        ],
+        "answer": 2,
+        "en": "Do you have a cheaper one?"
+      },
+      {
+        "prompt": "この{傘|かさ}は{私|わたし}＿＿です。",
+        "options": [
+          "の",
+          "のの",
+          "な"
+        ],
+        "answer": 0,
+        "en": "This umbrella is mine."
+      }
+    ]
+  },
+  {
+    "id": "sou-looks",
+    "order": 96,
+    "level": "N4",
+    "title": "〜そう — \"looks …\"",
+    "pattern": "〜そう（おいしそう）",
+    "register": "both",
+    "prerequisites": [
+      "i-adjectives",
+      "na-adjectives"
+    ],
+    "contrastWith": [
+      "sou-hearsay",
+      "you-da"
+    ],
+    "explanation": "Add そう to say how something looks to you, before you know for sure: おいしそう, \"that looks delicious\". い-adjectives drop the い (おいしい → おいしそう), な-adjectives just add そう (げんきそう), and verbs use the ます-stem (ふりそう, \"it looks like it'll rain\"); two special ones are いい → よさそう and ない → なさそう. Before a noun it becomes そうな (おいしそうなケーキ), before a verb そうに, and you add だ or です at the end for casual or polite speech. Careful: かわいそう means \"poor thing\", not \"looks cute\". This そう is only about appearance; そうだ meaning \"I heard\" and ようだ meaning \"it seems\" are separate lessons.",
+    "examples": [
+      {
+        "jp": "わあ、おいしそう！",
+        "en": "Wow, that looks delicious!"
+      },
+      {
+        "jp": "{雨|あめ}が{降|ふ}りそうですね。",
+        "en": "It looks like it's going to rain, doesn't it?"
+      },
+      {
+        "jp": "{今日|きょう}は{元気|げんき}そうだね。",
+        "en": "You look well today."
+      },
+      {
+        "jp": "{眠|ねむ}そうだね。{早|はや}く{寝|ね}たら？",
+        "en": "You look sleepy. Why don't you go to bed early?"
+      },
+      {
+        "jp": "この{映画|えいが}、{面白|おもしろ}そう。{一緒|いっしょ}に{見|み}ない？",
+        "en": "This film looks good. Want to watch it together?"
+      },
+      {
+        "jp": "あの{店|みせ}においしそうなケーキがあったよ。",
+        "en": "There was a delicious-looking cake at that shop."
+      },
+      {
+        "jp": "この{椅子|いす}、{壊|こわ}れそう。",
+        "en": "This chair looks like it's about to break."
+      },
+      {
+        "jp": "{彼|かれ}は{楽|たの}しそうに{歌|うた}っています。",
+        "en": "He's singing and looks like he's having fun."
+      },
+      {
+        "jp": "このソファー、よさそうだね。",
+        "en": "This sofa looks nice."
+      },
+      {
+        "jp": "{高|たか}そうな{時計|とけい}ですね。",
+        "en": "That's an expensive-looking watch."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "That looks delicious.",
+        "jp": "おいしそうですね。",
+        "tiles": [
+          "おいし",
+          "そう",
+          "ですね。"
+        ],
+        "alternatives": [
+          "おいしそう。",
+          "おいしそうだね。",
+          "おいしそうです。"
+        ]
+      },
+      {
+        "en": "It looks like it's going to rain.",
+        "jp": "{雨|あめ}が{降|ふ}りそうです。",
+        "tiles": [
+          "雨が",
+          "降り",
+          "そう",
+          "です。"
+        ],
+        "alternatives": [
+          "雨が降りそうだ。",
+          "雨が降りそう。",
+          "雨が降りそうですね。",
+          "雨が降りそうだね。"
+        ]
+      },
+      {
+        "en": "You look sleepy.",
+        "jp": "{眠|ねむ}そうだね。",
+        "tiles": [
+          "眠",
+          "そう",
+          "だね。"
+        ],
+        "alternatives": [
+          "眠そうですね。",
+          "眠そう。",
+          "眠そうだ。"
+        ]
+      },
+      {
+        "en": "This film looks interesting.",
+        "jp": "この{映画|えいが}は{面白|おもしろ}そうです。",
+        "tiles": [
+          "この",
+          "映画は",
+          "面白",
+          "そう",
+          "です。"
+        ],
+        "alternatives": [
+          "この映画は面白そう。",
+          "この映画、面白そう。",
+          "この映画は面白そうだね。",
+          "この映画、面白そうですね。"
+        ]
+      },
+      {
+        "en": "That's an expensive-looking watch.",
+        "jp": "{高|たか}そうな{時計|とけい}ですね。",
+        "tiles": [
+          "高",
+          "そうな",
+          "時計",
+          "ですね。"
+        ],
+        "alternatives": [
+          "高そうな時計だね。",
+          "高そうな時計です。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "わあ、おいし＿＿！",
+        "options": [
+          "そう",
+          "そうな",
+          "さそう"
+        ],
+        "answer": 0,
+        "en": "Wow, that looks delicious!"
+      },
+      {
+        "prompt": "{雨|あめ}が＿＿そうですね。",
+        "options": [
+          "ふる",
+          "ふった",
+          "ふり"
+        ],
+        "answer": 2,
+        "en": "It looks like it's going to rain, doesn't it?"
+      },
+      {
+        "prompt": "このソファー、＿＿そうだね。",
+        "options": [
+          "よさ",
+          "いい",
+          "よ"
+        ],
+        "answer": 0,
+        "en": "This sofa looks nice."
+      },
+      {
+        "prompt": "{高|たか}そう＿＿{時計|とけい}ですね。",
+        "options": [
+          "の",
+          "な",
+          "に"
+        ],
+        "answer": 1,
+        "en": "That's an expensive-looking watch."
+      },
+      {
+        "prompt": "{彼|かれ}は{楽|たの}しそう＿＿{歌|うた}っています。",
+        "options": [
+          "な",
+          "で",
+          "に"
+        ],
+        "answer": 2,
+        "en": "He's singing and looks like he's having fun."
+      }
+    ]
+  },
+  {
+    "id": "te-kureru",
+    "order": 97,
+    "level": "N4",
+    "title": "〜てくれる・〜てもらう — favours",
+    "pattern": "〜てくれる・〜てもらう・〜てあげる",
+    "register": "both",
+    "prerequisites": [
+      "kureru",
+      "te-form"
+    ],
+    "contrastWith": [
+      "kureru"
+    ],
+    "explanation": "Put くれる, もらう or あげる after the て-form to show who is doing a favour for whom. 〜てくれる means someone does something for me (つまがりょうりをつくってくれた), 〜てもらう means I get someone to do it, with that person + に (おっとにてつだってもらった), and 〜てあげる means I do it for someone, which can sound a little showy, so use it with care. To ask your partner for something, say 〜てくれる？, or more politely 〜てもらえますか, and to thank them, say 〜てくれてありがとう. Unlike plain くれる (giving a thing), these are about actions, and they come up constantly between partners.",
+    "examples": [
+      {
+        "jp": "{妻|つま}が{晩|ばん}ご{飯|はん}を{作|つく}ってくれました。",
+        "en": "My wife made dinner for me."
+      },
+      {
+        "jp": "{手伝|てつだ}ってくれてありがとう。",
+        "en": "Thanks for helping me."
+      },
+      {
+        "jp": "ちょっと{窓|まど}を{開|あ}けてくれる？",
+        "en": "Could you open the window for a moment?"
+      },
+      {
+        "jp": "{夫|おっと}に{駅|えき}まで{迎|むか}えに{来|き}てもらいました。",
+        "en": "I had my husband come and pick me up at the station."
+      },
+      {
+        "jp": "この{漢字|かんじ}、{読|よ}んでもらえますか。",
+        "en": "Could you read this kanji for me?"
+      },
+      {
+        "jp": "すみません、{写真|しゃしん}を{撮|と}ってもらえませんか。",
+        "en": "Excuse me, could you take a photo of us?"
+      },
+      {
+        "jp": "{友達|ともだち}に{引|ひ}っ{越|こ}しを{手伝|てつだ}ってもらった。",
+        "en": "I got my friends to help me move house."
+      },
+      {
+        "jp": "{妹|いもうと}に{日本語|にほんご}を{教|おし}えてあげた。",
+        "en": "I taught my little sister some Japanese."
+      },
+      {
+        "jp": "{重|おも}そうだね。{持|も}ってあげるよ。",
+        "en": "That looks heavy. I'll carry it for you."
+      },
+      {
+        "jp": "{夫|おっと}はいつも{話|はなし}を{聞|き}いてくれます。",
+        "en": "My husband always listens to me."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "Thanks for helping me.",
+        "jp": "{手伝|てつだ}ってくれてありがとう。",
+        "tiles": [
+          "手伝って",
+          "くれて",
+          "ありがとう。"
+        ],
+        "alternatives": [
+          "手伝ってくれてありがとうございます。"
+        ]
+      },
+      {
+        "en": "Could you open the window?",
+        "jp": "{窓|まど}を{開|あ}けてくれる？",
+        "tiles": [
+          "窓を",
+          "開けて",
+          "くれる？"
+        ],
+        "alternatives": [
+          "窓を開けてくれますか。",
+          "窓を開けてもらえる？",
+          "窓を開けてもらえますか。",
+          "窓、開けてくれる？"
+        ]
+      },
+      {
+        "en": "My wife made dinner for me.",
+        "jp": "{妻|つま}が{晩|ばん}ご{飯|はん}を{作|つく}ってくれました。",
+        "tiles": [
+          "妻が",
+          "晩ご飯を",
+          "作って",
+          "くれました。"
+        ],
+        "alternatives": [
+          "妻が晩ご飯を作ってくれた。",
+          "妻は晩ご飯を作ってくれました。",
+          "妻に晩ご飯を作ってもらいました。"
+        ]
+      },
+      {
+        "en": "I had my husband pick me up at the station.",
+        "jp": "{夫|おっと}に{駅|えき}まで{迎|むか}えに{来|き}てもらった。",
+        "tiles": [
+          "夫に",
+          "駅まで",
+          "迎えに",
+          "来て",
+          "もらった。"
+        ],
+        "alternatives": [
+          "夫に駅まで迎えに来てもらいました。",
+          "夫が駅まで迎えに来てくれた。",
+          "夫が駅まで迎えに来てくれました。"
+        ]
+      },
+      {
+        "en": "I'll carry it for you.",
+        "jp": "{持|も}ってあげるよ。",
+        "tiles": [
+          "持って",
+          "あげる",
+          "よ。"
+        ],
+        "alternatives": [
+          "持ってあげます。",
+          "持ってあげるね。",
+          "私が持ってあげるよ。"
+        ]
+      },
+      {
+        "en": "Could you take a photo for us?",
+        "jp": "{写真|しゃしん}を{撮|と}ってもらえませんか。",
+        "tiles": [
+          "写真を",
+          "撮って",
+          "もらえませんか。"
+        ],
+        "alternatives": [
+          "写真を撮ってもらえますか。",
+          "写真を撮ってくれませんか。",
+          "写真を撮っていただけませんか。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{手伝|てつだ}って＿＿ありがとう。",
+        "options": [
+          "あげて",
+          "くれる",
+          "くれて"
+        ],
+        "answer": 2,
+        "en": "Thanks for helping me."
+      },
+      {
+        "prompt": "{夫|おっと}＿＿{駅|えき}まで{迎|むか}えに{来|き}てもらいました。",
+        "options": [
+          "が",
+          "を",
+          "に"
+        ],
+        "answer": 2,
+        "en": "I had my husband come and pick me up at the station."
+      },
+      {
+        "prompt": "{重|おも}そうだね。{持|も}って＿＿よ。",
+        "options": [
+          "あげる",
+          "くれる",
+          "もらう"
+        ],
+        "answer": 0,
+        "en": "That looks heavy. I'll carry it for you."
+      },
+      {
+        "prompt": "{妻|つま}が{晩|ばん}ご{飯|はん}を{作|つく}って＿＿。",
+        "options": [
+          "あげました",
+          "くれました",
+          "もらいました"
+        ],
+        "answer": 1,
+        "en": "My wife made dinner for me."
+      },
+      {
+        "prompt": "この{漢字|かんじ}、{読|よ}んで＿＿ますか。",
+        "options": [
+          "もらえ",
+          "もらい",
+          "あげ"
+        ],
+        "answer": 0,
+        "en": "Could you read this kanji for me?"
+      }
+    ]
+  },
+  {
+    "id": "ba-conditional",
+    "order": 98,
+    "level": "N4",
+    "title": "〜ば — \"if\"",
+    "pattern": "〜ば・〜ければ",
+    "register": "both",
+    "prerequisites": [
+      "tara-conditional"
+    ],
+    "contrastWith": [
+      "tara-conditional",
+      "to-conditional",
+      "nara"
+    ],
+    "explanation": "ば is another \"if\", built by changing the verb's last u-sound to e and adding ば (いく → いけば, たべる → たべれば, する → すれば, くる → くれば); い-adjectives change い to ければ (やすければ, and いい → よければ), ない becomes なければ, and nouns use なら instead. Two set phrases are worth learning whole: 〜ばいい, \"you just need to …\", and どうすればいい？, \"what should I do?\"; 〜ばよかった means \"I wish I had …\". ば puts the focus on the condition itself, while たら is the all-purpose \"if / when\" and と is for things that always happen. It is fine in both casual and polite speech; the end of the sentence sets the politeness.",
+    "examples": [
+      {
+        "jp": "どうすればいいですか。",
+        "en": "What should I do?"
+      },
+      {
+        "jp": "{安|やす}ければ、{買|か}います。",
+        "en": "If it's cheap, I'll buy it."
+      },
+      {
+        "jp": "{時間|じかん}があれば、{一緒|いっしょ}に{行|い}きませんか。",
+        "en": "If you have time, shall we go together?"
+      },
+      {
+        "jp": "{明日|あした}、{天気|てんき}がよければ、{海|うみ}に{行|い}こう。",
+        "en": "If the weather's good tomorrow, let's go to the beach."
+      },
+      {
+        "jp": "このボタンを{押|お}せばいいよ。",
+        "en": "You just need to press this button."
+      },
+      {
+        "jp": "{急|いそ}がなければ、{間|ま}に{合|あ}わないよ。",
+        "en": "If we don't hurry, we won't make it."
+      },
+      {
+        "jp": "わからなければ、{聞|き}いてね。",
+        "en": "If you don't understand, just ask."
+      },
+      {
+        "jp": "{練習|れんしゅう}すれば、{上手|じょうず}になりますよ。",
+        "en": "If you practise, you'll get better."
+      },
+      {
+        "jp": "もっと{早|はや}く{来|く}ればよかった。",
+        "en": "I wish I'd come earlier."
+      },
+      {
+        "jp": "{傘|かさ}を{持|も}ってくればよかった。",
+        "en": "I should have brought an umbrella."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "What should I do?",
+        "jp": "どうすればいいですか。",
+        "tiles": [
+          "どう",
+          "すれば",
+          "いい",
+          "ですか。"
+        ],
+        "alternatives": [
+          "どうすればいい？",
+          "どうしたらいいですか。",
+          "どうしたらいい？"
+        ]
+      },
+      {
+        "en": "If it's cheap, I'll buy it.",
+        "jp": "{安|やす}ければ{買|か}います。",
+        "tiles": [
+          "安",
+          "ければ",
+          "買います。"
+        ],
+        "alternatives": [
+          "安ければ、買います。",
+          "安ければ買う。",
+          "安かったら買います。"
+        ]
+      },
+      {
+        "en": "If you have time, let's go together.",
+        "jp": "{時間|じかん}があれば、{一緒|いっしょ}に{行|い}こう。",
+        "tiles": [
+          "時間が",
+          "あれば、",
+          "一緒に",
+          "行こう。"
+        ],
+        "alternatives": [
+          "時間があれば、一緒に行きましょう。",
+          "時間があったら、一緒に行こう。",
+          "時間があれば一緒に行こう。"
+        ]
+      },
+      {
+        "en": "You just need to press this button.",
+        "jp": "このボタンを{押|お}せばいいです。",
+        "tiles": [
+          "この",
+          "ボタンを",
+          "押せば",
+          "いいです。"
+        ],
+        "alternatives": [
+          "このボタンを押せばいい。",
+          "このボタンを押せばいいよ。",
+          "このボタンを押せばいいですよ。"
+        ]
+      },
+      {
+        "en": "If we don't hurry, we'll be late.",
+        "jp": "{急|いそ}がなければ{遅|おく}れます。",
+        "tiles": [
+          "急が",
+          "なければ",
+          "遅れます。"
+        ],
+        "alternatives": [
+          "急がなければ、遅れます。",
+          "急がなければ遅れる。",
+          "急がないと遅れる。",
+          "急がないと遅れます。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "どう＿＿いいですか。",
+        "options": [
+          "すれば",
+          "しれば",
+          "されば"
+        ],
+        "answer": 0,
+        "en": "What should I do?"
+      },
+      {
+        "prompt": "{時間|じかん}が＿＿、{一緒|いっしょ}に{行|い}こう。",
+        "options": [
+          "あるば",
+          "あれば",
+          "あったば"
+        ],
+        "answer": 1,
+        "en": "If you have time, let's go together."
+      },
+      {
+        "prompt": "{安|やす}＿＿、{買|か}います。",
+        "options": [
+          "いれば",
+          "くれば",
+          "ければ"
+        ],
+        "answer": 2,
+        "en": "If it's cheap, I'll buy it."
+      },
+      {
+        "prompt": "{天気|てんき}が＿＿ければ、{海|うみ}に{行|い}こう。",
+        "options": [
+          "い",
+          "よ",
+          "いい"
+        ],
+        "answer": 1,
+        "en": "If the weather's good, let's go to the beach."
+      },
+      {
+        "prompt": "もっと{早|はや}く{来|く}れば＿＿。",
+        "options": [
+          "よかった",
+          "いい",
+          "よくない"
+        ],
+        "answer": 0,
+        "en": "I wish I'd come earlier."
+      }
+    ]
+  },
+  {
+    "id": "shi-reasons",
+    "order": 99,
+    "level": "N4",
+    "title": "〜し — \"and besides\"",
+    "pattern": "〜し、〜し",
+    "register": "both",
+    "prerequisites": [
+      "kara-because"
+    ],
+    "contrastWith": [
+      "kara-because"
+    ],
+    "explanation": "Put し after a plain-form sentence to stack up reasons, like \"… and besides …\": やすいし、おいしいし、ここにしよう, \"it's cheap, it's tasty — let's go with this place\". Nouns and な-adjectives take だ before し (あめだし, ひまだし). Often people give just one reason with し and leave the rest unsaid, which sounds softer than から: あしたはやすみだし…, \"well, tomorrow's a day off, so …\". から gives one clear reason, while し hints that there are others too. In polite speech you can put です or ます before し (やすいですし).",
+    "examples": [
+      {
+        "jp": "{安|やす}いし、おいしいし、この{店|みせ}にしよう。",
+        "en": "It's cheap and it's tasty — let's go with this place."
+      },
+      {
+        "jp": "{今日|きょう}は{雨|あめ}だし、{家|うち}でゆっくりしよう。",
+        "en": "It's raining today, so let's take it easy at home."
+      },
+      {
+        "jp": "{明日|あした}は{休|やす}みだし、もう{少|すこ}し{飲|の}もうか。",
+        "en": "Tomorrow's a day off, so shall we have a bit more to drink?"
+      },
+      {
+        "jp": "この{部屋|へや}は{広|ひろ}いし、{駅|えき}にも{近|ちか}いし、いいですね。",
+        "en": "This flat is roomy and close to the station too. It's nice."
+      },
+      {
+        "jp": "{疲|つか}れたし、もう{寝|ね}る。",
+        "en": "I'm tired, so I'm going to bed."
+      },
+      {
+        "jp": "{彼|かれ}は{優|やさ}しいし、{料理|りょうり}も{上手|じょうず}だし、{最高|さいこう}の{夫|おっと}です。",
+        "en": "He's kind and a good cook too — he's the best husband."
+      },
+      {
+        "jp": "{時間|じかん}もないし、タクシーで{行|い}きましょう。",
+        "en": "We're short on time too, so let's take a taxi."
+      },
+      {
+        "jp": "{今日|きょう}は{暑|あつ}いし、アイスを{食|た}べに{行|い}かない？",
+        "en": "It's hot today, so how about going out for ice cream?"
+      },
+      {
+        "jp": "{天気|てんき}もいいし、{散歩|さんぽ}しませんか。",
+        "en": "The weather's nice too, so shall we go for a walk?"
+      },
+      {
+        "jp": "{日本語|にほんご}は{難|むずか}しいですし、{時間|じかん}もかかります。",
+        "en": "Japanese is difficult, and it takes time too."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "It's cheap and tasty, so let's go with this place.",
+        "jp": "{安|やす}いし、おいしいし、ここにしよう。",
+        "tiles": [
+          "安いし、",
+          "おいしいし、",
+          "ここに",
+          "しよう。"
+        ],
+        "alternatives": [
+          "安いし、おいしいし、ここにしましょう。",
+          "安いしおいしいし、ここにしよう。"
+        ]
+      },
+      {
+        "en": "It's raining, so let's relax at home.",
+        "jp": "{雨|あめ}だし、{家|うち}でゆっくりしよう。",
+        "tiles": [
+          "雨",
+          "だし、",
+          "家で",
+          "ゆっくり",
+          "しよう。"
+        ],
+        "alternatives": [
+          "雨だし、家でゆっくりしましょう。",
+          "雨だし家でゆっくりしよう。"
+        ]
+      },
+      {
+        "en": "I'm tired, so I'm going to bed.",
+        "jp": "{疲|つか}れたし、もう{寝|ね}る。",
+        "tiles": [
+          "疲れた",
+          "し、",
+          "もう",
+          "寝る。"
+        ],
+        "alternatives": [
+          "疲れたし、もう寝ます。",
+          "疲れたしもう寝る。"
+        ]
+      },
+      {
+        "en": "The weather's nice too, so shall we go for a walk?",
+        "jp": "{天気|てんき}もいいし、{散歩|さんぽ}しませんか。",
+        "tiles": [
+          "天気も",
+          "いいし、",
+          "散歩",
+          "しませんか。"
+        ],
+        "alternatives": [
+          "天気もいいし、散歩しない？",
+          "天気もいいし、散歩に行きませんか。",
+          "天気もいいし、散歩に行かない？"
+        ]
+      },
+      {
+        "en": "He's kind, and he's a good cook too.",
+        "jp": "{彼|かれ}は{優|やさ}しいし、{料理|りょうり}も{上手|じょうず}です。",
+        "tiles": [
+          "彼は",
+          "優しいし、",
+          "料理も",
+          "上手です。"
+        ],
+        "alternatives": [
+          "彼は優しいし、料理も上手だ。",
+          "彼は優しいですし、料理も上手です。",
+          "彼は優しいし、料理も上手。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{安|やす}い＿＿、おいしいし、この{店|みせ}にしよう。",
+        "options": [
+          "し",
+          "だし",
+          "から"
+        ],
+        "answer": 0,
+        "en": "It's cheap and it's tasty — let's go with this place."
+      },
+      {
+        "prompt": "{今日|きょう}は{雨|あめ}＿＿、{家|うち}でゆっくりしよう。",
+        "options": [
+          "し",
+          "だし",
+          "なし"
+        ],
+        "answer": 1,
+        "en": "It's raining today, so let's take it easy at home."
+      },
+      {
+        "prompt": "{部屋|へや}も{広|ひろ}いし、{駅|えき}＿＿{近|ちか}いし、いいですね。",
+        "options": [
+          "でも",
+          "にも",
+          "をも"
+        ],
+        "answer": 1,
+        "en": "The flat is roomy, it's close to the station too — it's nice."
+      },
+      {
+        "prompt": "{料理|りょうり}も{上手|じょうず}＿＿、{優|やさ}しいし、{最高|さいこう}の{夫|おっと}です。",
+        "options": [
+          "だし",
+          "なし",
+          "いし"
+        ],
+        "answer": 0,
+        "en": "He's a good cook and he's kind — he's the best husband."
+      },
+      {
+        "prompt": "{疲|つか}れた＿＿、もう{寝|ね}る。",
+        "options": [
+          "だし",
+          "のし",
+          "し"
+        ],
+        "answer": 2,
+        "en": "I'm tired (and all), so I'm going to bed."
+      }
+    ]
+  },
+  {
+    "id": "sou-hearsay",
+    "order": 100,
+    "level": "N4",
+    "title": "〜そうだ — \"I heard that\"",
+    "pattern": "〜そうです",
+    "register": "both",
+    "prerequisites": [
+      "casual-past"
+    ],
+    "contrastWith": [
+      "sou-looks",
+      "you-da"
+    ],
+    "explanation": "Put そうだ (casual) or そうです (polite) after a full plain-form sentence to pass on something you heard or read: あしたはあめだそうです, \"I hear it's going to rain tomorrow\", and say where it came from with 〜によると, \"according to …\". Watch the form in front: the plain form (ふるそうだ) means \"I heard\", but the ます-stem (ふりそうだ) means \"it looks like\", which is a different lesson. Between partners people often just use って instead (あしたあめだって), and らしい also means \"apparently\". ようだ is your own guess from evidence, whereas そうだ simply reports what someone said.",
+    "examples": [
+      {
+        "jp": "{天気予報|てんきよほう}によると、{明日|あした}は{雨|あめ}だそうです。",
+        "en": "According to the weather forecast, it's going to rain tomorrow."
+      },
+      {
+        "jp": "あの{店|みせ}のラーメンはとてもおいしいそうです。",
+        "en": "I hear the ramen at that shop is really good."
+      },
+      {
+        "jp": "{田中|たなか}さんは{来月|らいげつ}{結婚|けっこん}するそうだよ。",
+        "en": "Apparently Tanaka-san is getting married next month."
+      },
+      {
+        "jp": "{母|はは}が{来週|らいしゅう}{遊|あそ}びに{来|く}るそうです。",
+        "en": "My mother says she's coming to visit next week."
+      },
+      {
+        "jp": "{駅|えき}の{近|ちか}くに{新|あたら}しいカフェができたそうだよ。",
+        "en": "I hear a new café has opened near the station."
+      },
+      {
+        "jp": "{昨日|きのう}、{東京|とうきょう}で{地震|じしん}があったそうです。",
+        "en": "Apparently there was an earthquake in Tokyo yesterday."
+      },
+      {
+        "jp": "{妹|いもうと}は{最近|さいきん}、{仕事|しごと}が{忙|いそが}しいそうです。",
+        "en": "My sister says she's been busy at work lately."
+      },
+      {
+        "jp": "この{辺|へん}は{夜|よる}も{静|しず}かだそうです。",
+        "en": "I hear this area is quiet at night too."
+      },
+      {
+        "jp": "あの{映画|えいが}、すごく{面白|おもしろ}いって。",
+        "en": "They say that film is really good."
+      },
+      {
+        "jp": "{明日|あした}は{雪|ゆき}らしいよ。",
+        "en": "Apparently it's going to snow tomorrow."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I hear it's going to rain tomorrow.",
+        "jp": "{明日|あした}は{雨|あめ}だそうです。",
+        "tiles": [
+          "明日は",
+          "雨",
+          "だ",
+          "そうです。"
+        ],
+        "alternatives": [
+          "明日は雨だそうだ。",
+          "明日は雨だそうだよ。",
+          "明日、雨だそうです。",
+          "明日は雨が降るそうです。"
+        ]
+      },
+      {
+        "en": "I hear that shop's ramen is delicious.",
+        "jp": "あの{店|みせ}のラーメンはおいしいそうです。",
+        "tiles": [
+          "あの",
+          "店の",
+          "ラーメンは",
+          "おいしい",
+          "そうです。"
+        ],
+        "alternatives": [
+          "あの店のラーメンはおいしいそうだ。",
+          "あの店のラーメンはおいしいそうだよ。",
+          "あの店のラーメン、おいしいそうです。"
+        ]
+      },
+      {
+        "en": "Apparently Tanaka-san is getting married.",
+        "jp": "{田中|たなか}さんは{結婚|けっこん}するそうだよ。",
+        "tiles": [
+          "田中さんは",
+          "結婚する",
+          "そう",
+          "だよ。"
+        ],
+        "alternatives": [
+          "田中さんは結婚するそうです。",
+          "田中さん、結婚するそうだよ。",
+          "田中さんは結婚するって。"
+        ]
+      },
+      {
+        "en": "My mother says she's coming next week.",
+        "jp": "{母|はは}は{来週|らいしゅう}{来|く}るそうです。",
+        "tiles": [
+          "母は",
+          "来週",
+          "来る",
+          "そうです。"
+        ],
+        "alternatives": [
+          "母は来週来るそうだ。",
+          "母が来週来るそうです。",
+          "母は来週来るって。"
+        ]
+      },
+      {
+        "en": "Apparently there was an earthquake yesterday.",
+        "jp": "{昨日|きのう}{地震|じしん}があったそうです。",
+        "tiles": [
+          "昨日",
+          "地震が",
+          "あった",
+          "そうです。"
+        ],
+        "alternatives": [
+          "昨日、地震があったそうです。",
+          "昨日地震があったそうだ。",
+          "昨日、地震があったって。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{明日|あした}は{雨|あめ}＿＿そうです。",
+        "options": [
+          "の",
+          "だ",
+          "な"
+        ],
+        "answer": 1,
+        "en": "I hear it's going to rain tomorrow."
+      },
+      {
+        "prompt": "{天気予報|てんきよほう}によると、{雨|あめ}が＿＿そうです。",
+        "options": [
+          "ふり",
+          "ふって",
+          "ふる"
+        ],
+        "answer": 2,
+        "en": "According to the forecast, it's going to rain."
+      },
+      {
+        "prompt": "あの{店|みせ}のラーメンは＿＿そうです。",
+        "options": [
+          "おいしい",
+          "おいし",
+          "おいしく"
+        ],
+        "answer": 0,
+        "en": "I hear the ramen at that shop is delicious."
+      },
+      {
+        "prompt": "この{辺|へん}は＿＿そうです。",
+        "options": [
+          "しずか",
+          "しずかだ",
+          "しずかな"
+        ],
+        "answer": 1,
+        "en": "I hear this area is quiet."
+      },
+      {
+        "prompt": "{田中|たなか}さんは{来月|らいげつ}{結婚|けっこん}する＿＿。",
+        "options": [
+          "そうだ",
+          "そうな",
+          "そうに"
+        ],
+        "answer": 0,
+        "en": "Apparently Tanaka-san is getting married next month."
+      }
+    ]
+  },
+  {
+    "id": "te-oku",
+    "order": 101,
+    "level": "N4",
+    "title": "〜ておく — \"do in advance\"",
+    "pattern": "〜ておく・〜とく",
+    "register": "both",
+    "prerequisites": [
+      "te-form"
+    ],
+    "contrastWith": [
+      "te-shimau"
+    ],
+    "explanation": "おく means \"put\" or \"leave\", and after the て-form it says you do something now so that it's ready for later: ホテルをよやくしておく, \"I'll book the hotel ahead of time\". It can also mean leaving something as it is: まどをあけておいて, \"leave the window open\". In casual speech ておく shrinks to とく (かっとく, \"I'll buy it\") and でおく to どく (よんどく); in polite speech say ておきます. Compare てしまう, which is about finishing something or an accident; ておく is always on purpose, with a plan in mind.",
+    "examples": [
+      {
+        "jp": "{旅行|りょこう}の{前|まえ}に、ホテルを{予約|よやく}しておきます。",
+        "en": "I'll book the hotel before the trip."
+      },
+      {
+        "jp": "{窓|まど}を{開|あ}けておいてね。",
+        "en": "Leave the window open, okay?"
+      },
+      {
+        "jp": "ビールを{冷蔵庫|れいぞうこ}に{入|い}れておいたよ。",
+        "en": "I've put some beer in the fridge (so it's cold)."
+      },
+      {
+        "jp": "パーティーの{前|まえ}に、{部屋|へや}を{掃除|そうじ}しておこう。",
+        "en": "Let's clean the room before the party."
+      },
+      {
+        "jp": "{明日|あした}は{早|はや}いから、{今日|きょう}は{早|はや}く{寝|ね}ておきます。",
+        "en": "I have an early start tomorrow, so I'll get to bed early tonight."
+      },
+      {
+        "jp": "{牛乳|ぎゅうにゅう}、{買|か}っとくね。",
+        "en": "I'll pick up some milk (so we have it)."
+      },
+      {
+        "jp": "{電気|でんき}はつけておいてください。",
+        "en": "Please leave the lights on."
+      },
+      {
+        "jp": "{会議|かいぎ}の{前|まえ}に、このメールを{読|よ}んでおいてください。",
+        "en": "Please read this email before the meeting."
+      },
+      {
+        "jp": "{晩|ばん}ご{飯|はん}、{作|つく}っておいたよ。",
+        "en": "I've made dinner for later."
+      },
+      {
+        "jp": "{日本|にほん}に{行|い}く{前|まえ}に、{日本語|にほんご}を{勉強|べんきょう}しておきたいです。",
+        "en": "I want to study some Japanese before going to Japan."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I'll book the hotel in advance.",
+        "jp": "ホテルを{予約|よやく}しておきます。",
+        "tiles": [
+          "ホテルを",
+          "予約して",
+          "おきます。"
+        ],
+        "alternatives": [
+          "ホテルを予約しておく。",
+          "ホテルを予約しとく。",
+          "ホテル、予約しとくね。",
+          "ホテルを予約しておくね。"
+        ]
+      },
+      {
+        "en": "Leave the window open, okay?",
+        "jp": "{窓|まど}を{開|あ}けておいてね。",
+        "tiles": [
+          "窓を",
+          "開けて",
+          "おいて",
+          "ね。"
+        ],
+        "alternatives": [
+          "窓を開けておいてください。",
+          "窓を開けといてね。",
+          "窓、開けといて。",
+          "窓を開けておいて。"
+        ]
+      },
+      {
+        "en": "I've put the beer in the fridge.",
+        "jp": "ビールを{冷蔵庫|れいぞうこ}に{入|い}れておいたよ。",
+        "tiles": [
+          "ビールを",
+          "冷蔵庫に",
+          "入れて",
+          "おいた",
+          "よ。"
+        ],
+        "alternatives": [
+          "ビールを冷蔵庫に入れておきました。",
+          "ビール、冷蔵庫に入れといたよ。",
+          "ビールを冷蔵庫に入れといたよ。",
+          "ビールを冷蔵庫に入れておいた。"
+        ]
+      },
+      {
+        "en": "Let's clean the room before the party.",
+        "jp": "パーティーの{前|まえ}に{部屋|へや}を{掃除|そうじ}しておこう。",
+        "tiles": [
+          "パーティーの",
+          "前に",
+          "部屋を",
+          "掃除して",
+          "おこう。"
+        ],
+        "alternatives": [
+          "パーティーの前に、部屋を掃除しておこう。",
+          "パーティーの前に部屋を掃除しておきましょう。",
+          "パーティーの前に部屋を掃除しとこう。"
+        ]
+      },
+      {
+        "en": "I'll pick up some milk (so we have it).",
+        "jp": "{牛乳|ぎゅうにゅう}を{買|か}っとくね。",
+        "tiles": [
+          "牛乳を",
+          "買っ",
+          "とく",
+          "ね。"
+        ],
+        "alternatives": [
+          "牛乳を買っておくね。",
+          "牛乳を買っておきます。",
+          "牛乳、買っとくね。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "ホテルを{予約|よやく}＿＿おきます。",
+        "options": [
+          "して",
+          "しって",
+          "しで"
+        ],
+        "answer": 0,
+        "en": "I'll book the hotel in advance."
+      },
+      {
+        "prompt": "{窓|まど}を{開|あ}けて＿＿ね。",
+        "options": [
+          "おって",
+          "おきて",
+          "おいて"
+        ],
+        "answer": 2,
+        "en": "Leave the window open, okay?"
+      },
+      {
+        "prompt": "{牛乳|ぎゅうにゅう}、{買|か}っ＿＿ね。",
+        "options": [
+          "どく",
+          "とく",
+          "たく"
+        ],
+        "answer": 1,
+        "en": "I'll pick up some milk (so we have it)."
+      },
+      {
+        "prompt": "この{本|ほん}、{読|よ}ん＿＿ね。",
+        "options": [
+          "どいて",
+          "といて",
+          "ていて"
+        ],
+        "answer": 0,
+        "en": "Read this book (before then), okay?"
+      },
+      {
+        "prompt": "{大事|だいじ}なメールを{消|け}して＿＿。",
+        "options": [
+          "おいた",
+          "しまった",
+          "みた"
+        ],
+        "answer": 1,
+        "en": "Oops, I deleted an important email."
+      }
+    ]
+  },
+  {
+    "id": "to-conditional",
+    "order": 102,
+    "level": "N4",
+    "title": "〜と — \"whenever\", \"if (naturally)\"",
+    "pattern": "〜と、〜",
+    "register": "both",
+    "prerequisites": [
+      "dictionary-form",
+      "tara-conditional"
+    ],
+    "contrastWith": [
+      "tara-conditional",
+      "ba-conditional",
+      "nara"
+    ],
+    "explanation": "Put と after the dictionary form (or the ない-form) to say that one thing always or automatically leads to another: ボタンをおすと、ドアがあく, \"when you press the button, the door opens\". It is perfect for giving directions (みぎにまがると、えきがあります), explaining how machines work, and talking about habits and natural facts. The second half must be something that simply happens, so no requests, wishes or \"let's\"; for those use たら (いえについたら、でんわして). This と comes after a verb or adjective (a noun needs だ first: あめだと), so it isn't the と that means \"and\" or \"with\"; ば and なら are the other \"if\" words. The end of the sentence sets the politeness, so it works in both casual and polite speech.",
+    "examples": [
+      {
+        "jp": "このボタンを{押|お}すと、ドアが{開|あ}きます。",
+        "en": "When you press this button, the door opens."
+      },
+      {
+        "jp": "{右|みぎ}に{曲|ま}がると、{駅|えき}があります。",
+        "en": "If you turn right, you'll find the station."
+      },
+      {
+        "jp": "{春|はる}になると、{桜|さくら}が{咲|さ}きます。",
+        "en": "When spring comes, the cherry blossoms come out."
+      },
+      {
+        "jp": "コーヒーを{飲|の}むと、{眠|ねむ}れなくなる。",
+        "en": "When I drink coffee, I can't sleep."
+      },
+      {
+        "jp": "{夫|おっと}はお{酒|さけ}を{飲|の}むと、すぐ{寝|ね}ます。",
+        "en": "Whenever my husband drinks, he falls asleep straight away."
+      },
+      {
+        "jp": "この{道|みち}をまっすぐ{行|い}くと、{公園|こうえん}があります。",
+        "en": "Go straight along this road and you'll come to a park."
+      },
+      {
+        "jp": "{急|いそ}がないと、{遅|おく}れるよ。",
+        "en": "If we don't hurry, we'll be late."
+      },
+      {
+        "jp": "{窓|まど}を{開|あ}けると、{涼|すず}しい{風|かぜ}が{入|はい}ります。",
+        "en": "When you open the window, a cool breeze comes in."
+      },
+      {
+        "jp": "{妻|つま}は{映画|えいが}を{見|み}ると、いつも{泣|な}きます。",
+        "en": "My wife always cries when she watches films."
+      },
+      {
+        "jp": "ここを{押|お}さないと、お{湯|ゆ}が{出|で}ません。",
+        "en": "If you don't press here, the hot water won't come out."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "When you press this button, the door opens.",
+        "jp": "このボタンを{押|お}すと、ドアが{開|あ}きます。",
+        "tiles": [
+          "このボタンを",
+          "押すと、",
+          "ドアが",
+          "開きます。"
+        ],
+        "alternatives": [
+          "このボタンを押すとドアが開きます。",
+          "このボタンを押すと、ドアが開く。"
+        ]
+      },
+      {
+        "en": "If you turn right, there's the station.",
+        "jp": "{右|みぎ}に{曲|ま}がると、{駅|えき}があります。",
+        "tiles": [
+          "右に",
+          "曲がると、",
+          "駅が",
+          "あります。"
+        ],
+        "alternatives": [
+          "右に曲がると駅があります。",
+          "右に曲がると、駅がある。",
+          "右に曲がると、駅があるよ。"
+        ]
+      },
+      {
+        "en": "When spring comes, the cherry blossoms come out.",
+        "jp": "{春|はる}になると、{桜|さくら}が{咲|さ}きます。",
+        "tiles": [
+          "春に",
+          "なると、",
+          "桜が",
+          "咲きます。"
+        ],
+        "alternatives": [
+          "春になると桜が咲きます。",
+          "春になると、桜が咲く。"
+        ]
+      },
+      {
+        "en": "If we don't hurry, we'll be late.",
+        "jp": "{急|いそ}がないと{遅|おく}れるよ。",
+        "tiles": [
+          "急が",
+          "ないと",
+          "遅れるよ。"
+        ],
+        "alternatives": [
+          "急がないと、遅れるよ。",
+          "急がないと遅れますよ。",
+          "急がないと遅れる。",
+          "急がなければ遅れるよ。"
+        ]
+      },
+      {
+        "en": "When I drink coffee, I can't sleep.",
+        "jp": "コーヒーを{飲|の}むと、{眠|ねむ}れなくなります。",
+        "tiles": [
+          "コーヒーを",
+          "飲むと、",
+          "眠れなく",
+          "なります。"
+        ],
+        "alternatives": [
+          "コーヒーを飲むと、眠れなくなる。",
+          "コーヒーを飲むと眠れなくなります。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "このボタンを＿＿と、ドアが{開|あ}きます。",
+        "options": [
+          "おす",
+          "おした",
+          "おして"
+        ],
+        "answer": 0,
+        "en": "When you press this button, the door opens."
+      },
+      {
+        "prompt": "{右|みぎ}に{曲|ま}がる＿＿、{駅|えき}があります。",
+        "options": [
+          "で",
+          "と",
+          "から"
+        ],
+        "answer": 1,
+        "en": "If you turn right, you'll find the station."
+      },
+      {
+        "prompt": "{春|はる}に＿＿と、{桜|さくら}が{咲|さ}きます。",
+        "options": [
+          "なって",
+          "なった",
+          "なる"
+        ],
+        "answer": 2,
+        "en": "When spring comes, the cherry blossoms come out."
+      },
+      {
+        "prompt": "{家|いえ}に＿＿、{電話|でんわ}してね。",
+        "options": [
+          "つくと",
+          "ついたら",
+          "つきと"
+        ],
+        "answer": 1,
+        "en": "Call me when you get home. (a request, so not と)"
+      },
+      {
+        "prompt": "{急|いそ}が＿＿と、{遅|おく}れるよ。",
+        "options": [
+          "ない",
+          "なく",
+          "なかった"
+        ],
+        "answer": 0,
+        "en": "If we don't hurry, we'll be late."
+      }
+    ]
+  },
+  {
+    "id": "you-ni-naru",
+    "order": 103,
+    "level": "N4",
+    "title": "〜ようになる — \"come to be able\"",
+    "pattern": "〜ようになる",
+    "register": "both",
+    "prerequisites": [
+      "potential-form",
+      "adj-naru"
+    ],
+    "contrastWith": [
+      "koto-ni-suru"
+    ],
+    "explanation": "Add ようになる to the dictionary form or the potential form to describe a gradual change in what you can do or what you usually do: カタカナがよめるようになった, \"I've become able to read katakana\". It's the perfect way to talk about your own progress, politely with ようになりました or casually with ようになった. For a change in the other direction, use the ない-form with なくなる: ねむれなくなった, \"I can't sleep any more\". 〜くなる and 〜になる are for adjectives and nouns, while ようになる is for verbs; ようにする, \"make a point of doing\", is a close cousin you only need to recognise. Don't confuse it with ことにする, which is a one-off decision, not a gradual change.",
+    "examples": [
+      {
+        "jp": "カタカナが{読|よ}めるようになりました。",
+        "en": "I've become able to read katakana."
+      },
+      {
+        "jp": "{夫|おっと}は{納豆|なっとう}が{食|た}べられるようになった。",
+        "en": "My husband can eat natto now."
+      },
+      {
+        "jp": "{毎日|まいにち}{練習|れんしゅう}して、{漢字|かんじ}が{書|か}けるようになった。",
+        "en": "I practised every day, and now I can write kanji."
+      },
+      {
+        "jp": "{日本語|にほんご}が{少|すこ}し{話|はな}せるようになりました。",
+        "en": "I can speak a little Japanese now."
+      },
+      {
+        "jp": "{最近|さいきん}、{妻|つま}は{朝|あさ}{早|はや}く{起|お}きるようになった。",
+        "en": "Lately my wife has started getting up early."
+      },
+      {
+        "jp": "{子|こ}どものときは{野菜|やさい}が{嫌|きら}いでしたが、{今|いま}は{食|た}べるようになりました。",
+        "en": "I hated vegetables as a child, but now I eat them."
+      },
+      {
+        "jp": "{最近|さいきん}、{夜|よる}{眠|ねむ}れなくなった。",
+        "en": "Lately I can't sleep at night any more."
+      },
+      {
+        "jp": "{彼|かれ}は{前|まえ}よりよく{笑|わら}うようになった。",
+        "en": "He laughs a lot more than he used to."
+      },
+      {
+        "jp": "{二人|ふたり}で{料理|りょうり}するようになりました。",
+        "en": "We've started cooking together."
+      },
+      {
+        "jp": "{毎日|まいにち}{歩|ある}くようにしています。",
+        "en": "I make a point of walking every day."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I've become able to read katakana.",
+        "jp": "カタカナが{読|よ}めるようになりました。",
+        "tiles": [
+          "カタカナが",
+          "読める",
+          "ように",
+          "なりました。"
+        ],
+        "alternatives": [
+          "カタカナが読めるようになった。",
+          "カタカナを読めるようになりました。",
+          "カタカナを読めるようになった。"
+        ]
+      },
+      {
+        "en": "My husband can eat natto now.",
+        "jp": "{夫|おっと}は{納豆|なっとう}が{食|た}べられるようになった。",
+        "tiles": [
+          "夫は",
+          "納豆が",
+          "食べられる",
+          "ように",
+          "なった。"
+        ],
+        "alternatives": [
+          "夫は納豆が食べられるようになりました。",
+          "夫は納豆を食べられるようになった。",
+          "夫は納豆を食べられるようになりました。"
+        ]
+      },
+      {
+        "en": "We've started cooking together.",
+        "jp": "{二人|ふたり}で{料理|りょうり}するようになりました。",
+        "tiles": [
+          "二人で",
+          "料理する",
+          "ように",
+          "なりました。"
+        ],
+        "alternatives": [
+          "二人で料理するようになった。",
+          "二人で料理をするようになりました。",
+          "一緒に料理するようになりました。"
+        ]
+      },
+      {
+        "en": "Lately I can't sleep at night any more.",
+        "jp": "{最近|さいきん}、{夜|よる}{眠|ねむ}れなくなった。",
+        "tiles": [
+          "最近、",
+          "夜",
+          "眠れなく",
+          "なった。"
+        ],
+        "alternatives": [
+          "最近、夜眠れなくなりました。",
+          "最近夜眠れなくなった。"
+        ]
+      },
+      {
+        "en": "I can speak a little Japanese now.",
+        "jp": "{日本語|にほんご}が{少|すこ}し{話|はな}せるようになりました。",
+        "tiles": [
+          "日本語が",
+          "少し",
+          "話せる",
+          "ように",
+          "なりました。"
+        ],
+        "alternatives": [
+          "日本語が少し話せるようになった。",
+          "日本語を少し話せるようになりました。",
+          "少し日本語が話せるようになりました。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "カタカナが{読|よ}める＿＿なりました。",
+        "options": [
+          "のに",
+          "ように",
+          "よう"
+        ],
+        "answer": 1,
+        "en": "I've become able to read katakana."
+      },
+      {
+        "prompt": "{夫|おっと}は{納豆|なっとう}が＿＿ようになった。",
+        "options": [
+          "たべられる",
+          "たべられて",
+          "たべられた"
+        ],
+        "answer": 0,
+        "en": "My husband can eat natto now."
+      },
+      {
+        "prompt": "{最近|さいきん}、{夜|よる}{眠|ねむ}れ＿＿なった。",
+        "options": [
+          "ない",
+          "なく",
+          "なくて"
+        ],
+        "answer": 1,
+        "en": "Lately I can't sleep at night any more."
+      },
+      {
+        "prompt": "{毎日|まいにち}{練習|れんしゅう}して、{漢字|かんじ}が{書|か}ける＿＿になった。",
+        "options": [
+          "の",
+          "そう",
+          "よう"
+        ],
+        "answer": 2,
+        "en": "I practised every day, and now I can write kanji."
+      },
+      {
+        "prompt": "{最近|さいきん}、{妻|つま}は{朝|あさ}{早|はや}く{起|お}きる＿＿。",
+        "options": [
+          "ようになった",
+          "ようになる",
+          "ようなった"
+        ],
+        "answer": 0,
+        "en": "Lately my wife has started getting up early."
+      }
+    ]
+  },
+  {
+    "id": "you-da",
+    "order": 104,
+    "level": "N4",
+    "title": "〜ようだ・〜みたい — \"seems\"",
+    "pattern": "〜ようだ・〜みたい",
+    "register": "both",
+    "prerequisites": [
+      "relative-clauses"
+    ],
+    "contrastWith": [
+      "kamoshirenai",
+      "sou-looks",
+      "sou-hearsay"
+    ],
+    "explanation": "Use ようだ, or casual みたい, when you draw a conclusion from what you notice: だれもいないようです, \"it seems nobody's here\". Put it after a plain-form sentence; nouns take のようだ or just みたい (あめのようだ, あめみたい), and な-adjectives take なようだ or just みたい (ひまみたい). みたい is what you'll hear and say most with your partner, while ようです is more careful and polite. Both also mean \"like\" in comparisons: ゆめみたい, \"like a dream\", and before a noun みたいな or のような. Compare そう (how something looks at a glance), そうだ (what you heard) and かもしれない (it's just possible).",
+    "examples": [
+      {
+        "jp": "{誰|だれ}もいないようです。",
+        "en": "It seems nobody's here."
+      },
+      {
+        "jp": "{夫|おっと}は{疲|つか}れているみたい。",
+        "en": "My husband seems tired."
+      },
+      {
+        "jp": "{外|そと}は{雨|あめ}みたいだね。",
+        "en": "It looks like it's raining outside."
+      },
+      {
+        "jp": "{電気|でんき}がついていないから、{隣|となり}の{人|ひと}は{留守|るす}のようです。",
+        "en": "The lights are off, so the neighbours seem to be out."
+      },
+      {
+        "jp": "この{店|みせ}は{人気|にんき}があるみたいだね。いつも{人|ひと}が{並|なら}んでいる。",
+        "en": "This shop seems popular. There's always a queue."
+      },
+      {
+        "jp": "{風邪|かぜ}をひいたみたい。",
+        "en": "I think I've caught a cold."
+      },
+      {
+        "jp": "{夢|ゆめ}みたい！",
+        "en": "It's like a dream!"
+      },
+      {
+        "jp": "{妻|つま}は{子|こ}どもみたいに{笑|わら}った。",
+        "en": "My wife laughed like a child."
+      },
+      {
+        "jp": "{今日|きょう}は{春|はる}のような{天気|てんき}ですね。",
+        "en": "It's spring-like weather today, isn't it?"
+      },
+      {
+        "jp": "{彼|かれ}は{今日|きょう}、{暇|ひま}みたいだよ。",
+        "en": "He seems to be free today."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "It seems nobody's here.",
+        "jp": "{誰|だれ}もいないようです。",
+        "tiles": [
+          "誰も",
+          "いない",
+          "ようです。"
+        ],
+        "alternatives": [
+          "誰もいないみたいです。",
+          "誰もいないみたい。",
+          "誰もいないようだ。"
+        ]
+      },
+      {
+        "en": "My husband seems tired.",
+        "jp": "{夫|おっと}は{疲|つか}れているみたいです。",
+        "tiles": [
+          "夫は",
+          "疲れている",
+          "みたい",
+          "です。"
+        ],
+        "alternatives": [
+          "夫は疲れているみたい。",
+          "夫は疲れているようです。",
+          "夫は疲れてるみたい。"
+        ]
+      },
+      {
+        "en": "I think I've caught a cold.",
+        "jp": "{風邪|かぜ}をひいたみたい。",
+        "tiles": [
+          "風邪を",
+          "ひいた",
+          "みたい。"
+        ],
+        "alternatives": [
+          "風邪をひいたみたいです。",
+          "風邪をひいたようです。",
+          "風邪ひいたみたい。"
+        ]
+      },
+      {
+        "en": "It's like a dream.",
+        "jp": "{夢|ゆめ}みたいです。",
+        "tiles": [
+          "夢",
+          "みたい",
+          "です。"
+        ],
+        "alternatives": [
+          "夢みたい。",
+          "夢のようです。",
+          "夢みたいだ。"
+        ]
+      },
+      {
+        "en": "This shop seems popular.",
+        "jp": "この{店|みせ}は{人気|にんき}があるみたいです。",
+        "tiles": [
+          "この店は",
+          "人気が",
+          "ある",
+          "みたいです。"
+        ],
+        "alternatives": [
+          "この店は人気があるようです。",
+          "この店は人気があるみたい。",
+          "この店、人気があるみたいだね。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{外|そと}は{雨|あめ}＿＿ようです。",
+        "options": [
+          "の",
+          "な",
+          "だ"
+        ],
+        "answer": 0,
+        "en": "It seems to be raining outside."
+      },
+      {
+        "prompt": "{彼|かれ}は{今日|きょう}、{暇|ひま}＿＿ようだ。",
+        "options": [
+          "の",
+          "な",
+          "だ"
+        ],
+        "answer": 1,
+        "en": "He seems to be free today."
+      },
+      {
+        "prompt": "{誰|だれ}もいない＿＿。",
+        "options": [
+          "みたいの",
+          "のみたい",
+          "みたい"
+        ],
+        "answer": 2,
+        "en": "It seems nobody's here."
+      },
+      {
+        "prompt": "{妻|つま}は{子|こ}ども＿＿{笑|わら}った。",
+        "options": [
+          "みたいな",
+          "みたいに",
+          "みたい"
+        ],
+        "answer": 1,
+        "en": "My wife laughed like a child."
+      },
+      {
+        "prompt": "{春|はる}＿＿{天気|てんき}ですね。",
+        "options": [
+          "のような",
+          "ような",
+          "のように"
+        ],
+        "answer": 0,
+        "en": "It's spring-like weather, isn't it?"
+      }
+    ]
+  },
+  {
+    "id": "nakutemo-ii",
+    "order": 105,
+    "level": "N4",
+    "title": "〜なくてもいい — \"don't have to\"",
+    "pattern": "〜なくてもいい",
+    "register": "both",
+    "prerequisites": [
+      "temo-ii",
+      "nai-form"
+    ],
+    "contrastWith": [
+      "temo-ii",
+      "nakereba-naranai"
+    ],
+    "explanation": "To say \"you don't have to …\", take the ない-form, change ない to なくて, and add もいい: いそがなくてもいい, \"you don't have to hurry\". With your partner the も is often dropped (いそがなくていいよ), and in polite speech you say いいです. It is the opposite of なければならない (\"have to\"), and the partner of てもいい: てもいい gives permission to do something, なくてもいい gives permission not to. Nouns and な-adjectives use じゃなくてもいい: すぐじゃなくてもいい, \"it doesn't have to be right away\".",
+    "examples": [
+      {
+        "jp": "{急|いそ}がなくてもいいよ。",
+        "en": "You don't have to hurry."
+      },
+      {
+        "jp": "{明日|あした}は{早|はや}く{起|お}きなくてもいいです。",
+        "en": "You don't have to get up early tomorrow."
+      },
+      {
+        "jp": "{靴|くつ}は{脱|ぬ}がなくてもいいですか。",
+        "en": "Is it all right if I keep my shoes on?"
+      },
+      {
+        "jp": "{今日|きょう}は{料理|りょうり}しなくていいよ。{外|そと}で{食|た}べよう。",
+        "en": "You don't need to cook today. Let's eat out."
+      },
+      {
+        "jp": "お{金|かね}は{払|はら}わなくてもいいです。{無料|むりょう}ですから。",
+        "en": "You don't have to pay. It's free."
+      },
+      {
+        "jp": "{全部|ぜんぶ}{食|た}べなくてもいいよ。",
+        "en": "You don't have to eat it all."
+      },
+      {
+        "jp": "{心配|しんぱい}しなくてもいいよ。{大丈夫|だいじょうぶ}だから。",
+        "en": "You don't need to worry. It's fine."
+      },
+      {
+        "jp": "{日曜日|にちようび}は{会社|かいしゃ}に{行|い}かなくてもいい。",
+        "en": "I don't have to go to work on Sundays."
+      },
+      {
+        "jp": "{返事|へんじ}はすぐじゃなくてもいいです。",
+        "en": "You don't have to reply right away."
+      },
+      {
+        "jp": "{高|たか}くなくてもいいから、{丈夫|じょうぶ}な{傘|かさ}がほしい。",
+        "en": "It doesn't have to be expensive; I just want a sturdy umbrella."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "You don't have to hurry.",
+        "jp": "{急|いそ}がなくてもいいです。",
+        "tiles": [
+          "急が",
+          "なくても",
+          "いいです。"
+        ],
+        "alternatives": [
+          "急がなくてもいい。",
+          "急がなくていいよ。",
+          "急がなくてもいいよ。",
+          "急がなくていいです。"
+        ]
+      },
+      {
+        "en": "You don't have to get up early tomorrow.",
+        "jp": "{明日|あした}は{早|はや}く{起|お}きなくてもいいよ。",
+        "tiles": [
+          "明日は",
+          "早く",
+          "起きなくても",
+          "いいよ。"
+        ],
+        "alternatives": [
+          "明日は早く起きなくてもいいです。",
+          "明日は早く起きなくていいよ。",
+          "明日、早く起きなくてもいい。"
+        ]
+      },
+      {
+        "en": "You don't need to cook today.",
+        "jp": "{今日|きょう}は{料理|りょうり}しなくていいよ。",
+        "tiles": [
+          "今日は",
+          "料理",
+          "しなくて",
+          "いいよ。"
+        ],
+        "alternatives": [
+          "今日は料理しなくてもいいよ。",
+          "今日は料理しなくてもいいです。",
+          "今日は料理をしなくていいよ。"
+        ]
+      },
+      {
+        "en": "You don't have to worry.",
+        "jp": "{心配|しんぱい}しなくてもいいです。",
+        "tiles": [
+          "心配",
+          "しなくても",
+          "いいです。"
+        ],
+        "alternatives": [
+          "心配しなくていいよ。",
+          "心配しなくてもいい。",
+          "心配しなくてもいいよ。"
+        ]
+      },
+      {
+        "en": "Is it all right if I don't take my shoes off?",
+        "jp": "{靴|くつ}は{脱|ぬ}がなくてもいいですか。",
+        "tiles": [
+          "靴は",
+          "脱が",
+          "なくても",
+          "いいですか。"
+        ],
+        "alternatives": [
+          "靴は脱がなくてもいい？",
+          "靴、脱がなくていいですか。",
+          "靴を脱がなくてもいいですか。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{急|いそ}が＿＿もいいよ。",
+        "options": [
+          "なくて",
+          "なくで",
+          "ないて"
+        ],
+        "answer": 0,
+        "en": "You don't have to hurry."
+      },
+      {
+        "prompt": "{明日|あした}は{早|はや}く＿＿なくてもいいです。",
+        "options": [
+          "おきる",
+          "おき",
+          "おきて"
+        ],
+        "answer": 1,
+        "en": "You don't have to get up early tomorrow."
+      },
+      {
+        "prompt": "{全部|ぜんぶ}{食|た}べ＿＿いいよ。",
+        "options": [
+          "ても",
+          "なくても",
+          "ないと"
+        ],
+        "answer": 1,
+        "en": "You don't have to eat it all."
+      },
+      {
+        "prompt": "{心配|しんぱい}＿＿なくてもいいよ。",
+        "options": [
+          "する",
+          "して",
+          "し"
+        ],
+        "answer": 2,
+        "en": "You don't need to worry."
+      },
+      {
+        "prompt": "{返事|へんじ}はすぐ＿＿もいいです。",
+        "options": [
+          "じゃなくて",
+          "くなくて",
+          "なくて"
+        ],
+        "answer": 0,
+        "en": "You don't have to reply right away."
+      }
+    ]
+  },
+  {
+    "id": "nara",
+    "order": 106,
+    "level": "N4",
+    "title": "〜なら — \"if it's …\"",
+    "pattern": "〜なら",
+    "register": "both",
+    "prerequisites": [
+      "tara-conditional"
+    ],
+    "contrastWith": [
+      "tara-conditional",
+      "ba-conditional",
+      "to-conditional"
+    ],
+    "explanation": "なら means \"if (as you say)\" or \"if it's about …\", and it usually builds on something the other person has just said: きょうとにいくなら、あきがいいよ, \"if you're going to Kyoto, autumn is best\". Put it straight after a noun (すしなら、あのみせ) or a な-adjective (ひまなら), or after a plain-form verb or い-adjective (さむいなら). It is the natural way to give advice and recommendations, in casual or polite speech. Unlike たら, the なら part doesn't have to happen first: you pick autumn before you go to Kyoto. ば and と are the other \"if\" words, for general conditions and automatic results.",
+    "examples": [
+      {
+        "jp": "{京都|きょうと}に{行|い}くなら、{秋|あき}がいいですよ。",
+        "en": "If you're going to Kyoto, autumn is the best time."
+      },
+      {
+        "jp": "{寿司|すし}なら、あの{店|みせ}がおいしいよ。",
+        "en": "If it's sushi you want, that place is good."
+      },
+      {
+        "jp": "{疲|つか}れているなら、{先|さき}に{寝|ね}てもいいよ。",
+        "en": "If you're tired, you can go to bed before me."
+      },
+      {
+        "jp": "コンビニに{行|い}くなら、{牛乳|ぎゅうにゅう}も{買|か}ってくれる？",
+        "en": "If you're going to the convenience store, could you get some milk too?"
+      },
+      {
+        "jp": "{暇|ひま}なら、ちょっと{手伝|てつだ}って。",
+        "en": "If you're free, give me a hand."
+      },
+      {
+        "jp": "{日本語|にほんご}の{勉強|べんきょう}なら、{毎日|まいにち}{少|すこ}しずつがいいです。",
+        "en": "When it comes to studying Japanese, a little every day is best."
+      },
+      {
+        "jp": "{鍵|かぎ}なら、テーブルの{上|うえ}にあるよ。",
+        "en": "If you're looking for the keys, they're on the table."
+      },
+      {
+        "jp": "{寒|さむ}いなら、エアコンをつけようか。",
+        "en": "If you're cold, shall I put the air con on?"
+      },
+      {
+        "jp": "{雨|あめ}なら、{家|うち}で{映画|えいが}を{見|み}よう。",
+        "en": "If it's going to rain, let's watch a film at home."
+      },
+      {
+        "jp": "お{金|かね}がないなら、{私|わたし}が{払|はら}うよ。",
+        "en": "If you haven't got any money, I'll pay."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "If you're going to Kyoto, autumn is best.",
+        "jp": "{京都|きょうと}に{行|い}くなら、{秋|あき}がいいです。",
+        "tiles": [
+          "京都に",
+          "行くなら、",
+          "秋が",
+          "いいです。"
+        ],
+        "alternatives": [
+          "京都に行くなら、秋がいい。",
+          "京都に行くなら、秋がいいですよ。",
+          "京都に行くなら秋がいいよ。"
+        ]
+      },
+      {
+        "en": "If it's sushi you want, that shop is good.",
+        "jp": "{寿司|すし}なら、あの{店|みせ}がいいよ。",
+        "tiles": [
+          "寿司なら、",
+          "あの",
+          "店が",
+          "いいよ。"
+        ],
+        "alternatives": [
+          "寿司なら、あの店がいいです。",
+          "寿司なら、あの店がいいですよ。",
+          "寿司ならあの店がいいよ。"
+        ]
+      },
+      {
+        "en": "If you're looking for the keys, they're on the table.",
+        "jp": "{鍵|かぎ}なら、テーブルの{上|うえ}にあるよ。",
+        "tiles": [
+          "鍵なら、",
+          "テーブルの",
+          "上に",
+          "あるよ。"
+        ],
+        "alternatives": [
+          "鍵なら、テーブルの上にありますよ。",
+          "鍵ならテーブルの上にあるよ。",
+          "鍵なら、テーブルの上にあります。"
+        ]
+      },
+      {
+        "en": "If you're free, give me a hand.",
+        "jp": "{暇|ひま}なら、{手伝|てつだ}って。",
+        "tiles": [
+          "暇",
+          "なら、",
+          "手伝って。"
+        ],
+        "alternatives": [
+          "暇なら、手伝ってください。",
+          "暇なら手伝って。",
+          "暇なら、手伝ってくれる？"
+        ]
+      },
+      {
+        "en": "If you're tired, you can go to bed first.",
+        "jp": "{疲|つか}れているなら、{先|さき}に{寝|ね}てもいいよ。",
+        "tiles": [
+          "疲れているなら、",
+          "先に",
+          "寝ても",
+          "いいよ。"
+        ],
+        "alternatives": [
+          "疲れているなら、先に寝てもいいです。",
+          "疲れてるなら、先に寝てもいいよ。",
+          "疲れたなら、先に寝てもいいよ。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{寿司|すし}＿＿、あの{店|みせ}がおいしいよ。",
+        "options": [
+          "なら",
+          "だなら",
+          "たら"
+        ],
+        "answer": 0,
+        "en": "If it's sushi you want, that place is good."
+      },
+      {
+        "prompt": "{京都|きょうと}に＿＿なら、{秋|あき}がいいですよ。",
+        "options": [
+          "いった",
+          "いき",
+          "いく"
+        ],
+        "answer": 2,
+        "en": "If you're going to Kyoto, autumn is best."
+      },
+      {
+        "prompt": "{暇|ひま}＿＿、{手伝|てつだ}って。",
+        "options": [
+          "だなら",
+          "なら",
+          "ななら"
+        ],
+        "answer": 1,
+        "en": "If you're free, give me a hand."
+      },
+      {
+        "prompt": "{鍵|かぎ}＿＿、テーブルの{上|うえ}にあるよ。",
+        "options": [
+          "なら",
+          "でも",
+          "から"
+        ],
+        "answer": 0,
+        "en": "If you're looking for the keys, they're on the table."
+      },
+      {
+        "prompt": "{寒|さむ}い＿＿、エアコンをつけようか。",
+        "options": [
+          "だなら",
+          "くなら",
+          "なら"
+        ],
+        "answer": 2,
+        "en": "If you're cold, shall I put the air con on?"
+      },
+      {
+        "prompt": "{家|いえ}に{着|つ}い＿＿、{電話|でんわ}してね。",
+        "options": [
+          "なら",
+          "たら",
+          "と"
+        ],
+        "answer": 1,
+        "en": "Call me once you get home. (it happens first, so たら)"
+      }
+    ]
+  },
+  {
+    "id": "passive",
+    "order": 107,
+    "level": "N4",
+    "title": "Passive — \"was done (to me)\"",
+    "pattern": "〜れる・〜られる",
+    "register": "both",
+    "recognitionOnly": true,
+    "prerequisites": [
+      "potential-form"
+    ],
+    "contrastWith": [
+      "potential-form",
+      "keigo-verbs",
+      "causative"
+    ],
+    "explanation": "The passive form says what was done to someone: う-verbs change the last u-sound to a and add れる (ふむ → ふまれる, いう → いわれる), る-verbs add られる (たべる → たべられる), する becomes される and くる becomes こられる. The person who did it is marked with に: つまにおこられた, \"I got told off by my wife\". Japanese also uses the passive for things that happen to you and annoy you, even the weather: あめにふられた, \"I got caught in the rain\". る-verb passives look exactly like the potential form, and the same shape is also used as a polite honorific, so let the context guide you; the causative (させる, \"make someone do\") is a different form. You only need to recognise passives for now, in casual and polite speech alike.",
+    "examples": [
+      {
+        "jp": "{電車|でんしゃ}で{足|あし}を{踏|ふ}まれました。",
+        "en": "Someone stepped on my foot on the train."
+      },
+      {
+        "jp": "{昨日|きのう}、{雨|あめ}に{降|ふ}られた。",
+        "en": "I got caught in the rain yesterday."
+      },
+      {
+        "jp": "{妻|つま}に{怒|おこ}られた。",
+        "en": "I got told off by my wife."
+      },
+      {
+        "jp": "{先生|せんせい}に{褒|ほ}められました。",
+        "en": "I was praised by my teacher."
+      },
+      {
+        "jp": "{自転車|じてんしゃ}を{盗|ぬす}まれました。",
+        "en": "My bicycle was stolen."
+      },
+      {
+        "jp": "{友達|ともだち}の{結婚式|けっこんしき}に{招待|しょうたい}されました。",
+        "en": "I was invited to a friend's wedding."
+      },
+      {
+        "jp": "{夜中|よなか}に{赤|あか}ちゃんに{泣|な}かれて、{眠|ねむ}れなかった。",
+        "en": "The baby cried in the night, and I couldn't sleep."
+      },
+      {
+        "jp": "この{歌|うた}は{世界中|せかいじゅう}で{歌|うた}われています。",
+        "en": "This song is sung all over the world."
+      },
+      {
+        "jp": "{母|はは}に「もっと{野菜|やさい}を{食|た}べて」と{言|い}われた。",
+        "en": "My mum told me to eat more vegetables."
+      },
+      {
+        "jp": "{隣|となり}の{人|ひと}にパーティーに{呼|よ}ばれました。",
+        "en": "We were invited to a party by the neighbours."
+      }
+    ],
+    "buildItems": [],
+    "drills": [
+      {
+        "prompt": "{電車|でんしゃ}で{足|あし}を{踏|ふ}＿＿ました。",
+        "options": [
+          "まれ",
+          "めれ",
+          "ませ"
+        ],
+        "answer": 0,
+        "en": "Someone stepped on my foot on the train."
+      },
+      {
+        "prompt": "{妻|つま}＿＿{怒|おこ}られた。",
+        "options": [
+          "が",
+          "に",
+          "を"
+        ],
+        "answer": 1,
+        "en": "I got told off by my wife."
+      },
+      {
+        "prompt": "{昨日|きのう}、{雨|あめ}に＿＿。",
+        "options": [
+          "ふった",
+          "ふれた",
+          "ふられた"
+        ],
+        "answer": 2,
+        "en": "I got caught in the rain yesterday."
+      },
+      {
+        "prompt": "{隣|となり}の{人|ひと}にパーティーに＿＿ました。",
+        "options": [
+          "よばれ",
+          "よまれ",
+          "よばられ"
+        ],
+        "answer": 0,
+        "en": "We were invited to a party by the neighbours."
+      },
+      {
+        "prompt": "{先生|せんせい}に＿＿ました。",
+        "options": [
+          "ほめさせ",
+          "ほめられ",
+          "ほめれ"
+        ],
+        "answer": 1,
+        "en": "I was praised by my teacher."
+      }
+    ]
+  },
+  {
+    "id": "koto-ni-suru",
+    "order": 108,
+    "level": "N4",
+    "title": "〜ことにする — \"decide to\"",
+    "pattern": "〜ことにする",
+    "register": "both",
+    "prerequisites": [
+      "ka-or-ni-suru",
+      "koto-ga-dekiru"
+    ],
+    "contrastWith": [
+      "you-ni-naru"
+    ],
+    "explanation": "Add ことにする to the dictionary form or the ない-form to say you decide to do (or not to do) something: らいげつひっこすことにした, \"we've decided to move next month\". You'll mostly hear it in the past, ことにしました or casual ことにした, to report a decision. ことにしている means it's your personal rule or habit: まいあさはしることにしている, \"I make a point of running every morning\". When a decision is made by others or by circumstances, Japanese says ことになる (ことになった, \"it's been decided\"); just recognise it for now. Don't confuse it with ようになる, which is a gradual change rather than a decision; にする alone picks a thing (コーヒーにする).",
+    "examples": [
+      {
+        "jp": "{来月|らいげつ}、{引|ひ}っ{越|こ}すことにしました。",
+        "en": "We've decided to move next month."
+      },
+      {
+        "jp": "{今日|きょう}から{家|うち}では{日本語|にほんご}で{話|はな}すことにしよう。",
+        "en": "Let's make it a rule to speak Japanese at home from today."
+      },
+      {
+        "jp": "{夏休|なつやす}みは{海|うみ}に{行|い}くことにした。",
+        "en": "We've decided to go to the seaside for the summer holidays."
+      },
+      {
+        "jp": "お{酒|さけ}を{飲|の}まないことにしました。",
+        "en": "I've decided not to drink."
+      },
+      {
+        "jp": "{毎朝|まいあさ}{走|はし}ることにしています。",
+        "en": "I make a point of running every morning."
+      },
+      {
+        "jp": "{寝|ね}る{前|まえ}にスマホを{見|み}ないことにしている。",
+        "en": "I make a rule of not looking at my phone before bed."
+      },
+      {
+        "jp": "{雨|あめ}だから、{今日|きょう}は{出|で}かけないことにしよう。",
+        "en": "It's raining, so let's not go out today."
+      },
+      {
+        "jp": "{仕事|しごと}で{大阪|おおさか}に{引|ひ}っ{越|こ}すことになりました。",
+        "en": "We're moving to Osaka because of work. (it's been decided for us)"
+      },
+      {
+        "jp": "{車|くるま}を{買|か}うことにしました。",
+        "en": "We've decided to buy a car."
+      },
+      {
+        "jp": "{週末|しゅうまつ}は{二人|ふたり}で{料理|りょうり}することにしている。",
+        "en": "We make a habit of cooking together at weekends."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "We've decided to move next month.",
+        "jp": "{来月|らいげつ}{引|ひ}っ{越|こ}すことにしました。",
+        "tiles": [
+          "来月",
+          "引っ越す",
+          "ことに",
+          "しました。"
+        ],
+        "alternatives": [
+          "来月、引っ越すことにしました。",
+          "来月引っ越すことにした。",
+          "来月、引っ越すことにした。"
+        ]
+      },
+      {
+        "en": "I've decided not to drink.",
+        "jp": "お{酒|さけ}を{飲|の}まないことにしました。",
+        "tiles": [
+          "お酒を",
+          "飲まない",
+          "ことに",
+          "しました。"
+        ],
+        "alternatives": [
+          "お酒を飲まないことにした。",
+          "お酒は飲まないことにしました。",
+          "お酒は飲まないことにした。"
+        ]
+      },
+      {
+        "en": "I make a point of running every morning.",
+        "jp": "{毎朝|まいあさ}{走|はし}ることにしています。",
+        "tiles": [
+          "毎朝",
+          "走る",
+          "ことに",
+          "しています。"
+        ],
+        "alternatives": [
+          "毎朝走ることにしている。",
+          "毎朝、走ることにしています。",
+          "毎朝走ることにしてる。"
+        ]
+      },
+      {
+        "en": "Let's not go out today.",
+        "jp": "{今日|きょう}は{出|で}かけないことにしよう。",
+        "tiles": [
+          "今日は",
+          "出かけない",
+          "ことに",
+          "しよう。"
+        ],
+        "alternatives": [
+          "今日は出かけないことにしましょう。",
+          "今日は出かけないことにしよう！"
+        ]
+      },
+      {
+        "en": "We've decided to buy a car.",
+        "jp": "{車|くるま}を{買|か}うことにしました。",
+        "tiles": [
+          "車を",
+          "買う",
+          "ことに",
+          "しました。"
+        ],
+        "alternatives": [
+          "車を買うことにした。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{来月|らいげつ}、{引|ひ}っ{越|こ}す＿＿にしました。",
+        "options": [
+          "こと",
+          "もの",
+          "の"
+        ],
+        "answer": 0,
+        "en": "We've decided to move next month."
+      },
+      {
+        "prompt": "お{酒|さけ}を＿＿ことにしました。",
+        "options": [
+          "のまなく",
+          "のまない",
+          "のみない"
+        ],
+        "answer": 1,
+        "en": "I've decided not to drink."
+      },
+      {
+        "prompt": "{毎朝|まいあさ}{走|はし}ることに＿＿。",
+        "options": [
+          "あります",
+          "いきます",
+          "しています"
+        ],
+        "answer": 2,
+        "en": "I make a point of running every morning."
+      },
+      {
+        "prompt": "{仕事|しごと}で{大阪|おおさか}に{引|ひ}っ{越|こ}すこと＿＿なりました。",
+        "options": [
+          "を",
+          "に",
+          "が"
+        ],
+        "answer": 1,
+        "en": "We're moving to Osaka because of work. (it's been decided for us)"
+      },
+      {
+        "prompt": "{雨|あめ}だから、{今日|きょう}は{出|で}かけない＿＿にしよう。",
+        "options": [
+          "の",
+          "とき",
+          "こと"
+        ],
+        "answer": 2,
+        "en": "It's raining, so let's not go out today."
+      },
+      {
+        "prompt": "{私|わたし}はコーヒー＿＿します。",
+        "options": [
+          "を",
+          "が",
+          "に"
+        ],
+        "answer": 2,
+        "en": "I'll have a coffee."
+      }
+    ]
+  },
+  {
+    "id": "temo-even-if",
+    "order": 109,
+    "level": "N4",
+    "title": "〜ても — \"even if\"",
+    "pattern": "〜ても",
+    "register": "both",
+    "prerequisites": [
+      "te-form",
+      "temo-ii"
+    ],
+    "contrastWith": [
+      "temo-ii",
+      "tara-conditional",
+      "noni"
+    ],
+    "explanation": "Add も to the て-form to say \"even if\" or \"even though\": あめがふっても、いきます, \"I'll go even if it rains\"; い-adjectives become くても (さむくても), and nouns and な-adjectives use でも (あめでも, ひまでも). With a question word it means \"no matter …\": いくらたべても、ふとらない, \"no matter how much I eat, I don't put on weight\". Don't confuse it with てもいい (\"it's okay to …\"), which gives permission. たら says what will happen if something happens, while ても says the result stays the same anyway; のに, coming later, is for frustrating real-life contrasts. It works in casual and polite speech alike.",
+    "examples": [
+      {
+        "jp": "{雨|あめ}が{降|ふ}っても、{行|い}きます。",
+        "en": "I'll go even if it rains."
+      },
+      {
+        "jp": "いくら{食|た}べても、{太|ふと}らない。",
+        "en": "No matter how much I eat, I don't put on weight."
+      },
+      {
+        "jp": "{高|たか}くても、このソファーが{欲|ほ}しい。",
+        "en": "Even if it's expensive, I want this sofa."
+      },
+      {
+        "jp": "{忙|いそが}しくても、{毎日|まいにち}{日本語|にほんご}を{勉強|べんきょう}しています。",
+        "en": "Even when I'm busy, I study Japanese every day."
+      },
+      {
+        "jp": "{何度|なんど}{聞|き}いても、わからない。",
+        "en": "No matter how many times I hear it, I don't get it."
+      },
+      {
+        "jp": "{日曜日|にちようび}でも、{夫|おっと}は{仕事|しごと}をしています。",
+        "en": "My husband works even on Sundays."
+      },
+      {
+        "jp": "{寒|さむ}くても、{窓|まど}を{開|あ}けて{寝|ね}る。",
+        "en": "Even when it's cold, I sleep with the window open."
+      },
+      {
+        "jp": "{電話|でんわ}しても、{出|で}なかった。",
+        "en": "I called, but nobody answered."
+      },
+      {
+        "jp": "{下手|へた}でも、{楽|たの}しいです。",
+        "en": "Even though I'm not good at it, it's fun."
+      },
+      {
+        "jp": "どんなに{疲|つか}れていても、{寝|ね}る{前|まえ}に{歯|は}を{磨|みが}く。",
+        "en": "No matter how tired I am, I brush my teeth before bed."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I'll go even if it rains.",
+        "jp": "{雨|あめ}が{降|ふ}っても{行|い}きます。",
+        "tiles": [
+          "雨が",
+          "降っても",
+          "行きます。"
+        ],
+        "alternatives": [
+          "雨が降っても、行きます。",
+          "雨が降っても行く。",
+          "雨でも行きます。",
+          "雨が降っても、行くよ。"
+        ]
+      },
+      {
+        "en": "No matter how much I eat, I don't put on weight.",
+        "jp": "いくら{食|た}べても{太|ふと}らない。",
+        "tiles": [
+          "いくら",
+          "食べても",
+          "太らない。"
+        ],
+        "alternatives": [
+          "いくら食べても、太らない。",
+          "いくら食べても太りません。",
+          "いくら食べても、太りません。"
+        ]
+      },
+      {
+        "en": "Even if it's expensive, I want this sofa.",
+        "jp": "{高|たか}くても、このソファーが{欲|ほ}しい。",
+        "tiles": [
+          "高くても、",
+          "この",
+          "ソファーが",
+          "欲しい。"
+        ],
+        "alternatives": [
+          "高くても、このソファーが欲しいです。",
+          "高くてもこのソファーが欲しい。"
+        ]
+      },
+      {
+        "en": "My husband works even on Sundays.",
+        "jp": "{日曜日|にちようび}でも{夫|おっと}は{働|はたら}いています。",
+        "tiles": [
+          "日曜日",
+          "でも",
+          "夫は",
+          "働いています。"
+        ],
+        "alternatives": [
+          "日曜日でも、夫は働いています。",
+          "夫は日曜日でも働いています。",
+          "日曜日でも夫は仕事をしています。"
+        ]
+      },
+      {
+        "en": "I called, but nobody answered.",
+        "jp": "{電話|でんわ}しても{出|で}なかった。",
+        "tiles": [
+          "電話",
+          "しても",
+          "出なかった。"
+        ],
+        "alternatives": [
+          "電話しても、出なかった。",
+          "電話しても出ませんでした。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{雨|あめ}が{降|ふ}っ＿＿、{行|い}きます。",
+        "options": [
+          "たら",
+          "ても",
+          "て"
+        ],
+        "answer": 1,
+        "en": "I'll go even if it rains."
+      },
+      {
+        "prompt": "{高|たか}＿＿、このソファーが{欲|ほ}しい。",
+        "options": [
+          "いでも",
+          "でも",
+          "くても"
+        ],
+        "answer": 2,
+        "en": "Even if it's expensive, I want this sofa."
+      },
+      {
+        "prompt": "{日曜日|にちようび}＿＿、{夫|おっと}は{仕事|しごと}をしています。",
+        "options": [
+          "でも",
+          "ても",
+          "だっても"
+        ],
+        "answer": 0,
+        "en": "My husband works even on Sundays."
+      },
+      {
+        "prompt": "いくら{食|た}べ＿＿、{太|ふと}らない。",
+        "options": [
+          "ても",
+          "たら",
+          "て"
+        ],
+        "answer": 0,
+        "en": "No matter how much I eat, I don't put on weight."
+      },
+      {
+        "prompt": "{窓|まど}を{開|あ}け＿＿いいですか。",
+        "options": [
+          "でも",
+          "ても",
+          "とも"
+        ],
+        "answer": 1,
+        "en": "May I open the window? (permission, てもいい)"
+      }
+    ]
+  },
+  {
+    "id": "tokoro",
+    "order": 110,
+    "level": "N4",
+    "title": "〜ところ — \"about to\", \"in the middle of\", \"just did\"",
+    "pattern": "〜ところ",
+    "register": "both",
+    "prerequisites": [
+      "te-imasu",
+      "casual-past"
+    ],
+    "contrastWith": [
+      "te-imasu"
+    ],
+    "explanation": "ところ means \"point\" or \"moment\", and the verb form in front tells you which moment: dictionary form + ところ is \"just about to\" (いまでるところ, \"I'm just about to leave\"), ている + ところ is \"right in the middle of\" (たべているところ), and た + ところ is \"have just done\" (いまついたところ, \"I've just arrived\"). It's perfect for quick messages to your partner. Add です for polite speech or だ in casual speech, or drop it altogether in a text. ている on its own just says something is going on; ているところ stresses \"right at this very moment\".",
+    "examples": [
+      {
+        "jp": "{今|いま}、{家|いえ}を{出|で}るところ。",
+        "en": "I'm just about to leave the house."
+      },
+      {
+        "jp": "{今|いま}、{駅|えき}に{着|つ}いたところです。",
+        "en": "I've just arrived at the station."
+      },
+      {
+        "jp": "{今|いま}、{晩|ばん}ご{飯|はん}を{作|つく}っているところだよ。",
+        "en": "I'm in the middle of making dinner right now."
+      },
+      {
+        "jp": "ちょうど{今|いま}、{寝|ね}るところでした。",
+        "en": "I was just about to go to bed."
+      },
+      {
+        "jp": "{会議|かいぎ}が{終|お}わったところです。",
+        "en": "The meeting has just finished."
+      },
+      {
+        "jp": "{今|いま}、{電車|でんしゃ}に{乗|の}ったところ。もうすぐ{着|つ}くよ。",
+        "en": "I've just got on the train. I'll be there soon."
+      },
+      {
+        "jp": "{今|いま}{起|お}きたところ。",
+        "en": "I've just woken up."
+      },
+      {
+        "jp": "{今|いま}、{運転|うんてん}しているところだから、あとで{電話|でんわ}するね。",
+        "en": "I'm driving right now, so I'll call you back later."
+      },
+      {
+        "jp": "これから{買|か}い{物|もの}に{行|い}くところ。{何|なに}かいる？",
+        "en": "I'm just about to go shopping. Do you need anything?"
+      },
+      {
+        "jp": "{今|いま}、{日本語|にほんご}を{勉強|べんきょう}しているところです。",
+        "en": "I'm right in the middle of studying Japanese."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I'm just about to leave the house.",
+        "jp": "{今|いま}{家|いえ}を{出|で}るところです。",
+        "tiles": [
+          "今",
+          "家を",
+          "出る",
+          "ところです。"
+        ],
+        "alternatives": [
+          "今、家を出るところです。",
+          "今家を出るところ。",
+          "今、家を出るところだよ。",
+          "今、家を出るところだ。"
+        ]
+      },
+      {
+        "en": "I've just arrived at the station.",
+        "jp": "{今|いま}{駅|えき}に{着|つ}いたところです。",
+        "tiles": [
+          "今",
+          "駅に",
+          "着いた",
+          "ところです。"
+        ],
+        "alternatives": [
+          "今、駅に着いたところです。",
+          "今駅に着いたところ。",
+          "今、駅に着いたところだよ。"
+        ]
+      },
+      {
+        "en": "I'm in the middle of making dinner.",
+        "jp": "{晩|ばん}ご{飯|はん}を{作|つく}っているところです。",
+        "tiles": [
+          "晩ご飯を",
+          "作っている",
+          "ところです。"
+        ],
+        "alternatives": [
+          "晩ご飯を作っているところ。",
+          "今、晩ご飯を作っているところです。",
+          "晩ご飯を作ってるところだよ。"
+        ]
+      },
+      {
+        "en": "I've just woken up.",
+        "jp": "{今|いま}{起|お}きたところ。",
+        "tiles": [
+          "今",
+          "起きた",
+          "ところ。"
+        ],
+        "alternatives": [
+          "今起きたところです。",
+          "今、起きたところ。",
+          "今起きたところだよ。"
+        ]
+      },
+      {
+        "en": "I'm just about to go shopping.",
+        "jp": "これから{買|か}い{物|もの}に{行|い}くところです。",
+        "tiles": [
+          "これから",
+          "買い物に",
+          "行く",
+          "ところです。"
+        ],
+        "alternatives": [
+          "これから買い物に行くところ。",
+          "今から買い物に行くところです。",
+          "これから買い物に行くところだよ。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{今|いま}、{駅|えき}に＿＿ところです。",
+        "options": [
+          "つく",
+          "ついた",
+          "ついて"
+        ],
+        "answer": 1,
+        "en": "I've just arrived at the station."
+      },
+      {
+        "prompt": "{今|いま}、{家|いえ}を＿＿ところ。",
+        "options": [
+          "でる",
+          "でた",
+          "でて"
+        ],
+        "answer": 0,
+        "en": "I'm just about to leave the house."
+      },
+      {
+        "prompt": "{晩|ばん}ご{飯|はん}を{作|つく}って＿＿ところだよ。",
+        "options": [
+          "いた",
+          "おく",
+          "いる"
+        ],
+        "answer": 2,
+        "en": "I'm in the middle of making dinner right now."
+      },
+      {
+        "prompt": "ちょうど{今|いま}、{寝|ね}る＿＿でした。",
+        "options": [
+          "こと",
+          "ところ",
+          "もの"
+        ],
+        "answer": 1,
+        "en": "I was just about to go to bed."
+      },
+      {
+        "prompt": "{今|いま}{起|お}き＿＿ところ。",
+        "options": [
+          "た",
+          "る",
+          "て"
+        ],
+        "answer": 0,
+        "en": "I've just woken up."
+      }
+    ]
+  },
+  {
+    "id": "keigo-verbs",
+    "order": 111,
+    "level": "N4",
+    "title": "Honorific and humble verbs",
+    "pattern": "いらっしゃる・{召|め}し{上|あ}がる・いただく・{申|もう}す",
+    "register": "polite",
+    "recognitionOnly": true,
+    "prerequisites": [
+      "keigo-set-phrases"
+    ],
+    "contrastWith": [
+      "keigo-set-phrases",
+      "passive"
+    ],
+    "explanation": "Staff in shops, hotels and on the phone use special respectful verbs, and you'll hear them every time you travel in Japan. Honorific verbs lift up the other person: いらっしゃる (be, come, go), めしあがる (eat, drink), おっしゃる (say), なさる (do), ごらんになる (look) and くださる (give me). Humble verbs lower yourself: いただく (receive, eat), まいる (come, go), もうす (say, be called), おる (be) and いたす (do). Ordinary verbs can also become honorific with お〜になる (おまちになる) or humble with お〜する (おもちします, \"let me carry that\"), and passive-looking forms like こられる are sometimes used as light honorifics too. You only need to recognise these, alongside set phrases like いらっしゃいませ; when you speak, ordinary ます-forms are perfectly polite.",
+    "examples": [
+      {
+        "jp": "{何名様|なんめいさま}でいらっしゃいますか。",
+        "en": "How many people are in your party?"
+      },
+      {
+        "jp": "{田中|たなか}{様|さま}はいらっしゃいますか。",
+        "en": "Is Mr Tanaka there, please? (on the phone)"
+      },
+      {
+        "jp": "どうぞ{召|め}し{上|あ}がってください。",
+        "en": "Please, help yourself."
+      },
+      {
+        "jp": "{先生|せんせい}がそうおっしゃいました。",
+        "en": "The teacher said so."
+      },
+      {
+        "jp": "お{飲|の}み{物|もの}は{何|なに}になさいますか。",
+        "en": "What would you like to drink?"
+      },
+      {
+        "jp": "スミスと{申|もう}します。",
+        "en": "My name is Smith."
+      },
+      {
+        "jp": "お{部屋|へや}までご{案内|あんない}いたします。",
+        "en": "I'll show you to your room."
+      },
+      {
+        "jp": "すぐに{参|まい}ります。",
+        "en": "I'll be right with you."
+      },
+      {
+        "jp": "{明日|あした}は{家|いえ}におります。",
+        "en": "I'll be at home tomorrow."
+      },
+      {
+        "jp": "お{荷物|にもつ}をお{持|も}ちします。",
+        "en": "Let me carry your bags."
+      },
+      {
+        "jp": "こちらをご{覧|らん}ください。",
+        "en": "Please take a look at this."
+      },
+      {
+        "jp": "お{客|きゃく}さんからお{菓子|かし}をいただきました。",
+        "en": "I received some sweets from a guest."
+      }
+    ],
+    "buildItems": [],
+    "drills": [
+      {
+        "prompt": "どうぞ{召|め}し＿＿ください。",
+        "options": [
+          "あがって",
+          "あげて",
+          "あって"
+        ],
+        "answer": 0,
+        "en": "Please, help yourself."
+      },
+      {
+        "prompt": "{私|わたし}はスミスと＿＿。",
+        "options": [
+          "おっしゃいます",
+          "もうします",
+          "いらっしゃいます"
+        ],
+        "answer": 1,
+        "en": "My name is Smith."
+      },
+      {
+        "prompt": "{先生|せんせい}がそう＿＿。",
+        "options": [
+          "もうしました",
+          "いたしました",
+          "おっしゃいました"
+        ],
+        "answer": 2,
+        "en": "The teacher said so."
+      },
+      {
+        "prompt": "{田中|たなか}{様|さま}は＿＿か。",
+        "options": [
+          "いらっしゃいます",
+          "おります",
+          "まいります"
+        ],
+        "answer": 0,
+        "en": "Is Mr Tanaka there, please?"
+      },
+      {
+        "prompt": "お{荷物|にもつ}をお{持|も}ち＿＿。",
+        "options": [
+          "になります",
+          "します",
+          "なさい"
+        ],
+        "answer": 1,
+        "en": "Let me carry your bags."
+      }
+    ]
+  },
+  {
+    "id": "embedded-questions",
+    "order": 112,
+    "level": "N4",
+    "title": "〜か — questions inside sentences",
+    "pattern": "〜か（どうか）わからない",
+    "register": "both",
+    "prerequisites": [
+      "casual-past",
+      "ka-question"
+    ],
+    "contrastWith": [],
+    "explanation": "To tuck a question inside a bigger sentence, end the question part with か: なんじにはじまるかわからない, \"I don't know what time it starts\". If the question has no question word (a yes/no question), use かどうか, \"whether or not\": くるかどうかきいてみる, \"I'll ask whether she's coming\". Use the plain form before か, but drop だ after nouns and な-adjectives: ほんとうかどうか, \"whether it's true\". The bigger verb is usually わからない, しらない, おぼえていない, きいてみる or おしえて. It works in casual and polite speech; just make the last verb polite (わかりません).",
+    "examples": [
+      {
+        "jp": "{映画|えいが}が{何時|なんじ}に{始|はじ}まるかわかりません。",
+        "en": "I don't know what time the film starts."
+      },
+      {
+        "jp": "{夫|おっと}に{何|なに}が{食|た}べたいか{聞|き}いてみます。",
+        "en": "I'll ask my husband what he wants to eat."
+      },
+      {
+        "jp": "{明日|あした}{雨|あめ}が{降|ふ}るかどうかわからない。",
+        "en": "I don't know whether it'll rain tomorrow."
+      },
+      {
+        "jp": "{鍵|かぎ}をどこに{置|お}いたか{覚|おぼ}えていない。",
+        "en": "I don't remember where I put my keys."
+      },
+      {
+        "jp": "この{店|みせ}、{何時|なんじ}までか{知|し}ってる？",
+        "en": "Do you know what time this shop is open until?"
+      },
+      {
+        "jp": "パーティーに{来|く}るかどうか、{教|おし}えてください。",
+        "en": "Please let me know whether you're coming to the party."
+      },
+      {
+        "jp": "{誰|だれ}が{来|く}るか{知|し}らない。",
+        "en": "I don't know who's coming."
+      },
+      {
+        "jp": "それが{本当|ほんとう}かどうか、わかりません。",
+        "en": "I don't know whether that's true."
+      },
+      {
+        "jp": "どれがいいか、{一緒|いっしょ}に{考|かんが}えよう。",
+        "en": "Let's work out together which one is best."
+      },
+      {
+        "jp": "{妻|つま}の{誕生日|たんじょうび}に{何|なに}をあげるか、まだ{決|き}めていない。",
+        "en": "I still haven't decided what to give my wife for her birthday."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I don't know what time it starts.",
+        "jp": "{何時|なんじ}に{始|はじ}まるかわかりません。",
+        "tiles": [
+          "何時に",
+          "始まるか",
+          "わかりません。"
+        ],
+        "alternatives": [
+          "何時に始まるかわからない。",
+          "何時に始まるか知りません。",
+          "何時に始まるか知らない。"
+        ]
+      },
+      {
+        "en": "I'll ask my husband what he wants to eat.",
+        "jp": "{夫|おっと}に{何|なに}が{食|た}べたいか{聞|き}いてみます。",
+        "tiles": [
+          "夫に",
+          "何が",
+          "食べたいか",
+          "聞いてみます。"
+        ],
+        "alternatives": [
+          "夫に何が食べたいか聞いてみる。",
+          "夫に何を食べたいか聞いてみます。",
+          "夫に何を食べたいか聞いてみる。"
+        ]
+      },
+      {
+        "en": "I don't know whether it'll rain tomorrow.",
+        "jp": "{明日|あした}{雨|あめ}が{降|ふ}るかどうかわからない。",
+        "tiles": [
+          "明日",
+          "雨が",
+          "降るか",
+          "どうか",
+          "わからない。"
+        ],
+        "alternatives": [
+          "明日雨が降るかどうかわかりません。",
+          "明日、雨が降るかどうかわからない。",
+          "明日、雨が降るかどうかわかりません。"
+        ]
+      },
+      {
+        "en": "I don't remember where I put my keys.",
+        "jp": "{鍵|かぎ}をどこに{置|お}いたか{覚|おぼ}えていない。",
+        "tiles": [
+          "鍵を",
+          "どこに",
+          "置いたか",
+          "覚えていない。"
+        ],
+        "alternatives": [
+          "鍵をどこに置いたか覚えていません。",
+          "鍵をどこに置いたか覚えてない。"
+        ]
+      },
+      {
+        "en": "Please tell me whether you're coming.",
+        "jp": "{来|く}るかどうか{教|おし}えてください。",
+        "tiles": [
+          "来るか",
+          "どうか",
+          "教えて",
+          "ください。"
+        ],
+        "alternatives": [
+          "来るかどうか教えて。",
+          "来るかどうか、教えてください。",
+          "来るかどうか教えてね。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{何時|なんじ}に{始|はじ}まる＿＿わかりません。",
+        "options": [
+          "か",
+          "が",
+          "と"
+        ],
+        "answer": 0,
+        "en": "I don't know what time it starts."
+      },
+      {
+        "prompt": "{明日|あした}{雨|あめ}が{降|ふ}るか＿＿わからない。",
+        "options": [
+          "どこか",
+          "どうか",
+          "なにか"
+        ],
+        "answer": 1,
+        "en": "I don't know whether it'll rain tomorrow."
+      },
+      {
+        "prompt": "それが{本当|ほんとう}＿＿どうか、わかりません。",
+        "options": [
+          "だか",
+          "なか",
+          "か"
+        ],
+        "answer": 2,
+        "en": "I don't know whether that's true."
+      },
+      {
+        "prompt": "{鍵|かぎ}を＿＿に{置|お}いたか{覚|おぼ}えていない。",
+        "options": [
+          "どこ",
+          "どれ",
+          "どう"
+        ],
+        "answer": 0,
+        "en": "I don't remember where I put my keys."
+      },
+      {
+        "prompt": "{誰|だれ}が{来|く}る＿＿{知|し}らない。",
+        "options": [
+          "かどうか",
+          "か",
+          "を"
+        ],
+        "answer": 1,
+        "en": "I don't know who's coming."
+      }
+    ]
+  },
+  {
+    "id": "te-hoshii",
+    "order": 113,
+    "level": "N4",
+    "title": "〜てほしい — \"I want you to\"",
+    "pattern": "〜てほしい",
+    "register": "both",
+    "prerequisites": [
+      "hoshii",
+      "te-form"
+    ],
+    "contrastWith": [
+      "hoshii"
+    ],
+    "explanation": "On its own, ほしい means you want a thing (なにがほしい？); after the て-form it means you want someone else to do something: もっとはなしてほしい, \"I want you to talk to me more\". The person you want to act takes に: おっとにてつだってほしい, \"I want my husband to help\". For \"I don't want you to …\", use the ない-form + でほしい: しんぱいしないでほしい. Said straight to someone it can sound demanding, so for everyday requests the softer 〜てくれる？ or 〜てもらえる？ usually works better. Add です for polite speech (〜てほしいです), or soften it with な or んだけど with your partner.",
+    "examples": [
+      {
+        "jp": "{夫|おっと}にもっと{話|はな}してほしい。",
+        "en": "I want my husband to talk to me more."
+      },
+      {
+        "jp": "{週末|しゅうまつ}は{手伝|てつだ}ってほしいな。",
+        "en": "I'd like you to help out at the weekend."
+      },
+      {
+        "jp": "{誕生日|たんじょうび}に{何|なに}がほしい？",
+        "en": "What do you want for your birthday?"
+      },
+      {
+        "jp": "{今日|きょう}は{早|はや}く{帰|かえ}ってきてほしい。",
+        "en": "I'd like you to come home early today."
+      },
+      {
+        "jp": "{心配|しんぱい}しないでほしい。",
+        "en": "I don't want you to worry."
+      },
+      {
+        "jp": "{妻|つま}にこの{本|ほん}を{読|よ}んでほしいです。",
+        "en": "I'd like my wife to read this book."
+      },
+      {
+        "jp": "{両親|りょうしん}にはずっと{元気|げんき}でいてほしい。",
+        "en": "I want my parents to stay healthy for a long time."
+      },
+      {
+        "jp": "{夜|よる}は{電話|でんわ}しないでほしいです。",
+        "en": "I'd rather you didn't call at night."
+      },
+      {
+        "jp": "{家|うち}では{日本語|にほんご}で{話|はな}してほしいんだけど。",
+        "en": "I'd like you to speak Japanese at home, if that's okay."
+      },
+      {
+        "jp": "{部屋|へや}をきれいにしてほしい。",
+        "en": "I want you to tidy up the room."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "I want my husband to talk to me more.",
+        "jp": "{夫|おっと}にもっと{話|はな}してほしい。",
+        "tiles": [
+          "夫に",
+          "もっと",
+          "話して",
+          "ほしい。"
+        ],
+        "alternatives": [
+          "夫にもっと話してほしいです。",
+          "夫にはもっと話してほしい。"
+        ]
+      },
+      {
+        "en": "I don't want you to worry.",
+        "jp": "{心配|しんぱい}しないでほしいです。",
+        "tiles": [
+          "心配",
+          "しないで",
+          "ほしいです。"
+        ],
+        "alternatives": [
+          "心配しないでほしい。",
+          "心配しないでほしいな。"
+        ]
+      },
+      {
+        "en": "I'd like you to come home early.",
+        "jp": "{早|はや}く{帰|かえ}ってきてほしい。",
+        "tiles": [
+          "早く",
+          "帰ってきて",
+          "ほしい。"
+        ],
+        "alternatives": [
+          "早く帰ってきてほしいです。",
+          "早く帰ってきてほしいな。"
+        ]
+      },
+      {
+        "en": "I'd like my wife to read this book.",
+        "jp": "{妻|つま}にこの{本|ほん}を{読|よ}んでほしいです。",
+        "tiles": [
+          "妻に",
+          "この本を",
+          "読んで",
+          "ほしいです。"
+        ],
+        "alternatives": [
+          "妻にこの本を読んでほしい。",
+          "この本を妻に読んでほしいです。"
+        ]
+      },
+      {
+        "en": "I'd like you to help at the weekend.",
+        "jp": "{週末|しゅうまつ}は{手伝|てつだ}ってほしい。",
+        "tiles": [
+          "週末は",
+          "手伝って",
+          "ほしい。"
+        ],
+        "alternatives": [
+          "週末は手伝ってほしいです。",
+          "週末は手伝ってほしいな。",
+          "週末、手伝ってほしい。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{夫|おっと}＿＿もっと{話|はな}してほしい。",
+        "options": [
+          "で",
+          "に",
+          "を"
+        ],
+        "answer": 1,
+        "en": "I want my husband to talk to me more."
+      },
+      {
+        "prompt": "{心配|しんぱい}し＿＿ほしい。",
+        "options": [
+          "ないで",
+          "なくて",
+          "なく"
+        ],
+        "answer": 0,
+        "en": "I don't want you to worry."
+      },
+      {
+        "prompt": "{誕生日|たんじょうび}に{何|なに}が＿＿？",
+        "options": [
+          "ほしい",
+          "ほしがって",
+          "してほしい"
+        ],
+        "answer": 0,
+        "en": "What do you want for your birthday? (a thing)"
+      },
+      {
+        "prompt": "{週末|しゅうまつ}は＿＿ほしいな。",
+        "options": [
+          "てつだい",
+          "てつだう",
+          "てつだって"
+        ],
+        "answer": 2,
+        "en": "I'd like you to help out at the weekend."
+      },
+      {
+        "prompt": "{妻|つま}にこの{本|ほん}を{読|よ}ん＿＿ほしいです。",
+        "options": [
+          "て",
+          "だ",
+          "で"
+        ],
+        "answer": 2,
+        "en": "I'd like my wife to read this book."
+      }
+    ]
+  },
+  {
+    "id": "noni",
+    "order": 114,
+    "level": "N4",
+    "title": "〜のに — \"even though\"",
+    "pattern": "〜のに",
+    "register": "both",
+    "prerequisites": [
+      "kedo-but"
+    ],
+    "contrastWith": [
+      "kedo-but",
+      "temo-even-if"
+    ],
+    "explanation": "のに links two facts when the second is unexpected, disappointing or annoying: やくそくしたのに、こなかった, \"even though he promised, he didn't come\". Use the plain form before のに, but nouns and な-adjectives take な (やすみなのに, ひまなのに). At the end of a sentence のに shows regret or a mild complaint: いっしょにいきたかったのに, \"and I really wanted to go with you\". けど is a neutral \"but\", and ても is \"even if\" about things that may happen, while のに is about real facts and carries feeling. It works in casual and polite speech, but because it sounds like a complaint, use it gently with your partner!",
+    "examples": [
+      {
+        "jp": "{約束|やくそく}したのに、{来|こ}なかった。",
+        "en": "Even though he promised, he didn't come."
+      },
+      {
+        "jp": "{日曜日|にちようび}なのに、{仕事|しごと}に{行|い}かなければならない。",
+        "en": "Even though it's Sunday, I have to go to work."
+      },
+      {
+        "jp": "たくさん{寝|ね}たのに、まだ{眠|ねむ}い。",
+        "en": "I slept a lot, but I'm still sleepy."
+      },
+      {
+        "jp": "{一生懸命|いっしょうけんめい}{作|つく}ったのに、{誰|だれ}も{食|た}べなかった。",
+        "en": "I worked so hard on the cooking, but nobody ate it."
+      },
+      {
+        "jp": "{一緒|いっしょ}に{行|い}きたかったのに。",
+        "en": "And I really wanted to go with you."
+      },
+      {
+        "jp": "{高|たか}いのに、あまりおいしくない。",
+        "en": "It's expensive, and yet it's not very good."
+      },
+      {
+        "jp": "{暇|ひま}なのに、{手伝|てつだ}ってくれない。",
+        "en": "You're free, but you won't help me."
+      },
+      {
+        "jp": "{春|はる}なのに、まだ{寒|さむ}いですね。",
+        "en": "It's spring, and yet it's still cold, isn't it?"
+      },
+      {
+        "jp": "ダイエットしているのに、{痩|や}せない。",
+        "en": "I'm on a diet, but I'm not losing weight."
+      },
+      {
+        "jp": "もっと{早|はや}く{言|い}ってくれたらよかったのに。",
+        "en": "If only you'd told me sooner."
+      }
+    ],
+    "buildItems": [
+      {
+        "en": "Even though he promised, he didn't come.",
+        "jp": "{約束|やくそく}したのに、{来|こ}なかった。",
+        "tiles": [
+          "約束した",
+          "のに、",
+          "来なかった。"
+        ],
+        "alternatives": [
+          "約束したのに、来ませんでした。",
+          "約束したのに来なかった。"
+        ]
+      },
+      {
+        "en": "I slept a lot, but I'm still sleepy.",
+        "jp": "たくさん{寝|ね}たのに、まだ{眠|ねむ}い。",
+        "tiles": [
+          "たくさん",
+          "寝たのに、",
+          "まだ",
+          "眠い。"
+        ],
+        "alternatives": [
+          "たくさん寝たのに、まだ眠いです。",
+          "たくさん寝たのにまだ眠い。"
+        ]
+      },
+      {
+        "en": "Even though it's Sunday, I have work.",
+        "jp": "{日曜日|にちようび}なのに{仕事|しごと}があります。",
+        "tiles": [
+          "日曜日",
+          "なのに",
+          "仕事が",
+          "あります。"
+        ],
+        "alternatives": [
+          "日曜日なのに、仕事があります。",
+          "日曜日なのに仕事がある。",
+          "日曜日なのに、仕事がある。"
+        ]
+      },
+      {
+        "en": "It's spring, and yet it's still cold.",
+        "jp": "{春|はる}なのに、まだ{寒|さむ}いです。",
+        "tiles": [
+          "春",
+          "なのに、",
+          "まだ",
+          "寒いです。"
+        ],
+        "alternatives": [
+          "春なのに、まだ寒い。",
+          "春なのにまだ寒いですね。",
+          "春なのに、まだ寒いね。"
+        ]
+      },
+      {
+        "en": "And I really wanted to go with you.",
+        "jp": "{一緒|いっしょ}に{行|い}きたかったのに。",
+        "tiles": [
+          "一緒に",
+          "行きたかった",
+          "のに。"
+        ],
+        "alternatives": [
+          "一緒に行きたかったのに…",
+          "一緒に行きたかったのになあ。"
+        ]
+      }
+    ],
+    "drills": [
+      {
+        "prompt": "{約束|やくそく}した＿＿、{来|こ}なかった。",
+        "options": [
+          "のに",
+          "から",
+          "ので"
+        ],
+        "answer": 0,
+        "en": "Even though he promised, he didn't come."
+      },
+      {
+        "prompt": "{日曜日|にちようび}＿＿のに、{仕事|しごと}がある。",
+        "options": [
+          "で",
+          "な",
+          "の"
+        ],
+        "answer": 1,
+        "en": "Even though it's Sunday, I have work."
+      },
+      {
+        "prompt": "{暇|ひま}＿＿、{手伝|てつだ}ってくれない。",
+        "options": [
+          "のに",
+          "でのに",
+          "なのに"
+        ],
+        "answer": 2,
+        "en": "You're free, but you won't help me."
+      },
+      {
+        "prompt": "たくさん{寝|ね}た＿＿、まだ{眠|ねむ}い。",
+        "options": [
+          "から",
+          "のに",
+          "ので"
+        ],
+        "answer": 1,
+        "en": "I slept a lot, but I'm still sleepy."
+      },
+      {
+        "prompt": "{高|たか}い＿＿、あまりおいしくない。",
+        "options": [
+          "のに",
+          "なのに",
+          "でも"
+        ],
+        "answer": 0,
+        "en": "It's expensive, and yet it's not very good."
+      }
+    ]
+  },
+  {
+    "id": "causative",
+    "order": 115,
+    "level": "N4",
+    "title": "Causative — \"make / let someone\"",
+    "pattern": "〜せる・〜させる",
+    "register": "both",
+    "recognitionOnly": true,
+    "prerequisites": [
+      "nai-form"
+    ],
+    "contrastWith": [
+      "passive"
+    ],
+    "explanation": "The causative form says someone makes or lets another person do something. Build it from the ない-form stem: う-verbs change the last u-sound to a and add せる (いく → いかせる, まつ → またせる), る-verbs add させる (たべる → たべさせる), する becomes させる and くる becomes こさせる. The person who is made or allowed to act usually takes に: こどもにやさいをたべさせる, \"I make the kids eat vegetables\". The set phrase 〜させてください means \"please let me …\" (はらわせてください, \"let me pay\"), and おまたせしました, \"sorry to keep you waiting\", comes from the same form. Don't mix it up with the passive (〜れる・〜られる, \"was done to me\"); you only need to recognise causatives for now.",
+    "examples": [
+      {
+        "jp": "{子|こ}どもに{野菜|やさい}を{食|た}べさせます。",
+        "en": "I make the kids eat their vegetables."
+      },
+      {
+        "jp": "{私|わたし}に{払|はら}わせてください。",
+        "en": "Please let me pay."
+      },
+      {
+        "jp": "お{待|ま}たせしました。",
+        "en": "Sorry to keep you waiting."
+      },
+      {
+        "jp": "{待|ま}たせてごめんね。",
+        "en": "Sorry I kept you waiting."
+      },
+      {
+        "jp": "ちょっと{考|かんが}えさせてください。",
+        "en": "Let me think about it for a bit."
+      },
+      {
+        "jp": "{妻|つま}を{笑|わら}わせるのが{好|す}きです。",
+        "en": "I love making my wife laugh."
+      },
+      {
+        "jp": "{夫|おっと}を{心配|しんぱい}させてしまった。",
+        "en": "I ended up making my husband worry."
+      },
+      {
+        "jp": "{犬|いぬ}を{公園|こうえん}で{遊|あそ}ばせました。",
+        "en": "I let the dog play in the park."
+      },
+      {
+        "jp": "{今日|きょう}は{私|わたし}に{料理|りょうり}させて。",
+        "en": "Let me do the cooking today."
+      },
+      {
+        "jp": "{娘|むすめ}には{好|す}きなことをさせたい。",
+        "en": "I want to let my daughter do what she loves."
+      }
+    ],
+    "buildItems": [],
+    "drills": [
+      {
+        "prompt": "{私|わたし}に{払|はら}＿＿ください。",
+        "options": [
+          "われて",
+          "わせて",
+          "せて"
+        ],
+        "answer": 1,
+        "en": "Please let me pay."
+      },
+      {
+        "prompt": "お{待|ま}た＿＿しました。",
+        "options": [
+          "せ",
+          "れ",
+          "て"
+        ],
+        "answer": 0,
+        "en": "Sorry to keep you waiting."
+      },
+      {
+        "prompt": "ちょっと{考|かんが}え＿＿ください。",
+        "options": [
+          "られて",
+          "せて",
+          "させて"
+        ],
+        "answer": 2,
+        "en": "Let me think about it for a bit."
+      },
+      {
+        "prompt": "{子|こ}ども＿＿{野菜|やさい}を{食|た}べさせます。",
+        "options": [
+          "に",
+          "が",
+          "で"
+        ],
+        "answer": 0,
+        "en": "I make the kids eat their vegetables."
+      },
+      {
+        "prompt": "{妻|つま}を＿＿のが{好|す}きです。",
+        "options": [
+          "わらわれる",
+          "わらわせる",
+          "わらう"
+        ],
+        "answer": 1,
+        "en": "I love making my wife laugh."
+      }
+    ]
+  }
+]

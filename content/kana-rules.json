@@ -1,0 +1,920 @@
+[
+  {
+    "id": "hira-dakuten",
+    "day": 6,
+    "title": "Voiced sounds: ゛ and ゜",
+    "explanation": "Two small marks change a kana's sound. Two short strokes (゛, called dakuten) give the consonant a heavier, buzzing sound: k → g (か → が), s → z (さ → ざ), t → d (た → だ) and h → b (は → ば). A small circle (゜, called handakuten) goes only on the は row and turns h into p: は → ぱ. ぢ and づ sound just like じ (ji) and ず (zu) and appear in only a few words, such as つづく (to continue), so when you hear 'ji' or 'zu' it is almost always じ or ず.",
+    "pairs": [
+      {
+        "from": "か",
+        "to": "が",
+        "romaji": "ga"
+      },
+      {
+        "from": "き",
+        "to": "ぎ",
+        "romaji": "gi"
+      },
+      {
+        "from": "く",
+        "to": "ぐ",
+        "romaji": "gu"
+      },
+      {
+        "from": "け",
+        "to": "げ",
+        "romaji": "ge"
+      },
+      {
+        "from": "こ",
+        "to": "ご",
+        "romaji": "go"
+      },
+      {
+        "from": "さ",
+        "to": "ざ",
+        "romaji": "za"
+      },
+      {
+        "from": "し",
+        "to": "じ",
+        "romaji": "ji"
+      },
+      {
+        "from": "す",
+        "to": "ず",
+        "romaji": "zu"
+      },
+      {
+        "from": "せ",
+        "to": "ぜ",
+        "romaji": "ze"
+      },
+      {
+        "from": "そ",
+        "to": "ぞ",
+        "romaji": "zo"
+      },
+      {
+        "from": "た",
+        "to": "だ",
+        "romaji": "da"
+      },
+      {
+        "from": "ち",
+        "to": "ぢ",
+        "romaji": "ji"
+      },
+      {
+        "from": "つ",
+        "to": "づ",
+        "romaji": "zu"
+      },
+      {
+        "from": "て",
+        "to": "で",
+        "romaji": "de"
+      },
+      {
+        "from": "と",
+        "to": "ど",
+        "romaji": "do"
+      },
+      {
+        "from": "は",
+        "to": "ば",
+        "romaji": "ba"
+      },
+      {
+        "from": "ひ",
+        "to": "び",
+        "romaji": "bi"
+      },
+      {
+        "from": "ふ",
+        "to": "ぶ",
+        "romaji": "bu"
+      },
+      {
+        "from": "へ",
+        "to": "べ",
+        "romaji": "be"
+      },
+      {
+        "from": "ほ",
+        "to": "ぼ",
+        "romaji": "bo"
+      },
+      {
+        "from": "は",
+        "to": "ぱ",
+        "romaji": "pa"
+      },
+      {
+        "from": "ひ",
+        "to": "ぴ",
+        "romaji": "pi"
+      },
+      {
+        "from": "ふ",
+        "to": "ぷ",
+        "romaji": "pu"
+      },
+      {
+        "from": "へ",
+        "to": "ぺ",
+        "romaji": "pe"
+      },
+      {
+        "from": "ほ",
+        "to": "ぽ",
+        "romaji": "po"
+      }
+    ],
+    "practiceWords": [
+      {
+        "kana": "ごはん",
+        "en": "rice; a meal"
+      },
+      {
+        "kana": "みず",
+        "en": "water"
+      },
+      {
+        "kana": "ともだち",
+        "en": "friend"
+      },
+      {
+        "kana": "かばん",
+        "en": "bag"
+      },
+      {
+        "kana": "ぜんぶ",
+        "en": "all; everything"
+      },
+      {
+        "kana": "でんわ",
+        "en": "phone; phone call"
+      },
+      {
+        "kana": "かんぱい",
+        "en": "cheers! (a toast)"
+      },
+      {
+        "kana": "さんぽ",
+        "en": "a walk; a stroll"
+      }
+    ]
+  },
+  {
+    "id": "hira-yoon",
+    "day": 7,
+    "title": "Small ゃ ゅ ょ, small っ and long vowels",
+    "explanation": "A small ゃ, ゅ or ょ after an i-sound kana (き, し, ち, に, ひ, み, り and their ゛ ゜ forms) blends the two into one beat: き + ゃ = きゃ (kya), while a full-size きや is two beats, ki-ya. A small っ is a one-beat pause that doubles the next consonant: おと oto (sound) vs おっと otto (husband). A long vowel lasts two beats and is written with an extra vowel: おばさん (aunt) vs おばあさん (grandmother). A long 'e' is usually spelled えい (せんせい) and a long 'o' usually おう (ありがとう); ええ and おお appear only in a few words, such as おねえさん and おおきい.",
+    "pairs": [
+      {
+        "from": "き",
+        "to": "きゃ",
+        "romaji": "kya"
+      },
+      {
+        "from": "き",
+        "to": "きゅ",
+        "romaji": "kyu"
+      },
+      {
+        "from": "き",
+        "to": "きょ",
+        "romaji": "kyo"
+      },
+      {
+        "from": "し",
+        "to": "しゃ",
+        "romaji": "sha"
+      },
+      {
+        "from": "し",
+        "to": "しゅ",
+        "romaji": "shu"
+      },
+      {
+        "from": "し",
+        "to": "しょ",
+        "romaji": "sho"
+      },
+      {
+        "from": "ち",
+        "to": "ちゃ",
+        "romaji": "cha"
+      },
+      {
+        "from": "ち",
+        "to": "ちゅ",
+        "romaji": "chu"
+      },
+      {
+        "from": "ち",
+        "to": "ちょ",
+        "romaji": "cho"
+      },
+      {
+        "from": "に",
+        "to": "にゃ",
+        "romaji": "nya"
+      },
+      {
+        "from": "に",
+        "to": "にゅ",
+        "romaji": "nyu"
+      },
+      {
+        "from": "に",
+        "to": "にょ",
+        "romaji": "nyo"
+      },
+      {
+        "from": "ひ",
+        "to": "ひゃ",
+        "romaji": "hya"
+      },
+      {
+        "from": "ひ",
+        "to": "ひゅ",
+        "romaji": "hyu"
+      },
+      {
+        "from": "ひ",
+        "to": "ひょ",
+        "romaji": "hyo"
+      },
+      {
+        "from": "み",
+        "to": "みゃ",
+        "romaji": "mya"
+      },
+      {
+        "from": "み",
+        "to": "みゅ",
+        "romaji": "myu"
+      },
+      {
+        "from": "み",
+        "to": "みょ",
+        "romaji": "myo"
+      },
+      {
+        "from": "り",
+        "to": "りゃ",
+        "romaji": "rya"
+      },
+      {
+        "from": "り",
+        "to": "りゅ",
+        "romaji": "ryu"
+      },
+      {
+        "from": "り",
+        "to": "りょ",
+        "romaji": "ryo"
+      },
+      {
+        "from": "ぎ",
+        "to": "ぎゃ",
+        "romaji": "gya"
+      },
+      {
+        "from": "ぎ",
+        "to": "ぎゅ",
+        "romaji": "gyu"
+      },
+      {
+        "from": "ぎ",
+        "to": "ぎょ",
+        "romaji": "gyo"
+      },
+      {
+        "from": "じ",
+        "to": "じゃ",
+        "romaji": "ja"
+      },
+      {
+        "from": "じ",
+        "to": "じゅ",
+        "romaji": "ju"
+      },
+      {
+        "from": "じ",
+        "to": "じょ",
+        "romaji": "jo"
+      },
+      {
+        "from": "び",
+        "to": "びゃ",
+        "romaji": "bya"
+      },
+      {
+        "from": "び",
+        "to": "びゅ",
+        "romaji": "byu"
+      },
+      {
+        "from": "び",
+        "to": "びょ",
+        "romaji": "byo"
+      },
+      {
+        "from": "ぴ",
+        "to": "ぴゃ",
+        "romaji": "pya"
+      },
+      {
+        "from": "ぴ",
+        "to": "ぴゅ",
+        "romaji": "pyu"
+      },
+      {
+        "from": "ぴ",
+        "to": "ぴょ",
+        "romaji": "pyo"
+      },
+      {
+        "from": "びよういん",
+        "to": "びょういん",
+        "romaji": "byouin"
+      },
+      {
+        "from": "おと",
+        "to": "おっと",
+        "romaji": "otto"
+      },
+      {
+        "from": "きて",
+        "to": "きって",
+        "romaji": "kitte"
+      },
+      {
+        "from": "おばさん",
+        "to": "おばあさん",
+        "romaji": "obaasan"
+      },
+      {
+        "from": "おじさん",
+        "to": "おじいさん",
+        "romaji": "ojiisan"
+      },
+      {
+        "from": "ゆき",
+        "to": "ゆうき",
+        "romaji": "yuuki"
+      },
+      {
+        "from": "え",
+        "to": "ええ",
+        "romaji": "ee"
+      },
+      {
+        "from": "せかい",
+        "to": "せいかい",
+        "romaji": "seikai"
+      },
+      {
+        "from": "ここ",
+        "to": "こうこう",
+        "romaji": "koukou"
+      },
+      {
+        "from": "とり",
+        "to": "とおり",
+        "romaji": "toori"
+      }
+    ],
+    "practiceWords": [
+      {
+        "kana": "いっしょ",
+        "en": "together"
+      },
+      {
+        "kana": "きょう",
+        "en": "today"
+      },
+      {
+        "kana": "でんしゃ",
+        "en": "train"
+      },
+      {
+        "kana": "おちゃ",
+        "en": "tea (usually green tea)"
+      },
+      {
+        "kana": "ちょっと",
+        "en": "a little; just a moment"
+      },
+      {
+        "kana": "おかあさん",
+        "en": "mother; mom"
+      },
+      {
+        "kana": "せんせい",
+        "en": "teacher"
+      },
+      {
+        "kana": "ありがとう",
+        "en": "thanks"
+      }
+    ]
+  },
+  {
+    "id": "kata-dakuten-yoon",
+    "day": 13,
+    "title": "Katakana: ゛ ゜, small ャ ュ ョ ッ and ー",
+    "explanation": "Katakana uses the same ゛ and ゜ marks and the same small ャ, ュ, ョ and ッ as hiragana, so ガ is ga, パ is pa, キャ is kya, and ッ doubles the next consonant: バグ (a software bug) vs バッグ (bag). The big difference is long vowels: instead of adding a vowel, katakana stretches a sound with a dash, ー, so ビル (building) and ビール (beer) are different words. Loanwords use ー for almost every long vowel, including the long 'e' in ケーキ (cake).",
+    "pairs": [
+      {
+        "from": "カ",
+        "to": "ガ",
+        "romaji": "ga"
+      },
+      {
+        "from": "キ",
+        "to": "ギ",
+        "romaji": "gi"
+      },
+      {
+        "from": "ク",
+        "to": "グ",
+        "romaji": "gu"
+      },
+      {
+        "from": "ケ",
+        "to": "ゲ",
+        "romaji": "ge"
+      },
+      {
+        "from": "コ",
+        "to": "ゴ",
+        "romaji": "go"
+      },
+      {
+        "from": "サ",
+        "to": "ザ",
+        "romaji": "za"
+      },
+      {
+        "from": "シ",
+        "to": "ジ",
+        "romaji": "ji"
+      },
+      {
+        "from": "ス",
+        "to": "ズ",
+        "romaji": "zu"
+      },
+      {
+        "from": "セ",
+        "to": "ゼ",
+        "romaji": "ze"
+      },
+      {
+        "from": "ソ",
+        "to": "ゾ",
+        "romaji": "zo"
+      },
+      {
+        "from": "タ",
+        "to": "ダ",
+        "romaji": "da"
+      },
+      {
+        "from": "チ",
+        "to": "ヂ",
+        "romaji": "ji"
+      },
+      {
+        "from": "ツ",
+        "to": "ヅ",
+        "romaji": "zu"
+      },
+      {
+        "from": "テ",
+        "to": "デ",
+        "romaji": "de"
+      },
+      {
+        "from": "ト",
+        "to": "ド",
+        "romaji": "do"
+      },
+      {
+        "from": "ハ",
+        "to": "バ",
+        "romaji": "ba"
+      },
+      {
+        "from": "ヒ",
+        "to": "ビ",
+        "romaji": "bi"
+      },
+      {
+        "from": "フ",
+        "to": "ブ",
+        "romaji": "bu"
+      },
+      {
+        "from": "ヘ",
+        "to": "ベ",
+        "romaji": "be"
+      },
+      {
+        "from": "ホ",
+        "to": "ボ",
+        "romaji": "bo"
+      },
+      {
+        "from": "ハ",
+        "to": "パ",
+        "romaji": "pa"
+      },
+      {
+        "from": "ヒ",
+        "to": "ピ",
+        "romaji": "pi"
+      },
+      {
+        "from": "フ",
+        "to": "プ",
+        "romaji": "pu"
+      },
+      {
+        "from": "ヘ",
+        "to": "ペ",
+        "romaji": "pe"
+      },
+      {
+        "from": "ホ",
+        "to": "ポ",
+        "romaji": "po"
+      },
+      {
+        "from": "キ",
+        "to": "キャ",
+        "romaji": "kya"
+      },
+      {
+        "from": "キ",
+        "to": "キュ",
+        "romaji": "kyu"
+      },
+      {
+        "from": "キ",
+        "to": "キョ",
+        "romaji": "kyo"
+      },
+      {
+        "from": "シ",
+        "to": "シャ",
+        "romaji": "sha"
+      },
+      {
+        "from": "シ",
+        "to": "シュ",
+        "romaji": "shu"
+      },
+      {
+        "from": "シ",
+        "to": "ショ",
+        "romaji": "sho"
+      },
+      {
+        "from": "チ",
+        "to": "チャ",
+        "romaji": "cha"
+      },
+      {
+        "from": "チ",
+        "to": "チュ",
+        "romaji": "chu"
+      },
+      {
+        "from": "チ",
+        "to": "チョ",
+        "romaji": "cho"
+      },
+      {
+        "from": "ニ",
+        "to": "ニャ",
+        "romaji": "nya"
+      },
+      {
+        "from": "ニ",
+        "to": "ニュ",
+        "romaji": "nyu"
+      },
+      {
+        "from": "ニ",
+        "to": "ニョ",
+        "romaji": "nyo"
+      },
+      {
+        "from": "ヒ",
+        "to": "ヒャ",
+        "romaji": "hya"
+      },
+      {
+        "from": "ヒ",
+        "to": "ヒュ",
+        "romaji": "hyu"
+      },
+      {
+        "from": "ヒ",
+        "to": "ヒョ",
+        "romaji": "hyo"
+      },
+      {
+        "from": "ミ",
+        "to": "ミャ",
+        "romaji": "mya"
+      },
+      {
+        "from": "ミ",
+        "to": "ミュ",
+        "romaji": "myu"
+      },
+      {
+        "from": "ミ",
+        "to": "ミョ",
+        "romaji": "myo"
+      },
+      {
+        "from": "リ",
+        "to": "リャ",
+        "romaji": "rya"
+      },
+      {
+        "from": "リ",
+        "to": "リュ",
+        "romaji": "ryu"
+      },
+      {
+        "from": "リ",
+        "to": "リョ",
+        "romaji": "ryo"
+      },
+      {
+        "from": "ギ",
+        "to": "ギャ",
+        "romaji": "gya"
+      },
+      {
+        "from": "ギ",
+        "to": "ギュ",
+        "romaji": "gyu"
+      },
+      {
+        "from": "ギ",
+        "to": "ギョ",
+        "romaji": "gyo"
+      },
+      {
+        "from": "ジ",
+        "to": "ジャ",
+        "romaji": "ja"
+      },
+      {
+        "from": "ジ",
+        "to": "ジュ",
+        "romaji": "ju"
+      },
+      {
+        "from": "ジ",
+        "to": "ジョ",
+        "romaji": "jo"
+      },
+      {
+        "from": "ビ",
+        "to": "ビャ",
+        "romaji": "bya"
+      },
+      {
+        "from": "ビ",
+        "to": "ビュ",
+        "romaji": "byu"
+      },
+      {
+        "from": "ビ",
+        "to": "ビョ",
+        "romaji": "byo"
+      },
+      {
+        "from": "ピ",
+        "to": "ピャ",
+        "romaji": "pya"
+      },
+      {
+        "from": "ピ",
+        "to": "ピュ",
+        "romaji": "pyu"
+      },
+      {
+        "from": "ピ",
+        "to": "ピョ",
+        "romaji": "pyo"
+      },
+      {
+        "from": "バグ",
+        "to": "バッグ",
+        "romaji": "baggu"
+      },
+      {
+        "from": "ビル",
+        "to": "ビール",
+        "romaji": "biiru"
+      },
+      {
+        "from": "ハト",
+        "to": "ハート",
+        "romaji": "haato"
+      }
+    ],
+    "practiceWords": [
+      {
+        "kana": "ビール",
+        "en": "beer"
+      },
+      {
+        "kana": "ジュース",
+        "en": "juice; soft drink"
+      },
+      {
+        "kana": "メニュー",
+        "en": "menu"
+      },
+      {
+        "kana": "シャワー",
+        "en": "shower"
+      },
+      {
+        "kana": "チョコレート",
+        "en": "chocolate"
+      },
+      {
+        "kana": "パジャマ",
+        "en": "pajamas"
+      },
+      {
+        "kana": "ベッド",
+        "en": "bed"
+      },
+      {
+        "kana": "スーパー",
+        "en": "supermarket"
+      }
+    ]
+  },
+  {
+    "id": "kata-extended",
+    "day": 14,
+    "title": "Extended sounds for loanwords",
+    "explanation": "Loanwords need some sounds that the basic kana can't spell, so katakana builds them by adding a small ァ, ィ, ゥ, ェ or ォ (or ュ, as in デュ) to a normal kana: テ + ィ = ティ (ti), フ + ァ = ファ (fa), ウ + ィ = ウィ (wi), チ + ェ = チェ (che). Each combination is said as one beat, just like キャ. ヴ (ウ with ゛) spells a 'v', but most people say it like 'b', and many words are more often written with the バ row: バイオリン is more common than ヴァイオリン for 'violin'.",
+    "pairs": [
+      {
+        "from": "テ",
+        "to": "ティ",
+        "romaji": "ti"
+      },
+      {
+        "from": "デ",
+        "to": "ディ",
+        "romaji": "di"
+      },
+      {
+        "from": "デ",
+        "to": "デュ",
+        "romaji": "dyu"
+      },
+      {
+        "from": "フ",
+        "to": "ファ",
+        "romaji": "fa"
+      },
+      {
+        "from": "フ",
+        "to": "フィ",
+        "romaji": "fi"
+      },
+      {
+        "from": "フ",
+        "to": "フェ",
+        "romaji": "fe"
+      },
+      {
+        "from": "フ",
+        "to": "フォ",
+        "romaji": "fo"
+      },
+      {
+        "from": "シ",
+        "to": "シェ",
+        "romaji": "she"
+      },
+      {
+        "from": "ジ",
+        "to": "ジェ",
+        "romaji": "je"
+      },
+      {
+        "from": "チ",
+        "to": "チェ",
+        "romaji": "che"
+      },
+      {
+        "from": "ウ",
+        "to": "ウィ",
+        "romaji": "wi"
+      },
+      {
+        "from": "ウ",
+        "to": "ウェ",
+        "romaji": "we"
+      },
+      {
+        "from": "ウ",
+        "to": "ウォ",
+        "romaji": "wo"
+      },
+      {
+        "from": "ト",
+        "to": "トゥ",
+        "romaji": "tu"
+      },
+      {
+        "from": "ド",
+        "to": "ドゥ",
+        "romaji": "du"
+      },
+      {
+        "from": "ツ",
+        "to": "ツァ",
+        "romaji": "tsa"
+      },
+      {
+        "from": "ウ",
+        "to": "ヴ",
+        "romaji": "vu"
+      },
+      {
+        "from": "ヴ",
+        "to": "ヴァ",
+        "romaji": "va"
+      },
+      {
+        "from": "ヴ",
+        "to": "ヴィ",
+        "romaji": "vi"
+      },
+      {
+        "from": "ヴ",
+        "to": "ヴェ",
+        "romaji": "ve"
+      },
+      {
+        "from": "ヴ",
+        "to": "ヴォ",
+        "romaji": "vo"
+      }
+    ],
+    "practiceWords": [
+      {
+        "kana": "パーティー",
+        "en": "party"
+      },
+      {
+        "kana": "カフェ",
+        "en": "café"
+      },
+      {
+        "kana": "フォーク",
+        "en": "fork"
+      },
+      {
+        "kana": "ソファー",
+        "en": "sofa; couch"
+      },
+      {
+        "kana": "ディナー",
+        "en": "dinner (special or at a restaurant)"
+      },
+      {
+        "kana": "チェック",
+        "en": "check (look over)"
+      },
+      {
+        "kana": "シェフ",
+        "en": "chef"
+      },
+      {
+        "kana": "ハロウィン",
+        "en": "Halloween"
+      }
+    ]
+  }
+]

@@ -17,7 +17,7 @@ export function RadicalLesson({ radical, examples, mnemonic, onHookChange, onPra
       <article className="card st-lesson">
         <p className="label">New part</p>
         <div className="st-lesson-head">
-          <div className="st-glyph-box"><Glyph char={radical.char} size={104} /></div>
+          <div className="st-glyph-box"><Glyph char={radical.char} size={84} /></div>
           <div className="st-lesson-gloss">
             <h2 className="st-lesson-meaning">{radical.meaning}</h2>
             {radical.name !== radical.meaning && <p className="muted">{radical.name}</p>}

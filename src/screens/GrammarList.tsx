@@ -3,10 +3,12 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Link } from 'react-router-dom';
 import { grammarGloss } from '../components/study/format.ts';
+import { MixedText } from '../components/study/MixedText.tsx';
 import { useAsync } from '../components/study/useAsync.ts';
 import { Icon, Ruby, Screen, TopBar } from '../components/ui.tsx';
 import { db } from '../lib/db.ts';
 import { loadGrammar } from '../lib/data.ts';
+import { useRubyShow } from '../lib/hooks.ts';
 import type { GrammarPoint } from '../lib/types.ts';
 import { currentPhase } from '../srs/course.ts';
 import '../components/study/study.css';
@@ -18,14 +20,23 @@ const PHASE_NAMES: Record<number, string> = {
   4: 'Real Japanese',
 };
 
-function Row({ point, learned, locked }: { point: GrammarPoint; learned: boolean; locked: boolean }) {
+function Row({ point, learned, locked, show }: {
+  point: GrammarPoint;
+  learned: boolean;
+  locked: boolean;
+  /** Which readings to show, per the furigana setting. */
+  show: ReturnType<typeof useRubyShow>;
+}) {
   return (
     <li>
       <Link to={`/grammar/${encodeURIComponent(point.id)}`} className={locked ? 'st-grammar-row locked' : 'st-grammar-row'}>
         <span className="st-grammar-text">
-          <span className="st-grammar-pattern"><Ruby text={point.pattern} show="none" /></span>
-          <span className="st-grammar-title">{grammarGloss(point)}</span>
+          <span className="st-grammar-pattern"><Ruby text={point.pattern} show={show} /></span>
+          {/* Hidden separators keep the link's name from running the pieces together. */}
+          <span className="visually-hidden">, </span>
+          <span className="st-grammar-title"><MixedText text={grammarGloss(point)} /></span>
         </span>
+        {(learned || locked) && <span className="visually-hidden">, </span>}
         {learned ? (
           <span className="chip ai"><Icon name="check" size={12} strokeWidth={3} />Learned</span>
         ) : locked ? (
@@ -38,6 +49,7 @@ function Row({ point, learned, locked }: { point: GrammarPoint; learned: boolean
 }
 
 export default function GrammarList() {
+  const show = useRubyShow();
   const data = useAsync(() => Promise.all([loadGrammar(), currentPhase()]), []);
   const introduced = useLiveQuery(
     async () => new Set((await db.items.where('kind').equals('grammar').primaryKeys()).map((id) => String(id).slice('grammar:'.length))),
@@ -73,7 +85,7 @@ export default function GrammarList() {
               <h2 id={`grammar-phase-${ph}`} className="label">Phase {ph} · {PHASE_NAMES[ph]}</h2>
               <ul className="card st-grammar-list">
                 {points.filter((p) => p.phase === ph).sort((a, b) => a.order - b.order).map((p) => (
-                  <Row key={p.id} point={p} learned={introduced.has(p.id)} locked={!introduced.has(p.id) && p.phase > phase} />
+                  <Row key={p.id} point={p} learned={introduced.has(p.id)} locked={!introduced.has(p.id) && p.phase > phase} show={show} />
                 ))}
               </ul>
             </section>

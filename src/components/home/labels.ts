@@ -14,9 +14,10 @@ export type KanjiTargets = Record<2 | 3 | 4, number>;
 export function phaseDetail(phase: Phase, targets: KanjiTargets): string {
   switch (phase) {
     case 1: return 'Hiragana, katakana and everyday words';
+    // Each phase is counted in its own kanji, like the progress under it and the library.
     case 2: return `Your first ${targets[2].toLocaleString()} kanji, inside real words`;
-    case 3: return `Up to ${targets[3].toLocaleString()} kanji, reading real sentences`;
-    case 4: return `All ${targets[4].toLocaleString()} everyday kanji`;
+    case 3: return `${(targets[3] - targets[2]).toLocaleString()} more kanji (${targets[3].toLocaleString()} in all), reading real sentences`;
+    case 4: return `The last ${(targets[4] - targets[3]).toLocaleString()} of all ${targets[4].toLocaleString()} everyday kanji`;
   }
 }
 
@@ -31,18 +32,19 @@ export function phaseKanjiTargets(curriculum: Curriculum): KanjiTargets {
   };
 }
 
-/** "84 of 300 kanji" — progress toward the end of the current phase. */
-export function phaseProgressText(p: CourseProgress, kanjiTotal: number): string {
-  if (p.phase === 1) return `${p.phaseDone} of ${p.nextPhaseAt ?? 0} kana`;
-  const target = p.nextPhaseAt ?? kanjiTotal;
-  return `${p.kanjiIntroduced.toLocaleString()} of ${target.toLocaleString()} kanji`;
+/**
+ * "84 of 300 kanji" — progress in the current phase, counted in that phase's own
+ * kanji as the kanji library's phase groups are ("Phase 3 · 0 of 500 kanji").
+ * Phase 1 counts the basic kana ("49 of 92 basic kana"), which is what unlocks phase 2.
+ */
+export function phaseProgressText(p: CourseProgress): string {
+  if (p.phase === 1) return `${p.phaseDone} of ${p.phaseTarget} basic kana`;
+  return `${p.phaseDone.toLocaleString()} of ${p.phaseTarget.toLocaleString()} kanji`;
 }
 
-/** 0..1 toward the end of the current phase. */
-export function phaseFraction(p: CourseProgress, kanjiTotal: number): number {
-  const target = p.phase === 1 ? p.nextPhaseAt : p.nextPhaseAt ?? kanjiTotal;
-  const done = p.phase === 1 ? p.phaseDone : p.kanjiIntroduced;
-  return target ? Math.min(1, done / target) : 0;
+/** 0..1 through the current phase. */
+export function phaseFraction(p: CourseProgress): number {
+  return p.phaseTarget ? Math.min(1, p.phaseDone / p.phaseTarget) : 0;
 }
 
 export const WEEKDAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -77,6 +79,11 @@ export function agoText(then: number, now: number = Date.now()): string {
   const h = Math.round(min / 60);
   if (h < 24) return `${h} h ago`;
   return plural(Math.round(h / 24), 'day') + ' ago';
+}
+
+/** "1-day streak", "12-day streak" */
+export function streakText(days: number): string {
+  return `${days.toLocaleString()}-day streak`;
 }
 
 export function plural(n: number, one: string, many = `${one}s`): string {

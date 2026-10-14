@@ -244,10 +244,12 @@ describe('stats and household', () => {
 
       // A new study day: the streak comes from the device reporting it, even when it's lower
       // (a missed day breaks a streak)…
-      await send(tablet, { days: [studied('2026-10-15', [0, 0, 0, 0, false])], streak: 0, kanjiKnown: 2, knownKanji: [], phase: 1 });
+      const tabletKanji = ['日', '火'];
+      const phoneKanji = ['日', '月', '水'];
+      await send(tablet, { days: [studied('2026-10-15', [0, 0, 0, 0, false])], streak: 0, kanjiKnown: 2, knownKanji: tabletKanji, phase: 1 });
       assert.equal((await stats()).streak, 0);
       // …and a device still on yesterday can't put the old streak back.
-      await send(phone, { days: [studied('2026-10-14', [10, 15, 12, 0, false])], streak: 5, kanjiKnown: 3, knownKanji: [], phase: 2 });
+      await send(phone, { days: [studied('2026-10-14', [10, 15, 12, 0, false])], streak: 5, kanjiKnown: 3, knownKanji: phoneKanji, phase: 2 });
       carter = await stats();
       assert.equal(carter.streak, 0);
       assert.equal(carter.day('2026-10-14')?.studyMinutes, 12);
@@ -255,10 +257,90 @@ describe('stats and household', () => {
 
       // A device whose clock is weeks ahead can't set the streak, nor sneak it in as the larger
       // value once a correct device reports the same day again.
-      await send(phone, { days: [studied('2026-12-01', [0, 0, 0, 0, false])], streak: 40, kanjiKnown: 3, knownKanji: [], phase: 2 });
+      await send(phone, { days: [studied('2026-12-01', [0, 0, 0, 0, false])], streak: 40, kanjiKnown: 3, knownKanji: phoneKanji, phase: 2 });
       assert.equal((await stats()).streak, 0);
-      await send(tablet, { days: [studied('2026-10-15', [0, 0, 0, 0, false])], streak: 0, kanjiKnown: 2, knownKanji: [], phase: 1 });
+      await send(tablet, { days: [studied('2026-10-15', [0, 0, 0, 0, false])], streak: 0, kanjiKnown: 2, knownKanji: tabletKanji, phase: 1 });
       assert.equal((await stats()).streak, 0);
+
+      // The tablet is reset: its own numbers drop, while what the phone reported still counts.
+      await send(tablet, {
+        days: [studied('2026-10-13', [0, 0, 0, 0, false]), studied('2026-10-14', [0, 0, 0, 0, false])],
+        streak: 0,
+        kanjiKnown: 0,
+        knownKanji: [],
+        phase: 1,
+      });
+      carter = await stats();
+      assert.deepEqual(carter.day('2026-10-13'), studied('2026-10-13', [20, 40, 35, 5, true]));
+      assert.deepEqual(carter.day('2026-10-14'), studied('2026-10-14', [10, 15, 12, 0, false]));
+      assert.deepEqual(carter.knownKanji, phoneKanji);
+      assert.equal(carter.kanjiKnown, 3);
+    } finally {
+      await own.close();
+    }
+  });
+
+  it("lets a phone lower its own numbers after 'Reset all progress' or an older backup", async () => {
+    const own = await createTestServer({ now: () => now });
+    try {
+      const ken = await own.register('Ken');
+      const partner = await own.register('Aiko');
+      const send = (body: StatsUploadRequest) =>
+        own.app.inject({ method: 'POST', url: '/api/stats', headers: bearer(ken.deviceToken), payload: body });
+      const kenStats = async () => {
+        const res = await own.app.inject({ method: 'GET', url: '/api/household', headers: bearer(partner.deviceToken) });
+        return res.json<HouseholdResponse>().members.find((m) => m.member.id === ken.memberId)!;
+      };
+      const week = (studied: boolean) =>
+        lastDays('2026-10-14', 7).map((date) => (studied ? day(date, true, 30) : emptyDay(date)));
+
+      await send({ days: week(true), streak: 7, kanjiKnown: 2, knownKanji: ['一', '二'], phase: 2 });
+      assert.equal((await kenStats()).days[6].sessionComplete, true);
+
+      // The phone pushes its stats right after the reset: a week of empty days.
+      assert.equal((await send({ days: week(false), streak: 0, kanjiKnown: 0, knownKanji: [], phase: 1 })).statusCode, 200);
+      const after = await kenStats();
+      assert.deepEqual(after.days, week(false));
+      assert.equal(after.streak, 0);
+      assert.equal(after.kanjiKnown, 0);
+      assert.deepEqual(after.knownKanji, []);
+      assert.equal(after.phase, 1);
+    } finally {
+      await own.close();
+    }
+  });
+
+  it('stops counting a signed-out device, and keeps the older history', async () => {
+    const own = await createTestServer({ now: () => now });
+    try {
+      const old = await own.register('Ken');
+      const send = (token: string, body: StatsUploadRequest) =>
+        own.app.inject({ method: 'POST', url: '/api/stats', headers: bearer(token), payload: body });
+      await send(old.deviceToken, {
+        days: [day('2026-10-01', true), day('2026-10-13', true), day('2026-10-14', true)],
+        streak: 14,
+        kanjiKnown: 1,
+        knownKanji: ['山'],
+        phase: 1,
+      });
+      const signout = await own.app.inject({ method: 'POST', url: '/api/signout', headers: bearer(old.deviceToken) });
+      assert.equal(signout.statusCode, 200);
+
+      // The same phone, reset, pairs again and uploads its (empty) week.
+      const fresh = await own.register('Ken');
+      await send(fresh.deviceToken, {
+        days: lastDays('2026-10-14', 7).map(emptyDay),
+        streak: 0,
+        kanjiKnown: 0,
+        knownKanji: [],
+        phase: 1,
+      });
+      const days = own.store.dayStats(old.memberId, '2026-09-30', '2026-10-14');
+      assert.deepEqual(
+        days.filter((d) => d.sessionComplete).map((d) => d.date),
+        ['2026-10-01'],
+      );
+      assert.deepEqual(own.store.memberSummary(old.memberId)?.knownKanji, []);
     } finally {
       await own.close();
     }
@@ -269,6 +351,8 @@ describe('stats and household', () => {
     const invalid: Record<string, unknown>[] = [
       { ...valid, days: [{ ...day('2026-10-14', true), date: '14/10/2026' }] },
       { ...valid, days: [{ ...day('2026-10-14', true), reviews: -1 }] },
+      // More right answers than reviews can't happen.
+      { ...valid, days: [{ ...day('2026-10-14', true), reviews: 3, correct: 10 }] },
       { ...valid, phase: 7 },
       { ...valid, knownKanji: 'abc' },
       { ...valid, streak: undefined },

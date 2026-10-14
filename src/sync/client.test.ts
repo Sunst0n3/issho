@@ -4,14 +4,20 @@ import { db, getSettings, updateSettings } from '../lib/db.ts';
 import {
   ApiError,
   aiCheck,
+  forgetRevokedPairing,
   getHousehold,
   getMessages,
   health,
   isPaired,
+  isServerUrl,
   normalizeServerUrl,
+  onServerReachable,
   pair,
+  renameMember,
+  secureContextProblem,
   sendMessage,
   socketUrl,
+  unpair,
   uploadVoice,
   wasRemoved,
 } from './client.ts';
@@ -202,7 +208,7 @@ describe('uploadVoice', () => {
 describe('pair', () => {
   it('registers, stores the pairing and clears chat from a previous household', async () => {
     await db.messages.put({ id: 1, clientId: 'old', memberId: 'm1', createdAt: '2026-01-01T00:00:00Z', kind: 'text', text: 'old' });
-    fetchMock.mockResolvedValueOnce(json({ deviceToken: 'new-token', memberId: 'm9', householdName: 'Our home' }));
+    fetchMock.mockResolvedValueOnce(json({ deviceToken: 'new-token', memberId: 'm9', householdName: 'Our home', householdId: 'h9' }));
 
     await pair({ serverUrl: 'https://issho.example.com/', householdCode: ' secret ', name: 'Carter' });
 
@@ -213,8 +219,41 @@ describe('pair', () => {
     const s = await getSettings();
     expect(s).toMatchObject({
       serverUrl: 'https://issho.example.com', deviceToken: 'new-token', memberId: 'm9', householdName: 'Our home', name: 'Carter',
+      lastPairing: { householdId: 'h9', memberId: 'm9', serverUrl: 'https://issho.example.com' },
     });
     expect(await db.messages.count()).toBe(0);
+  });
+
+  it('saves the name it registered with, even when the phone had another one', async () => {
+    await updateSettings({ name: 'Carter' });
+    fetchMock.mockResolvedValueOnce(json({ deviceToken: 't', memberId: 'm2', householdName: 'Home', householdId: 'h' }));
+    await pair({ serverUrl: '', householdCode: 'x', name: ' Carter C ' });
+    expect((await getSettings()).name).toBe('Carter C');
+  });
+
+  it("pairs again as the member this phone was, when it uses this phone's own name", async () => {
+    await updateSettings({ name: 'Carter C' });
+    fetchMock.mockResolvedValueOnce(json({ ok: true })).mockResolvedValueOnce(
+      json({ deviceToken: 't2', memberId: 'm1', householdName: 'Home', householdId: 'h' }),
+    );
+    await unpair();
+    await pair({ serverUrl: 'http://192.168.1.20:8787', householdCode: 'x', name: 'Carter C' });
+    expect(JSON.parse(lastCall().init.body as string)).toEqual({ householdCode: 'x', name: 'Carter C', memberId: 'm1' });
+
+    // Someone else using this phone (another name) is not signed in as its old member.
+    await updateSettings({ deviceToken: undefined, memberId: undefined });
+    fetchMock.mockResolvedValueOnce(json({ deviceToken: 't3', memberId: 'm7', householdName: 'Home', householdId: 'h' }));
+    await pair({ serverUrl: 'http://192.168.1.20:8787', householdCode: 'x', name: 'Mika' });
+    expect(JSON.parse(lastCall().init.body as string)).toEqual({ householdCode: 'x', name: 'Mika' });
+  });
+
+  it('refuses an address that cannot be a server, without calling anything', async () => {
+    const err = await pair({ serverUrl: 'not a url!!', householdCode: 'x', name: 'C' }).catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(ApiError);
+    expect(err).toMatchObject({ status: 0, code: 'invalid_server_url', transient: false });
+    expect((err as ApiError).message).toMatch(/doesn't look like a server address \(for example 192\.168\.1\.20:8787\)/);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect((await getSettings()).deviceToken).toBe('tok-123');
   });
 
   it('keeps the chat cache when re-pairing as the same member on the same server', async () => {
@@ -229,6 +268,120 @@ describe('pair', () => {
     await expect(pair({ serverUrl: 'http://other:8787', householdCode: 'nope', name: 'C' })).rejects.toMatchObject({ code: 'bad_code' });
     expect((await getSettings()).deviceToken).toBe('tok-123');
   });
+});
+
+describe('unpair', () => {
+  it('signs this phone out on the server, then forgets the pairing here', async () => {
+    fetchMock.mockResolvedValueOnce(json({ ok: true }));
+    await unpair();
+    const { url, init, headers } = lastCall();
+    expect(url).toBe('http://192.168.1.20:8787/api/signout');
+    expect(init.method).toBe('POST');
+    expect(headers.Authorization).toBe('Bearer tok-123');
+    const s = await getSettings();
+    expect(s).toMatchObject({ deviceToken: undefined, memberId: undefined });
+    // What the chat cache and outbox belong to is remembered for the next pairing.
+    expect(s.lastPairing).toEqual({ memberId: 'm1', serverUrl: 'http://192.168.1.20:8787' });
+    // Disconnecting on purpose isn't "this phone was disconnected".
+    expect(wasRemoved()).toBe(false);
+  });
+
+  it('still disconnects when the server is unreachable or already signed it out', async () => {
+    fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+    await unpair();
+    expect((await getSettings()).deviceToken).toBeUndefined();
+
+    await updateSettings({ deviceToken: 'tok-123', memberId: 'm1' });
+    fetchMock.mockResolvedValueOnce(json({ error: 'unauthorized' }, 401));
+    await unpair();
+    expect((await getSettings()).deviceToken).toBeUndefined();
+    expect(wasRemoved()).toBe(false);
+  });
+
+  it("doesn't say 'removed' when the server closes the socket as it signs the phone out", async () => {
+    // The server closes this device's socket with WS_CLOSE_UNPAIRED before it answers, and
+    // socket.ts then calls forgetRevokedPairing; other requests in flight may get a 401.
+    fetchMock.mockImplementationOnce(async () => {
+      await forgetRevokedPairing('tok-123');
+      return json({ ok: true });
+    });
+    await unpair();
+    expect((await getSettings()).deviceToken).toBeUndefined();
+    expect(wasRemoved()).toBe(false);
+    // A close that arrives after the answer changes nothing either.
+    await forgetRevokedPairing('tok-123');
+    expect(wasRemoved()).toBe(false);
+  });
+
+  it("doesn't wait long for a server that doesn't answer", async () => {
+    useTimerFakes();
+    fetchMock.mockImplementationOnce((_url, init) => new Promise((_resolve, reject) => {
+      init!.signal!.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+    }));
+    const done = unpair();
+    await vi.advanceTimersByTimeAsync(3_000);
+    await done;
+    expect((await getSettings()).deviceToken).toBeUndefined();
+  });
+});
+
+describe('renameMember', () => {
+  it('sends PATCH /api/me with the trimmed name', async () => {
+    const member = { id: 'm1', name: 'Carter C', joinedAt: '2026-10-01T00:00:00Z', lastSeenAt: null };
+    fetchMock.mockResolvedValueOnce(json(member));
+    await expect(renameMember(' Carter C ')).resolves.toEqual(member);
+    const { url, init, headers } = lastCall();
+    expect(url).toBe('http://192.168.1.20:8787/api/me');
+    expect(init.method).toBe('PATCH');
+    expect(headers.Authorization).toBe('Bearer tok-123');
+    expect(JSON.parse(init.body as string)).toEqual({ name: 'Carter C' });
+  });
+
+  it('reports a taken name', async () => {
+    fetchMock.mockResolvedValueOnce(json({ error: 'name_taken' }, 409));
+    await expect(renameMember('Mika')).rejects.toMatchObject({ status: 409, code: 'name_taken' });
+  });
+});
+
+describe('server reachability', () => {
+  it('tells listeners when the server answered', async () => {
+    const reached = vi.fn();
+    const off = onServerReachable(reached);
+    try {
+      fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+      await getHousehold().catch(() => {});
+      expect(reached).not.toHaveBeenCalled();
+      fetchMock.mockResolvedValueOnce(json({ householdName: 'Home', me: 'm1', members: [], sharedStreak: 0 }));
+      await getHousehold();
+      expect(reached).toHaveBeenCalledTimes(1);
+    } finally {
+      off();
+    }
+  });
+});
+
+describe('secureContextProblem', () => {
+  it('explains, in plain words, why an http:// page cannot work offline', () => {
+    vi.stubGlobal('isSecureContext', false);
+    expect(secureContextProblem()).toMatch(/https:\/\//);
+    expect(secureContextProblem()).toMatch(/offline/);
+  });
+
+  it('is null on https:// and localhost', () => {
+    vi.stubGlobal('isSecureContext', true);
+    expect(secureContextProblem()).toBeNull();
+  });
+});
+
+describe('isServerUrl', () => {
+  it.each(['', '192.168.1.20:8787', 'http://192.168.1.20:8787', 'homeserver:8787', 'issho.example.com', 'https://issho.tail1234.ts.net', '[fe80::1]:8787', 'https://example.com/issho'])(
+    'accepts %j',
+    (input) => expect(isServerUrl(input)).toBe(true),
+  );
+  it.each(['not a url!!', 'http://', 'ftp://example.com', 'https://exa mple.com', 'example.com:abc', 'https://user:pw@example.com', 'https://example.com/?q=1', '!!'])(
+    'rejects %j',
+    (input) => expect(isServerUrl(input)).toBe(false),
+  );
 });
 
 describe('normalizeServerUrl', () => {

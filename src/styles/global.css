@@ -10,7 +10,10 @@
   --muted-on-ink: #CFC8BA;
   --line: #DDD5C6;
   --line-strong: #CFC6B5;
-  --faint: #E6DFD2;        /* unwritten strokes, empty bars */
+  --faint: #E6DFD2;        /* empty bars, quiet dividers */
+  --ghost: #958C7E;        /* strokes to trace and pad guides: 3.3:1 on the card (a graphic to see), ink 5.1:1 on it */
+  --line-input: #8F877A;   /* text field borders: at least 3:1 on card and paper */
+  --focus-ring: var(--shu);
   --shu: #B3341C;
   --shu-tint: #F6E2DC;
   --shu-ink: #8A2814;
@@ -38,6 +41,7 @@
   :root:not([data-theme="light"]) {
     --paper: #171614; --paper-deep: #2A2723; --card: #201E1B; --ink: #EDE7DC; --ink-soft: #2B2824;
     --muted: #ABA393; --muted-on-ink: #ABA393; --line: #37332D; --line-strong: #4A453D; --faint: #34302A;
+    --ghost: #70675E; --line-input: #7A7365;
     --shu: #E0664B; --shu-tint: #3A211B; --shu-ink: #F2A994;
     --ai: #8FA9D6; --ai-tint: #1E2735; --ai-ink: #BCD0F0; --ai-muted: #A9B8D3; --good: #8FA9D6;
     --on-accent: #1A0F0C; --on-ink: #171614;
@@ -47,6 +51,7 @@
 :root[data-theme="dark"] {
   --paper: #171614; --paper-deep: #2A2723; --card: #201E1B; --ink: #EDE7DC; --ink-soft: #2B2824;
   --muted: #ABA393; --muted-on-ink: #ABA393; --line: #37332D; --line-strong: #4A453D; --faint: #34302A;
+  --ghost: #70675E; --line-input: #7A7365;
   --shu: #E0664B; --shu-tint: #3A211B; --shu-ink: #F2A994;
   --ai: #8FA9D6; --ai-tint: #1E2735; --ai-ink: #BCD0F0; --ai-muted: #A9B8D3; --good: #8FA9D6;
   --on-accent: #1A0F0C; --on-ink: #171614;
@@ -70,7 +75,8 @@ h1, h2, h3 { margin: 0; line-height: 1.25; text-wrap: balance; }
 p { margin: 0; }
 button, input, textarea, select { font: inherit; color: inherit; }
 a { color: var(--ai); }
-:focus-visible { outline: 2px solid var(--shu); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+::placeholder { color: var(--muted); opacity: 1; }
 [lang="ja"] { font-feature-settings: "palt" 0; }
 .jp-display { font-family: var(--font-display); }
 .muted { color: var(--muted); }
@@ -78,9 +84,17 @@ a { color: var(--ai); }
   position: absolute !important; width: 1px; height: 1px; overflow: hidden;
   clip: rect(0 0 0 0); white-space: nowrap;
 }
+/* A table can't shrink to 1px: anchored at the right edge it overflows to the
+   left, which never makes the page scroll sideways. */
+table.visually-hidden { left: auto; right: 0; }
 ruby rt { font-size: 0.5em; color: var(--muted); font-family: var(--font-body); }
+/* Reduced motion: every animation jumps to its end in one step. Looping ones
+   (skeleton pulses, live dots) run once and stop instead of flickering. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+  *, *::before, *::after {
+    animation-duration: 1ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important; scroll-behavior: auto !important;
+  }
 }
 
 /* ---- Shared primitives (src/components/ui.tsx) ---- */
@@ -141,7 +155,7 @@ ruby rt { font-size: 0.5em; color: var(--muted); font-family: var(--font-body); 
 .choice.correct { border: 2px solid var(--good); background: var(--good); color: var(--on-accent); font-weight: 700; }
 .choice.wrong { border: 2px solid var(--shu); background: var(--shu-tint); color: var(--shu-ink); text-decoration: line-through; }
 .text-input {
-  width: 100%; min-height: 52px; padding: 0 16px; border-radius: 14px; border: 1px solid var(--line-strong);
+  width: 100%; min-height: 52px; padding: 0 16px; border-radius: 14px; border: 1px solid var(--line-input);
   background: var(--card); font-size: 18px;
 }
 .feedback { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: 16px; }
@@ -158,3 +172,9 @@ ruby rt { font-size: 0.5em; color: var(--muted); font-family: var(--font-body); 
 }
 .tabbar a.active { color: var(--shu); font-weight: 700; }
 .empty { padding: 32px 16px; text-align: center; color: var(--muted); }
+
+/* ---- App-level messages (src/App.tsx): page not found, a screen that failed ---- */
+.app-message { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding-top: 24px; }
+.app-message-mark { font-family: var(--font-display); font-size: 40px; line-height: 1.2; color: var(--shu); }
+.app-message-title { font-family: var(--font-display); font-size: 26px; font-weight: 700; overflow-wrap: anywhere; }
+.app-message-actions { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }

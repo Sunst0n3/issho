@@ -27,10 +27,10 @@ export interface BlockProgress {
   practice: boolean;
 }
 
-/** A card that no longer exists or is suspended is skipped. */
-async function load(cardId: string): Promise<PreparedCard | null> {
+/** A card that no longer exists or is suspended is skipped. `block` is every card of the block. */
+async function load(cardId: string, block: readonly string[]): Promise<PreparedCard | null> {
   const card = await db.cards.get(cardId);
-  return card && !card.suspended ? prepareCard(card) : null;
+  return card && !card.suspended ? prepareCard(card, Math.random, { block }) : null;
 }
 
 export function ReviewBlock({ cardIds, timer, onProgress, onAnswered, onDone }: {
@@ -60,7 +60,7 @@ export function ReviewBlock({ cardIds, timer, onProgress, onAnswered, onDone }: 
   const loadAt = (i: number) => {
     let p = loads.current.get(i);
     if (!p && queue[i]) {
-      p = load(queue[i].cardId);
+      p = load(queue[i].cardId, cardIds);
       loads.current.set(i, p);
     }
     return p;

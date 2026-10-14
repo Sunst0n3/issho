@@ -3,9 +3,19 @@
 import { useEffect, useId, useRef } from 'react';
 import { Icon, ProgressBar } from '../ui.tsx';
 
-export function SessionHeader({ progress, label, onClose }: { progress: number; label: string; onClose: () => void }) {
+/**
+ * `title` is the screen's h1, read by screen readers only: the bar shows progress, not a
+ * title. Leave it out when the content has its own h1 (the summary, an empty session).
+ */
+export function SessionHeader({ progress, label, onClose, title }: {
+  progress: number;
+  label: string;
+  onClose: () => void;
+  title?: string;
+}) {
   return (
     <div className="topbar st-header">
+      {title && <h1 className="visually-hidden">{title}</h1>}
       <button type="button" className="icon-btn" aria-label="Close" onClick={onClose}>
         <Icon name="close" size={22} />
       </button>

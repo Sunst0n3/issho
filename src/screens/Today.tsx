@@ -2,20 +2,19 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { Link, Navigate } from 'react-router-dom';
 import { NewToday, newItemTiles } from '../components/home/NewToday.tsx';
 import { ConnectHint, PartnerCard, SyncFooter } from '../components/home/PartnerCard.tsx';
+import { SecureNotice } from '../components/home/SecureNotice.tsx';
 import { SessionPanel } from '../components/home/SessionPanel.tsx';
 import { StreakCard } from '../components/home/StreakCard.tsx';
 import {
   dateOfKey,
   greeting,
   phaseFraction,
-  phaseKanjiTargets,
   phaseProgressText,
   WEEKDAYS_EN,
   WEEKDAYS_JA,
 } from '../components/home/labels.ts';
 import { useClockTick, useLive } from '../components/home/useLive.ts';
 import { Icon, Screen } from '../components/ui.tsx';
-import { loadCurriculum } from '../lib/data.ts';
 import { dayKey, getSettings } from '../lib/db.ts';
 import { courseProgress, type CourseProgress } from '../srs/course.ts';
 import { planToday } from '../srs/planner.ts';
@@ -23,12 +22,12 @@ import { streak } from '../srs/progress.ts';
 import { isPairedSettings } from '../sync/client.ts';
 import '../components/home/home.css';
 
-function PhaseLine({ progress, kanjiTotal }: { progress: CourseProgress; kanjiTotal: number }) {
-  const pct = `${Math.round(phaseFraction(progress, kanjiTotal) * 100)}%`;
+function PhaseLine({ progress }: { progress: CourseProgress }) {
+  const pct = `${Math.round(phaseFraction(progress) * 100)}%`;
   return (
     <Link to="/learn" className="today-phase">
       <span className="today-phase-text">
-        <strong>Phase {progress.phase}</strong> · {phaseProgressText(progress, kanjiTotal)}
+        <strong>Phase {progress.phase}</strong> · {phaseProgressText(progress)}
       </span>
       <span className="today-phase-bar" aria-hidden="true"><span style={{ width: pct }} /></span>
       <Icon name="forward" size={16} />
@@ -56,12 +55,11 @@ export default function Today() {
   const tick = useClockTick();
   const streakLive = useLive(() => streak(), [tick]);
   const today = useLive(async () => {
-    const [plan, progress, curriculum] = await Promise.all([planToday(), courseProgress(), loadCurriculum()]);
+    const [plan, progress] = await Promise.all([planToday(), courseProgress()]);
     return {
       plan,
       progress,
       tiles: await newItemTiles(plan.newItems),
-      kanjiTotal: phaseKanjiTargets(curriculum)[4],
     };
   }, [tick]);
 
@@ -87,6 +85,8 @@ export default function Today() {
         </Link>
       </header>
 
+      <SecureNotice />
+
       {streakLive.status === 'ready'
         ? <StreakCard info={streakLive.value} />
         : <div className="hm-skeleton streak" aria-hidden="true" />}
@@ -104,7 +104,9 @@ export default function Today() {
           <SessionPanel
             plan={today.value.plan}
             todayDone={todayDone}
-            courseFinished={today.value.progress.unitsTotal > 0
+            // Nothing new is left at all (kana, kanji, words, grammar), and every kanji is met.
+            courseFinished={today.value.plan.courseComplete === true
+              && today.value.progress.unitsTotal > 0
               && today.value.progress.unitsIntroduced === today.value.progress.unitsTotal}
           />
           {!todayDone && <NewToday tiles={today.value.tiles} />}
@@ -113,7 +115,7 @@ export default function Today() {
 
       {paired ? <PartnerCard /> : <ConnectHint />}
 
-      {today.status === 'ready' && <PhaseLine progress={today.value.progress} kanjiTotal={today.value.kanjiTotal} />}
+      {today.status === 'ready' && <PhaseLine progress={today.value.progress} />}
 
       <SyncFooter paired={paired} />
     </Screen>

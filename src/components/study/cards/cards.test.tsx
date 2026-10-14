@@ -24,6 +24,8 @@ vi.mock('../../../writing/WritingPad.tsx', async () => (await import('../test-ut
 const card = (kind: ItemKind, key: string, type: CardType): CardRecord => newCardRecord(itemId(kind, key), kind, type);
 const choice = (name: string | RegExp) => within(screen.getByRole('group', { name: 'Answer choices' })).getByRole('button', { name });
 const answer = (onAnswer: ReturnType<typeof vi.fn>) => onAnswer.mock.calls[0][0] as CardAnswer;
+/** The feedback note of the first answer, rendered on its own. */
+const noteOf = (onAnswer: ReturnType<typeof vi.fn>) => render(<p>{answer(onAnswer).feedback?.note}</p>).container.firstElementChild!;
 
 const shi = KANA.find((k) => k.char === 'し')!;
 const mizu = WORDS.find((w) => w.id === 'w-mizu')!;
@@ -92,6 +94,8 @@ describe('kana cards', () => {
     const view = render(<KanaWriteCard prepared={prepared} onAnswer={onAnswer} />);
     expect(screen.getByRole('heading', { name: 'Write the hiragana for' })).toBeTruthy();
     expect(screen.getByText('a')).toBeTruthy();
+    // The pad's name says what to write, not the answer.
+    expect(await screen.findByRole('img', { name: 'Writing pad for the hiragana for "a" (memory)' })).toBeTruthy();
     fireEvent.click(await screen.findByRole('button', { name: 'Finish writing' }));
     expect(answer(onAnswer)).toMatchObject({ grade: 3, mode: 'written', correct: true, feedback: { title: 'Well written', expected: 'あ' } });
 
@@ -118,6 +122,8 @@ describe('kana cards', () => {
     expect(screen.getByRole('img', { name: /Stroke order animation for あ/ })).toBeTruthy();
     const grades = screen.getByRole('group', { name: 'How did your writing compare?' });
     expect(within(grades).getAllByRole('button').map((b) => b.textContent?.replace(/[\d.]+(m|h|d|mo|y)$/, ''))).toEqual(['Again', 'Hard', 'Good', 'Easy']);
+    // Read as "Easy, back in 7 days", not "Easy7d".
+    expect(within(grades).getByRole('button', { name: /^Easy, back in \d+ days$/ })).toBeTruthy();
     fireEvent.click(within(grades).getByRole('button', { name: /Easy/ }));
     expect(answer(onAnswer)).toEqual({ grade: 4, mode: 'self', correct: true });
   });
@@ -128,7 +134,11 @@ describe('radical and kanji cards', () => {
     const onAnswer = vi.fn();
     render(<RadicalMeaningCard prepared={{ view: 'radical-meaning', card: card('radical', '氵', 'meaning'), radical: RADICALS[0], options: ['hand', 'water', 'roof', 'mouth'] }} onAnswer={onAnswer} />);
     fireEvent.click(choice('hand'));
-    expect(answer(onAnswer)).toMatchObject({ grade: 1, correct: false, feedback: { expected: 'water', note: 'water (side), a form of 水' } });
+    expect(answer(onAnswer)).toMatchObject({ grade: 1, correct: false, feedback: { expected: 'water' } });
+    const note = noteOf(onAnswer);
+    expect(note.textContent).toBe('water (side), a form of 水');
+    // Japanese inside English is marked, so screen readers switch voice.
+    expect(note.querySelector('[lang="ja"]')?.textContent).toBe('水');
   });
 
   it('kanji meaning: typed answers forgive a small typo but not another option', () => {
@@ -152,6 +162,21 @@ describe('radical and kanji cards', () => {
     expect(answer(onAnswer)).toMatchObject({ grade: 1, correct: false });
   });
 
+  it('kanji meaning: an accepted typo or plural still shows the right spelling, and the readings include an ON one', () => {
+    const onAnswer = vi.fn();
+    const aka = { char: '赤', meanings: ['red'], kun: ['あか', 'あか.い', 'あか.らむ', 'あか.らめる'], on: ['セキ', 'シャク'], strokeCount: 7, components: [] };
+    localStorage.setItem('issho.study.typed', JSON.stringify({ 'kanji-meaning': true }));
+    const view = render(<KanjiMeaningCard prepared={{ view: 'kanji-meaning', card: card('kanji', '赤', 'meaning'), kanji: aka, options: [], notAccepted: ['read'] }} onAnswer={onAnswer} />);
+    const input = screen.getByLabelText('Meaning');
+    fireEvent.change(input, { target: { value: 'reds' } });
+    fireEvent.submit(input);
+    expect(answer(onAnswer)).toMatchObject({ grade: 3, mode: 'typed', correct: true });
+    const note = noteOf(onAnswer);
+    expect(note.textContent).toContain('red');
+    expect(note.querySelector('[lang="ja"]')?.textContent).toBe('あか・あかい・セキ・シャク');
+    view.unmount();
+  });
+
   it('kanji reading: the kanji is underlined in its word and the feedback breaks the word down', () => {
     const onAnswer = vi.fn();
     render(<KanjiReadingCard onAnswer={onAnswer} prepared={{
@@ -160,6 +185,8 @@ describe('radical and kanji cards', () => {
       breakdown: [{ char: '水', meaning: 'water' }, { char: '曜', meaning: 'weekday' }, { char: '日', meaning: 'day' }],
     }} />);
     expect(document.querySelector('.st-target')?.textContent).toBe('水');
+    // The underline is visual only, so screen readers hear which kanji it marks.
+    expect(document.querySelector('.st-big .visually-hidden')?.textContent).toBe(' (underlined: 水)');
     fireEvent.click(choice('すいようび'));
     const a = answer(onAnswer);
     expect(a).toMatchObject({ grade: 3, feedback: { expected: 'すいようび', note: 'Wednesday', speak: 'すいようび' } });
@@ -171,6 +198,8 @@ describe('radical and kanji cards', () => {
     render(<KanjiWriteCard prepared={{ view: 'kanji-write', card: card('kanji', '水', 'write'), kanji: KANJI['水'], reading: 'みず' }} onAnswer={onAnswer} />);
     expect(screen.getByRole('heading', { name: 'Write the kanji for' })).toBeTruthy();
     expect(screen.getByText('みず')).toBeTruthy();
+    // The pad's name says what to write without giving the kanji away.
+    expect(await screen.findByRole('img', { name: 'Writing pad for the kanji for "water" (みず) (memory)' })).toBeTruthy();
     fireEvent.click(await screen.findByRole('button', { name: 'Miss a stroke' }));
     expect(screen.getByText('Check the direction this stroke travels.')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Finish writing' }));
@@ -227,7 +256,8 @@ describe('word, vocab and grammar cards', () => {
     const ie = SURVIVAL[1];
     const view = render(<VocabMeaningCard prepared={{ view: 'vocab-meaning', card: card('vocab', ie.id, 'meaning'), vocab: ie, options: ['love', 'house', 'above', 'face'] }} onAnswer={onAnswer} />);
     fireEvent.click(choice('house'));
-    expect(answer(onAnswer)).toMatchObject({ grade: 3, feedback: { note: 'A home or a building.' } });
+    expect(answer(onAnswer)).toMatchObject({ grade: 3 });
+    expect(noteOf(onAnswer).textContent).toBe('A home or a building.');
     view.unmount();
 
     onAnswer.mockClear();

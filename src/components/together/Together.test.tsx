@@ -50,6 +50,7 @@ const mocks = vi.hoisted(() => ({
   getQuizzes: vi.fn(),
   createQuiz: vi.fn(),
   hardestKanji: vi.fn(),
+  reconnectNow: vi.fn(),
 }));
 
 vi.mock('../../sync/stats.ts', () => ({
@@ -61,6 +62,7 @@ vi.mock('../../sync/socket.ts', () => ({
   onServerEvent: () => () => {},
   onStatusChange: () => () => {},
   connectFromSettings: async () => {},
+  reconnectNow: mocks.reconnectNow,
 }));
 vi.mock('../../sync/client.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../sync/client.ts')>()),
@@ -99,7 +101,7 @@ describe('Together, not paired', () => {
   it('explains the together features and offers to connect', async () => {
     await updateSettings({ name: 'Aiko' });
     renderTogether();
-    expect(await screen.findByText('Practise with your partner')).toBeTruthy();
+    expect(await screen.findByText('Practice with your partner')).toBeTruthy();
     expect(screen.getByLabelText('Household code')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Connect' })).toBeTruthy();
     expect(mocks.getQuizzes).not.toHaveBeenCalled();
@@ -120,8 +122,11 @@ describe('Together, paired', () => {
     expect(await screen.findByText('This week')).toBeTruthy();
     expect(screen.getByText('Synced 2 min ago')).toBeTruthy();
 
-    // The table behind the bars, labelled by the server's dates.
+    // The table behind the bars, labelled by the server's dates. It sits in a clipped
+    // box: a table can't shrink to 1 px, and a long partner name would widen the page.
     const table = screen.getByRole('table');
+    expect(table.className).toBe('');
+    expect(table.parentElement?.className).toBe('visually-hidden');
     const rows = within(table).getAllByRole('row');
     expect(rows).toHaveLength(8);
     expect(within(rows[1]).getByRole('rowheader').textContent).toBe('Thursday');
@@ -146,12 +151,14 @@ describe('Together, paired', () => {
     expect(chat.getAttribute('href')).toBe('/chat');
     await waitFor(() => expect(chat.textContent).toContain('げんき？'));
     expect(chat.textContent).toContain('1 unread');
+    // Its parts are read with pauses, not run together ("Chat in Japaneseげんき？").
+    await waitFor(() => expect(screen.getByRole('link', { name: 'Chat in Japanese げんき？ 1 unread' })).toBe(chat));
 
     // Phase 2 → a level 2 script.
     expect(await screen.findByText('At the station')).toBeTruthy();
     expect(screen.getByRole('link', { name: /Start role-play/ }).getAttribute('href')).toBe('/roleplay/rp-2');
 
-    const take = await screen.findByRole('link', { name: /Take the quiz/ });
+    const take = await screen.findByRole('link', { name: 'Ken sent you 5 kanji Take the quiz' });
     expect(take.getAttribute('href')).toBe('/quiz/q-in');
     expect(take.textContent).toContain('Ken sent you 5 kanji');
     const sent = screen.getByText(/Ken got 3\/4/);
@@ -213,6 +220,61 @@ describe('Together, paired', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     fireEvent.click(await screen.findByRole('button', { name: 'Send quiz' }));
     await waitFor(() => expect(mocks.createQuiz).toHaveBeenCalledWith({ toMemberId: 'ken', items: [{ char: '曜' }] }));
+  });
+
+  it("says the home server can't be reached, and Try again reconnects as well as refetching", async () => {
+    mocks.status = 'offline';
+    mocks.household = { loading: false, error: new Error('network') };
+    renderTogether();
+    // The phone itself is online: it's the home server that isn't answering.
+    expect(await screen.findByRole('heading', { name: "Couldn't reach your home server" })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(mocks.reconnectNow).toHaveBeenCalled();
+    expect(mocks.refresh).toHaveBeenCalled();
+  });
+
+  it('moves focus to the week when Try again brings it in', async () => {
+    mocks.status = 'offline';
+    mocks.household = { loading: false, error: new Error('network') };
+    const view = renderTogether();
+    const retry = await screen.findByRole('button', { name: 'Try again' });
+    retry.focus();
+    fireEvent.click(retry);
+    mocks.household = { data: HOUSEHOLD, fetchedAt: Date.now(), loading: false };
+    view.rerender(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><Together /></MemoryRouter>);
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('heading', { name: 'This week' })));
+  });
+
+  it('keeps focus in the quiz card as its buttons change', async () => {
+    mocks.hardestKanji.mockResolvedValue([{ char: '曜', lapses: 3, stability: 1 }, { char: '週', lapses: 2, stability: 2 }]);
+    renderTogether();
+    const send = await screen.findByRole('button', { name: 'Send' });
+    send.focus();
+    fireEvent.click(send);
+    const question = await screen.findByText('Send these 2 kanji to Ken?');
+    await waitFor(() => expect(document.activeElement).toBe(question));
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Send' })));
+  });
+
+  it("writes the partner fallback in lower case mid-sentence while the household hasn't loaded", async () => {
+    mocks.status = 'offline';
+    mocks.household = { loading: false, error: new Error('network') };
+    mocks.getQuizzes.mockResolvedValue({
+      inbox: [],
+      sent: [{ ...quiz('q-sent', {}), fromMemberId: 'me', toMemberId: 'ken', result: { correct: 0, total: 0, missed: [], finishedAt: '2026-10-14T09:00:00Z' } }],
+    });
+    renderTogether();
+    expect(await screen.findByText('All 5 kanji were new to your partner')).toBeTruthy();
+  });
+
+  it("doesn't say the partner hasn't joined when the household just hasn't loaded", async () => {
+    mocks.status = 'offline';
+    mocks.household = { loading: false, error: new Error('network') };
+    renderTogether();
+    expect(await screen.findByText('Quizzes need your home server. You can send one once this phone connects.')).toBeTruthy();
+    expect(screen.queryByText(/Once your partner joins/)).toBeNull();
+    expect(screen.getByRole('button', { name: 'Send' })).toHaveProperty('disabled', true);
   });
 
   it('shows the cached view with an offline note', async () => {

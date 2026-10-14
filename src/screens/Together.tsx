@@ -1,14 +1,15 @@
-// The Together tab: your week next to your partner's, and ways to practise
+// The Together tab: your week next to your partner's, and ways to practice
 // together (chat, tonight's role-play, quizzing each other). Works offline from
 // the last household view this phone saw.
 
 import type { Table } from 'dexie';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { Link } from 'react-router-dom';
 import type { MemberStats, Quiz, QuizzesResponse } from '../../shared/api.ts';
 import { ConnectServerForm } from '../components/together/ConnectServerForm.tsx';
-import { memberName, sharedKanji, splitHousehold, timeAgo, useNow } from '../components/together/household.ts';
+import { focusLost } from '../components/together/focus.ts';
+import { memberName, midSentence, PARTNER_FALLBACK, sharedKanji, splitHousehold, timeAgo, useNow } from '../components/together/household.ts';
 import { useRolePlayInvite } from '../components/together/live.ts';
 import { QuizSender } from '../components/together/QuizSender.tsx';
 import { useQuizzes } from '../components/together/quizzes.ts';
@@ -23,7 +24,7 @@ import { useKnownKanji, useRubyShow, useSettings, useSettingsLoaded } from '../l
 import type { RolePlay, Settings } from '../lib/types.ts';
 import { currentPhase } from '../srs/course.ts';
 import type { PendingMessage } from '../sync/outbox.ts';
-import { onServerEvent, useServerStatus, type ServerStatus } from '../sync/socket.ts';
+import { onServerEvent, reconnectNow, useServerStatus, type ServerStatus } from '../sync/socket.ts';
 import { useHousehold } from '../sync/stats.ts';
 
 export default function Together() {
@@ -55,7 +56,7 @@ function Unpaired() {
     <Screen tabs label="Together">
       <Header />
       <section className="card tg-together-explain" aria-labelledby="together-explain">
-        <h2 id="together-explain">Practise with your partner</h2>
+        <h2 id="together-explain">Practice with your partner</h2>
         <ul className="tg-feature-list">
           <li><Icon name="chat" /><span><strong>Text in Japanese.</strong> A private tip can help before you send.</span></li>
           <li><Icon name="mic" /><span><strong>Act out role-plays</strong> out loud, on two phones or one.</span></li>
@@ -78,12 +79,24 @@ function Paired({ settings }: { settings: Settings }) {
   const { data, fetchedAt, loading, error, refresh } = useHousehold();
   const quizzes = useQuizzes();
   const { me, partner } = splitHousehold(data);
-  const partnerName = partner?.member.name ?? 'Your partner';
+  const partnerName = partner?.member.name ?? PARTNER_FALLBACK;
   const invite = useRolePlayInvite();
 
   useEffect(() => onServerEvent((ev) => {
     if (ev.type === 'stats') void refresh();
   }), [refresh]);
+
+  // "Try again" is replaced by the week (or by the card again when it still fails): keep focus there.
+  const retried = useRef(false);
+  const weekHeading = useRef<HTMLHeadingElement>(null);
+  const retryButton = useRef<HTMLButtonElement>(null);
+  useLayoutEffect(() => {
+    if (!retried.current) return;
+    const target = data ? weekHeading.current : retryButton.current;
+    if (!target) return; // Still loading.
+    retried.current = false;
+    if (focusLost()) target.focus();
+  }, [data, loading, error]);
 
   return (
     <Screen tabs label="Together">
@@ -98,21 +111,29 @@ function Paired({ settings }: { settings: Settings }) {
       )}
 
       {data ? (
-        <WeekCard me={me} partner={partner} partnerName={partnerName} sharedStreak={data.sharedStreak} />
+        <WeekCard me={me} partner={partner} partnerName={partnerName} sharedStreak={data.sharedStreak} headingRef={weekHeading} />
       ) : loading || !error ? (
         <div className="tg-skeleton-block" aria-busy="true" aria-label="Loading your week" />
       ) : (
         <div className="tg-notice-card">
-          <h2>{status === 'offline' ? "You're offline" : "Couldn't reach your home server"}</h2>
+          {/* The socket says 'offline' whenever the server can't be reached, even on a working network. */}
+          <h2>{navigator.onLine === false ? "You're offline" : "Couldn't reach your home server"}</h2>
           <p>Your week and your partner's show up here once this phone connects.</p>
-          <button type="button" className="btn secondary small" onClick={() => void refresh()}>Try again</button>
+          <button ref={retryButton} type="button" className="btn secondary small" onClick={() => {
+            retried.current = true;
+            // Reconnect the live connection too, rather than waiting out its backoff, so the
+            // header doesn't keep saying "Offline" over freshly loaded data.
+            reconnectNow();
+            void refresh();
+          }}>Try again</button>
         </div>
       )}
 
       <h2 className="label tg-section-label">Practice together</h2>
       <ChatCard myId={settings.memberId} />
       <RolePlayCard />
-      <QuizSender partnerId={partner?.member.id} partnerName={partnerName}>
+      {/* Without the household (offline, nothing cached) we can't tell whether the partner joined. */}
+      <QuizSender partnerId={partner?.member.id} partnerName={partnerName} householdKnown={Boolean(data)}>
         <QuizLists data={quizzes.data} nameOf={(memberId) => memberName(data, memberId, partnerName)} />
       </QuizSender>
     </Screen>
@@ -140,11 +161,12 @@ function SyncStatus({ status, fetchedAt, hasData, failed }: {
   return <p className="tg-sync-status">Connecting…</p>;
 }
 
-function WeekCard({ me, partner, partnerName, sharedStreak }: {
+function WeekCard({ me, partner, partnerName, sharedStreak, headingRef }: {
   me?: MemberStats;
   partner?: MemberStats;
   partnerName: string;
   sharedStreak: number;
+  headingRef?: RefObject<HTMLHeadingElement>;
 }) {
   const local = useKnownKanji();
   // This phone's own list is fresher than the copy it last uploaded.
@@ -154,7 +176,7 @@ function WeekCard({ me, partner, partnerName, sharedStreak }: {
   return (
     <section className="card" aria-labelledby="week-title">
       <div className="tg-week-head">
-        <h2 id="week-title">This week</h2>
+        <h2 ref={headingRef} id="week-title" tabIndex={-1}>This week</h2>
         <ul className="tg-legend">
           <li><span className="tg-swatch tg-you" aria-hidden="true" />You</li>
           {partner && <li><span className="tg-swatch tg-partner" aria-hidden="true" />{partnerName}</li>}
@@ -184,6 +206,7 @@ function WeekCard({ me, partner, partnerName, sharedStreak }: {
 }
 
 function ChatCard({ myId }: { myId?: string }) {
+  const id = useId();
   const summary = useLiveQuery(async () => {
     const last = await db.messages.orderBy('id').last();
     const lastRead = lastReadMessageId();
@@ -198,12 +221,15 @@ function ChatCard({ myId }: { myId?: string }) {
     ? last.kind === 'voice' ? `Voice message${last.transcript ? ` · ${last.transcript}` : ''}` : last.text
     : undefined;
 
+  const unread = summary && summary.unread > 0 ? summary.unread : 0;
   return (
-    <Link to="/chat" className="tg-chat-card">
+    // Named from its parts so screen readers hear a pause between them, not "Chat in JapaneseYou: …".
+    <Link to="/chat" className="tg-chat-card"
+      aria-labelledby={[`${id}-title`, `${id}-preview`, unread ? `${id}-unread` : ''].filter(Boolean).join(' ')}>
       <span className="tg-chat-card-icon" aria-hidden="true"><Icon name="chat" size={22} /></span>
       <span className="tg-chat-card-body">
-        <span className="tg-chat-card-title">Chat in Japanese</span>
-        <span className="tg-chat-card-preview">
+        <span className="tg-chat-card-title" id={`${id}-title`}>Chat in Japanese</span>
+        <span className="tg-chat-card-preview" id={`${id}-preview`}>
           {summary === undefined ? ' '
             : summary.failed > 0 ? `${summary.failed} not sent · open the chat to retry`
               : summary.waiting > 0 ? `${summary.waiting} waiting to send`
@@ -211,10 +237,10 @@ function ChatCard({ myId }: { myId?: string }) {
                   : 'Say hello. Your messages show up here.'}
         </span>
       </span>
-      {summary && summary.unread > 0 && (
+      {unread > 0 && (
         <span className="tg-unread-badge">
-          <span aria-hidden="true">{summary.unread}</span>
-          <span className="visually-hidden">{summary.unread} unread</span>
+          <span aria-hidden="true">{unread}</span>
+          <span className="visually-hidden" id={`${id}-unread`}>{unread} unread</span>
         </span>
       )}
       <Icon name="forward" />
@@ -261,23 +287,25 @@ function RolePlayCard() {
 }
 
 function SentResult({ quiz, partnerName }: { quiz: Quiz; partnerName: string }) {
-  const chars = quiz.items.map((i) => i.char).join(' ');
+  const unique = [...new Set(quiz.items.map((i) => i.char))];
+  const chars = unique.join(' ');
   if (!quiz.result) {
-    return <span>Waiting for {partnerName} · <span lang="ja">{chars}</span></span>;
+    return <span>Waiting for {midSentence(partnerName)} · <span lang="ja">{chars}</span></span>;
   }
   const { correct, total, missed } = quiz.result;
-  const fresh = quiz.items.length - total;
-  if (total === 0) return <span>All {quiz.items.length} kanji were new to {partnerName}</span>;
+  const fresh = Math.max(0, unique.length - total);
+  if (total === 0) return <span>All {unique.length} kanji were new to {midSentence(partnerName)}</span>;
   return (
     <span>
       {partnerName} got {correct}/{total}
-      {missed.length > 0 ? <> — missed <span lang="ja" className="tg-missed-kanji">{missed.join(' ')}</span></> : ' — every one'}
+      {missed.length > 0 ? <> — missed <span lang="ja" className="tg-missed-kanji">{[...new Set(missed)].join(' ')}</span></> : ' — every one'}
       {fresh > 0 && <span className="muted"> · {fresh} new to them</span>}
     </span>
   );
 }
 
 function QuizLists({ data, nameOf }: { data?: QuizzesResponse; nameOf: (memberId: string) => string }) {
+  const id = useId();
   const todo = data?.inbox.filter((q) => !q.result).slice(0, 3) ?? [];
   const sent = data?.sent.slice(0, 3) ?? [];
   if (!todo.length && !sent.length) return null;
@@ -289,9 +317,9 @@ function QuizLists({ data, nameOf }: { data?: QuizzesResponse; nameOf: (memberId
           <ul className="tg-quiz-list">
             {todo.map((q) => (
               <li key={q.id}>
-                <Link className="tg-quiz-row tg-todo" to={`/quiz/${q.id}`}>
-                  <span>{nameOf(q.fromMemberId)} sent you {q.items.length} kanji</span>
-                  <span className="tg-quiz-row-action">Take the quiz <Icon name="forward" size={16} /></span>
+                <Link className="tg-quiz-row tg-todo" to={`/quiz/${q.id}`} aria-labelledby={`${id}-${q.id} ${id}-${q.id}-go`}>
+                  <span id={`${id}-${q.id}`}>{nameOf(q.fromMemberId)} sent you {new Set(q.items.map((i) => i.char)).size} kanji</span>
+                  <span className="tg-quiz-row-action" id={`${id}-${q.id}-go`}>Take the quiz <Icon name="forward" size={16} /></span>
                 </Link>
               </li>
             ))}

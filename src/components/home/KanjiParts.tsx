@@ -1,9 +1,12 @@
 // Pieces of the kanji page: readings, memory hook, the learner's card status.
-import { useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { loadWordIndex } from '../../lib/data.ts';
 import { dayKey, db, itemId } from '../../lib/db.ts';
-import type { CardRecord, CurriculumUnit, ItemRecord } from '../../lib/types.ts';
+import type { CardRecord, CurriculumUnit, ItemRecord, WordEntry } from '../../lib/types.ts';
 import { introducePlanItem } from '../../srs/course.ts';
 import { daysBetween } from '../../srs/days.ts';
+import { MNEMONIC_MAX } from '../study/learn/KanjiLesson.tsx';
+import { focusLost } from '../together/focus.ts';
 import { Icon } from '../ui.tsx';
 import { kanaToRomaji } from './romaji.ts';
 
@@ -43,6 +46,27 @@ export function MemoryHook({ item, stock }: { item?: ItemRecord; stock?: string 
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
   const text = item?.customMnemonic ?? stock;
+  const input = useRef<HTMLTextAreaElement>(null);
+  const editButton = useRef<HTMLButtonElement>(null);
+  const wasEditing = useRef(false);
+
+  // The button pressed is replaced by the editor and back: keep focus with the hook.
+  useEffect(() => {
+    if (editing) input.current?.focus();
+    else if (wasEditing.current) editButton.current?.focus();
+    wasEditing.current = editing;
+  }, [editing]);
+
+  // After Save the editor stays until the live item shows the new hook. Closing
+  // earlier would briefly show "Write your own memory hook" for a first hook,
+  // and focus would be lost when the Edit button replaced it.
+  const [saved, setSaved] = useState<{ value: string | undefined } | null>(null);
+  useEffect(() => {
+    if (saved && (!item || item.customMnemonic === saved.value)) {
+      setSaved(null);
+      setEditing(false);
+    }
+  }, [saved, item]);
 
   if (item?.hideMnemonic) {
     return (
@@ -54,7 +78,7 @@ export function MemoryHook({ item, stock }: { item?: ItemRecord; stock?: string 
   if (!text && !editing) {
     // Only learned items have a record to keep a hook in.
     return item ? (
-      <button type="button" className="btn ghost small kd-show-hook" onClick={() => { setDraft(''); setEditing(true); }}>
+      <button ref={editButton} type="button" className="btn ghost small kd-show-hook" onClick={() => { setDraft(''); setEditing(true); }}>
         <Icon name="plus" size={18} />Write your own memory hook
       </button>
     ) : null;
@@ -62,8 +86,9 @@ export function MemoryHook({ item, stock }: { item?: ItemRecord; stock?: string 
 
   const save = async () => {
     if (!item) return;
-    await db.items.update(item.id, { customMnemonic: draft.trim() || undefined });
-    setEditing(false);
+    const value = draft.trim() || undefined;
+    await db.items.update(item.id, { customMnemonic: value });
+    setSaved({ value });
   };
 
   return (
@@ -72,7 +97,7 @@ export function MemoryHook({ item, stock }: { item?: ItemRecord; stock?: string 
       {editing ? (
         <>
           <label className="visually-hidden" htmlFor="kd-hook-input">Your memory hook</label>
-          <textarea id="kd-hook-input" className="kd-hook-input" rows={3} maxLength={200} value={draft}
+          <textarea ref={input} id="kd-hook-input" className="kd-hook-input" rows={3} maxLength={MNEMONIC_MAX} value={draft}
             placeholder="One short picture that ties the shape to the meaning" onChange={(e) => setDraft(e.target.value)} />
           <div className="kd-hook-actions">
             <button type="button" className="btn primary small" onClick={() => void save()}>Save</button>
@@ -90,7 +115,8 @@ export function MemoryHook({ item, stock }: { item?: ItemRecord; stock?: string 
           <p className="kd-hook-text">{text}</p>
           {item && (
             <div className="kd-hook-actions">
-              <button type="button" className="btn ghost small" onClick={() => { setDraft(text ?? ''); setEditing(true); }}>Edit</button>
+              <button ref={editButton} type="button" className="btn ghost small"
+                onClick={() => { setDraft(text ?? ''); setEditing(true); }}>Edit</button>
               <button type="button" className="btn ghost small" onClick={() => void db.items.update(item.id, { hideMnemonic: true })}>Hide</button>
             </div>
           )}
@@ -110,12 +136,21 @@ function whenDue(due: Date, now: Date): string {
   return `In ${days} days · ${DAY.format(due)}`;
 }
 
-export function CardStatus({ item, cards }: { item: ItemRecord; cards: readonly CardRecord[] }) {
+/** `justLearned`: it replaces "Learn this now", whose button had focus; focus moves here. */
+export function CardStatus({ item, cards, justLearned = false }: {
+  item: ItemRecord;
+  cards: readonly CardRecord[];
+  justLearned?: boolean;
+}) {
+  const section = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    if (justLearned && focusLost()) section.current?.focus();
+  }, [justLearned]);
   const active = cards.filter((c) => !c.suspended);
   const next = active.reduce<Date | undefined>((min, c) => (!min || c.due < min ? c.due : min), undefined);
   const lapses = active.reduce((sum, c) => sum + c.lapses, 0);
   return (
-    <section className="card kd-status" aria-label="Your progress">
+    <section ref={section} className="card kd-status" aria-label="Your progress" tabIndex={justLearned ? -1 : undefined}>
       <div>
         <span className="kd-stat-label">Learned</span>
         <span className="kd-stat">{DAY.format(item.introducedAt)}</span>
@@ -132,8 +167,31 @@ export function CardStatus({ item, cards }: { item: ItemRecord; cards: readonly 
   );
 }
 
-export function ComingUp({ unit, nextUp }: { unit: CurriculumUnit; nextUp: boolean }) {
+/**
+ * The unit's words that can come along when it is learned ahead of the course:
+ * only those whose other kanji are already known, as the course guarantees
+ * when it reaches the unit in order.
+ */
+export async function readableWords(unit: CurriculumUnit): Promise<string[]> {
+  if (unit.type !== 'kanji' || !unit.words.length) return [];
+  const [index, known] = await Promise.all([
+    // Without the word list the kanji still comes, just on its own.
+    loadWordIndex().catch(() => new Map<string, WordEntry>()),
+    db.items.where('kind').equals('kanji').primaryKeys(),
+  ]);
+  const knownKanji = new Set(known.map((id) => String(id).slice('kanji:'.length)));
+  knownKanji.add(unit.char);
+  return unit.words.filter((id) => {
+    const word = index.get(id);
+    return word !== undefined && word.kanji.every((k) => knownKanji.has(k));
+  });
+}
+
+export function ComingUp({ unit, nextUp, onShow }: { unit: CurriculumUnit; nextUp: boolean; onShow?(): void }) {
   const [busy, setBusy] = useState(false);
+  const shown = useRef(onShow);
+  shown.current = onShow;
+  useEffect(() => shown.current?.(), [unit.char]);
   const [error, setError] = useState(false);
   const learn = async () => {
     setBusy(true);
@@ -143,7 +201,7 @@ export function ComingUp({ unit, nextUp }: { unit: CurriculumUnit; nextUp: boole
         itemId: itemId(unit.type, unit.char),
         kind: unit.type,
         key: unit.char,
-        ...(unit.type === 'kanji' ? { words: unit.words } : {}),
+        ...(unit.type === 'kanji' ? { words: await readableWords(unit) } : {}),
       });
     } catch {
       setError(true);

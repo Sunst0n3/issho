@@ -1,10 +1,39 @@
 // Whether the home server has the AI helper turned on, asked once per session,
 // and friendly wording for the helper's errors.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { ApiError, health } from '../../sync/client.ts';
 
+/**
+ * The helper is switched on but failing on the server's side: a key or model the
+ * API refuses ('ai_misconfigured'), or the API itself erroring ('ai_unavailable').
+ */
+export type AiProblem = 'ai_misconfigured' | 'ai_unavailable';
+
+/**
+ * Shown once, in the chat, when the helper turns out to be broken. Only a refused key
+ * or model points at the server's setup; an erroring API is nothing to fix at home.
+ */
+export const AI_BROKEN_NOTICE: Record<AiProblem, string> = {
+  ai_misconfigured: "The AI helper isn't working — check the server's API key.",
+  ai_unavailable: "The AI helper isn't answering right now, so messages send without a check.",
+};
+
 let known: Promise<boolean> | null = null;
+let problem: AiProblem | undefined;
+/** Bumps whenever the session's verdict changes, so mounted screens re-ask. */
+let version = 0;
+const listeners = new Set<() => void>();
+
+function changed() {
+  version++;
+  for (const cb of [...listeners]) cb();
+}
+
+function subscribe(cb: () => void) {
+  listeners.add(cb);
+  return () => { listeners.delete(cb); };
+}
 
 /** Resolves false when the helper is off or the server can't be asked right now. */
 export function aiAvailable(): Promise<boolean> {
@@ -20,22 +49,55 @@ export function aiAvailable(): Promise<boolean> {
 /** The server said 'ai_disabled' after all: hide the helper for the rest of the session. */
 export function markAiDisabled(): void {
   known = Promise.resolve(false);
+  changed();
+}
+
+/** The helper's failure when it is a server-side problem that won't fix itself, else undefined. */
+export function aiProblemOf(e: unknown): AiProblem | undefined {
+  const code = e instanceof ApiError ? e.code : undefined;
+  return code === 'ai_misconfigured' || code === 'ai_unavailable' ? code : undefined;
+}
+
+/**
+ * The helper failed on the server's side: stop asking it for the rest of the session
+ * (messages go without a check), and remember why so Settings can say so.
+ */
+export function markAiBroken(why: AiProblem): void {
+  problem ??= why;
+  known = Promise.resolve(false);
+  changed();
+}
+
+/** Why the helper isn't working this session, if it failed on the server's side. */
+export function aiProblem(): AiProblem | undefined {
+  return problem;
+}
+
+/** aiProblem(), kept current (for Settings → AI helper). */
+export function useAiProblem(): AiProblem | undefined {
+  return useSyncExternalStore(subscribe, aiProblem, aiProblem);
 }
 
 /** For tests. */
 export function resetAiAvailability(): void {
   known = null;
+  problem = undefined;
+  changed();
 }
 
-/** True once the server has confirmed the helper is on. Re-asks when `reachable` turns true. */
+/**
+ * True once the server has confirmed the helper is on. Re-asks when `reachable` turns
+ * true, and turns false as soon as the helper is found to be off or broken.
+ */
 export function useAiAvailable(reachable: boolean): boolean {
   const [on, setOn] = useState(false);
+  const verdict = useSyncExternalStore(subscribe, () => version, () => version);
   useEffect(() => {
     if (!reachable) return;
     let live = true;
     void aiAvailable().then((v) => { if (live) setOn(v); });
     return () => { live = false; };
-  }, [reachable]);
+  }, [reachable, verdict]);
   return on;
 }
 

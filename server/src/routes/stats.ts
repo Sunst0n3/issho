@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import type { HouseholdResponse, MemberStats, StatsUploadRequest } from '../../../shared/api.ts';
-import { currentMember } from '../auth.ts';
+import { currentDevice, currentMember } from '../auth.ts';
 import type { AppContext } from '../context.ts';
 import { addDays, dayKey, fillDays, isDayKey, lastDays, sharedStreak } from '../days.ts';
 import { parseWith } from '../errors.ts';
@@ -9,14 +9,16 @@ import { parseWith } from '../errors.ts';
 const HOUSEHOLD_DAYS = 7;
 const count = z.number().int().min(0).max(1_000_000);
 
-const DayStatsSchema = z.object({
-  date: z.string().refine(isDayKey, 'must be a YYYY-MM-DD date'),
-  studyMinutes: z.number().min(0).max(24 * 60),
-  reviews: count,
-  correct: count,
-  newItems: count,
-  sessionComplete: z.boolean(),
-});
+const DayStatsSchema = z
+  .object({
+    date: z.string().refine(isDayKey, 'must be a YYYY-MM-DD date'),
+    studyMinutes: z.number().min(0).max(24 * 60),
+    reviews: count,
+    correct: count,
+    newItems: count,
+    sessionComplete: z.boolean(),
+  })
+  .refine((day) => day.correct <= day.reviews, { message: 'correct must not exceed reviews', path: ['correct'] });
 
 const StatsUploadSchema = z.object({
   days: z.array(DayStatsSchema).max(62),
@@ -30,7 +32,7 @@ export function statsRoutes(app: FastifyInstance, ctx: AppContext): void {
   app.post('/api/stats', async (request) => {
     const member = currentMember(request);
     const upload = parseWith(StatsUploadSchema, request.body);
-    ctx.store.saveStats(member.id, upload, ctx.now(), reportedDay(ctx, upload));
+    ctx.store.saveStats(member.id, currentDevice(request), upload, ctx.now(), reportedDay(ctx, upload));
     ctx.hub.broadcast({ type: 'stats', memberId: member.id });
     return { ok: true };
   });

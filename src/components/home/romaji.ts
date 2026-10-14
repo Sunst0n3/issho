@@ -56,6 +56,8 @@ export function kanaToRomaji(text: string): string {
     }
     let syllable = SYLLABLES.get(c);
     if (syllable === undefined) {
+      // A small っ with nothing to double (ジッ, the 十 of 十本) still shows: "jit".
+      if (doubleNext) out.push('t');
       out.push(c);
       doubleNext = false;
       continue;
@@ -71,5 +73,6 @@ export function kanaToRomaji(text: string): string {
     }
     out.push(syllable);
   }
+  if (doubleNext) out.push('t');
   return out.join('');
 }

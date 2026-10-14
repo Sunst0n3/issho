@@ -2,9 +2,10 @@
 // phone shows its own part and both advance together over the socket), or on
 // one phone (pick a part and pass it back and forth, or read both parts).
 
-import { useCallback, useEffect, useId, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { splitHousehold } from '../components/together/household.ts';
+import { useFocusWhenLost } from '../components/together/focus.ts';
 import { dismissInvite, useRolePlayInvite } from '../components/together/live.ts';
 import {
   initialRun,
@@ -132,11 +133,19 @@ function Run({ script }: { script: RolePlay }) {
   // ---- Progress -----------------------------------------------------------------
   const startedAt = useRef(0);
   const verdicts = useRef(new Map<number, Verdict>());
+  /** Lines this phone got to in this round. The partner's phone can finish early, skipping the rest. */
+  const reached = useRef(new Set<number>());
   const [lineVerdict, setLineVerdict] = useState<{ key: string; verdict: Verdict }>();
   const lineKey = `${run.round}:${run.lineIndex}`;
   const verdict = lineVerdict?.key === lineKey ? lineVerdict.verdict : undefined;
 
-  useEffect(() => { verdicts.current = new Map(); }, [run.round]);
+  useLayoutEffect(() => {
+    verdicts.current = new Map();
+    reached.current = new Set();
+  }, [run.round]);
+  useLayoutEffect(() => {
+    if (run.step === 'active') reached.current.add(run.lineIndex);
+  }, [run.step, run.lineIndex, run.round]);
   useEffect(() => {
     if (run.step === 'active' && !startedAt.current) startedAt.current = Date.now();
   }, [run.step, run.round]);
@@ -152,6 +161,12 @@ function Run({ script }: { script: RolePlay }) {
     verdicts.current.set(run.lineIndex, v);
     setLineVerdict({ key: lineKey, verdict: v });
   };
+
+  // ---- Focus: each step replaces the button that was pressed -------------------------
+  const lineRef = useRef<HTMLElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  useFocusWhenLost(lineRef, `${run.step}:${lineKey}`);
+  useFocusWhenLost(headingRef, `${run.step}:${run.round}`);
 
   // ---- Screens --------------------------------------------------------------------
   if (run.step === 'setup') {
@@ -170,10 +185,10 @@ function Run({ script }: { script: RolePlay }) {
   if (run.step === 'waiting') {
     return (
       <Screen label={script.title}>
-        <TopBar back="/roleplay" title={script.title} />
+        <TopBar back="/roleplay" title={script.title} heading={false} />
         <div className="tg-rp-waiting card" role="status">
           <span className="tg-pulse tg-big" aria-hidden="true" />
-          <h1>Waiting for {partnerName}…</h1>
+          <h1 ref={headingRef}>Waiting for {partnerName}…</h1>
           <p>On {partnerName}'s phone: open Together, then this role-play. It will offer to join you.</p>
           <p className="muted">You're {roleName(run.part)}.</p>
           {status !== 'online' && <p className="tg-say-note">You're offline right now. We'll keep trying.</p>}
@@ -189,15 +204,16 @@ function Run({ script }: { script: RolePlay }) {
   }
 
   if (run.step === 'done') {
-    const myLines = script.lines.filter((l) => isMyLine(run.part, l.role)).length;
+    // Only lines this phone got to: when the partner's phone ends the run early, the rest weren't said.
+    const myLines = script.lines.filter((l, i) => isMyLine(run.part, l.role) && reached.current.has(i)).length;
     const checked = [...verdicts.current.values()];
     const great = checked.filter((v) => v === 'great').length;
     return (
       <Screen label={script.title}>
-        <TopBar close="/roleplay" title={script.title} />
+        <TopBar close="/roleplay" title={script.title} heading={false} />
         <div className="tg-rp-done">
           <p className="tg-eyebrow" lang="ja">おつかれさま</p>
-          <h1 className="tg-together-title">Nicely done</h1>
+          <h1 ref={headingRef} className="tg-together-title">Nicely done</h1>
           <p>You finished “{script.title}”{run.part === 'both' ? ', reading both parts.' : ` as ${roleName(run.part)}.`}</p>
           <dl className="tg-stat-row">
             <div className="tg-stat"><dt>Lines you said</dt><dd>{myLines}</dd></div>
@@ -223,9 +239,15 @@ function Run({ script }: { script: RolePlay }) {
 
   return (
     <Screen label={script.title}>
-      <TopBar close="/roleplay"
+      <TopBar close="/roleplay" heading={false}
         title={<ProgressBar value={run.lineIndex / total} label="Role-play progress" />}
-        right={<span className="tg-rp-count">{run.lineIndex + 1} / {total}</span>} />
+        right={(
+          <span className="tg-rp-count" aria-live="polite">
+            <span aria-hidden="true">{run.lineIndex + 1} / {total}</span>
+            <span className="visually-hidden">Line {run.lineIndex + 1} of {total}</span>
+          </span>
+        )} />
+      <h1 className="visually-hidden">{script.title}</h1>
 
       {duo && (
         <p className={status === 'online' ? 'tg-rp-duo' : 'tg-rp-duo tg-offline'}>
@@ -242,7 +264,7 @@ function Run({ script }: { script: RolePlay }) {
         </p>
       )}
 
-      <RolePlayLine key={lineKey} line={line} roles={script.roles} mine={mine} readingBoth={run.part === 'both'}
+      <RolePlayLine ref={lineRef} key={lineKey} line={line} roles={script.roles} mine={mine} readingBoth={run.part === 'both'}
         partnerLabel={duo ? partnerName : 'your partner'} onVerdict={onVerdict} />
 
       <div className="tg-rp-bottom">
@@ -290,7 +312,7 @@ function Setup({ script, rubyShow, mode, part, dispatch, paired, online, hasPart
 
   return (
     <Screen label={script.title}>
-      <TopBar back="/roleplay" title="Role-play" />
+      <TopBar back="/roleplay" title="Role-play" heading={false} />
       <header className="tg-rp-head">
         <span className="chip ai">Level {script.level} · {LEVEL_NAMES[script.level]}</span>
         <h1 className="tg-together-title">{script.title}</h1>
@@ -313,7 +335,7 @@ function Setup({ script, rubyShow, mode, part, dispatch, paired, online, hasPart
       )}
 
       <fieldset className="tg-option-group">
-        <legend className="label">How do you want to practise?</legend>
+        <legend className="label">How do you want to practice?</legend>
         <label className={duoAvailable ? 'tg-option-card' : 'tg-option-card tg-disabled'}>
           <input type="radio" name="rp-mode" value="duo" checked={chosenMode === 'duo'} disabled={!duoAvailable}
             aria-labelledby={`${id}-duo`} aria-describedby={`${id}-duo-note`}

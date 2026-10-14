@@ -21,13 +21,18 @@ function writtenTitle(grade: number): string | undefined {
   return undefined;
 }
 
-export function WriteQuestion({ card, char, ask, target, note, speak, onAnswer, practice = false }: {
+export function WriteQuestion({ card, char, ask, target, label, note, speak, onAnswer, practice = false }: {
   card: CardRecord;
   char: string;
   /** "Write the kanji for" */
   ask: string;
   /** What to write, e.g. the meaning and a reading. */
   target: ReactNode;
+  /**
+   * The same as plain text for the pad's accessible name, without the answer:
+   * 'the kanji for "water" (みず)' → "Writing pad for the kanji for "water" (みず)".
+   */
+  label: string;
   /** The other half of the answer shown afterwards, e.g. the reading. */
   note?: ReactNode;
   /** Japanese read aloud by Listen afterwards. */
@@ -89,12 +94,12 @@ export function WriteQuestion({ card, char, ask, target, note, speak, onAnswer, 
         <div className="writing-pad st-skeleton" aria-busy="true" aria-label="Loading the writing pad" />
       ) : (
         <>
-          <WritingPad ref={pad} strokes={strokes} mode="memory" label={`the answer to: ${ask}`}
+          <WritingPad ref={pad} strokes={strokes} mode="memory" label={label}
             onStrokeResult={coach.onStrokeResult} onComplete={complete} />
           {!finished && (
             <>
               <CoachText line={coach.line} />
-              <PadTools pad={pad} last="giveUp" />
+              <PadTools pad={pad} coach={coach} last="giveUp" />
               <button type="button" className="btn ghost small st-center" onClick={() => setPaper(true)}>
                 Write on paper instead
               </button>

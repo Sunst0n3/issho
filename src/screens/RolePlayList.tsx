@@ -1,6 +1,6 @@
 // Every role-play, grouped by level, with the level that fits your phase marked.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { timeAgo } from '../components/together/household.ts';
 import { LEVEL_NAMES, levelForPhase, type Level } from '../components/together/rolePlay.ts';
@@ -21,6 +21,7 @@ export default function RolePlayList() {
   const [level, setLevel] = useState<Level>();
   const [attempt, setAttempt] = useState(0);
   const [history] = useState(rolePlayHistory);
+  const id = useId();
 
   useEffect(() => {
     let live = true;
@@ -56,19 +57,24 @@ export default function RolePlayList() {
         const recommended = l === level;
         return (
           <section key={l} className={recommended ? 'tg-rp-level tg-recommended' : 'tg-rp-level'} aria-labelledby={`rp-level-${l}`}>
-            <h2 id={`rp-level-${l}`} className="tg-rp-level-title">
-              Level {l} <span className="muted">· {LEVEL_NAMES[l]}</span>
+            {/* The chip sits beside the heading, not in it: "Level 2 · Everyday", not "…EverydayFor you now". */}
+            <div className="tg-rp-level-head">
+              <h2 id={`rp-level-${l}`} className="tg-rp-level-title">
+                Level {l} <span className="muted">· {LEVEL_NAMES[l]}</span>
+              </h2>
               {recommended && <span className="chip shu">For you now</span>}
-            </h2>
+            </div>
             <ul className="tg-rp-list">
               {atLevel.map((s) => (
                 <li key={s.id}>
-                  <Link className="tg-rp-row" to={`/roleplay/${s.id}`}>
+                  {/* Named from its parts, so they are read with pauses between them. */}
+                  <Link className="tg-rp-row" to={`/roleplay/${s.id}`}
+                    aria-labelledby={['title', 'jp', 'setting', 'meta'].map((part) => `${id}-${s.id}-${part}`).join(' ')}>
                     <span className="tg-rp-row-body">
-                      <span className="tg-rp-row-title">{s.title}</span>
-                      <Ruby text={s.titleJp} show={rubyShow} className="tg-rp-row-jp" />
-                      <span className="tg-rp-row-setting">{s.setting}</span>
-                      <span className="tg-rp-row-meta">
+                      <span className="tg-rp-row-title" id={`${id}-${s.id}-title`}>{s.title}</span>
+                      <span id={`${id}-${s.id}-jp`}><Ruby text={s.titleJp} show={rubyShow} className="tg-rp-row-jp" /></span>
+                      <span className="tg-rp-row-setting" id={`${id}-${s.id}-setting`}>{s.setting}</span>
+                      <span className="tg-rp-row-meta" id={`${id}-${s.id}-meta`}>
                         {s.lines.length} lines
                         {history[s.id] && <> · <Icon name="check" size={14} /> Done {timeAgo(history[s.id])}</>}
                       </span>

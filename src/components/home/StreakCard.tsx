@@ -1,5 +1,5 @@
 import type { DayStatus, StreakInfo } from '../../srs/progress.ts';
-import { dateOfKey, plural, WEEKDAYS_EN } from './labels.ts';
+import { dateOfKey, plural, streakText, WEEKDAYS_EN } from './labels.ts';
 
 const STATUS_TEXT: Record<DayStatus, string> = {
   done: 'studied',
@@ -7,6 +7,7 @@ const STATUS_TEXT: Record<DayStatus, string> = {
   missed: 'missed',
   today: 'today, not done yet',
   future: 'coming up',
+  before: 'before you started',
 };
 
 function subline(info: StreakInfo): string {
@@ -22,7 +23,7 @@ export function StreakCard({ info }: { info: StreakInfo }) {
         <span className="streak-badge" lang="ja" aria-hidden="true">続</span>
         <div className="streak-text">
           <h2 id="streak-title" className="streak-title">
-            {info.current > 0 ? `${plural(info.current, 'day')} streak` : 'Start your streak today'}
+            {info.current > 0 ? streakText(info.current) : 'Start your streak today'}
           </h2>
           <p className="streak-sub">{subline(info)}</p>
         </div>

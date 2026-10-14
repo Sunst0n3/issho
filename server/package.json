@@ -7,10 +7,10 @@
     "node": ">=24.2"
   },
   "scripts": {
-    "start": "node --env-file-if-exists=.env src/index.ts",
-    "dev": "node --watch --env-file-if-exists=.env src/index.ts",
+    "start": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env src/index.ts",
+    "dev": "node --disable-warning=ExperimentalWarning --watch --env-file-if-exists=.env src/index.ts",
     "admin": "node --disable-warning=ExperimentalWarning src/admin.ts",
-    "test": "node --test test/*.test.ts",
+    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

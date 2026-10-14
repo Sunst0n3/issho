@@ -19,9 +19,12 @@ import {
   type AcceptedStroke,
   type Frame,
   type StrokeMatch,
+  STYLUS_LENIENCY,
 } from './matcher.ts';
 import { BOX_CENTER, pathStart, resample, samplePath, type Point } from './path.ts';
-import { DEFAULT_PLACEMENT, place, randomPlacement, scribble, seededRng, synthStroke, type PlacementRange } from './synthetic.ts';
+import {
+  DEFAULT_PLACEMENT, FINGER, place, randomPlacement, scribble, seededRng, synthStroke, type HandOptions, type PlacementRange,
+} from './synthetic.ts';
 
 const TRIALS = 40;
 
@@ -226,6 +229,54 @@ describe('matchStrokeOf: telling neighbouring strokes apart', () => {
 
   it('rejects an out-of-range index', () => {
     expect(() => matchStrokeOf([{ x: 1, y: 1 }], ['M0,0L10,10'], 3)).toThrow(RangeError);
+  });
+});
+
+describe('stylus leniency', () => {
+  // A pen: less wobble, steadier speed, cleaner landing and lift than a finger.
+  const STYLUS: HandOptions = {
+    jitter: [1.5, 3], wobbleSpacing: [12, 24], step: [1, 4], drop: [0, 0.2], sensorNoise: 0.3, endTrim: 1.5, overshoot: 1.5,
+  };
+
+  function acceptance(chars: readonly string[], hand: HandOptions, leniency: number) {
+    let ok = 0;
+    let n = 0;
+    chars.forEach((char, c) => {
+      const strokes = STROKE_FIXTURES[char];
+      for (let t = 0; t < TRIALS; t++) {
+        const rng = seededRng(7 + c * 1000 + t);
+        const placement = randomPlacement(rng);
+        const drawn = strokes.map((d) => synthStroke(d, placement, rng, hand));
+        const accepted: AcceptedStroke[] = [];
+        strokes.forEach((d, i) => {
+          n++;
+          if (matchStrokeOf(drawn[i], strokes, i, { frame: estimateFrame(accepted), leniency }).ok) ok++;
+          accepted.push({ points: drawn[i], target: d });
+        });
+      }
+    });
+    return ok / n;
+  }
+
+  it('is stricter than a finger, and still accepts pen strokes (and nearly all finger ones)', () => {
+    expect(STYLUS_LENIENCY).toBeLessThan(1);
+    expect(acceptance(CORE_CHARACTERS, STYLUS, STYLUS_LENIENCY)).toBeGreaterThanOrEqual(0.98);
+    expect(acceptance(HARD_CHARACTERS, STYLUS, STYLUS_LENIENCY)).toBeGreaterThanOrEqual(0.98);
+    expect(acceptance(CORE_CHARACTERS, FINGER, STYLUS_LENIENCY)).toBeGreaterThanOrEqual(0.95);
+  });
+
+  it('lets fewer wrong strokes through in dense characters', () => {
+    const wrongAccepted = (leniency: number) => {
+      let ok = 0;
+      for (const w of hard) {
+        w.strokes.forEach((d, i) => {
+          if (i === 0) return;
+          w.strokes.forEach((_, j) => { if (j !== i && matchStroke(w.drawn[j], d, { frame: w.frames[i], leniency }).ok) ok++; });
+        });
+      }
+      return ok;
+    };
+    expect(wrongAccepted(STYLUS_LENIENCY)).toBeLessThan(wrongAccepted(1));
   });
 });
 

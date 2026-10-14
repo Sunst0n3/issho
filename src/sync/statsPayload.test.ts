@@ -46,6 +46,11 @@ describe('buildStatsPayload', () => {
     expect(buildStatsPayload({ days: [], streak: 3.9, knownKanji: [], phase: 0 })).toMatchObject({ streak: 3, phase: 1 });
   });
 
+  it('never reports more right answers than reviews (the server rejects that)', () => {
+    expect(toDayStats(day('2026-10-14', { reviews: 3, correct: 10 }))).toMatchObject({ reviews: 3, correct: 3 });
+    expect(toDayStats(day('2026-10-14', { reviews: 3, correct: 2 }))).toMatchObject({ reviews: 3, correct: 2 });
+  });
+
   it('caps study time at a day and never sends NaN (the server rejects the whole upload otherwise)', () => {
     // e.g. a session timer that kept counting while the phone slept overnight
     expect(toDayStats(day('2026-10-14', { studyMs: 30 * 60 * 60_000 })).studyMinutes).toBe(24 * 60);

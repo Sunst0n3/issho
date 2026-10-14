@@ -127,6 +127,31 @@ describe('RolePlayRun on one phone', () => {
     expect(screen.getByText('Your line · Server')).toBeTruthy();
   });
 
+  it('gives each step one h1, keeps focus in the run and announces progress', async () => {
+    renderRun();
+    expect(await screen.findByRole('heading', { level: 1, name: 'At the café' })).toBeTruthy();
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole('group', { name: 'How do you want to practice?' })).toBeTruthy();
+    pick('Guest');
+    click('Start');
+
+    // The Start button is gone: focus lands on the line to say.
+    const line = screen.getByRole('article', { name: 'Your line' });
+    expect(document.activeElement).toBe(line);
+    expect(screen.getAllByRole('heading', { level: 1 }).map((h) => h.textContent)).toEqual(['At the café']);
+    const count = document.querySelector('.tg-rp-count')!;
+    expect(count.getAttribute('aria-live')).toBe('polite');
+    expect(count.textContent).toContain('Line 1 of 3');
+
+    click('I said it');
+    expect(document.activeElement).toBe(screen.getByRole('article', { name: "Server's line" }));
+    expect(count.textContent).toContain('Line 2 of 3');
+    click('Next');
+    click('I said it');
+    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 1, name: 'Nicely done' }));
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  });
+
   it('can read both parts', async () => {
     renderRun();
     await screen.findByRole('heading', { name: 'At the café' });
@@ -245,6 +270,20 @@ describe('RolePlayRun on two phones', () => {
     emit({ type: 'roleplay', memberId: 'ken', state: state(0, 'active', 'b') });
     expect(screen.getByText('Your line · Guest')).toBeTruthy();
     expect(mocks.sent).toEqual([{ type: 'roleplay', state: state(0, 'active', 'a') }]);
+  });
+
+  it("counts only the lines this phone got to when the partner's phone ends the run early", async () => {
+    renderRun();
+    await screen.findByRole('heading', { name: 'At the café' });
+    emit({ type: 'roleplay', memberId: 'ken', state: { sessionId: 's-ken', scriptId: 'rp-cafe', role: 'a', lineIndex: 0, status: 'waiting' } });
+    click('Join as Server');
+    expect(screen.getByRole('heading', { name: 'Listen to Ken' })).toBeTruthy();
+
+    // Ken taps through to the end before this phone reaches its line.
+    emit({ type: 'roleplay', memberId: 'ken', state: { sessionId: 's-ken', scriptId: 'rp-cafe', role: 'a', lineIndex: 3, status: 'done' } });
+    expect(screen.getByRole('heading', { name: 'Nicely done' })).toBeTruthy();
+    expect(screen.getByText('Lines you said').nextSibling?.textContent).toBe('0');
+    expect(screen.getByText('Lines in all').nextSibling?.textContent).toBe('3');
   });
 
   it('joins a role-play the partner started', async () => {

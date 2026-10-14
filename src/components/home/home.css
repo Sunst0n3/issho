@@ -15,6 +15,12 @@
 .hm-ok {
   padding: 10px 14px; border-radius: var(--r-md); background: var(--ai-tint); color: var(--ai-ink); font-size: 14px;
 }
+.hm-warning {
+  display: flex; flex-direction: column; gap: 6px; padding: 14px 16px;
+  border-radius: var(--r-lg); background: var(--shu-tint); color: var(--shu-ink); font-size: 14px;
+}
+.hm-warning-title { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; }
+.hm-warning-title svg { flex-shrink: 0; }
 
 .hm-skeleton {
   background: var(--paper-deep); border-radius: var(--r-lg);
@@ -66,8 +72,10 @@
 
 /* ---- Today ---- */
 .today-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.today-head > div { flex: 1; min-width: 0; }
 .today-date { font-size: 13px; color: var(--muted); letter-spacing: 0.02em; }
-.today-greeting { margin-top: 2px; font-family: var(--font-display); font-size: 30px; font-weight: 700; }
+/* A long one-word name breaks inside the column instead of pushing the page sideways. */
+.today-greeting { margin-top: 2px; font-family: var(--font-display); font-size: 30px; font-weight: 700; overflow-wrap: anywhere; }
 
 .streak-card { display: flex; flex-direction: column; gap: 14px; }
 .streak-top { display: flex; align-items: center; gap: 12px; }
@@ -93,6 +101,8 @@
 /* The session panel is dark ink in light mode and a raised dark card in dark mode. */
 .plan-panel {
   --panel-bg: var(--ink); --panel-fg: var(--on-ink); --panel-tile: var(--ink-soft); --panel-muted: var(--muted-on-ink);
+  /* Shu on dark ink is only 2.8:1; the panel's text colour is the ring that stands out in both themes. */
+  --focus-ring: var(--panel-fg);
   display: flex; flex-direction: column; gap: 14px; padding: 18px;
   border-radius: 20px; background: var(--panel-bg); color: var(--panel-fg);
 }

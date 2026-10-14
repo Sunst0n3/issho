@@ -6,7 +6,7 @@ import type { AiTranslateResponse } from '../../../shared/api.ts';
 import { rubyToPlain } from '../../lib/ruby.ts';
 import { aiTranslate } from '../../sync/client.ts';
 import { Icon, Ruby } from '../ui.tsx';
-import { aiErrorMessage } from './ai.ts';
+import { aiErrorMessage, aiProblemOf, markAiBroken } from './ai.ts';
 
 type State =
   | { kind: 'idle' }
@@ -64,6 +64,9 @@ export function TranslateSheet({ knownKanji, onUse, onClose }: {
       setState({ kind: 'done', result: await aiTranslate({ english: text, knownKanji }) });
     } catch (err) {
       setState({ kind: 'error', message: aiErrorMessage(err) });
+      // The chat stops checking messages too, and Settings can say what's wrong.
+      const problem = aiProblemOf(err);
+      if (problem) markAiBroken(problem);
     }
   };
 

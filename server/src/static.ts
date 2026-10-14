@@ -8,7 +8,11 @@ const IMMUTABLE = 'public, max-age=31536000, immutable';
 // with its ETag on every load, so a new deploy is picked up immediately.
 const REVALIDATE = 'no-cache';
 
-/** Serves the built PWA from `root`. Returns false (and serves nothing) when there's no build there. */
+/**
+ * Serves the built PWA from `root`. Returns false (and serves nothing) when there's no build there.
+ * Text files go out brotli- or gzip-compressed when the browser accepts it and the compressed copy
+ * exists (see precompress.ts), with `Vary: Accept-Encoding`.
+ */
 export async function registerStatic(app: FastifyInstance, root: string): Promise<boolean> {
   if (!existsSync(path.join(root, 'index.html'))) {
     app.log.warn({ staticDir: root }, 'no built app found; serving the API only');
@@ -20,6 +24,7 @@ export async function registerStatic(app: FastifyInstance, root: string): Promis
     root,
     // `send` rejects `..` segments and paths outside `root`; dotfiles are never served.
     dotfiles: 'ignore',
+    preCompressed: true,
     cacheControl: false,
     etag: true,
     lastModified: true,

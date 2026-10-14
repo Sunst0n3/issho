@@ -1,9 +1,10 @@
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import type { RawData } from 'ws';
 import { z } from 'zod';
-import type { ClientEvent, Member } from '../../shared/api.ts';
-import { authHook, currentMember, hashToken } from './auth.ts';
+import { WS_CLOSE_UNPAIRED, type ClientEvent, type Member } from '../../shared/api.ts';
+import { authenticate } from './auth.ts';
 import type { AppContext } from './context.ts';
+import { HttpError } from './errors.ts';
 
 export const WS_PATH = '/api/ws';
 export const WS_MAX_PAYLOAD = 16 * 1024;
@@ -25,10 +26,23 @@ const ClientEventSchema = z.discriminatedUnion('type', [
 /** GET /api/ws?token=… — must be registered in its own scope (its auth hook reads the query). */
 export function websocketRoutes(app: FastifyInstance, ctx: AppContext): void {
   // Browsers can't set headers on a WebSocket, so the device token travels in the query string.
-  app.addHook('onRequest', authHook(ctx, queryToken));
+  // A browser never sees why an upgrade was refused (any HTTP error is just close code 1006), so
+  // an unknown token gets its socket and is closed with WS_CLOSE_UNPAIRED: the phone then knows
+  // to pair again instead of retrying forever.
+  app.addHook('onRequest', async (request) => {
+    const device = authenticate(ctx, queryToken(request));
+    if (!device && !request.ws) throw new HttpError(401, 'unauthorized');
+    request.member = device?.member ?? null;
+    request.deviceTokenHash = device?.tokenHash ?? null;
+  });
 
   app.get(WS_PATH, { websocket: true }, (socket, request) => {
-    const member = currentMember(request);
+    const member = request.member;
+    const tokenHash = request.deviceTokenHash;
+    if (!member || !tokenHash) {
+      socket.close(WS_CLOSE_UNPAIRED, 'device not paired');
+      return;
+    }
 
     // Handlers are attached synchronously so no early frame is missed.
     socket.on('message', (data, isBinary) => {
@@ -41,7 +55,7 @@ export function websocketRoutes(app: FastifyInstance, ctx: AppContext): void {
       }
     });
 
-    const cameOnline = ctx.hub.join(member.id, socket, hashToken(queryToken(request)!));
+    const cameOnline = ctx.hub.join(member.id, socket, tokenHash);
     for (const memberId of ctx.hub.onlineMemberIds()) {
       if (memberId !== member.id) ctx.hub.send(socket, { type: 'presence', memberId, online: true });
     }

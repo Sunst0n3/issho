@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
+import { SecureNotice } from '../components/home/SecureNotice.tsx';
 import { AboutSection, DataSection } from '../components/home/SettingsData.tsx';
 import { AppearanceSection, KanaSection, StudySection, YouSection } from '../components/home/SettingsStudy.tsx';
 import { TogetherSection } from '../components/home/SettingsTogether.tsx';
@@ -12,7 +13,8 @@ export default function Settings() {
 
   return (
     <Screen label="Settings">
-      <TopBar back="/" title={<h1 className="set-title">Settings</h1>} />
+      <TopBar back="/" title="Settings" />
+      <SecureNotice />
       {settings ? (
         <>
           <YouSection settings={settings} />

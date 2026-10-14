@@ -77,10 +77,10 @@
     ],
     "drills": [
       { "prompt": "これはわたし＿＿かばんです。", "options": ["の", "は", "か"], "answer": 0, "en": "This is my bag." },
-      { "prompt": "それはつま＿＿ほんです。", "options": ["を", "か", "の"], "answer": 2, "en": "That is my wife's book." },
+      { "prompt": "それ＿＿つまのほんです。", "options": ["か", "の", "は"], "answer": 2, "en": "That is my wife's book." },
       { "prompt": "このかさはだれ＿＿ですか。", "options": ["は", "の", "か"], "answer": 1, "en": "Whose umbrella is this?" },
-      { "prompt": "これはにほん＿＿くるまです。", "options": ["を", "の", "か"], "answer": 1, "en": "This is a Japanese car." },
-      { "prompt": "そのほんはわたし＿＿です。", "options": ["を", "は", "の"], "answer": 2, "en": "That book is mine." }
+      { "prompt": "これはにほん＿＿くるまです。", "options": ["は", "か", "の"], "answer": 2, "en": "This is a Japanese car." },
+      { "prompt": "そのほん＿＿わたしのです。", "options": ["の", "は", "か"], "answer": 1, "en": "That book is mine." }
     ]
   },
   {
@@ -118,11 +118,11 @@
       { "jp": "あしたもやすみじゃないです。", "en": "Tomorrow isn't a day off either." }
     ],
     "drills": [
-      { "prompt": "おっとはせんせいです。わたし＿＿せんせいです。", "options": ["も", "の", "か"], "answer": 0, "en": "My husband is a teacher. I'm a teacher too." },
-      { "prompt": "これ＿＿わたしのかばんです。", "options": ["か", "も", "を"], "answer": 1, "en": "This is my bag too." },
-      { "prompt": "きょうはやすみじゃないです。あした＿＿やすみじゃないです。", "options": ["の", "を", "も"], "answer": 2, "en": "Today isn't a day off. Tomorrow isn't either." },
-      { "prompt": "つま＿＿にほんごのがくせいです。", "options": ["か", "を", "も"], "answer": 2, "en": "My wife is also a student of Japanese." },
-      { "prompt": "あれ＿＿えきですか。", "options": ["に", "も", "を"], "answer": 1, "en": "Is that over there a station too?" }
+      { "prompt": "おっとはせんせいです。わたし＿＿せんせいです。", "options": ["も", "の", "は"], "answer": 0, "en": "My husband is a teacher. I'm a teacher too." },
+      { "prompt": "これもわたし＿＿かばんです。", "options": ["も", "の", "は"], "answer": 1, "en": "This is my bag too." },
+      { "prompt": "きょうはやすみじゃないです。あした＿＿やすみじゃないです。", "options": ["の", "は", "も"], "answer": 2, "en": "Today isn't a day off. Tomorrow isn't either." },
+      { "prompt": "つま＿＿にほんごのがくせいです。", "options": ["か", "は", "も"], "answer": 2, "en": "My wife is also a student of Japanese." },
+      { "prompt": "あれもえきです＿＿。", "options": ["も", "か", "は"], "answer": 1, "en": "Is that over there a station too?" }
     ]
   },
   {
@@ -223,11 +223,11 @@
       { "jp": "{一緒|いっしょ}に{日本語|にほんご}を{勉強|べんきょう}します。", "en": "We study Japanese together." }
     ],
     "drills": [
-      { "prompt": "パン＿＿{食|た}べます。", "options": ["に", "を", "へ"], "answer": 1, "en": "I eat bread." },
-      { "prompt": "{毎朝|まいあさ}コーヒー＿＿{飲|の}みます。", "options": ["を", "へ", "に"], "answer": 0, "en": "I drink coffee every morning." },
-      { "prompt": "{昨日|きのう}、{映画|えいが}＿＿{見|み}ました。", "options": ["へ", "に", "を"], "answer": 2, "en": "I watched a movie yesterday." },
-      { "prompt": "{何|なに}＿＿{飲|の}みますか。", "options": ["は", "を", "に"], "answer": 1, "en": "What will you drink?" },
-      { "prompt": "{一緒|いっしょ}に{日本語|にほんご}＿＿{勉強|べんきょう}します。", "options": ["を", "へ", "に"], "answer": 0, "en": "We study Japanese together." }
+      { "prompt": "パン＿＿{食|た}べます。", "options": ["の", "を", "か"], "answer": 1, "en": "I eat bread." },
+      { "prompt": "{毎朝|まいあさ}コーヒー＿＿{飲|の}みます。", "options": ["を", "か", "の"], "answer": 0, "en": "I drink coffee every morning." },
+      { "prompt": "{昨日|きのう}、{映画|えいが}＿＿{見|み}ました。", "options": ["の", "か", "を"], "answer": 2, "en": "I watched a movie yesterday." },
+      { "prompt": "{何|なに}を{飲|の}みます＿＿。", "options": ["を", "か", "は"], "answer": 1, "en": "What will you drink?" },
+      { "prompt": "{妻|つま}＿＿{料理|りょうり}を{食|た}べます。", "options": ["を", "か", "の"], "answer": 2, "en": "I eat my wife's cooking." }
     ]
   },
   {
@@ -244,11 +244,11 @@
       { "jp": "{来年|らいねん}、{日本|にほん}に{行|い}きます。", "en": "We're going to Japan next year." }
     ],
     "drills": [
-      { "prompt": "{七時|しちじ}＿＿{起|お}きます。", "options": ["を", "に", "へ"], "answer": 1, "en": "I get up at seven." },
-      { "prompt": "{毎日|まいにち}{会社|かいしゃ}＿＿{行|い}きます。", "options": ["を", "で", "に"], "answer": 2, "en": "I go to the office every day." },
-      { "prompt": "{六時|ろくじ}に{家|うち}＿＿{帰|かえ}ります。", "options": ["に", "を", "で"], "answer": 0, "en": "I go home at six." },
-      { "prompt": "{日曜日|にちようび}＿＿スーパーに{行|い}きます。", "options": ["で", "に", "を"], "answer": 1, "en": "I'm going to the supermarket on Sunday." },
-      { "prompt": "{何時|なんじ}＿＿{寝|ね}ますか。", "options": ["で", "を", "に"], "answer": 2, "en": "What time do you go to bed?" }
+      { "prompt": "{七時|しちじ}＿＿{起|お}きます。", "options": ["を", "に", "の"], "answer": 1, "en": "I get up at seven." },
+      { "prompt": "{毎日|まいにち}{会社|かいしゃ}＿＿{行|い}きます。", "options": ["を", "の", "に"], "answer": 2, "en": "I go to the office every day." },
+      { "prompt": "{明日|あした}＿＿{日本|にほん}に{行|い}きます。", "options": ["に", "は", "を"], "answer": 1, "en": "I'm going to Japan tomorrow." },
+      { "prompt": "{日曜日|にちようび}に{映画|えいが}＿＿{見|み}ます。", "options": ["を", "に", "の"], "answer": 0, "en": "I'm going to watch a movie on Sunday." },
+      { "prompt": "{何時|なんじ}＿＿{寝|ね}ますか。", "options": ["は", "を", "に"], "answer": 2, "en": "What time do you go to bed?" }
     ]
   },
   {
@@ -265,11 +265,11 @@
       { "jp": "{五時|ごじ}に{家|うち}へ{帰|かえ}ります。", "en": "I head home at five." }
     ],
     "drills": [
-      { "prompt": "{日本|にほん}＿＿ようこそ。", "options": ["を", "へ", "で"], "answer": 1, "en": "Welcome to Japan." },
+      { "prompt": "{日本|にほん}＿＿ようこそ。", "options": ["を", "へ", "の"], "answer": 1, "en": "Welcome to Japan." },
       { "prompt": "{明日|あした}、{東京|とうきょう}＿＿{行|い}きます。", "options": ["へ", "を", "の"], "answer": 0, "en": "I'm going to Tokyo tomorrow." },
-      { "prompt": "{五時|ごじ}に{家|うち}＿＿{帰|かえ}ります。", "options": ["で", "を", "へ"], "answer": 2, "en": "I head home at five." },
-      { "prompt": "{週末|しゅうまつ}は{海|うみ}＿＿{行|い}きます。", "options": ["を", "へ", "の"], "answer": 1, "en": "We're going to the sea this weekend." },
-      { "prompt": "どこ＿＿{行|い}きますか。", "options": ["で", "の", "へ"], "answer": 2, "en": "Where are you going?" }
+      { "prompt": "{五時|ごじ}＿＿{家|うち}へ{帰|かえ}ります。", "options": ["へ", "を", "に"], "answer": 2, "en": "I head home at five." },
+      { "prompt": "{週末|しゅうまつ}＿＿{海|うみ}へ{行|い}きます。", "options": ["へ", "は", "を"], "answer": 1, "en": "We're going to the sea this weekend." },
+      { "prompt": "どこ＿＿{行|い}きますか。", "options": ["は", "の", "へ"], "answer": 2, "en": "Where are you going?" }
     ]
   },
   {
@@ -287,9 +287,9 @@
     ],
     "drills": [
       { "prompt": "{家|うち}＿＿{晩|ばん}ご{飯|はん}を{食|た}べます。", "options": ["で", "に", "を"], "answer": 0, "en": "We eat dinner at home." },
-      { "prompt": "{電車|でんしゃ}＿＿{会社|かいしゃ}に{行|い}きます。", "options": ["に", "を", "で"], "answer": 2, "en": "I go to the office by train." },
-      { "prompt": "{図書館|としょかん}＿＿{本|ほん}を{読|よ}みました。", "options": ["へ", "で", "に"], "answer": 1, "en": "I read a book at the library." },
-      { "prompt": "はし＿＿{食|た}べます。", "options": ["で", "を", "へ"], "answer": 0, "en": "I eat with chopsticks." },
+      { "prompt": "{電車|でんしゃ}で{会社|かいしゃ}＿＿{行|い}きます。", "options": ["で", "を", "に"], "answer": 2, "en": "I go to the office by train." },
+      { "prompt": "{図書館|としょかん}で{本|ほん}＿＿{読|よ}みました。", "options": ["に", "を", "の"], "answer": 1, "en": "I read a book at the library." },
+      { "prompt": "はし＿＿{食|た}べます。", "options": ["を", "に", "で"], "answer": 2, "en": "I eat with chopsticks." },
       { "prompt": "{日本語|にほんご}＿＿メールを{書|か}きます。", "options": ["に", "で", "を"], "answer": 1, "en": "I write emails in Japanese." }
     ]
   },
@@ -307,11 +307,11 @@
       { "jp": "{友達|ともだち}と{話|はな}しました。", "en": "I talked with a friend." }
     ],
     "drills": [
-      { "prompt": "パン＿＿{卵|たまご}を{食|た}べました。", "options": ["に", "と", "を"], "answer": 1, "en": "I ate bread and eggs." },
-      { "prompt": "{妻|つま}＿＿{映画|えいが}を{見|み}ます。", "options": ["と", "を", "に"], "answer": 0, "en": "I'm going to watch a movie with my wife." },
+      { "prompt": "パン＿＿{卵|たまご}を{食|た}べました。", "options": ["の", "と", "を"], "answer": 1, "en": "I ate bread and eggs." },
+      { "prompt": "{妻|つま}と{映画|えいが}＿＿{見|み}ます。", "options": ["を", "に", "と"], "answer": 0, "en": "I'm going to watch a movie with my wife." },
       { "prompt": "{夫|おっと}＿＿{一緒|いっしょ}に{料理|りょうり}をします。", "options": ["で", "を", "と"], "answer": 2, "en": "I cook together with my husband." },
-      { "prompt": "{友達|ともだち}＿＿{話|はな}しました。", "options": ["を", "の", "と"], "answer": 2, "en": "I talked with a friend." },
-      { "prompt": "コーヒー＿＿ケーキをください。", "options": ["で", "と", "を"], "answer": 1, "en": "Coffee and cake, please." }
+      { "prompt": "{家|うち}＿＿{友達|ともだち}と{話|はな}しました。", "options": ["で", "と", "を"], "answer": 0, "en": "I talked with a friend at home." },
+      { "prompt": "コーヒー＿＿ケーキをください。", "options": ["で", "を", "と"], "answer": 2, "en": "Coffee and cake, please." }
     ]
   },
   {

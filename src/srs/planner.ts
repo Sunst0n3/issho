@@ -28,6 +28,11 @@ export interface SessionPlan {
   /** Every card due now, before the daily cap. */
   backlog: number;
   estimateMinutes: number;
+  /**
+   * True once there is nothing new left to learn: every kana, kanji, survival
+   * word and grammar point has been introduced. (All kanji met is not enough.)
+   */
+  courseComplete?: boolean;
 }
 
 /** New items pause while more than this many cards are due (or 2× the daily cap, if lower). */
@@ -110,12 +115,14 @@ export async function planToday(now: Date = new Date()): Promise<SessionPlan> {
 
   const threshold = backlogThreshold(settings.maxReviewsPerDay);
   const newRoom = Math.max(0, settings.newPerDay - today.newItems);
-  // Only a pause that holds new items back is worth reporting.
-  const blocked = newRoom > 0 && backlog > threshold;
-  const newItems = blocked ? [] : await nextNewItems(newRoom, now);
+  const next = await nextNewItems(newRoom, now);
+  // Only a pause that holds new items back is worth reporting: none once the
+  // day's new items are done, or once the course has nothing new left.
+  const blocked = next.length > 0 && backlog > threshold;
+  const newItems = blocked ? [] : next;
+  const courseComplete = next.length === 0 && (newRoom > 0 || (await nextNewItems(1, now)).length === 0);
 
-  const phase = await currentPhase();
-  const reading = (await pickSentences(readingCountFor(phase), { now, phase })).map((s) => s.id);
+  const reading = await planReading(now);
 
   return {
     reviews,
@@ -124,7 +131,40 @@ export async function planToday(now: Date = new Date()): Promise<SessionPlan> {
     reading,
     backlog,
     estimateMinutes: estimateMinutes(reviews.length, newItems, reading.length),
+    courseComplete,
   };
+}
+
+/**
+ * Today's i+1 sentence ids, as many as the phase reads. Picked again once the
+ * day's new items are learned, so reading can use the kanji just taught.
+ */
+export async function planReading(now: Date = new Date()): Promise<string[]> {
+  const phase = await currentPhase();
+  return (await pickSentences(readingCountFor(phase), { now, phase })).map((s) => s.id);
+}
+
+/** When the next study day starts (4 a.m., see dayKey). */
+export function nextStudyDayStart(now: Date): Date {
+  const start = new Date(now);
+  start.setHours(4, 0, 0, 0);
+  if (start.getTime() <= now.getTime()) start.setDate(start.getDate() + 1);
+  return start;
+}
+
+/**
+ * Moves new cards that are left out of today's first check to the next study
+ * day, so they arrive with tomorrow's reviews instead of showing as due at once.
+ * Cards already answered are left alone.
+ */
+export async function deferNewCards(cardIds: readonly string[], now: Date = new Date()): Promise<void> {
+  if (!cardIds.length) return;
+  const due = nextStudyDayStart(now);
+  await db.transaction('rw', db.cards, async () => {
+    const cards = await db.cards.bulkGet([...cardIds]);
+    const fresh = cards.filter((c): c is CardRecord => c !== undefined && c.state === State.New && c.reps === 0);
+    await db.cards.bulkPut(fresh.map((c) => ({ ...c, due })));
+  });
 }
 
 // ---------------------------------------------------------------------------

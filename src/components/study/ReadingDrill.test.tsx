@@ -2,10 +2,12 @@ import { act, cleanup, fireEvent, render, screen, within } from '@testing-librar
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cardId, db, updateSettings } from '../../lib/db.ts';
 import { introduceItem, markKnownMany } from '../../srs/items.ts';
-import { pickTarget } from './readingQuestion.ts';
+import { parseRuby } from '../../lib/ruby.ts';
+import type { WordEntry } from '../../lib/types.ts';
+import { pickTarget, prepareReading, resolveWord, wordLookup } from './readingQuestion.ts';
 import { ReadingDrill } from './ReadingDrill.tsx';
 import { unsaveSentence } from './sentences.ts';
-import { CURRICULUM, resetStudyDb, SENTENCES } from './test-utils.tsx';
+import { CURRICULUM, resetStudyDb, SENTENCES, WORDS } from './test-utils.tsx';
 
 vi.mock('../../lib/data.ts', async () => (await import('./test-utils.tsx')).dataMock);
 
@@ -45,6 +47,72 @@ describe('pickTarget', () => {
   });
 });
 
+describe('resolveWord: the whole underlined word', () => {
+  const entry = (id: string, written: string, kana: string, meaning: string): WordEntry =>
+    ({ id, written, kana, meanings: [meaning], pos: ['n'], freqRank: 5, kanji: [...written].filter((c) => c > '\u4e00') });
+  const lookup = wordLookup([
+    entry('takai', '高い', 'たかい', 'high'),
+    entry('taka', '高', 'たか', 'amount'),
+    entry('hitotsu', '一つ', 'ひとつ', 'one'),
+    entry('ippai', '一杯', 'いっぱい', 'a cupful'),
+    entry('yamaga', '山が', 'やまが', 'mountain villa'),
+    entry('gakusei', '学生', 'がくせい', 'student'),
+    entry('gakuseijidai', '学生時代', 'がくせいじだい', 'student days'),
+  ]);
+  const known = new Set(['高', '一', '山', '学', '生', '時', '代', '空', '今', '日', '来']);
+  const resolve = (jp: string, text: string) => {
+    const segs = parseRuby(jp);
+    return resolveWord(segs, segs.findIndex((s) => s.text === text), known, lookup);
+  };
+
+  it('takes in the okurigana, so the answer is the whole reading', () => {
+    const r = resolve('{今日|きょう}は{空|そら}が{高|たか}いですね。', '高');
+    expect(r).toMatchObject({ written: '高い', answer: 'たかい', target: { start: 4, count: 1, tail: 1 } });
+    // The fragment, and readings running on into the sentence, are never offered as wrong options.
+    expect(r.nearMisses).toEqual(expect.arrayContaining(['たか', 'たかいで', 'たかいです']));
+    expect(r.nearMisses).not.toContain('たかい');
+    expect(resolve('{大|おお}きいピザを{一|ひと}つください。', '一')).toMatchObject({ written: '一つ', answer: 'ひとつ' });
+  });
+
+  it('spans word segments the dictionary knows as one word, and finishes a reading cut at っ', () => {
+    expect(resolve('{学生|がくせい}{時代|じだい}の{友|とも}だち', '学生')).toMatchObject({ written: '学生時代', answer: 'がくせいじだい' });
+    expect(resolve('{白|しろ}ワインを{一|いっ}ぱいください。', '一')).toMatchObject({ written: '一ぱい', answer: 'いっぱい' });
+  });
+
+  it('leaves a particle after a word in the sentence (山が is "the mountain", not 山が "mountain villa")', () => {
+    expect(resolve('{山|やま}が{高|たか}い。', '山')).toMatchObject({ written: '山', answer: 'やま', target: { tail: 0 } });
+  });
+
+  it('without a dictionary word keeps the segment alone but still rules out its run-on readings', () => {
+    const r = resolve('{来|き}たいです。', '来');
+    expect(r).toMatchObject({ written: '来', answer: 'き' });
+    expect(r.nearMisses).toEqual(expect.arrayContaining(['きた', 'きたい']));
+  });
+});
+
+describe('prepareReading', () => {
+  it('asks for the whole word, and never offers the word as a wrong option', async () => {
+    WORDS.push({ id: 'w-takai', written: '高い', kana: 'たかい', meanings: ['high'], pos: ['adj-i'], freqRank: 5, kanji: ['高'] });
+    try {
+      await introduceItem('kanji', '水');
+      const q = await prepareReading({ id: 'x', jp: '{水|みず}はつめたいです。', en: 'The water is cold.' });
+      expect(q).toMatchObject({ kind: 'reading', written: '水', answer: 'みず' });
+      if (q.kind !== 'reading') return;
+      expect(q.options).toContain('みず');
+      expect(q.options.filter((o) => o.startsWith('みず'))).toEqual(['みず']);
+    } finally {
+      WORDS.pop();
+    }
+  });
+
+  it('skips a reading cut short at っ that the dictionary cannot finish', async () => {
+    await introduceItem('kanji', '水');
+    await introduceItem('kanji', '日');
+    const q = await prepareReading({ id: 'x', jp: '{日|にっ}きと{水|みず}', en: 'A diary and water.' });
+    expect(q).toMatchObject({ kind: 'reading', written: '水' });
+  });
+});
+
 describe('ReadingDrill', () => {
   it('asks for the reading of the underlined word, saves the sentence, then asks what a kana sentence means', async () => {
     await reachPhase3();
@@ -53,7 +121,8 @@ describe('ReadingDrill', () => {
     const sentences = [SENTENCES[0], SENTENCES[1]];
     render(<ReadingDrill sentences={sentences} onDone={onDone} />);
 
-    expect(await screen.findByRole('heading', { name: 'How do you read the underlined word?' })).toBeTruthy();
+    // The underline is only visual, so the question names the word for screen readers.
+    expect(await screen.findByRole('heading', { name: /^How do you read the underlined word\?\s*Underlined:\s*水$/ })).toBeTruthy();
     expect(document.querySelector('.st-target')?.textContent).toBe('水');
     // The reading of the target stays hidden until answered.
     expect(document.querySelector('.st-target rt')).toBeNull();
@@ -63,6 +132,8 @@ describe('ReadingDrill', () => {
     expect(screen.getByText('Correct')).toBeTruthy();
     expect(screen.getByText('I drink water.')).toBeTruthy();
     expect(document.querySelector('.st-target rt')?.textContent).toBe('みず');
+    // The feedback breaks the word down.
+    expect(document.querySelector('.st-fb-breakdown')?.textContent).toBe('水 (みず)');
 
     fireEvent.click(await screen.findByRole('button', { name: 'Save sentence' }));
     expect(await screen.findByRole('button', { name: 'Saved for review' })).toBeTruthy();
@@ -87,8 +158,27 @@ describe('ReadingDrill', () => {
   it('prefers a recently learned kanji for the question', async () => {
     await introduceItem('kanji', '水');
     render(<ReadingDrill sentences={[{ id: 'x', jp: '{日|ひ}と{水|みず}', en: 'Sun and water.' }]} onDone={() => {}} />);
-    await screen.findByRole('heading', { name: 'How do you read the underlined word?' });
+    await screen.findByRole('heading', { name: /^How do you read the underlined word\?/ });
     expect(document.querySelector('.st-target')?.textContent).toBe('水');
+  });
+
+  it('underlines the whole word, okurigana included, and reveals only its reading', async () => {
+    WORDS.push({ id: 'w-takai', written: '高い', kana: 'たかい', meanings: ['high'], pos: ['adj-i'], freqRank: 5, kanji: ['高'] });
+    try {
+      await updateSettings({ furigana: 'never' });
+      await db.items.put({ id: 'kanji:高', kind: 'kanji', key: '高', introducedAt: new Date() });
+      render(<ReadingDrill sentences={[{ id: 'x', jp: 'そらが{高|たか}いですね。', en: 'The sky is high.' }]} onDone={() => {}} />);
+      expect(await screen.findByRole('heading', { name: /^How do you read the underlined word\?\s*Underlined:\s*高い$/ })).toBeTruthy();
+      expect(document.querySelector('.st-target')?.tagName).toBe('U');
+      expect(document.querySelector('.st-target')?.textContent).toBe('高い');
+      expect(document.querySelector('.st-sentence')?.textContent).toBe('そらが高いですね。');
+      fireEvent.click(choices().getByRole('button', { name: 'たかい' }));
+      expect(screen.getByText('Correct')).toBeTruthy();
+      expect(document.querySelector('.st-target')?.textContent).toBe('高たかい');
+      expect(document.querySelector('.st-fb-breakdown')?.textContent).toBe('高 (たか) + い');
+    } finally {
+      WORDS.pop();
+    }
   });
 
   it('asks what a sentence means when its only kanji is new, and shows the furigana of that kanji', async () => {

@@ -29,7 +29,8 @@ RUN if [ -s public/data/curriculum.json ]; then \
         exit 1; \
       }; \
     done \
- && npm run build
+ && npm run build \
+ && node server/src/precompress.ts dist
 
 # 2. The server's production dependencies.
 FROM ${NODE_IMAGE} AS server-deps
@@ -38,6 +39,8 @@ COPY server/package.json server/package-lock.json ./
 RUN npm ci --omit=dev
 
 # 3. Runtime. Node runs the TypeScript sources directly (type stripping), so there is no server build.
+# dist/ comes with brotli and gzip copies of its text files (made above), which the server sends to
+# browsers that accept them: the app's first download shrinks from about 7 MB to under 2 MB.
 FROM ${NODE_IMAGE}
 ENV NODE_ENV=production \
     NODE_OPTIONS=--disable-warning=ExperimentalWarning \

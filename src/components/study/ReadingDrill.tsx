@@ -2,39 +2,82 @@
 // translation, listening, shadowing and (from phase 3) saving. Not graded.
 
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { db } from '../../lib/db.ts';
 import { useRubyShow } from '../../lib/hooks.ts';
-import { parseRuby } from '../../lib/ruby.ts';
+import { parseRuby, type RubySegment } from '../../lib/ruby.ts';
 import { currentPhase } from '../../srs/course.ts';
 import { markSentencesShown } from '../../srs/planner.ts';
 import { SpeakButton } from '../SpeakButton.tsx';
 import { Icon } from '../ui.tsx';
 import { ChoiceGrid } from './cards/parts.tsx';
-import { prepareReading } from './readingQuestion.ts';
+import { prepareReading, type ReadingTarget } from './readingQuestion.ts';
 import { saveSentence, type SentenceLike } from './sentences.ts';
 import { useFocusHeading, useScrollToTop } from './focus.ts';
 import { Shadow } from './Shadow.tsx';
 import { useAsync } from './useAsync.ts';
 
-/** The sentence with ruby per the furigana setting; the target word underlined, its reading hidden until answered. */
-export function SentenceText({ jp, target = -1, revealTarget = false }: { jp: string; target?: number; revealTarget?: boolean }) {
+/**
+ * The target word's pieces: its ruby segments and the okurigana after them;
+ * `rest` is the remainder of that plain segment and `next` the first segment
+ * after it.
+ */
+function targetParts(segs: readonly RubySegment[], target: ReadingTarget) {
+  const end = target.start + target.count;
+  const plainAfter = segs[end]?.reading === undefined ? segs[end] : undefined;
+  const chars = plainAfter ? [...plainAfter.text] : [];
+  return {
+    word: segs.slice(target.start, end),
+    tail: chars.slice(0, target.tail).join(''),
+    rest: chars.slice(target.tail).join(''),
+    next: plainAfter ? end + 1 : end,
+  };
+}
+
+/**
+ * The sentence with ruby per the furigana setting; the target word (with its
+ * okurigana) underlined, its reading hidden until answered.
+ */
+export function SentenceText({ jp, target, revealTarget = false }: { jp: string; target?: ReadingTarget; revealTarget?: boolean }) {
   const show = useRubyShow();
+  const segs = parseRuby(jp);
+  const render = (seg: RubySegment, i: number, inTarget: boolean): ReactNode => {
+    const visible = seg.reading !== undefined
+      && (inTarget ? revealTarget : show === 'all' || (typeof show === 'function' && show(seg.text)));
+    return <Fragment key={i}>{visible ? <ruby>{seg.text}<rt>{seg.reading}</rt></ruby> : seg.text}</Fragment>;
+  };
+  if (!target) return <p className="st-sentence" lang="ja">{segs.map((seg, i) => render(seg, i, false))}</p>;
+
+  const { word, tail, rest, next } = targetParts(segs, target);
   return (
     <p className="st-sentence" lang="ja">
-      {parseRuby(jp).map((seg, i) => {
-        const isTarget = i === target;
-        const visible = seg.reading !== undefined
-          && (isTarget ? revealTarget : show === 'all' || (typeof show === 'function' && show(seg.text)));
-        const text = visible ? <ruby>{seg.text}<rt>{seg.reading}</rt></ruby> : seg.text;
-        return isTarget ? <span key={i} className="st-target">{text}</span> : <Fragment key={i}>{text}</Fragment>;
-      })}
+      {segs.slice(0, target.start).map((seg, i) => render(seg, i, false))}
+      <u className="st-target">{word.map((seg, i) => render(seg, target.start + i, true))}{tail}</u>
+      {rest}
+      {segs.slice(next).map((seg, i) => render(seg, next + i, false))}
+    </p>
+  );
+}
+
+/** "高 (たか) + い": the underlined word's kanji with their readings, then its kana. */
+function TargetBreakdown({ jp, target }: { jp: string; target: ReadingTarget }) {
+  const { word, tail } = targetParts(parseRuby(jp), target);
+  const parts = [...word.map((seg) => ({ text: seg.text, reading: seg.reading })), ...(tail ? [{ text: tail, reading: undefined }] : [])];
+  return (
+    <p className="st-fb-breakdown">
+      {parts.map((part, i) => (
+        <span key={i}>
+          {i > 0 && <span aria-hidden="true"> + </span>}
+          <span lang="ja" className="st-fb-char">{part.text}</span>
+          {part.reading && <> (<span lang="ja">{part.reading}</span>)</>}
+        </span>
+      ))}
     </p>
   );
 }
 
 /** Saving sentences as review cards starts with phase 3, reading for real. */
-const SAVE_FROM_PHASE = 3;
+export const SAVE_FROM_PHASE = 3;
 
 function SaveButton({ sentence }: { sentence: SentenceLike }) {
   const saved = useLiveQuery(() => db.savedSentences.get(sentence.id), [sentence.id]);
@@ -92,10 +135,16 @@ function SentenceStep({ sentence, last, doneLabel, canSave, onNext }: {
     <div className="st-reading" ref={root}>
       <section className="st-question">
         <h2 className="st-ask">
-          {!q ? 'Read this sentence' : q.kind === 'reading' ? 'How do you read the underlined word?' : 'What does this mean?'}
+          {!q ? 'Read this sentence' : q.kind === 'reading' ? (
+            <>
+              How do you read the underlined word?
+              {/* The underline is only visual: name the word for screen readers. */}
+              <span className="visually-hidden"> Underlined: <span lang="ja">{q.written}</span></span>
+            </>
+          ) : 'What does this mean?'}
         </h2>
         <div className="card st-prompt st-reading-card">
-          <SentenceText jp={sentence.jp} target={q?.kind === 'reading' ? q.target : -1} revealTarget={answered} />
+          <SentenceText jp={sentence.jp} target={q?.kind === 'reading' ? q.target : undefined} revealTarget={answered} />
           {answered && <p className="st-translation">{sentence.en}</p>}
         </div>
       </section>
@@ -108,19 +157,20 @@ function SentenceStep({ sentence, last, doneLabel, canSave, onNext }: {
       {answered && (
         <>
           {q && (
-            <div className={correct ? 'feedback good' : 'feedback bad'} role="status">
+            <div className={correct ? 'feedback good st-feedback' : 'feedback bad st-feedback'} role="status">
               <p className="st-fb-title">
                 {correct ? 'Correct' : <>Not quite: it's <span lang={q.kind === 'reading' ? 'ja' : undefined}>{q.answer}</span></>}
               </p>
+              {q.kind === 'reading' && <TargetBreakdown jp={sentence.jp} target={q.target} />}
             </div>
           )}
           <div className="st-row">
-            <SpeakButton text={sentence.jp} />
             <SpeakButton text={sentence.jp} rate={0.7} label="Slow" />
             {canSave && <SaveButton sentence={sentence} />}
           </div>
           <Shadow text={sentence.jp} />
           <div className="st-footer">
+            <SpeakButton text={sentence.jp} compact label="Listen to the sentence" />
             <button ref={continueRef} type="button" className="btn ink st-grow" onClick={onNext}>
               {last ? doneLabel : 'Continue'}
             </button>

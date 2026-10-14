@@ -1,4 +1,5 @@
 import { gradeFor } from '../../../srs/answers.ts';
+import { MixedText } from '../MixedText.tsx';
 import { AnswerArea, Question } from './parts.tsx';
 import type { CardProps } from './types.ts';
 
@@ -15,7 +16,7 @@ export function VocabRecallCard({ prepared, onAnswer }: CardProps<'vocab-recall'
           grade: gradeFor(r),
           mode: r.mode,
           correct: r.correct,
-          feedback: { expected: vocab.kana, expectedLang: 'ja', note: vocab.note, speak: vocab.kana },
+          feedback: { expected: vocab.kana, expectedLang: 'ja', note: vocab.note && <MixedText text={vocab.note} />, speak: vocab.kana },
         })} />
     </>
   );

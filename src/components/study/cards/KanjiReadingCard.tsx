@@ -2,11 +2,16 @@ import { gradeFor } from '../../../srs/answers.ts';
 import { AnswerArea, fitStyle, Question } from './parts.tsx';
 import type { CardProps } from './types.ts';
 
-/** A word with the kanji highlighted, the target kanji underlined in shu. */
+/**
+ * A word with the target kanji underlined in shu. The underline is visual
+ * only, so screen readers are told which kanji it marks.
+ */
 export function MarkedWord({ written, mark }: { written: string; mark: string }) {
+  const marked = [...written].length > 1 && written.includes(mark);
   return (
     <p className="st-big st-fit" lang="ja" style={fitStyle(written)}>
-      {[...written].map((ch, i) => (ch === mark ? <span key={i} className="st-target">{ch}</span> : ch))}
+      {[...written].map((ch, i) => (ch === mark ? <u key={i} className="st-target">{ch}</u> : ch))}
+      {marked && <span className="visually-hidden" lang="en"> (underlined: <span lang="ja">{mark}</span>)</span>}
     </p>
   );
 }

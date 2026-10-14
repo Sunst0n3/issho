@@ -1,6 +1,8 @@
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import type { StreakInfo } from '../../srs/progress.ts';
 import { Glyph } from '../Glyph.tsx';
+import { streakText } from '../home/labels.ts';
 import { Icon } from '../ui.tsx';
 import type { LearnedLabel } from './learn/data.ts';
 
@@ -29,17 +31,20 @@ export function SessionSummary({ stats, streak, newBlocked, onDone }: {
   newBlocked?: string;
   onDone: () => void;
 }) {
+  // The last answer's button is gone: start screen readers and keyboards at the title.
+  const title = useRef<HTMLHeadingElement>(null);
+  useEffect(() => title.current?.focus({ preventScroll: true }), []);
   const minutes = Math.max(stats.ms > 0 ? 1 : 0, Math.round(stats.ms / 60_000));
   const accuracy = stats.reviews ? `${Math.round((stats.correct / stats.reviews) * 100)}%` : '–';
   return (
     <section className="st-summary" aria-labelledby="st-summary-title">
       <p className="st-eyebrow" lang="ja">おつかれさま</p>
-      <h1 id="st-summary-title" className="st-summary-title">Session complete</h1>
+      <h1 id="st-summary-title" className="st-summary-title" ref={title} tabIndex={-1}>Session complete</h1>
 
       {streak && streak.current > 0 && (
         <div className="card st-streak">
           <span className="st-streak-badge"><Icon name="flame" size={22} filled /></span>
-          <span><strong>{streak.current} day streak</strong>{streak.best > streak.current && <span className="muted"> · best {streak.best}</span>}</span>
+          <span><strong>{streakText(streak.current)}</strong>{streak.best > streak.current && <span className="muted"> · best {streak.best}</span>}</span>
         </div>
       )}
 

@@ -188,7 +188,7 @@
 .st-lesson { display: flex; flex-direction: column; gap: 14px; }
 .st-lesson-head { display: flex; align-items: center; gap: 16px; }
 .st-glyph-box {
-  width: 128px; height: 128px; flex-shrink: 0; display: grid; place-items: center;
+  width: 104px; height: 104px; flex-shrink: 0; display: grid; place-items: center;
   border-radius: var(--r-lg); background: var(--paper); color: var(--ink);
 }
 .st-lesson-gloss { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
@@ -209,7 +209,7 @@
 
 .st-hook { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: var(--r-lg); background: var(--shu-tint); color: var(--shu-ink); }
 .st-hook .label { color: var(--shu-ink); }
-.st-hook .btn.ghost { color: var(--shu-ink); min-height: 36px; padding: 0 8px; }
+.st-hook .btn.ghost { color: var(--shu-ink); min-height: var(--tap); min-width: var(--tap); padding: 0 12px; }
 .st-hook-input { min-height: 76px; padding: 10px 12px; font-size: 16px; resize: vertical; }
 
 .st-words { list-style: none; margin: 0; padding: 2px 12px 2px 16px; }
@@ -298,6 +298,8 @@
 .st-grammar-list li + li { border-top: 1px solid var(--line); }
 .st-grammar-row { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 10px 12px 10px 16px; color: var(--ink); text-decoration: none; }
 .st-grammar-row.locked { color: var(--muted); }
+/* The list card clips to its rounded corners, so the focus ring goes inside the row. */
+.st-grammar-row:focus-visible { outline-offset: -2px; border-radius: var(--r-lg); }
 .st-grammar-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .st-grammar-pattern { font-family: var(--font-display); font-size: 18px; }
 .st-grammar-title { font-size: 13px; color: var(--muted); }

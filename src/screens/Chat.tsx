@@ -4,7 +4,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { markAiDisabled, useAiAvailable } from '../components/together/ai.ts';
-import { dayLabel, localDay, MessageBubble } from '../components/together/ChatBubbles.tsx';
+import { MessageList } from '../components/together/ChatBubbles.tsx';
 import { Composer, type ComposerHandle } from '../components/together/Composer.tsx';
 import { ConnectServerForm } from '../components/together/ConnectServerForm.tsx';
 import { useFuriganaDict } from '../components/together/furigana.ts';
@@ -17,11 +17,10 @@ import { db } from '../lib/db.ts';
 import { useKnownKanji, useRubyShow, useSettings, useSettingsLoaded } from '../lib/hooks.ts';
 import { isKanji } from '../lib/ruby.ts';
 import type { Settings } from '../lib/types.ts';
-import { syncMessages, useChatMessages, type ChatItem } from '../sync/chat.ts';
+import { syncMessages, useChatMessages } from '../sync/chat.ts';
 import { useServerStatus } from '../sync/socket.ts';
 import { useHousehold } from '../sync/stats.ts';
 
-const GROUP_GAP_MS = 5 * 60_000;
 const STARTERS = ['おはよう', 'こんにちは', 'げんき？'];
 /**
  * The helper only needs the gist of earlier lines, and the server refuses a whole
@@ -47,7 +46,7 @@ export default function Chat() {
   if (!settings.deviceToken) {
     return (
       <Screen label="Chat">
-        <TopBar back="/together" title="Chat" />
+        <TopBar back="/together" title="Chat" heading={false} />
         <div className="tg-together-intro">
           <h1 className="tg-together-title">Text each other in Japanese</h1>
           <p className="muted">
@@ -141,17 +140,18 @@ function Conversation({ settings }: { settings: Settings }) {
   return (
     <Screen label={`Chat with ${partnerName}`}>
       <div className="tg-chat-head">
-        <TopBar back="/together"
+        {/* The partner's name below is the screen's h1. */}
+        <TopBar back="/together" heading={false}
           title={(
-            <span className="tg-chat-who">
+            <div className="tg-chat-who">
               <span className="tg-avatar" aria-hidden="true">{initialOf(partnerName)}</span>
-              <span className="tg-chat-who-text">
-                <span className="tg-chat-name">{partnerName}</span>
+              <div className="tg-chat-who-text">
+                <h1 className="tg-chat-name">{partnerName}</h1>
                 <span className="tg-chat-sub">
                   {online ? 'Japanese only' : <><TIcon name="wifi" size={12} /> Offline · messages wait to send</>}
                 </span>
-              </span>
-            </span>
+              </div>
+            </div>
           )}
           right={(
             <button type="button" className="tg-furigana-toggle" aria-pressed={furigana} onClick={toggleFurigana}
@@ -199,32 +199,6 @@ function Conversation({ settings }: { settings: Settings }) {
       </div>
     </Screen>
   );
-}
-
-function MessageList({ messages, dict, show, online, senderName }: {
-  messages: ChatItem[];
-  dict: ReturnType<typeof useFuriganaDict>;
-  show: 'all' | 'none' | ((base: string) => boolean);
-  online: boolean;
-  senderName: (memberId: string) => string;
-}) {
-  const rows = [];
-  let day = '';
-  for (let i = 0; i < messages.length; i++) {
-    const m = messages[i];
-    const d = localDay(m.createdAt);
-    if (d !== day) {
-      day = d;
-      rows.push(<p key={`day-${d}`} className="tg-day-sep"><span>{dayLabel(m.createdAt)}</span></p>);
-    }
-    const next = messages[i + 1];
-    const showTime = !next || next.mine !== m.mine || localDay(next.createdAt) !== d
-      || Date.parse(next.createdAt) - Date.parse(m.createdAt) > GROUP_GAP_MS;
-    rows.push(
-      <MessageBubble key={m.key} item={m} dict={dict} show={show} online={online} showTime={showTime} senderName={senderName(m.memberId)} />,
-    );
-  }
-  return <>{rows}</>;
 }
 
 function ChatSkeleton() {

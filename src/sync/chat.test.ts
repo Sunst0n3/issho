@@ -112,6 +112,23 @@ describe('useChatMessages', () => {
     expect(items[2]).toMatchObject({ memberId: 'me', createdAt: '2026-10-14T00:59:00.000Z' });
   });
 
+  it('passes on when each message was written', async () => {
+    await db.messages.put({ ...msg(1), writtenAt: '2026-10-13T21:30:00.000Z' });
+    await db.messages.put(msg(2));
+    await (db.outbox as unknown as { put(row: PendingMessage): Promise<unknown> }).put(
+      { clientId: 'p1', createdAt: new Date('2026-10-14T01:00:00Z'), kind: 'text', text: 'later', attempts: 0 },
+    );
+    const { result } = renderHook(() => useChatMessages());
+    await waitFor(() => expect(result.current).toHaveLength(3));
+    expect(result.current!.map((i) => i.writtenAt)).toEqual(['2026-10-13T21:30:00.000Z', undefined, '2026-10-14T01:00:00.000Z']);
+  });
+
+  it('keeps writtenAt from the server in the cache', async () => {
+    serveHistory(0).history.push({ ...msg(1), writtenAt: '2026-10-13T21:30:00.000Z' });
+    await syncMessages();
+    expect((await db.messages.get(1))?.writtenAt).toBe('2026-10-13T21:30:00.000Z');
+  });
+
   it('updates live when a message arrives', async () => {
     const { result } = renderHook(() => useChatMessages());
     await waitFor(() => expect(result.current).toEqual([]));

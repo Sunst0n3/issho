@@ -3,12 +3,14 @@ import { z } from 'zod';
 import type { ChatMessage, SendMessageRequest } from '../../../shared/api.ts';
 import { currentMember } from '../auth.ts';
 import type { AppContext } from '../context.ts';
+import { MAX_WRITTEN_BEFORE_MS } from '../db.ts';
 import { HttpError, parseWith } from '../errors.ts';
 
 const MAX_TEXT = 2000;
 
 const SendMessageSchema = z.object({
   clientId: z.string().min(1).max(100),
+  writtenAt: z.iso.datetime({ offset: true }).optional(),
   kind: z.enum(['text', 'voice']),
   text: z.string().max(MAX_TEXT),
   transcript: z.string().max(MAX_TEXT).optional(),
@@ -44,10 +46,12 @@ export function messageRoutes(app: FastifyInstance, ctx: AppContext): void {
       }
     }
 
+    const now = ctx.now();
     const message = ctx.store.insertMessage({
       clientId: body.clientId,
       memberId: member.id,
-      createdAt: ctx.now().toISOString(),
+      createdAt: now.toISOString(),
+      writtenAt: body.writtenAt && writtenAt(body.writtenAt, now),
       kind: body.kind,
       text: body.text,
       transcript: body.transcript,
@@ -57,4 +61,13 @@ export function messageRoutes(app: FastifyInstance, ctx: AppContext): void {
     reply.code(201);
     return message;
   });
+}
+
+/**
+ * When a message was written, as the phone says, kept between a week before `now` and `now`: a
+ * phone's clock may be off, and a message can't be written after it arrived.
+ */
+function writtenAt(claimed: string, now: Date): string {
+  const time = Math.min(now.getTime(), Math.max(now.getTime() - MAX_WRITTEN_BEFORE_MS, Date.parse(claimed)));
+  return new Date(time).toISOString();
 }

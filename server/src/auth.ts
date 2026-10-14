@@ -8,6 +8,8 @@ declare module 'fastify' {
   interface FastifyRequest {
     /** The authenticated member; set by authHook() on protected routes. */
     member: Member | null;
+    /** The SHA-256 of the device token the member signed in with; set with `member`. */
+    deviceTokenHash: string | null;
   }
 }
 
@@ -36,24 +38,38 @@ export function bearerToken(header: string | undefined): string | null {
   return match ? match[1] : null;
 }
 
-export function authenticate(ctx: AppContext, token: string | null): Member | null {
+export interface Device {
+  member: Member;
+  tokenHash: string;
+}
+
+/** The device a token belongs to, or null when the token is malformed, signed out or unknown. */
+export function authenticate(ctx: AppContext, token: string | null): Device | null {
   if (!token || !TOKEN_PATTERN.test(token)) return null;
-  const member = ctx.store.memberForTokenHash(hashToken(token));
+  const tokenHash = hashToken(token);
+  const member = ctx.store.memberForTokenHash(tokenHash);
   if (!member) return null;
   ctx.store.touchMember(member.id, ctx.now(), LAST_SEEN_RESOLUTION_MS);
-  return member;
+  return { member, tokenHash };
 }
 
 /** onRequest hook that rejects the request with 401 unless `extract` yields a valid device token. */
 export function authHook(ctx: AppContext, extract: (request: FastifyRequest) => string | null) {
   return async function requireMember(request: FastifyRequest): Promise<void> {
-    const member = authenticate(ctx, extract(request));
-    if (!member) throw new HttpError(401, 'unauthorized');
-    request.member = member;
+    const device = authenticate(ctx, extract(request));
+    if (!device) throw new HttpError(401, 'unauthorized');
+    request.member = device.member;
+    request.deviceTokenHash = device.tokenHash;
   };
 }
 
 export function currentMember(request: FastifyRequest): Member {
   if (!request.member) throw new HttpError(401, 'unauthorized');
   return request.member;
+}
+
+/** The authenticated device's token hash (see authHook). */
+export function currentDevice(request: FastifyRequest): string {
+  if (!request.deviceTokenHash) throw new HttpError(401, 'unauthorized');
+  return request.deviceTokenHash;
 }

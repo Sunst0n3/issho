@@ -5,6 +5,8 @@
 //   Authorization: Bearer <deviceToken>
 // The WebSocket passes the token as a query parameter: /api/ws?token=<deviceToken>
 // Errors are JSON { error: string } with a 4xx/5xx status.
+// Any origin may call /api/* (CORS): the app can live at one address and talk to the home server
+// at another ("Advanced: server address"). Auth is a bearer token, never a cookie.
 
 export interface HealthResponse { ok: true; version: string; aiEnabled: boolean }
 
@@ -12,14 +14,33 @@ export interface HealthResponse { ok: true; version: string; aiEnabled: boolean 
 export interface RegisterRequest {
   /** Shared secret set as HOUSEHOLD_CODE on the server. */
   householdCode: string;
+  /** Re-registering an existing member on a new device: same name = same member. */
   name: string;
-  /** Re-register an existing member on a new device (same name = same member). */
+  /**
+   * The member this phone was before it disconnected or was signed out. It pairs as that member
+   * again, renamed to `name`, unless another member already has that name (then the name wins).
+   */
+  memberId?: string;
 }
 export interface RegisterResponse {
   deviceToken: string;
   memberId: string;
   householdName: string;
+  /**
+   * Identifies this household's data; it changes only if the server starts afresh. A phone pairing
+   * again keeps its cached chat and unsent messages when this matches its last pairing.
+   */
+  householdId: string;
 }
+
+// PATCH /api/me { name } → Member — renames the caller's member (1–40 characters).
+// 409 { error: 'name_taken' } when another member has that name.
+export interface RenameMemberRequest { name: string }
+export type RenameMemberResponse = Member;
+
+// POST /api/signout → { ok: true } — signs this device out: its token stops working at once
+// (its WebSocket is closed with WS_CLOSE_UNPAIRED).
+export interface SignOutResponse { ok: true }
 
 export interface Member {
   id: string;
@@ -33,12 +54,14 @@ export interface DayStats {
   date: string;              // 'YYYY-MM-DD'
   studyMinutes: number;
   reviews: number;
-  correct: number;
+  correct: number;           // ≤ reviews
   newItems: number;
   sessionComplete: boolean;
 }
 
-// POST /api/stats — upsert this member's recent days and totals.
+// POST /api/stats — upsert this member's recent days and totals. Each device's upload replaces
+// its own earlier one (so a reset phone can lower its numbers); the household view merges the
+// member's devices, taking the largest value per day.
 // Success codes: POST /api/messages → 201 new / 200 resent clientId; POST /api/voice and /api/quizzes → 201.
 // Treat any 2xx as success.
 
@@ -79,7 +102,12 @@ export interface ChatMessage {
   id: number;
   clientId: string;
   memberId: string;
-  createdAt: string;         // ISO
+  createdAt: string;         // ISO, when the server received it (orders the chat)
+  /**
+   * ISO, when the sender wrote it on their phone, if it said (it may have waited offline).
+   * Never after createdAt, nor more than 7 days before it. Show `writtenAt ?? createdAt`.
+   */
+  writtenAt?: string;
   kind: MessageKind;
   text: string;              // Japanese text; for voice, optional caption
   transcript?: string;       // speech-to-text of a voice message
@@ -90,6 +118,8 @@ export interface ChatMessage {
 // POST /api/messages
 export interface SendMessageRequest {
   clientId: string;          // idempotency key: re-sending the same clientId returns the original
+  /** ISO, when the message was written (queued) on the phone; the server clamps it (see ChatMessage). */
+  writtenAt?: string;
   kind: 'text' | 'voice';
   text: string;
   transcript?: string;
@@ -102,6 +132,7 @@ export interface UploadVoiceResponse { audioId: string }
 // GET /api/voice/:audioId → the audio bytes with their content type
 
 // Quiz each other: send your hardest kanji to your partner.
+/** One kanji (a single Han character). The server drops repeats, keeping the first. */
 export interface QuizItem { char: string }
 export interface Quiz {
   id: string;
@@ -153,7 +184,9 @@ export interface AiTranslateResponse {
 
 /**
  * WebSocket close code (policy violation) for a device that is no longer paired: it was
- * signed out or removed with the admin CLI. The phone should pair again, not reconnect.
+ * signed out or removed with the admin CLI, or the server doesn't know its token (e.g. its data
+ * was reset). Sent right after the upgrade for an unknown token, and within seconds of a
+ * revoke for an open socket. The phone should pair again, not reconnect.
  */
 export const WS_CLOSE_UNPAIRED = 1008;
 

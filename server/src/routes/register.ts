@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import type { RegisterRequest, RegisterResponse } from '../../../shared/api.ts';
+import type { Member, RegisterRequest, RegisterResponse } from '../../../shared/api.ts';
 import { generateToken, hashToken, safeEqual } from '../auth.ts';
 import type { AppContext } from '../context.ts';
 import { HttpError, parseWith } from '../errors.ts';
@@ -19,6 +19,7 @@ const RegisterSchema = z.object({
   // the pairing form can say which field is wrong, and HOUSEHOLD_CODE may be as long as you like.
   householdCode: z.string(),
   name: MemberNameSchema,
+  memberId: z.uuid().optional(),
 }) satisfies z.ZodType<RegisterRequest>;
 
 export function registerRoutes(app: FastifyInstance, ctx: AppContext): void {
@@ -30,15 +31,39 @@ export function registerRoutes(app: FastifyInstance, ctx: AppContext): void {
     }
 
     const now = ctx.now();
-    const existing = ctx.store.findMemberByName(body.name);
-    const member = existing ?? ctx.store.createMember(body.name, now);
+    const { member, change } = findOrCreateMember(ctx, body, now);
     const deviceToken = generateToken();
     ctx.store.addDevice(member.id, hashToken(deviceToken), now);
-    request.log.info({ memberId: member.id, newMember: !existing }, 'device registered');
+    request.log.info({ memberId: member.id, newMember: change === 'created' }, 'device registered');
 
     // Lets partners' phones refresh their household view.
-    if (!existing) ctx.hub.broadcast({ type: 'stats', memberId: member.id });
+    if (change) ctx.hub.broadcast({ type: 'stats', memberId: member.id });
 
-    return { deviceToken, memberId: member.id, householdName: ctx.householdName() };
+    return {
+      deviceToken,
+      memberId: member.id,
+      householdName: ctx.householdName(),
+      householdId: ctx.store.householdId(),
+    };
   });
+}
+
+/**
+ * Same name = same member. A phone pairing again also names the member it was before, which
+ * keeps that member (renamed when the name changed meanwhile) instead of making a second one,
+ * unless another member already has the name.
+ */
+function findOrCreateMember(
+  ctx: AppContext,
+  body: z.output<typeof RegisterSchema>,
+  now: Date,
+): { member: Member; change: 'created' | 'renamed' | null } {
+  const byName = ctx.store.findMemberByName(body.name);
+  const previous = body.memberId ? ctx.store.getMember(body.memberId) : undefined;
+  if (previous && (!byName || byName.id === previous.id)) {
+    if (previous.name === body.name) return { member: previous, change: null };
+    return { member: ctx.store.renameMember(previous.id, body.name), change: 'renamed' };
+  }
+  if (byName) return { member: byName, change: null };
+  return { member: ctx.store.createMember(body.name, now), change: 'created' };
 }

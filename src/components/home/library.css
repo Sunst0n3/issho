@@ -1,7 +1,6 @@
 /* Kanji library, kanji page, kana chart, practice pad and bottom sheet.
    Colours are tokens only. */
 
-.lib-title { font-size: 17px; font-weight: 700; }
 .lib-summary { font-size: 14px; }
 
 /* ---- Tiles ---- */
@@ -14,9 +13,13 @@
 }
 .lib-tile.next { border: 2px solid var(--shu); padding: 7px 3px; }
 .lib-tile.locked { border-color: var(--line); background: transparent; color: var(--muted); }
-.lib-tile.locked > :first-child { opacity: 0.55; }
+/* Still a link, so the glyph keeps at least 3:1 (3.5:1 light, 4.6:1 dark). */
+.lib-tile.locked > :first-child { opacity: 0.75; }
+/* Up to two lines, so "Buddhist temple" isn't cut to "Buddhist te…". */
 .lib-meaning {
-  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; color: var(--muted);
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2;
+  max-width: 100%; overflow: hidden; overflow-wrap: anywhere; text-align: center;
+  font-size: 11px; line-height: 1.3; color: var(--muted);
 }
 .lib-flag { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--shu); }
 .lib-more { align-self: center; }
@@ -47,6 +50,11 @@
 .kd-hero-text { flex: 1; min-width: 150px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
 .kd-meaning { font-family: var(--font-display); font-size: 28px; font-weight: 700; line-height: 1.2; }
 .kd-also { font-size: 14px; }
+/* The full kanji a part is short for: a 44px target around the one character. */
+.kd-variant {
+  display: inline-flex; align-items: center; justify-content: center; min-width: var(--tap); min-height: var(--tap);
+  margin: -10px 0; vertical-align: middle; font-family: var(--font-display); font-size: 20px;
+}
 .kd-readings { display: flex; flex-direction: column; gap: 6px; margin: 0; }
 .kd-reading { display: flex; align-items: baseline; gap: 10px; }
 .kd-reading dt { flex-shrink: 0; width: 32px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: var(--muted); }
@@ -74,7 +82,7 @@
 .kd-hook-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-left: -12px; }
 .kd-hook .btn.ghost { color: var(--shu-ink); }
 .kd-hook-input {
-  width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line-strong);
+  width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line-input);
   background: var(--card); color: var(--ink); font-size: 16px; resize: vertical;
 }
 .btn.kd-show-hook { align-self: flex-start; }
@@ -108,7 +116,7 @@
 
 /* ---- Bottom sheet ---- */
 .hm-sheet-layer { position: fixed; inset: 0; z-index: 30; display: flex; align-items: flex-end; justify-content: center; }
-.hm-sheet-backdrop { position: absolute; inset: 0; background: var(--ink); opacity: 0.35; }
+.hm-sheet-backdrop { position: absolute; inset: 0; background: var(--ink-soft); opacity: 0.55; } /* --ink turns light in dark mode; --ink-soft is dark in both themes */
 .hm-sheet {
   position: relative; display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 560px;
   max-height: calc(100dvh - 24px - var(--safe-top)); overflow-y: auto; overscroll-behavior: contain;

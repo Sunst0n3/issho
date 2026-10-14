@@ -253,6 +253,19 @@ describe('meaningMatches', () => {
     expect(meaningMatches('black', ['black'], { notAccepted: ['block'] })).toBe(true);
   });
 
+  it('accepts a plain plural, or the singular of a listed plural', () => {
+    expect(meaningMatches('mountains', ['mountain'])).toBe(true);
+    expect(meaningMatches('waters', ['water'])).toBe(true);
+    expect(meaningMatches('days', ['day'])).toBe(true);
+    expect(meaningMatches('boxes', ['box'])).toBe(true);
+    expect(meaningMatches('cities', ['city'])).toBe(true);
+    expect(meaningMatches('vegetable', ['vegetables'])).toBe(true);
+    expect(meaningMatches('train stations', ['train station'])).toBe(true);
+    // Not for one- and two-letter words, and not when the plural is another kanji's meaning.
+    expect(meaningMatches('as', ['a'])).toBe(false);
+    expect(meaningMatches('news', ['new'], { notAccepted: ['news'] })).toBe(false);
+  });
+
   it('rejects empty input', () => {
     expect(meaningMatches('  ', ['water'])).toBe(false);
     expect(meaningMatches('the', ['water'])).toBe(false);

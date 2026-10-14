@@ -40,7 +40,8 @@ export function KanaLesson({ kana, example, all, onPractice, onNext }: {
               <span className="label">Example</span>
               <span>
                 <span className="st-word-written" lang="ja">{example.kana}</span>
-                {romaji && <span className="st-romaji">{kanaToRomaji(example.kana, all)}</span>}
+                {romaji && <span className="st-romaji">{kanaToRomaji(example.kana, all, { particles: true })}</span>}
+                {example.written && <span className="st-word-kana" lang="ja"> ({example.written})</span>}
               </span>
               <span className="st-word-en">{example.en}</span>
             </span>

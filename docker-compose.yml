@@ -5,6 +5,11 @@
 #   docker compose up -d --build
 # Members, devices and the household name, also while it runs:
 #   docker compose exec issho node server/src/admin.ts list      (or: help)
+#
+# HTTPS is needed on the phones: on a plain http://192.168.x.x:8787 address the browser won't let
+# Issho work offline or record voice (only https:// and localhost may). Easiest: Tailscale on this
+# machine and both phones, then `tailscale serve --bg 8787` and open https://<machine>.<tailnet>.ts.net.
+# Or put Caddy in front with your own domain. Details in server/.env.example ("HTTPS").
 services:
   issho:
     build: .
@@ -18,6 +23,8 @@ services:
       PORT: "8787"
       DATA_DIR: /data
       STATIC_DIR: /app/dist
+    # Behind Tailscale serve or a proxy on this machine, "127.0.0.1:8787:8787" keeps the plain
+    # http port off the network.
     ports:
       - "8787:8787"
     volumes:

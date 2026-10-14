@@ -105,8 +105,17 @@ describe('Today', () => {
 
   it('celebrates a finished course', async () => {
     for (const u of CURRICULUM.units) await addLearned(u.type, u.char);
+    setPlan({ courseComplete: true });
     renderAt('/', '/', <Today />);
     expect(await screen.findByRole('heading', { name: "You've met every kanji" })).toBeTruthy();
+  });
+
+  it("doesn't call the course finished while new words or grammar are still to come", async () => {
+    for (const u of CURRICULUM.units) await addLearned(u.type, u.char);
+    setPlan({ courseComplete: false });
+    renderAt('/', '/', <Today />);
+    expect(await screen.findByRole('heading', { name: 'All caught up' })).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: "You've met every kanji" })).toBeNull();
   });
 
   it('shows "Done for today" with extra practice once the session is complete', async () => {
@@ -116,8 +125,54 @@ describe('Today', () => {
     expect(await screen.findByRole('heading', { name: 'Done for today' })).toBeTruthy();
     expect(screen.getByRole('link', { name: /Practice writing/ }).getAttribute('href')).toBe('/write');
     expect(screen.getByRole('link', { name: /Read & shadow/ }).getAttribute('href')).toBe('/read');
-    expect(screen.getByRole('heading', { name: '1 day streak' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: '1-day streak' })).toBeTruthy();
     expect(screen.queryByRole('heading', { name: 'New today' })).toBeNull();
+    expect(screen.getByText('Nice work. Your next reviews will be waiting tomorrow.')).toBeTruthy();
+  });
+
+  it("doesn't promise tomorrow's reviews while extra reviews are ready", async () => {
+    await db.days.put({ date: dayKey(), studyMs: 600_000, reviews: 20, correct: 18, newItems: 5, sessionComplete: true });
+    setPlan({ reviews: ['kanji:日|meaning', 'kanji:日|reading'], estimateMinutes: 2 });
+    renderAt('/', '/', <Today />);
+    const panel = (await screen.findByRole('heading', { name: 'Done for today' })).closest('section')!;
+    expect(panel.textContent).not.toContain('waiting tomorrow');
+    expect(within(panel).getByRole('link', { name: /2 more reviews ready/ }).getAttribute('href')).toBe('/session');
+  });
+
+  it("doesn't call the course over while reviews wait for tomorrow", async () => {
+    for (const u of CURRICULUM.units) await addLearned(u.type, u.char);
+    setPlan({ backlog: 200, courseComplete: true });
+    renderAt('/', '/', <Today />);
+    const panel = (await screen.findByRole('heading', { name: "You've met every kanji" })).closest('section')!;
+    expect(panel.textContent).not.toContain("That's the whole course");
+    expect(panel.textContent).toContain('200 more reviews will wait for tomorrow.');
+  });
+
+  it('keeps the break note away from a finished course: held-back new items mean it is not finished', async () => {
+    for (const u of CURRICULUM.units) await addLearned(u.type, u.char);
+    const reason = 'New items are taking a break while you catch up on 200 reviews.';
+    setPlan({ backlog: 200, newBlocked: { reason }, courseComplete: false });
+    renderAt('/', '/', <Today />);
+    const panel = (await screen.findByRole('heading', { name: "Today's reviews are done" })).closest('section')!;
+    expect(panel.textContent).toContain(reason);
+    expect(screen.queryByRole('heading', { name: "You've met every kanji" })).toBeNull();
+  });
+
+  it('shows the days before the learner started as not started, not missed', async () => {
+    // A Wednesday evening, onboarded today with both kana marked known.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(2026, 9, 14, 20, 0));
+    try {
+      await db.items.add({ id: 'kana:あ', kind: 'kana', key: 'あ', introducedAt: new Date() });
+      renderAt('/', '/', <Today />);
+      const week = await screen.findByRole('list', { name: 'This week' });
+      expect(week.textContent).toContain('Monday: before you started');
+      expect(week.textContent).toContain('Tuesday: before you started');
+      expect(week.textContent).toContain('Wednesday: today, not done yet');
+      expect(week.textContent).not.toContain('missed');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('invites an unpaired phone to connect, and shows the phase progress', async () => {
@@ -127,6 +182,22 @@ describe('Today', () => {
     expect((await screen.findByRole('link', { name: /Study together: connect your home server/ })).getAttribute('href')).toBe('/together');
     expect((await screen.findByRole('link', { name: /Phase 2 · 1 of 5 kanji/ })).getAttribute('href')).toBe('/learn');
     expect(screen.getByText('Works offline · progress saved on this phone')).toBeTruthy();
+  });
+
+  it("warns on an insecure (http://) address and doesn't promise offline use there", async () => {
+    Object.defineProperty(window, 'isSecureContext', { value: false, configurable: true });
+    try {
+      renderAt('/', '/', <Today />);
+      expect(await screen.findByRole('heading', { name: "Issho can't work offline from this address" })).toBeTruthy();
+      expect(screen.getByText('Progress saved on this phone')).toBeTruthy();
+      expect(screen.queryByText(/Works offline/)).toBeNull();
+    } finally {
+      Object.defineProperty(window, 'isSecureContext', { value: true, configurable: true });
+    }
+    cleanup();
+    renderAt('/', '/', <Today />);
+    expect(await screen.findByText('Works offline · progress saved on this phone')).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: /can't work offline/ })).toBeNull();
   });
 
   it('says so when the home server removed this phone', async () => {
@@ -160,7 +231,48 @@ describe('Today', () => {
     const card = await screen.findByRole('link', { name: /Anna finished today/ });
     expect(card.getAttribute('href')).toBe('/together');
     expect(card.textContent).toContain('5 new · 31 reviews · 94% correct');
+    // The lines of the card are separated in its accessible name.
+    expect(card.getAttribute('aria-label')).toBe('Anna finished today. 5 new · 31 reviews · 94% correct');
     expect(screen.queryByText(/connect your home server/)).toBeNull();
+    household.data = undefined;
+  });
+
+  it('shows the partner seen most recently, not a leftover member who joined first', async () => {
+    await updateSettings({ deviceToken: 'token', memberId: 'm-sam', householdName: 'Our home' });
+    const member = (id: string, name: string, updatedAt: string | null): MemberStats => ({
+      member: { id, name, joinedAt: '2026-09-01T00:00:00Z', lastSeenAt: null },
+      days: [], streak: 0, kanjiKnown: 0, knownKanji: [], phase: 2, updatedAt,
+    });
+    household.data = {
+      householdName: 'Our home',
+      me: 'm-sam',
+      members: [member('m-ghost', 'Anna (old phone)', '2026-09-02T00:00:00Z'), member('m-sam', 'Sam', null),
+        member('m-anna', 'Anna', '2026-10-13T00:00:00Z')],
+      sharedStreak: 0,
+    };
+    try {
+      renderAt('/', '/', <Today />);
+      expect(await screen.findByRole('link', { name: /^Anna hasn't studied yet today/ })).toBeTruthy();
+      expect(screen.queryByText(/old phone/)).toBeNull();
+    } finally {
+      household.data = undefined;
+    }
+  });
+
+  it("words the partner's streak as an n-day streak", async () => {
+    await updateSettings({ deviceToken: 'token', memberId: 'm-sam' });
+    const member = (id: string, name: string, streak: number): MemberStats => ({
+      member: { id, name, joinedAt: '2026-09-01T00:00:00Z', lastSeenAt: null },
+      days: [],
+      streak,
+      kanjiKnown: 0,
+      knownKanji: [],
+      phase: 2,
+      updatedAt: null,
+    });
+    household.data = { householdName: 'Our home', me: 'm-sam', members: [member('m-sam', 'Sam', 0), member('m-anna', 'Anna', 4)], sharedStreak: 0 };
+    renderAt('/', '/', <Today />);
+    expect(await screen.findByText('4-day streak so far')).toBeTruthy();
     household.data = undefined;
   });
 });

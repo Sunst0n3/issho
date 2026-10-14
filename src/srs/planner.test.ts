@@ -1,6 +1,6 @@
 import { Rating, State, type Grade } from 'ts-fsrs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { db, updateSettings } from '../lib/db.ts';
+import { cardId, db, updateSettings } from '../lib/db.ts';
 import type { CardRecord, SentenceEntry } from '../lib/types.ts';
 import { applyKnownKana, introducePlanItem } from './course.ts';
 import { DAY_MS } from './days.ts';
@@ -8,9 +8,11 @@ import { introduceItem, markKnownMany } from './items.ts';
 import {
   backlogThreshold,
   capReviews,
+  deferNewCards,
   dueCount,
   estimateMinutes,
   markSentencesShown,
+  nextStudyDayStart,
   orderReviews,
   pickIPlusOne,
   pickSentences,
@@ -20,7 +22,7 @@ import {
 } from './planner.ts';
 import { learnedToday } from './progress.ts';
 import { gradeCard, newCardRecord } from './scheduler.ts';
-import { at, BASIC_HIRAGANA, fixtures, inTimeZone, resetDb } from './test-fixtures.ts';
+import { at, BASIC_HIRAGANA, CURRICULUM, fixtures, inTimeZone, KANA, resetDb } from './test-fixtures.ts';
 
 vi.mock('../lib/data.ts', async () => (await import('./test-fixtures.ts')).dataMock);
 
@@ -301,6 +303,36 @@ describe('planToday: new items', () => {
     expect(later.newBlocked?.reason).toMatch(new RegExp(`${kanaCards} reviews`));
   });
 
+  it('reports no pause once the course has nothing new left, and says the course is complete', async () => {
+    fixtures.survival = [];
+    fixtures.grammar = [];
+    await markKnownMany([
+      ...KANA.map((k) => ({ kind: 'kana' as const, key: k.char })),
+      ...CURRICULUM.units.map((u) => ({ kind: u.type, key: u.char })),
+    ], NOW);
+    await addDue(151);
+    const plan = await planToday(NOW);
+    expect(plan.newItems).toEqual([]);
+    expect(plan.newBlocked).toBeUndefined();
+    expect(plan.courseComplete).toBe(true);
+  });
+
+  it('is not complete with every kanji met while survival words or grammar are left', async () => {
+    await markKnownMany([
+      ...KANA.map((k) => ({ kind: 'kana' as const, key: k.char })),
+      ...CURRICULUM.units.map((u) => ({ kind: u.type, key: u.char })),
+    ], NOW);
+    await addDue(151);
+    let plan = await planToday(NOW);
+    expect(plan.courseComplete).toBe(false);
+    expect(plan.newBlocked).toBeDefined();
+    // Also when today's new items are done.
+    await updateSettings({ newPerDay: 0 });
+    plan = await planToday(NOW);
+    expect(plan.courseComplete).toBe(false);
+    expect(plan.newBlocked).toBeUndefined();
+  });
+
   it('resumes new items at the threshold', async () => {
     await addDue(150);
     const plan = await planToday(NOW);
@@ -321,6 +353,25 @@ describe('planToday: new items', () => {
     const plan = await planToday(NOW);
     expect(plan.estimateMinutes).toBe(estimateMinutes(10, plan.newItems, plan.reading.length));
     expect(plan.estimateMinutes).toBeGreaterThanOrEqual(5);
+  });
+});
+
+describe('deferNewCards', () => {
+  it('moves new cards left out of the first check to the next study day, leaving answered ones alone', async () => {
+    await introduceItem('kanji', '一', NOW);
+    const [reading, meaning] = [cardId('kanji:一', 'reading'), cardId('kanji:一', 'meaning')];
+    await gradeCard(meaning, Rating.Good, { durationMs: 1000, mode: 'choice', now: NOW });
+    const answeredDue = (await db.cards.get(meaning))!.due;
+    await deferNewCards([reading, meaning], NOW);
+    expect((await db.cards.get(reading))!.due).toEqual(at(2026, 10, 15, 4));
+    expect((await db.cards.get(meaning))!.due).toEqual(answeredDue);
+    expect((await planToday(NOW)).reviews).not.toContain(reading);
+    expect((await planToday(at(2026, 10, 15, 4))).reviews).toContain(reading);
+  });
+
+  it('starts the next study day at 4 a.m.', () => {
+    expect(nextStudyDayStart(at(2026, 10, 14, 9))).toEqual(at(2026, 10, 15, 4));
+    expect(nextStudyDayStart(at(2026, 10, 15, 2))).toEqual(at(2026, 10, 15, 4));
   });
 });
 

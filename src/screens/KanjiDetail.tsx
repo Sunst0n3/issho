@@ -1,4 +1,5 @@
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { useRef } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { Glyph } from '../components/Glyph.tsx';
 import { SpeakButton } from '../components/SpeakButton.tsx';
 import { CardStatus, ComingUp, MemoryHook, ReadingRow, spokenReading } from '../components/home/KanjiParts.tsx';
@@ -160,7 +161,6 @@ function Practice({ char }: { char: string }) {
 
 export default function KanjiDetail() {
   const char = useParams().char ?? '';
-  const location = useLocation();
   const settings = useSettings();
   const detail = useLive(() => loadDetail(char), [char]);
   // A live query keeps its last result until the next one arrives, so moving
@@ -174,10 +174,12 @@ export default function KanjiDetail() {
     cards: await db.cards.where('itemId').equals(id).toArray(),
   }), [id]);
   const mine = mineLive.status === 'ready' && mineLive.value.id === id ? mineLive.value : undefined;
+  // The kanji this page offered "Learn this now" for: once learned, its status takes the focus.
+  const offered = useRef<string>();
   const item = mine?.item;
 
-  // Opened from inside the app → go back where we came from; opened directly → the library.
-  const back = location.key === 'default' ? '/kanji' : true;
+  // Opened from inside the app, Back goes back where we came from; opened directly, to the library.
+  const back = '/kanji';
 
   if (detail.status === 'loading' || (detail.status === 'ready' && !d)) {
     return (
@@ -217,7 +219,7 @@ export default function KanjiDetail() {
 
   return (
     <Screen label={`${char}, ${title}`}>
-      <TopBar back={back} title={<span className="kd-topbar">{kanji ? 'Kanji' : 'Part (radical)'}</span>} />
+      <TopBar back={back} heading={false} title={<span className="kd-topbar">{kanji ? 'Kanji' : 'Part (radical)'}</span>} />
 
       <section className="card kd-hero">
         <div className="kd-glyph"><Glyph char={char} size={104} /></div>
@@ -227,7 +229,13 @@ export default function KanjiDetail() {
           {radical && (
             <p className="muted kd-also">
               Means “{radical.meaning}”
-              {radical.variantOf && <> · a short form of <Link to={`/kanji/${encodeURIComponent(radical.variantOf)}`} lang="ja">{radical.variantOf}</Link></>}
+              {radical.variantOf && (
+                <> · a short form of{' '}
+                  <Link to={`/kanji/${encodeURIComponent(radical.variantOf)}`} className="kd-variant" lang="ja">
+                    {radical.variantOf}
+                  </Link>
+                </>
+              )}
             </p>
           )}
           {kanji && (
@@ -241,8 +249,8 @@ export default function KanjiDetail() {
       </section>
 
       {mine && (item
-        ? <CardStatus item={item} cards={mine.cards} />
-        : unit && <ComingUp unit={unit} nextUp={d.nextUp} />)}
+        ? <CardStatus item={item} cards={mine.cards} justLearned={offered.current === id} />
+        : unit && <ComingUp unit={unit} nextUp={d.nextUp} onShow={() => { offered.current = id; }} />)}
 
       <StrokeOrder char={char} />
 

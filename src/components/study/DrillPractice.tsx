@@ -63,7 +63,8 @@ export function DrillPractice({ drills, onDone, doneLabel = 'Done' }: {
       <p className="label">Practice {index + 1} / {drills.length}</p>
       <div className="card st-prompt st-drill-card">
         <p className="st-drill-en">{drill.en}</p>
-        <DrillSentence prompt={drill.prompt} fill={picked ?? undefined} />
+        {/* Once answered the gap shows the right answer, never a wrong pick painted as filled; the pick is marked in the choices. */}
+        <DrillSentence prompt={drill.prompt} fill={picked === null ? undefined : answer} />
       </div>
       <ChoiceGrid options={options} answer={answer} picked={picked} onPick={setPicked} lang="ja" />
       {picked !== null && (
@@ -72,7 +73,6 @@ export function DrillPractice({ drills, onDone, doneLabel = 'Done' }: {
             <p className="st-fb-title">
               {picked === answer ? 'Right' : <>Not quite: it's <span lang="ja">{answer}</span></>}
             </p>
-            {picked !== answer && <Ruby className="st-fb-note" text={filledDrill(drill)} show="all" />}
           </div>
           <div className="st-row">
             <SpeakButton text={filledDrill(drill)} compact />

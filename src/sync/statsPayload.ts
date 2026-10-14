@@ -30,7 +30,8 @@ export function toDayStats(d: DayRecord): DayStats {
     // studyMs is open-ended (e.g. a session timer left running while the phone slept).
     studyMinutes: clamp(d.studyMs / 60_000, 0, MAX_DAY_MINUTES),
     reviews: clamp(d.reviews, 0, MAX_COUNT),
-    correct: clamp(d.correct, 0, MAX_COUNT),
+    // The server refuses more right answers than reviews.
+    correct: Math.min(clamp(d.correct, 0, MAX_COUNT), clamp(d.reviews, 0, MAX_COUNT)),
     newItems: clamp(d.newItems, 0, MAX_COUNT),
     sessionComplete: Boolean(d.sessionComplete),
   };

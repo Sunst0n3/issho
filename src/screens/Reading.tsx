@@ -4,7 +4,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ReadingDrill } from '../components/study/ReadingDrill.tsx';
+import { ReadingDrill, SAVE_FROM_PHASE } from '../components/study/ReadingDrill.tsx';
 import { unsaveSentence, type SentenceLike } from '../components/study/sentences.ts';
 import { SessionHeader } from '../components/study/SessionChrome.tsx';
 import { useStudyTimer } from '../components/study/time.ts';
@@ -12,6 +12,7 @@ import { useAsync } from '../components/study/useAsync.ts';
 import { Icon, Ruby, Screen, TopBar } from '../components/ui.tsx';
 import { db } from '../lib/db.ts';
 import { useRubyShow } from '../lib/hooks.ts';
+import { currentPhase, type Phase } from '../srs/course.ts';
 import { pickSentences } from '../srs/planner.ts';
 import '../components/study/study.css';
 
@@ -23,18 +24,25 @@ function Drill({ sentences, onClose, onDone }: { sentences: SentenceLike[]; onCl
   const onProgress = useCallback((i: number) => setIndex(i), []);
   return (
     <Screen label="Read and shadow">
-      <SessionHeader progress={index / sentences.length} label={`Read ${index + 1} / ${sentences.length}`} onClose={onClose} />
+      <SessionHeader progress={index / sentences.length} label={`Read ${index + 1} / ${sentences.length}`} onClose={onClose}
+        title="Read & shadow" />
       <ReadingDrill sentences={sentences} onProgress={onProgress} onDone={onDone} doneLabel="Finish" />
     </Screen>
   );
 }
 
-function SavedList({ onRead }: { onRead: (s: SentenceLike) => void }) {
+function SavedList({ phase, onRead }: { phase?: Phase; onRead: (s: SentenceLike) => void }) {
   const saved = useLiveQuery(() => db.savedSentences.orderBy('savedAt').reverse().toArray(), []);
   const show = useRubyShow();
   if (!saved) return <div className="st-skeleton st-skeleton-list" aria-busy="true" aria-label="Loading saved sentences" />;
   if (!saved.length) {
-    return <p className="empty">Save a sentence while reading and it comes back as a review card. Your saved sentences will be listed here.</p>;
+    return (
+      <p className="empty">
+        {phase !== undefined && phase < SAVE_FROM_PHASE
+          ? `From phase ${SAVE_FROM_PHASE} you can save sentences while reading. They come back as review cards and are listed here.`
+          : 'Save a sentence while reading and it comes back as a review card. Your saved sentences will be listed here.'}
+      </p>
+    );
   }
   return (
     <ul className="card st-saved">
@@ -56,6 +64,7 @@ function SavedList({ onRead }: { onRead: (s: SentenceLike) => void }) {
 export default function Reading() {
   const [round, setRound] = useState(0);
   const picks = useAsync(() => pickSentences(SENTENCES_PER_ROUND), [round]);
+  const phase = useAsync(currentPhase, []);
   /** The sentences being read; `picked` when they are the round picked for you (not a saved one). */
   const [reading, setReading] = useState<{ sentences: SentenceLike[]; picked: boolean } | null>(null);
   const [finished, setFinished] = useState(false);
@@ -104,7 +113,8 @@ export default function Reading() {
       <div className="card st-start">
         <h2 className="st-start-title">{finished ? 'Nice reading. Ready for more?' : 'Sentences at your level'}</h2>
         <p className="muted">
-          {n} {n === 1 ? 'sentence' : 'sentences'} with at most one new word each. Read, listen, then say {n === 1 ? 'it' : 'them'} out loud.
+          {n} {n === 1 ? 'sentence' : 'sentences'} with at most one new {phase.data === 1 ? 'kana or kanji' : 'kanji'} each.
+          {' '}Read, listen, then say {n === 1 ? 'it' : 'them'} out loud.
         </p>
         <button type="button" className="btn primary block" onClick={() => setReading({ sentences: picks.data ?? [], picked: true })}>
           {finished ? `Read ${n} more` : 'Start reading'}<Icon name="arrow" size={18} />
@@ -119,7 +129,7 @@ export default function Reading() {
       {start}
       <section className="st-section" aria-labelledby="saved-title">
         <h2 id="saved-title" className="label">Saved sentences</h2>
-        <SavedList onRead={(s) => setReading({ sentences: [s], picked: false })} />
+        <SavedList phase={phase.data} onRead={(s) => setReading({ sentences: [s], picked: false })} />
       </section>
     </Screen>
   );

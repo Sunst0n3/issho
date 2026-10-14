@@ -170,6 +170,20 @@ function sameEnds(typed: string, word: string): boolean {
   return typed[0] === word[0] && last;
 }
 
+/** Plain plurals of a word: mountains, boxes, cities. */
+function pluralsOf(word: string): string[] {
+  return [word + 's', word + 'es', ...(/[^aeiou]y$/.test(word) ? [word.slice(0, -1) + 'ies'] : [])];
+}
+
+/**
+ * One word the plain plural of the other ("mountains" for "mountain", or
+ * "vegetable" for "vegetables"): the same answer, not a slip, so the last
+ * letter may change. Words under 3 letters are left out ("as" ≠ "a").
+ */
+function isPluralPair(a: string, b: string): boolean {
+  return (b.length >= 3 && pluralsOf(b).includes(a)) || (a.length >= 3 && pluralsOf(a).includes(b));
+}
+
 /** A typo of `form`, word by word, so a short word in a phrase must be exact ("west exit" ≠ "east exit"). */
 function isTypoOf(typed: string, form: string): boolean {
   const typedWords = typed.split(' ');
@@ -177,7 +191,7 @@ function isTypoOf(typed: string, form: string): boolean {
   if (typedWords.length !== words.length) return false;
   return words.every((word, i) => {
     const t = typedWords[i];
-    if (t === word) return true;
+    if (t === word || isPluralPair(t, word)) return true;
     const allowance = typoAllowance(word);
     return allowance > 0 && sameEnds(t, word) && slipCount(word, t) <= allowance;
   });
@@ -185,8 +199,9 @@ function isTypoOf(typed: string, form: string): boolean {
 
 export interface MeaningMatchOptions {
   /**
-   * Meanings of other items that must not be accepted as a typo of this one
-   * (e.g. "block" when the answer is "black").
+   * Meanings of other items that must not be accepted as a typo (or plural) of
+   * this one, e.g. "block" when the answer is "black". Pass every other item's
+   * meanings, not only the ones on screen.
    */
   notAccepted?: readonly string[];
 }

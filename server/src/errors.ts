@@ -33,6 +33,8 @@ export function clientErrorCode(statusCode: number): string {
   switch (statusCode) {
     case 401:
       return 'unauthorized';
+    case 403:
+      return 'forbidden';
     case 404:
       return 'not_found';
     case 406:

@@ -22,6 +22,7 @@ export function toMessageRecord(m: ChatMessage): ChatMessageRecord {
     kind: m.kind,
     text: m.text,
   };
+  if (m.writtenAt !== undefined) rec.writtenAt = m.writtenAt;
   if (m.transcript !== undefined) rec.transcript = m.transcript;
   if (m.audioId !== undefined) rec.audioId = m.audioId;
   return rec;
@@ -58,7 +59,10 @@ export interface ChatItem {
   id?: number;
   clientId: string;
   memberId: string;
+  /** When the server got it (orders the conversation); for a pending message, when it was written. */
   createdAt: string;
+  /** When it was written on the sender's phone, if known. Show `writtenAt ?? createdAt`. */
+  writtenAt?: string;
   kind: ChatMessageRecord['kind'];
   text: string;
   transcript?: string;
@@ -113,6 +117,7 @@ export function useChatMessages(limit = 200): ChatItem[] | undefined {
       clientId: m.clientId,
       memberId: m.memberId,
       createdAt: m.createdAt,
+      writtenAt: m.writtenAt,
       kind: m.kind,
       text: m.text,
       transcript: m.transcript,
@@ -128,6 +133,7 @@ export function useChatMessages(limit = 200): ChatItem[] | undefined {
         clientId: p.clientId,
         memberId: me,
         createdAt: p.createdAt.toISOString(),
+        writtenAt: p.createdAt.toISOString(),
         kind: p.kind,
         text: p.text,
         transcript: p.transcript,

@@ -24,12 +24,20 @@ export function splitHousehold(data: HouseholdResponse | undefined): HouseholdPa
   return { me: data.members.find((m) => m.member.id === data.me), partner };
 }
 
+/** What the partner is called before the household has loaded. */
+export const PARTNER_FALLBACK = 'Your partner';
+
+/** A name for the middle of a sentence: the fallback "Your partner" becomes "your partner". */
+export function midSentence(name: string): string {
+  return name === PARTNER_FALLBACK ? 'your partner' : name;
+}
+
 /**
  * Who a message or quiz is from: the member's current name, or "Former member" for
  * someone removed from the household (what they sent stays). `fallback` until the
  * household has loaded.
  */
-export function memberName(data: HouseholdResponse | undefined, memberId: string, fallback = 'Your partner'): string {
+export function memberName(data: HouseholdResponse | undefined, memberId: string, fallback = PARTNER_FALLBACK): string {
   if (!data) return fallback;
   const member = data.members.find((m) => m.member.id === memberId);
   return member ? member.member.name || fallback : 'Former member';
