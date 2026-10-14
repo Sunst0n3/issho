@@ -3,7 +3,8 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-// The home server (server/) listens on 8787; in dev, Vite proxies /api to it.
+// The home server (server/) listens on 8787; in dev, Vite proxies /api to it
+// (ISSHO_API_PORT points a second dev copy at another server).
 export default defineConfig({
   plugins: [
     react(),
@@ -50,7 +51,7 @@ export default defineConfig({
   server: {
     host: true,
     proxy: {
-      '/api': { target: 'http://localhost:8787', ws: true, changeOrigin: true },
+      '/api': { target: `http://localhost:${process.env.ISSHO_API_PORT ?? 8787}`, ws: true, changeOrigin: true },
     },
   },
   test: {
