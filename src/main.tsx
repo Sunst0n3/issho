@@ -8,7 +8,11 @@ import { requestPersistentStorage } from './lib/backup.ts';
 import { getSettings } from './lib/db.ts';
 import { installSpeechUnlock } from './speech/tts.ts';
 import { startSync } from './sync/index.ts';
+import { silenceInDev } from './devSilence.ts';
 import './styles/global.css';
+
+// TEMPORARY while testing on this machine: also silence local production builds.
+if (import.meta.env.DEV || ['localhost', '127.0.0.1'].includes(location.hostname)) silenceInDev();
 
 // Before the first render, so a forced light or dark theme never flashes the system one.
 applyStoredTheme();
