@@ -64,9 +64,10 @@ export async function updateSettings(patch: Partial<Omit<Settings, 'id'>>): Prom
   return next;
 }
 
-/** Local calendar date key, 'YYYY-MM-DD'. A study day rolls over at 4 a.m. */
+/** Local calendar date key, 'YYYY-MM-DD'. A study day rolls over at 4 a.m. local time (DST-safe). */
 export function dayKey(d: Date = new Date()): string {
-  const shifted = new Date(d.getTime() - 4 * 60 * 60 * 1000);
+  const shifted = new Date(d);
+  if (shifted.getHours() < 4) shifted.setDate(shifted.getDate() - 1);
   const y = shifted.getFullYear();
   const m = String(shifted.getMonth() + 1).padStart(2, '0');
   const day = String(shifted.getDate()).padStart(2, '0');

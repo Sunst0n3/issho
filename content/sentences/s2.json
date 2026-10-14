@@ -1,0 +1,602 @@
+[
+  {
+    "id": "s-s2-001",
+    "jp": "{三丁目|さんちょうめ}の{本|ほん}やさんで{会|あ}いましょう。",
+    "en": "Let's meet at the bookstore in 3-chōme.",
+    "grammar": ["de-place-means", "masenka-mashou"]
+  },
+  {
+    "id": "s-s2-002",
+    "jp": "{何|なに}を{食|た}べたいですか。",
+    "en": "What do you want to eat?",
+    "grammar": ["wo-object", "tai-want", "ka-question"]
+  },
+  {
+    "id": "s-s2-003",
+    "jp": "{南口|みなみぐち}から{出|で}てください。",
+    "en": "Please go out through the south exit.",
+    "grammar": ["te-kudasai"]
+  },
+  {
+    "id": "s-s2-004",
+    "jp": "お{金|かね}が{足|た}りません。",
+    "en": "We don't have enough money.",
+    "grammar": ["masu-forms"]
+  },
+  {
+    "id": "s-s2-005",
+    "jp": "この{車|くるま}は{百万円|ひゃくまんえん}です。",
+    "en": "This car costs one million yen.",
+    "grammar": ["wa-desu"]
+  },
+  {
+    "id": "s-s2-006",
+    "jp": "{二人|ふたり}で{占|うらな}いに{行|い}きました。",
+    "en": "The two of us went to see a fortune-teller.",
+    "grammar": ["masu-forms", "ni-time-place"]
+  },
+  {
+    "id": "s-s2-007",
+    "jp": "{今日|きょう}はいい{天気|てんき}ですね。",
+    "en": "Nice weather today, isn't it?",
+    "grammar": ["wa-desu"]
+  },
+  {
+    "id": "s-s2-008",
+    "jp": "{力士|りきし}はとても{大|おお}きいですね。",
+    "en": "Sumo wrestlers are really big, aren't they?",
+    "grammar": ["i-adjectives"]
+  },
+  {
+    "id": "s-s2-009",
+    "jp": "おみくじは{大吉|だいきち}でした！",
+    "en": "My fortune slip said \"excellent luck\"!",
+    "grammar": ["adjective-past"]
+  },
+  {
+    "id": "s-s2-010",
+    "jp": "{周|まわ}りの{人|ひと}はみんな{日本語|にほんご}を{話|はな}しています。",
+    "en": "Everyone around us is speaking Japanese.",
+    "grammar": ["te-imasu"]
+  },
+  {
+    "id": "s-s2-011",
+    "jp": "{母|はは}は{毎日|まいにち}{電話|でんわ}をくれます。",
+    "en": "My mother calls me every day.",
+    "grammar": ["masu-forms"]
+  },
+  {
+    "id": "s-s2-012",
+    "jp": "{火|ひ}を{小|ちい}さくしてください。",
+    "en": "Please turn the heat down.",
+    "grammar": ["te-kudasai"]
+  },
+  {
+    "id": "s-s2-013",
+    "jp": "{花見|はなみ}に{行|い}きませんか。",
+    "en": "Shall we go cherry-blossom viewing?",
+    "grammar": ["masenka-mashou"]
+  },
+  {
+    "id": "s-s2-014",
+    "jp": "{右手|みぎて}に{大|おお}きい{木|き}があります。",
+    "en": "There's a big tree on your right.",
+    "grammar": ["arimasu-imasu"]
+  },
+  {
+    "id": "s-s2-015",
+    "jp": "この{本|ほん}はどこで{売|う}っていますか。",
+    "en": "Where do they sell this book?",
+    "grammar": ["de-place-means", "te-imasu"]
+  },
+  {
+    "id": "s-s2-016",
+    "jp": "{父|ちち}は{左手|ひだりて}で{書|か}きます。",
+    "en": "My father writes with his left hand.",
+    "grammar": ["de-place-means"]
+  },
+  {
+    "id": "s-s2-017",
+    "jp": "{少|すこ}し{休|やす}みましょう。",
+    "en": "Let's take a short break.",
+    "grammar": ["masenka-mashou"]
+  },
+  {
+    "id": "s-s2-018",
+    "jp": "{二人|ふたり}で{馬|うま}にのりました。",
+    "en": "We went horseback riding together.",
+    "grammar": ["masu-forms"]
+  },
+  {
+    "id": "s-s2-019",
+    "jp": "{駅|えき}まで{何分|なんぷん}ですか。",
+    "en": "How many minutes is it to the station?",
+    "grammar": ["kara-made", "ka-question"]
+  },
+  {
+    "id": "s-s2-020",
+    "jp": "このコップは{少|すこ}し{欠|か}けています。",
+    "en": "This glass is a little chipped.",
+    "grammar": ["te-imasu"]
+  },
+  {
+    "id": "s-s2-021",
+    "jp": "{大事|だいじ}な{話|はなし}があります。",
+    "en": "There's something important I need to talk to you about.",
+    "grammar": ["na-adjectives", "arimasu-imasu"]
+  },
+  {
+    "id": "s-s2-022",
+    "jp": "ここに{氏名|しめい}を{書|か}いてください。",
+    "en": "Please write your full name here.",
+    "grammar": ["te-kudasai"]
+  },
+  {
+    "id": "s-s2-023",
+    "jp": "この{本|ほん}は{読者|どくしゃ}が{多|おお}いです。",
+    "en": "This book has a lot of readers.",
+    "grammar": ["i-adjectives"]
+  },
+  {
+    "id": "s-s2-024",
+    "jp": "{電車|でんしゃ}に{間|ま}に{合|あ}いました！",
+    "en": "I made the train!",
+    "grammar": ["masu-forms"]
+  },
+  {
+    "id": "s-s2-025",
+    "jp": "{子|こ}どもたちが{羊|ひつじ}を{見|み}ています。",
+    "en": "The kids are looking at the sheep.",
+    "grammar": ["te-imasu"]
+  },
+  {
+    "id": "s-s2-026",
+    "jp": "{父|ちち}は{自分|じぶん}で{事業|じぎょう}をしています。",
+    "en": "My father runs his own business.",
+    "grammar": ["te-imasu"]
+  },
+  {
+    "id": "s-s2-027",
+    "jp": "{夕方|ゆうがた}から{雨|あめ}になりました。",
+    "en": "It started raining in the evening.",
+    "grammar": ["kara-made"]
+  },
+  {
+    "id": "s-s2-028",
+    "jp": "{一日|いちにち}に{三回|さんかい}{飲|の}んでください。",
+    "en": "Take it three times a day.",
+    "grammar": ["te-kudasai"]
+  },
+  {
+    "id": "s-s2-029",
+    "jp": "{市場|いちば}で{魚|さかな}を{買|か}いました。",
+    "en": "I bought fish at the market.",
+    "grammar": ["de-place-means", "wo-object"]
+  },
+  {
+    "id": "s-s2-030",
+    "jp": "{魚|さかな}の{売|う}り{場|ば}は{地下|ちか}です。",
+    "en": "The fish counter is in the basement.",
+    "grammar": ["wa-desu"]
+  },
+  {
+    "id": "s-s2-031",
+    "jp": "{駅員|えきいん}さんに{聞|き}きましょう。",
+    "en": "Let's ask someone who works at the station.",
+    "grammar": ["masenka-mashou"]
+  },
+  {
+    "id": "s-s2-032",
+    "jp": "この{店|みせ}は{十時|じゅうじ}に{開|ひら}きます。",
+    "en": "This shop opens at ten.",
+    "grammar": ["ni-time-place"]
+  },
+  {
+    "id": "s-s2-033",
+    "jp": "{学生|がくせい}{時代|じだい}の{友|とも}だちに{会|あ}いました。",
+    "en": "I met up with a friend from my school days.",
+    "grammar": ["no-possession", "masu-forms"]
+  },
+  {
+    "id": "s-s2-034",
+    "jp": "{明日|あした}は{何時|なんじ}に{出発|しゅっぱつ}しますか。",
+    "en": "What time are we leaving tomorrow?",
+    "grammar": ["ni-time-place", "ka-question"]
+  },
+  {
+    "id": "s-s2-035",
+    "jp": "{山里|やまざと}で{一日|いちにち}ゆっくり{休|やす}みました。",
+    "en": "We spent a relaxing day in a mountain village.",
+    "grammar": ["de-place-means", "masu-forms"]
+  },
+  {
+    "id": "s-s2-036",
+    "jp": "{電車|でんしゃ}が{動|うご}きません。",
+    "en": "The train isn't moving.",
+    "grammar": ["masu-forms"]
+  },
+  {
+    "id": "s-s2-037",
+    "jp": "{明日|あした}は{用事|ようじ}があります。",
+    "en": "I have some errands to run tomorrow.",
+    "grammar": ["arimasu-imasu"]
+  },
+  {
+    "id": "s-s2-038",
+    "jp": "{毎日|まいにち}{車|くるま}で{会社|かいしゃ}に{通|かよ}っています。",
+    "en": "I drive to work every day.",
+    "grammar": ["de-place-means", "te-imasu"]
+  },
+  {
+    "id": "s-s2-039",
+    "jp": "{体|からだ}に{気|き}をつけてね。",
+    "en": "Take care of yourself.",
+    "grammar": ["casual-speech"]
+  },
+  {
+    "id": "s-s2-040",
+    "jp": "{主人|しゅじん}は{今|いま}、{東京|とうきょう}にいます。",
+    "en": "My husband is in Tokyo right now.",
+    "grammar": ["arimasu-imasu"]
+  },
+  {
+    "id": "s-s2-041",
+    "jp": "{何|なに}か{問題|もんだい}がありますか。",
+    "en": "Is something wrong?",
+    "grammar": ["arimasu-imasu", "ka-question"]
+  },
+  {
+    "id": "s-s2-042",
+    "jp": "{尺八|しゃくはち}の{音|おと}が{聞|き}こえます。",
+    "en": "I can hear a shakuhachi flute.",
+    "grammar": ["no-possession"]
+  },
+  {
+    "id": "s-s2-043",
+    "jp": "{電話|でんわ}をもらって{安心|あんしん}しました。",
+    "en": "I was relieved when you called.",
+    "grammar": ["te-form"]
+  },
+  {
+    "id": "s-s2-044",
+    "jp": "{食事|しょくじ}の{用意|ようい}ができました。",
+    "en": "Dinner is ready.",
+    "grammar": ["masu-forms"]
+  },
+  {
+    "id": "s-s2-045",
+    "jp": "{店|みせ}の{前|まえ}に「カード{不可|ふか}」と{書|か}いてあります。",
+    "en": "The sign in front of the shop says \"No cards\".",
+    "grammar": ["te-form"]
+  },
+  {
+    "id": "s-s2-046",
+    "jp": "もう{一度|いちど}{言|い}ってください。",
+    "en": "Please say that one more time.",
+    "grammar": ["te-kudasai"]
+  },
+  {
+    "id": "s-s2-047",
+    "jp": "{主人|しゅじん}は{毎週|まいしゅう}{弓道|きゅうどう}をしています。",
+    "en": "My husband does Japanese archery every week.",
+    "grammar": ["te-imasu"]
+  },
+  {
+    "id": "s-s2-048",
+    "jp": "{大|おお}きい{虫|むし}がいる！",
+    "en": "There's a huge bug!",
+    "grammar": ["arimasu-imasu", "casual-speech"]
+  },
+  {
+    "id": "s-s2-049",
+    "jp": "このかばん、{重|おも}いね。{持|も}とうか？",
+    "en": "This bag is heavy. Want me to carry it?",
+    "grammar": ["casual-speech"]
+  },
+  {
+    "id": "s-s2-050",
+    "jp": "{長野|ながの}は{山|やま}が{多|おお}いです。",
+    "en": "Nagano has a lot of mountains.",
+    "grammar": ["i-adjectives"]
+  },
+  {
+    "id": "s-s2-051",
+    "jp": "{明日|あした}は{都合|つごう}がいいですか。",
+    "en": "Does tomorrow work for you?",
+    "grammar": ["ka-question"]
+  },
+  {
+    "id": "s-s2-052",
+    "jp": "{駅|えき}まで{車|くるま}で{三十分|さんじゅっぷん}{以上|いじょう}かかります。",
+    "en": "It takes more than thirty minutes to get to the station by car.",
+    "grammar": ["de-place-means", "kara-made"]
+  },
+  {
+    "id": "s-s2-053",
+    "jp": "{京都|きょうと}でいい{思|おも}い{出|で}ができました。",
+    "en": "We made some lovely memories in Kyoto.",
+    "grammar": ["de-place-means", "masu-forms"]
+  },
+  {
+    "id": "s-s2-054",
+    "jp": "{今日|きょう}は{家|うち}でゆっくりしよう。",
+    "en": "Let's take it easy at home today.",
+    "grammar": ["de-place-means", "casual-speech"]
+  },
+  {
+    "id": "s-s2-055",
+    "jp": "{花|はな}の{世話|せわ}は{主人|しゅじん}がしています。",
+    "en": "My husband is the one who looks after the flowers.",
+    "grammar": ["te-imasu"]
+  },
+  {
+    "id": "s-s2-056",
+    "jp": "{北区|きたく}は{東京|とうきょう}の{北|きた}のほうにあります。",
+    "en": "Kita Ward is in the northern part of Tokyo.",
+    "grammar": ["arimasu-imasu"]
+  },
+  {
+    "id": "s-s2-057",
+    "jp": "{母|はは}は{山口県|やまぐちけん}の{生|う}まれです。",
+    "en": "My mother was born in Yamaguchi Prefecture.",
+    "grammar": ["wa-desu", "no-possession"]
+  },
+  {
+    "id": "s-s2-058",
+    "jp": "この{道|みち}をまっすぐ{進|すす}んでください。",
+    "en": "Please go straight along this road.",
+    "grammar": ["wo-object", "te-kudasai"]
+  },
+  {
+    "id": "s-s2-059",
+    "jp": "{雨|あめ}が{止|や}みましたね。",
+    "en": "The rain has stopped.",
+    "grammar": ["masu-forms"]
+  },
+  {
+    "id": "s-s2-060",
+    "jp": "お{正月|しょうがつ}に{友|とも}だちが{来|き}ます。",
+    "en": "Some friends are coming over for New Year's.",
+    "grammar": ["ni-time-place"]
+  },
+  {
+    "id": "s-s2-061",
+    "jp": "{元旦|がんたん}は{二人|ふたり}でお{寺|てら}に{行|い}きました。",
+    "en": "On New Year's Day the two of us went to a temple.",
+    "grammar": ["ni-time-place", "masu-forms"]
+  },
+  {
+    "id": "s-s2-062",
+    "jp": "ダウンロードが{完了|かんりょう}しました。",
+    "en": "The download is complete.",
+    "grammar": ["masu-forms"]
+  },
+  {
+    "id": "s-s2-063",
+    "jp": "{友|とも}だちは{大学院|だいがくいん}の{学生|がくせい}です。",
+    "en": "My friend is a graduate student.",
+    "grammar": ["wa-desu", "no-possession"]
+  },
+  {
+    "id": "s-s2-064",
+    "jp": "いつか{二人|ふたり}で{世界中|せかいじゅう}を{回|まわ}りたいね。",
+    "en": "Someday I want us to travel all over the world.",
+    "grammar": ["tai-want", "casual-speech"]
+  },
+  {
+    "id": "s-s2-065",
+    "jp": "{京都|きょうと}のお{土産|みやげ}を{買|か}いました。",
+    "en": "I bought some souvenirs from Kyoto.",
+    "grammar": ["wo-object", "masu-forms"]
+  },
+  {
+    "id": "s-s2-066",
+    "jp": "お{母|かあ}さんに{孝行|こうこう}したいです。",
+    "en": "I want to do right by my mom.",
+    "grammar": ["tai-want"]
+  },
+  {
+    "id": "s-s2-067",
+    "jp": "{駅|えき}までの{道|みち}を{教|おし}えてくれませんか。",
+    "en": "Could you tell me how to get to the station?",
+    "grammar": ["kara-made", "te-form"]
+  },
+  {
+    "id": "s-s2-068",
+    "jp": "{毎日|まいにち}、{日本語|にほんご}で{作文|さくぶん}を{書|か}いています。",
+    "en": "I write a short composition in Japanese every day.",
+    "grammar": ["de-place-means", "te-imasu"]
+  },
+  {
+    "id": "s-s2-069",
+    "jp": "{日本|にほん}の{文化|ぶんか}はおもしろいです。",
+    "en": "Japanese culture is interesting.",
+    "grammar": ["i-adjectives"]
+  },
+  {
+    "id": "s-s2-070",
+    "jp": "{駅|えき}はここから{近|ちか}いですか。",
+    "en": "Is the station close to here?",
+    "grammar": ["kara-made", "ka-question"]
+  },
+  {
+    "id": "s-s2-071",
+    "jp": "{理由|りゆう}を{教|おし}えてください。",
+    "en": "Please tell me why.",
+    "grammar": ["te-kudasai"]
+  },
+  {
+    "id": "s-s2-072",
+    "jp": "{母|はは}は{毎年|まいとし}、{海外|かいがい}に{行|い}きます。",
+    "en": "My mother goes abroad every year.",
+    "grammar": ["ni-time-place", "masu-forms"]
+  },
+  {
+    "id": "s-s2-073",
+    "jp": "{弓道|きゅうどう}では{矢|や}を{二本|にほん}{持|も}ちます。",
+    "en": "In Japanese archery you hold two arrows.",
+    "grammar": ["de-place-means"]
+  },
+  {
+    "id": "s-s2-074",
+    "jp": "この{店|みせ}を{知|し}っていますか。",
+    "en": "Do you know this place?",
+    "grammar": ["te-imasu", "ka-question"]
+  },
+  {
+    "id": "s-s2-075",
+    "jp": "{子|こ}どもたちと{海|うみ}で{貝|かい}を{集|あつ}めました。",
+    "en": "I collected shells at the beach with the kids.",
+    "grammar": ["to-with", "de-place-means"]
+  },
+  {
+    "id": "s-s2-076",
+    "jp": "{別|べつ}に{何|なに}もいらないよ。",
+    "en": "I don't really need anything.",
+    "grammar": ["casual-speech"]
+  },
+  {
+    "id": "s-s2-077",
+    "jp": "{牛|ぎゅう}どんを{二|ふた}つください。",
+    "en": "Two beef bowls, please.",
+    "grammar": ["counting-tsu"]
+  },
+  {
+    "id": "s-s2-078",
+    "jp": "{買|か}い{物|もの}に{行|い}ってくるね。",
+    "en": "I'm going out to do some shopping.",
+    "grammar": ["te-form", "casual-speech"]
+  },
+  {
+    "id": "s-s2-079",
+    "jp": "{来月|らいげつ}、{新|あたら}しい{家|いえ}に{引|ひ}っこします。",
+    "en": "We're moving to a new house next month.",
+    "grammar": ["ni-time-place"]
+  },
+  {
+    "id": "s-s2-080",
+    "jp": "このズボン、{丈|たけ}が{少|すこ}し{長|なが}いね。",
+    "en": "These pants are a little too long.",
+    "grammar": ["casual-speech"]
+  },
+  {
+    "id": "s-s2-081",
+    "jp": "このスマホの{使|つか}い{方|かた}がわかりません。",
+    "en": "I don't know how to use this phone.",
+    "grammar": ["masu-forms"]
+  },
+  {
+    "id": "s-s2-082",
+    "jp": "{戸|と}を{開|あ}けて、{外|そと}の{空気|くうき}を{入|い}れよう。",
+    "en": "Let's open the door and let in some fresh air.",
+    "grammar": ["te-form", "casual-speech"]
+  },
+  {
+    "id": "s-s2-083",
+    "jp": "{近所|きんじょ}に{新|あたら}しい{店|みせ}ができました。",
+    "en": "A new shop opened in our neighborhood.",
+    "grammar": ["ni-time-place"]
+  },
+  {
+    "id": "s-s2-084",
+    "jp": "{友|とも}だちの{作品|さくひん}を{見|み}に{行|い}きました。",
+    "en": "We went to see our friend's work.",
+    "grammar": ["no-possession", "masu-forms"]
+  },
+  {
+    "id": "s-s2-085",
+    "jp": "{来年|らいねん}の{計画|けいかく}を{二人|ふたり}で{考|かんが}えましょう。",
+    "en": "Let's plan next year together.",
+    "grammar": ["wo-object", "masenka-mashou"]
+  },
+  {
+    "id": "s-s2-086",
+    "jp": "うちの{金魚|きんぎょ}が{死|し}にました。",
+    "en": "Our goldfish died.",
+    "grammar": ["masu-forms"]
+  },
+  {
+    "id": "s-s2-087",
+    "jp": "{今日|きょう}は{特別|とくべつ}な{日|ひ}だね。{外|そと}で{食|た}べよう！",
+    "en": "Today's a special day. Let's eat out!",
+    "grammar": ["na-adjectives", "casual-speech"]
+  },
+  {
+    "id": "s-s2-088",
+    "jp": "{私|わたし}も{同|おな}じものを{飲|の}みます。",
+    "en": "I'll have the same thing.",
+    "grammar": ["mo-also"]
+  },
+  {
+    "id": "s-s2-089",
+    "jp": "{台所|だいどころ}で{何|なに}を{作|つく}っているの？",
+    "en": "What are you making in the kitchen?",
+    "grammar": ["te-imasu", "casual-speech"]
+  },
+  {
+    "id": "s-s2-090",
+    "jp": "{日本語|にほんご}の{学校|がっこう}は{来週|らいしゅう}から{始|はじ}まります。",
+    "en": "Japanese school starts next week.",
+    "grammar": ["kara-made"]
+  },
+  {
+    "id": "s-s2-091",
+    "jp": "{早|はや}く{会|あ}いたいな。",
+    "en": "I can't wait to see you.",
+    "grammar": ["tai-want", "casual-speech"]
+  },
+  {
+    "id": "s-s2-092",
+    "jp": "{今朝|けさ}は{雨|あめ}が{強|つよ}かったですね。",
+    "en": "It was raining hard this morning, wasn't it?",
+    "grammar": ["adjective-past"]
+  },
+  {
+    "id": "s-s2-093",
+    "jp": "{父|ちち}は{前|まえ}に{海軍|かいぐん}にいました。",
+    "en": "My father used to be in the navy.",
+    "grammar": ["arimasu-imasu"]
+  },
+  {
+    "id": "s-s2-094",
+    "jp": "{毎朝|まいあさ}、{少|すこ}し{運動|うんどう}をしています。",
+    "en": "I get a little exercise every morning.",
+    "grammar": ["te-imasu"]
+  },
+  {
+    "id": "s-s2-095",
+    "jp": "シャツのボタンを{白|しろ}い{糸|いと}でつけました。",
+    "en": "I sewed the button onto the shirt with white thread.",
+    "grammar": ["de-place-means", "masu-forms"]
+  },
+  {
+    "id": "s-s2-096",
+    "jp": "{冬休|ふゆやす}みはどこに{行|い}きたい？",
+    "en": "Where do you want to go over winter break?",
+    "grammar": ["tai-want", "casual-speech"]
+  },
+  {
+    "id": "s-s2-097",
+    "jp": "{会社|かいしゃ}は{何時|なんじ}に{終|お}わる？",
+    "en": "What time do you finish work?",
+    "grammar": ["ni-time-place", "casual-speech"]
+  },
+  {
+    "id": "s-s2-098",
+    "jp": "この{古|ふる}い{家|いえ}は{台所|だいどころ}が{広|ひろ}いです。",
+    "en": "This old house has a spacious kitchen.",
+    "grammar": ["i-adjectives"]
+  },
+  {
+    "id": "s-s2-099",
+    "jp": "{私|わたし}たちは{海|うみ}の{近|ちか}くに{住|す}んでいます。",
+    "en": "We live near the sea.",
+    "grammar": ["te-imasu"]
+  },
+  {
+    "id": "s-s2-100",
+    "jp": "この{村|むら}の{住民|じゅうみん}は{百人|ひゃくにん}ぐらいです。",
+    "en": "About a hundred people live in this village.",
+    "grammar": ["wa-desu"]
+  }
+]

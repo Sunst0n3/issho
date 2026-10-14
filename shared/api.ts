@@ -39,6 +39,12 @@ export interface DayStats {
 }
 
 // POST /api/stats — upsert this member's recent days and totals.
+// Success codes: POST /api/messages → 201 new / 200 resent clientId; POST /api/voice and /api/quizzes → 201.
+// Treat any 2xx as success.
+
+/** POST /api/stats response. */
+export interface StatsUploadResponse { ok: true }
+
 export interface StatsUploadRequest {
   days: DayStats[];          // usually the last 7 days
   streak: number;

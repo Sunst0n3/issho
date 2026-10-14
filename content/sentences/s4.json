@@ -1,0 +1,828 @@
+[
+  {
+    "id": "s-s4-001",
+    "jp": "{今日|きょう}の{夕飯|ゆうはん}は{私|わたし}に{任|まか}せて。",
+    "en": "Leave dinner tonight to me.",
+    "grammar": [
+      "te-form",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-002",
+    "jp": "{私|わたし}は{文系|ぶんけい}で、{夫|おっと}は{理系|りけい}です。",
+    "en": "I studied humanities, and my husband studied science.",
+    "grammar": [
+      "wa-desu"
+    ]
+  },
+  {
+    "id": "s-s4-003",
+    "jp": "それは{仕事|しごと}と{関係|かんけい}ない{話|はなし}だよ。",
+    "en": "That has nothing to do with work.",
+    "grammar": [
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-004",
+    "jp": "{夫|おっと}の{提案|ていあん}について、{二人|ふたり}で{話|はな}し{合|あ}って{結論|けつろん}を{出|だ}した。",
+    "en": "We talked over my husband's suggestion together and came to a decision.",
+    "grammar": [
+      "te-form",
+      "casual-past"
+    ]
+  },
+  {
+    "id": "s-s4-005",
+    "jp": "お{祭|まつ}りの{日|ひ}、{駅|えき}は{大勢|おおぜい}の{人|ひと}でいっぱいでした。",
+    "en": "On the day of the festival, the station was full of people.",
+    "grammar": [
+      "adjective-past"
+    ]
+  },
+  {
+    "id": "s-s4-006",
+    "jp": "{予約|よやく}の{内容|ないよう}を{確認|かくにん}しました。",
+    "en": "I checked the details of the reservation.",
+    "grammar": [
+      "masu-forms"
+    ]
+  },
+  {
+    "id": "s-s4-007",
+    "jp": "{無理|むり}に{全部|ぜんぶ}{食|た}べなくていいよ。",
+    "en": "You don't have to force yourself to eat it all.",
+    "grammar": [
+      "nai-form",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-008",
+    "jp": "{再来週|さらいしゅう}から{夏休|なつやす}みです。",
+    "en": "Summer vacation starts the week after next.",
+    "grammar": [
+      "kara-made"
+    ]
+  },
+  {
+    "id": "s-s4-009",
+    "jp": "{丸|まる}いテーブルを{部屋|へや}の{真|ま}ん{中|なか}に{置|お}きました。",
+    "en": "I put a round table in the middle of the room.",
+    "grammar": [
+      "wo-object"
+    ]
+  },
+  {
+    "id": "s-s4-010",
+    "jp": "{疑|うたが}ってごめんね。{信|しん}じるよ。",
+    "en": "Sorry I doubted you. I believe you.",
+    "grammar": [
+      "te-form",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-011",
+    "jp": "{雨|あめ}だったので、{結局|けっきょく}{家|いえ}で{映画|えいが}を{見|み}ました。",
+    "en": "It was raining, so in the end we watched a movie at home.",
+    "grammar": [
+      "masu-forms"
+    ]
+  },
+  {
+    "id": "s-s4-012",
+    "jp": "このドラマは{毎週|まいしゅう}{金曜日|きんようび}に{放送|ほうそう}しています。",
+    "en": "This drama is on every Friday.",
+    "grammar": [
+      "te-imasu",
+      "ni-time-place"
+    ]
+  },
+  {
+    "id": "s-s4-013",
+    "jp": "{野球|やきゅう}は{地元|じもと}のチームを{応援|おうえん}しています。",
+    "en": "In baseball, I root for the local team.",
+    "grammar": [
+      "te-imasu"
+    ]
+  },
+  {
+    "id": "s-s4-014",
+    "jp": "コーヒーはもう{結構|けっこう}です。",
+    "en": "I'm fine for coffee, thank you.",
+    "grammar": [
+      "na-adjectives"
+    ]
+  },
+  {
+    "id": "s-s4-015",
+    "jp": "{革|かわ}のくつが{三割引|さんわりびき}で{安|やす}かった。",
+    "en": "The leather shoes were 30% off, so they were cheap.",
+    "grammar": [
+      "adjective-past",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-016",
+    "jp": "{食費|しょくひ}を{少|すこ}し{減|へ}らしたいです。",
+    "en": "I want to cut our food spending a little.",
+    "grammar": [
+      "tai-want"
+    ]
+  },
+  {
+    "id": "s-s4-017",
+    "jp": "{市|し}のスポーツ{施設|しせつ}は{安|やす}く{使|つか}えます。",
+    "en": "The city's sports facilities are cheap to use.",
+    "grammar": [
+      "potential-form"
+    ]
+  },
+  {
+    "id": "s-s4-018",
+    "jp": "{東京|とうきょう}と{比|くら}べると、ここのほうが{物価|ぶっか}が{安|やす}いです。",
+    "en": "Compared with Tokyo, prices are lower here.",
+    "grammar": [
+      "yori-hou"
+    ]
+  },
+  {
+    "id": "s-s4-019",
+    "jp": "{文句|もんく}ばかり{言|い}わないで、{難|むずか}しくても{最後|さいご}までやろう。",
+    "en": "Stop complaining. Even if it's hard, let's see it through.",
+    "grammar": [
+      "nai-form",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-020",
+    "jp": "かぜの{予防|よぼう}に、{手洗|てあら}いをしましょう。",
+    "en": "Let's wash our hands to keep from catching colds.",
+    "grammar": [
+      "masenka-mashou"
+    ]
+  },
+  {
+    "id": "s-s4-021",
+    "jp": "それは{違|ちが}うと{思|おも}うよ。",
+    "en": "I don't think that's right.",
+    "grammar": [
+      "to-omou",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-022",
+    "jp": "{昨日|きのう}の{番組|ばんぐみ}は{面白|おもしろ}かったね。",
+    "en": "Yesterday's show was fun, wasn't it?",
+    "grammar": [
+      "adjective-past",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-023",
+    "jp": "{規則|きそく}{正|ただ}しい{生活|せいかつ}を{心|こころ}がけています。",
+    "en": "I'm trying to keep a regular routine.",
+    "grammar": [
+      "te-imasu"
+    ]
+  },
+  {
+    "id": "s-s4-024",
+    "jp": "{父|ちち}の{手術|しゅじゅつ}は{無事|ぶじ}に{終|お}わりました。",
+    "en": "My father's surgery went fine.",
+    "grammar": [
+      "masu-forms"
+    ]
+  },
+  {
+    "id": "s-s4-025",
+    "jp": "この{薬|くすり}は{副作用|ふくさよう}がありますか。",
+    "en": "Does this medicine have any side effects?",
+    "grammar": [
+      "arimasu-imasu",
+      "ka-question"
+    ]
+  },
+  {
+    "id": "s-s4-026",
+    "jp": "{今月|こんげつ}は{予算|よさん}をオーバーしちゃった。",
+    "en": "We went over budget this month.",
+    "grammar": [
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-027",
+    "jp": "{敬語|けいご}はまだ{難|むずか}しいです。",
+    "en": "Polite Japanese is still hard for me.",
+    "grammar": [
+      "i-adjectives"
+    ]
+  },
+  {
+    "id": "s-s4-028",
+    "jp": "{日本|にほん}は{多|おお}くの{食品|しょくひん}を{輸入|ゆにゅう}しています。",
+    "en": "Japan imports a lot of its food.",
+    "grammar": [
+      "te-imasu"
+    ]
+  },
+  {
+    "id": "s-s4-029",
+    "jp": "{残業|ざんぎょう}があるので、{飲|の}み{会|かい}は{断|ことわ}りました。",
+    "en": "I had to work late, so I turned down the drinking party."
+  },
+  {
+    "id": "s-s4-030",
+    "jp": "{長時間|ちょうじかん}の{労働|ろうどう}は{体|からだ}に{悪|わる}いです。",
+    "en": "Working long hours is bad for your health.",
+    "grammar": [
+      "i-adjectives"
+    ]
+  },
+  {
+    "id": "s-s4-031",
+    "jp": "{明日|あした}から{北海道|ほっかいどう}に{出張|しゅっちょう}です。",
+    "en": "I'm on a business trip to Hokkaido from tomorrow.",
+    "grammar": [
+      "kara-made"
+    ]
+  },
+  {
+    "id": "s-s4-032",
+    "jp": "{食|た}べたあとで、お{皿|さら}は{私|わたし}が{洗|あら}うね。",
+    "en": "After we eat, I'll do the dishes.",
+    "grammar": [
+      "mae-ni-ato-de",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-033",
+    "jp": "この{地域|ちいき}は{環境|かんきょう}がよくて{住|す}みやすいです。",
+    "en": "This area has a good environment and is easy to live in."
+  },
+  {
+    "id": "s-s4-034",
+    "jp": "{追加|ついか}{料金|りょうきん}はかかりますか。",
+    "en": "Is there an extra charge?",
+    "grammar": [
+      "ka-question"
+    ]
+  },
+  {
+    "id": "s-s4-035",
+    "jp": "この{商品|しょうひん}はとても{人気|にんき}があります。",
+    "en": "This product is very popular.",
+    "grammar": [
+      "arimasu-imasu"
+    ]
+  },
+  {
+    "id": "s-s4-036",
+    "jp": "{新|あたら}しい{企画|きかく}を{担当|たんとう}することになりました。",
+    "en": "I've been put in charge of a new project.",
+    "grammar": [
+      "dictionary-form"
+    ]
+  },
+  {
+    "id": "s-s4-037",
+    "jp": "{来週|らいしゅう}、{父|ちち}が{退院|たいいん}します。",
+    "en": "My father is leaving the hospital next week.",
+    "grammar": [
+      "masu-forms"
+    ]
+  },
+  {
+    "id": "s-s4-038",
+    "jp": "お{風呂|ふろ}の{準備|じゅんび}ができたよ。{先|さき}に{入|はい}る?",
+    "en": "The bath is ready. Do you want to go first?",
+    "grammar": [
+      "casual-past",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-039",
+    "jp": "{姉|あね}の{写真|しゃしん}が{賞|しょう}を{取|と}りました。",
+    "en": "My older sister's photo won a prize.",
+    "grammar": [
+      "no-possession"
+    ]
+  },
+  {
+    "id": "s-s4-040",
+    "jp": "この{辺|へん}は{駅|えき}に{近|ちか}くて{便利|べんり}だし、{条件|じょうけん}もいいね。",
+    "en": "This area is close to the station and convenient, and the terms are good too.",
+    "grammar": [
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-041",
+    "jp": "{天井|てんじょう}が{高|たか}い{木造|もくぞう}の{家|いえ}に{住|す}みたい。",
+    "en": "I'd like to live in a wooden house with high ceilings.",
+    "grammar": [
+      "tai-want",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-042",
+    "jp": "{毎日|まいにち}、{基本|きほん}の{文法|ぶんぽう}を{復習|ふくしゅう}しています。",
+    "en": "Every day I review basic grammar.",
+    "grammar": [
+      "te-imasu"
+    ]
+  },
+  {
+    "id": "s-s4-043",
+    "jp": "{道|みち}を{渡|わた}るときは、{左右|さゆう}をよく{見|み}てね。",
+    "en": "When you cross the street, look both ways carefully.",
+    "grammar": [
+      "toki-when",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-044",
+    "jp": "{来月|らいげつ}、{会社|かいしゃ}が{新|あたら}しいビルに{移|うつ}ります。",
+    "en": "Next month my company is moving to a new building.",
+    "grammar": [
+      "ni-time-place"
+    ]
+  },
+  {
+    "id": "s-s4-045",
+    "jp": "あの{店|みせ}は{評判|ひょうばん}がよくて、いつも{長|なが}い{列|れつ}ができています。",
+    "en": "That shop has a good reputation, so there is always a long line.",
+    "grammar": [
+      "te-imasu"
+    ]
+  },
+  {
+    "id": "s-s4-046",
+    "jp": "{若|わか}い{人|ひと}に{流行|りゅうこう}している{曲|きょく}を{知|し}っていますか。",
+    "en": "Do you know the song that is popular with young people?",
+    "grammar": [
+      "te-imasu",
+      "ka-question"
+    ]
+  },
+  {
+    "id": "s-s4-047",
+    "jp": "お{正月|しょうがつ}に{神社|じんじゃ}へお{参|まい}りして、おみくじで{凶|きょう}を{引|ひ}いた。",
+    "en": "At New Year we prayed at a shrine, and I drew \"bad luck\" from the fortune slips.",
+    "grammar": [
+      "he-direction",
+      "casual-past"
+    ]
+  },
+  {
+    "id": "s-s4-048",
+    "jp": "この{価格|かかく}は{消費税|しょうひぜい}を{含|ふく}んでいますか。",
+    "en": "Does this price include consumption tax?",
+    "grammar": [
+      "te-imasu",
+      "ka-question"
+    ]
+  },
+  {
+    "id": "s-s4-049",
+    "jp": "{新幹線|しんかんせん}で{福岡|ふくおか}へ{行|い}きます。",
+    "en": "We're going to Fukuoka by shinkansen.",
+    "grammar": [
+      "he-direction",
+      "de-place-means"
+    ]
+  },
+  {
+    "id": "s-s4-050",
+    "jp": "はじめまして。{営業|えいぎょう}の{佐藤|さとう}と{申|もう}します。",
+    "en": "Nice to meet you. I'm Sato from sales."
+  },
+  {
+    "id": "s-s4-051",
+    "jp": "{宮島|みやじま}の{観光|かんこう}{情報|じょうほう}を{調|しら}べておいたよ。",
+    "en": "I looked up some sightseeing information about Miyajima.",
+    "grammar": [
+      "te-form",
+      "casual-past"
+    ]
+  },
+  {
+    "id": "s-s4-052",
+    "jp": "{交番|こうばん}で{警察|けいさつ}の{人|ひと}に{身分証明書|みぶんしょうめいしょ}を{見|み}せました。",
+    "en": "I showed my ID to the police officer at the police box.",
+    "grammar": [
+      "de-place-means"
+    ]
+  },
+  {
+    "id": "s-s4-053",
+    "jp": "{約束|やくそく}を{守|まも}ってくれてありがとう。",
+    "en": "Thank you for keeping your promise.",
+    "grammar": [
+      "te-form"
+    ]
+  },
+  {
+    "id": "s-s4-054",
+    "jp": "{玄関|げんかん}の{前|まえ}の{松|まつ}の{木|き}の{横|よこ}に、{黄色|きいろ}いベンチがあります。",
+    "en": "There is a yellow bench next to the pine tree in front of the entrance.",
+    "grammar": [
+      "arimasu-imasu"
+    ]
+  },
+  {
+    "id": "s-s4-055",
+    "jp": "{大型|おおがた}の{台風|たいふう}が{来|く}るから、{被害|ひがい}が{出|で}ないように{対策|たいさく}しよう。",
+    "en": "A big typhoon is coming, so let's get ready so nothing gets damaged.",
+    "grammar": [
+      "kara-because",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-056",
+    "jp": "このカメラは{日本製|にほんせい}で、{技術|ぎじゅつ}の{高|たか}さを{感|かん}じます。",
+    "en": "This camera is made in Japan, and you can feel the quality of the engineering."
+  },
+  {
+    "id": "s-s4-057",
+    "jp": "{選挙|せんきょ}の{日|ひ}、{二人|ふたり}で{投票|とうひょう}に{行|い}きました。",
+    "en": "On election day, the two of us went to vote.",
+    "grammar": [
+      "ni-time-place"
+    ]
+  },
+  {
+    "id": "s-s4-058",
+    "jp": "{現在|げんざい}の{状況|じょうきょう}を{教|おし}えてください。",
+    "en": "Please tell me how things stand at the moment.",
+    "grammar": [
+      "te-kudasai"
+    ]
+  },
+  {
+    "id": "s-s4-059",
+    "jp": "{友達|ともだち}の{影響|えいきょう}で、{夫|おっと}は{武道|ぶどう}を{始|はじ}めました。",
+    "en": "My husband took up a martial art because of a friend.",
+    "grammar": [
+      "masu-forms"
+    ]
+  },
+  {
+    "id": "s-s4-060",
+    "jp": "{値段|ねだん}が{高|たか}い{割|わり}に、{量|りょう}が{少|すく}ない。",
+    "en": "For the price, the portion is small.",
+    "grammar": [
+      "i-adjectives",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-061",
+    "jp": "{山|やま}の{天候|てんこう}は{突然|とつぜん}{変|か}わることがあります。",
+    "en": "The weather in the mountains can change suddenly.",
+    "grammar": [
+      "dictionary-form"
+    ]
+  },
+  {
+    "id": "s-s4-062",
+    "jp": "{今月|こんげつ}の{電気代|でんきだい}の{請求書|せいきゅうしょ}、{金額|きんがく}が{高|たか}くない?",
+    "en": "Doesn't this month's electricity bill look high?",
+    "grammar": [
+      "i-adjectives",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-063",
+    "jp": "{課長|かちょう}が{必|かなら}ず{検討|けんとう}すると{言|い}ってくれました。",
+    "en": "The section chief promised he would definitely consider it.",
+    "grammar": [
+      "dictionary-form"
+    ]
+  },
+  {
+    "id": "s-s4-064",
+    "jp": "{教科書|きょうかしょ}の{例文|れいぶん}は、{右側|みぎがわ}のページにあるよ。",
+    "en": "The example sentences are on the right-hand page of the textbook.",
+    "grammar": [
+      "arimasu-imasu",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-065",
+    "jp": "{長崎|ながさき}では{丘|おか}の{上|うえ}から{港|みなと}の{夜景|やけい}を{見|み}ました。",
+    "en": "In Nagasaki we saw the harbor at night from the top of a hill.",
+    "grammar": [
+      "de-place-means"
+    ]
+  },
+  {
+    "id": "s-s4-066",
+    "jp": "{叔母|おば}の{家|いえ}は{農家|のうか}で、{野菜|やさい}の{種|たね}を{分|わ}けてくれます。",
+    "en": "My aunt's family farms, and they share vegetable seeds with us.",
+    "grammar": [
+      "te-form"
+    ]
+  },
+  {
+    "id": "s-s4-067",
+    "jp": "{好奇心|こうきしん}が{強|つよ}い{学生|がくせい}は、{授業|じゅぎょう}で{細|こま}かいことまで{質問|しつもん}する。",
+    "en": "Curious students ask about even the small details in class.",
+    "grammar": [
+      "dictionary-form"
+    ]
+  },
+  {
+    "id": "s-s4-068",
+    "jp": "{憲法記念日|けんぽうきねんび}に、{町内会|ちょうないかい}がお{祭|まつ}りを{開催|かいさい}します。",
+    "en": "On Constitution Day, the neighborhood association is holding a festival.",
+    "grammar": [
+      "ni-time-place"
+    ]
+  },
+  {
+    "id": "s-s4-069",
+    "jp": "{深|ふか}い{谷|たに}に{古|ふる}い{橋|はし}がかかっています。",
+    "en": "An old bridge spans the deep valley.",
+    "grammar": [
+      "te-imasu"
+    ]
+  },
+  {
+    "id": "s-s4-070",
+    "jp": "{韓国|かんこく}と{日本|にほん}で{離|はな}れていても、{時差|じさ}がないから{毎日|まいにち}{話|はな}せるね。",
+    "en": "Even with you in Korea and me in Japan, there's no time difference, so we can talk every day.",
+    "grammar": [
+      "kara-because",
+      "potential-form"
+    ]
+  },
+  {
+    "id": "s-s4-071",
+    "jp": "{両親|りょうしん}は{九州|きゅうしゅう}の{島|しま}に{住|す}んでいて、{毎朝|まいあさ}{海岸|かいがん}を{歩|ある}いています。",
+    "en": "My parents live on an island in Kyushu and walk along the beach every morning.",
+    "grammar": [
+      "te-imasu"
+    ]
+  },
+  {
+    "id": "s-s4-072",
+    "jp": "{足|た}りない{材料|ざいりょう}は、{他|ほか}の{物|もの}で{補|おぎな}おう。",
+    "en": "Let's make up for the missing ingredients with something else.",
+    "grammar": [
+      "de-place-means",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-073",
+    "jp": "{余|あま}った{生地|きじ}が{固|かた}くなる{前|まえ}に、ハートの{形|かたち}のクッキーを{作|つく}ろう。",
+    "en": "Let's make heart-shaped cookies with the leftover dough before it gets hard.",
+    "grammar": [
+      "mae-ni-ato-de",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-074",
+    "jp": "{視力|しりょく}が{落|お}ちてきたので、{医師|いし}の{指示|しじ}に{従|したが}って{治療|ちりょう}を{始|はじ}めた。",
+    "en": "My eyesight was getting worse, so I started treatment as the doctor told me.",
+    "grammar": [
+      "casual-past"
+    ]
+  },
+  {
+    "id": "s-s4-075",
+    "jp": "{道路|どうろ}に{飛|と}び{出|だ}すのは{非常|ひじょう}に{危|あぶ}ないです。",
+    "en": "Running out into the road is extremely dangerous.",
+    "grammar": [
+      "dictionary-form",
+      "i-adjectives"
+    ]
+  },
+  {
+    "id": "s-s4-076",
+    "jp": "{夫|おっと}と{駅|えき}まで{競争|きょうそう}したら、{負|ま}けちゃった。",
+    "en": "I raced my husband to the station and lost.",
+    "grammar": [
+      "casual-past",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-077",
+    "jp": "{夫|おっと}の{故郷|ふるさと}は{人|ひと}が{優|やさ}しくて{良|よ}い{町|まち}です。",
+    "en": "My husband's hometown is a lovely town with kind people.",
+    "grammar": [
+      "te-form"
+    ]
+  },
+  {
+    "id": "s-s4-078",
+    "jp": "{予想|よそう}を{超|こ}える{激|はげ}しい{雨|あめ}で、{屋根|やね}に{音|おと}が{響|ひび}いている。",
+    "en": "The rain is heavier than forecast, and the sound is echoing off the roof.",
+    "grammar": [
+      "te-imasu",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-079",
+    "jp": "{東京|とうきょう}で{就職|しゅうしょく}した{独身|どくしん}の{兄|あに}を{訪|たず}ねました。",
+    "en": "I visited my older brother, who is single and got a job in Tokyo.",
+    "grammar": [
+      "casual-past"
+    ]
+  },
+  {
+    "id": "s-s4-080",
+    "jp": "{血|ち}の{検査|けんさ}の{結果|けっか}は{異常|いじょう}なしでした。",
+    "en": "The blood test showed nothing abnormal.",
+    "grammar": [
+      "adjective-past"
+    ]
+  },
+  {
+    "id": "s-s4-081",
+    "jp": "{歴史|れきし}の{知識|ちしき}を{増|ふ}やしたくて、{本|ほん}を{三冊|さんさつ}{買|か}いました。",
+    "en": "I wanted to learn more about history, so I bought three books.",
+    "grammar": [
+      "tai-want"
+    ]
+  },
+  {
+    "id": "s-s4-082",
+    "jp": "{将来|しょうらい}{大阪|おおさか}に{住|す}むかどうか、{二人|ふたり}で{相談|そうだん}しよう。",
+    "en": "Let's talk together about whether we'll live in Osaka someday.",
+    "grammar": [
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-083",
+    "jp": "{言葉|ことば}にしなくても、{愛|あい}は{伝|つた}わるよ。",
+    "en": "Even without saying it, love comes through.",
+    "grammar": [
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-084",
+    "jp": "{台湾|たいわん}で{旧正月|きゅうしょうがつ}を{過|す}ごしたのは、{貴重|きちょう}な{経験|けいけん}でした。",
+    "en": "Spending Lunar New Year in Taiwan was a valuable experience.",
+    "grammar": [
+      "de-place-means",
+      "adjective-past"
+    ]
+  },
+  {
+    "id": "s-s4-085",
+    "jp": "{貿易|ぼうえき}{会社|がいしゃ}で{働|はたら}く{父|ちち}は、{株|かぶ}の{話|はなし}ばかりしています。",
+    "en": "My dad works at a trading company and talks about nothing but stocks.",
+    "grammar": [
+      "te-imasu"
+    ]
+  },
+  {
+    "id": "s-s4-086",
+    "jp": "{彼|かれ}の{素直|すなお}な{告白|こくはく}がうれしかった。",
+    "en": "His honest confession made me so happy.",
+    "grammar": [
+      "adjective-past",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-087",
+    "jp": "{子供|こども}のころ、{劇|げき}で{忍者|にんじゃ}の{役|やく}を{演|えん}じたよ。",
+    "en": "When I was a kid, I played a ninja in a play.",
+    "grammar": [
+      "casual-past",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-088",
+    "jp": "{航空券|こうくうけん}を{予約|よやく}したよ。{座席|ざせき}は{通路側|つうろがわ}でいい?",
+    "en": "I booked our plane tickets. Is an aisle seat okay?",
+    "grammar": [
+      "casual-past",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-089",
+    "jp": "{冷|ひ}やしたりんごを{二個|にこ}、{皮|かわ}をむいてくれる?",
+    "en": "Could you peel two of the chilled apples for me?",
+    "grammar": [
+      "te-form",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-090",
+    "jp": "{花|はな}の{模様|もよう}の{食器|しょっき}を{買|か}いました。",
+    "en": "I bought dishes with a flower pattern.",
+    "grammar": [
+      "no-possession"
+    ]
+  },
+  {
+    "id": "s-s4-091",
+    "jp": "{帰|かえ}りにコンビニに{寄|よ}って、{宅配便|たくはいびん}を{出|だ}してくるね。",
+    "en": "I'll stop by the convenience store on the way home and send the package.",
+    "grammar": [
+      "te-form",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-092",
+    "jp": "{週末|しゅうまつ}に{美術館|びじゅつかん}の{展示|てんじ}を{見|み}に{行|い}ったら、{団体|だんたい}{客|きゃく}で{込|こ}んでいた。",
+    "en": "We went to see the exhibition at the art museum on the weekend, and it was crowded with tour groups.",
+    "grammar": [
+      "casual-past"
+    ]
+  },
+  {
+    "id": "s-s4-093",
+    "jp": "{部屋|へや}を{整理|せいり}していたら{大事|だいじ}な{書類|しょるい}が{破|やぶ}れて、{厄介|やっかい}なことになった。",
+    "en": "While I was tidying up, some important papers got torn, and now it is a real headache.",
+    "grammar": [
+      "te-imasu",
+      "casual-past"
+    ]
+  },
+  {
+    "id": "s-s4-094",
+    "jp": "{夫|おっと}も{育児|いくじ}に{積極的|せっきょくてき}です。",
+    "en": "My husband is really hands-on with the kids, too.",
+    "grammar": [
+      "mo-also"
+    ]
+  },
+  {
+    "id": "s-s4-095",
+    "jp": "{館内|かんない}は{飲食|いんしょく}{禁止|きんし}ですが、{一階|いっかい}で{飲|の}み{物|もの}を{販売|はんばい}しています。",
+    "en": "Eating and drinking are not allowed inside, but drinks are sold on the first floor.",
+    "grammar": [
+      "te-imasu"
+    ]
+  },
+  {
+    "id": "s-s4-096",
+    "jp": "{面接|めんせつ}では、{服装|ふくそう}で{印象|いんしょう}がかなり{変|か}わります。",
+    "en": "At an interview, your clothes make a big difference to the impression you give.",
+    "grammar": [
+      "de-place-means"
+    ]
+  },
+  {
+    "id": "s-s4-097",
+    "jp": "{夫婦|ふうふ}で{富士山|ふじさん}に{登|のぼ}るのが{目標|もくひょう}です。",
+    "en": "Our goal as a couple is to climb Mount Fuji.",
+    "grammar": [
+      "dictionary-form"
+    ]
+  },
+  {
+    "id": "s-s4-098",
+    "jp": "{逆|ぎゃく}の{電車|でんしゃ}に{乗|の}って、{乗|の}り{換|か}えに{失敗|しっぱい}した。",
+    "en": "I got on the train going the wrong way and messed up my transfer.",
+    "grammar": [
+      "te-form",
+      "casual-past"
+    ]
+  },
+  {
+    "id": "s-s4-099",
+    "jp": "{辛|から}いものは{好|す}きだけど、{油|あぶら}っこい{料理|りょうり}は{苦手|にがて}。",
+    "en": "I like spicy food, but I'm not big on oily dishes.",
+    "grammar": [
+      "kedo-but",
+      "casual-speech"
+    ]
+  },
+  {
+    "id": "s-s4-100",
+    "jp": "{妻|つま}の{三十歳|さんじゅっさい}の{記念|きねん}に{指輪|ゆびわ}を{買|か}いました。",
+    "en": "I bought my wife a ring to mark her thirtieth birthday.",
+    "grammar": [
+      "no-possession"
+    ]
+  }
+]

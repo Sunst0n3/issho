@@ -1,0 +1,22 @@
+# Issho home server. First run:
+#   cp server/.env.example server/.env        # then set HOUSEHOLD_CODE (and TZ, ANTHROPIC_API_KEY)
+#   mkdir -p issho-data                        # on Linux it must be writable by uid 1000:
+#   sudo chown 1000:1000 issho-data            #   (skip if your user already is uid 1000)
+#   docker compose up -d --build
+services:
+  issho:
+    build: .
+    image: issho:latest
+    restart: unless-stopped
+    env_file: server/.env
+    # Paths inside the container. These win over server/.env, so a .env written for
+    # `npm start` (DATA_DIR=./data, …) can't point the server away from the volume.
+    environment:
+      HOST: 0.0.0.0
+      PORT: "8787"
+      DATA_DIR: /data
+      STATIC_DIR: /app/dist
+    ports:
+      - "8787:8787"
+    volumes:
+      - ./issho-data:/data

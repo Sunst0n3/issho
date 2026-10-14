@@ -1,0 +1,19 @@
+# Installed fresh inside the image.
+**/node_modules
+
+# Build output and local data never go into the build context.
+dist
+server/data
+issho-data
+
+# The image ships the pre-built public/data/ (see the Dockerfile), so the raw dictionaries
+# it is generated from aren't needed.
+data-raw
+
+# Secrets and noise.
+**/.env
+**/.env.*
+!**/.env.example
+.git
+*.log
+.DS_Store

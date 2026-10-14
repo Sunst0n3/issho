@@ -252,7 +252,11 @@ export interface OutboxRecord {
   text: string;
   transcript?: string;
   audio?: Blob;
+  /** Set once the voice upload succeeded, so a retry doesn't upload it twice. */
+  audioId?: string;
   attempts: number;
+  /** Server error code when the message was rejected for good. */
+  failed?: string;
 }
 
 /** Local cache of chat messages (mirrors server). */
