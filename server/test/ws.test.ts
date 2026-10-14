@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { after, before, describe, it } from 'node:test';
 import type { ClientEvent, RegisterResponse, ServerEvent } from '../../shared/api.ts';
+import { WS_CLOSE_UNPAIRED } from '../src/hub.ts';
 import { bearer, createTestServer, listen, openSocket, tick, type TestServer } from './helpers.ts';
 
 describe('websocket', () => {
@@ -102,6 +103,30 @@ describe('websocket', () => {
     assert.equal(a.ws.readyState, WebSocket.OPEN);
 
     await Promise.all([a.close(), a2.close(), b.close()]);
+  });
+
+  it('disconnects devices signed out with the admin CLI', async () => {
+    const own = await createTestServer({ heartbeatMs: 20 });
+    try {
+      const ownBase = await listen(own);
+      const a = await own.register('Carter');
+      const b = await own.register('Aiko');
+      const kept = await openSocket(ownBase, a.deviceToken);
+      const revoked = await openSocket(ownBase, b.deviceToken);
+      const code = new Promise<number>((resolve) =>
+        revoked.ws.addEventListener('close', (e) => resolve(e.code), { once: true }),
+      );
+
+      // What `admin revoke` does, from another process.
+      own.store.revokeDevices(b.memberId);
+      assert.equal(await code, WS_CLOSE_UNPAIRED);
+      await kept.events.next(isPresence(b.memberId, false));
+      await tick(60);
+      assert.equal(kept.ws.readyState, WebSocket.OPEN);
+      await kept.close();
+    } finally {
+      await own.close();
+    }
   });
 
   it('closes sockets with 1001 when the server shuts down', async () => {

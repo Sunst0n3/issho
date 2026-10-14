@@ -43,6 +43,8 @@ describe('toKana', () => {
     expect(toKana('n')).toBe('ん');
     expect(toKana('nn')).toBe('ん');
     expect(toKana('hon')).toBe('ほん');
+    expect(toKana('gakkō')).toBe('がっこう');
+    expect(toKana('Kyôto')).toBe('きょうと');
   });
 
   it('makes small kana with x/l prefixes', () => {
@@ -158,6 +160,25 @@ describe('kanaMatches', () => {
   it('reads ruby markup and accepts any of several readings', () => {
     expect(kanaMatches('ashita', '{明日|あした}')).toBe(true);
     expect(kanaMatches('あす', ['あした', 'あす'])).toBe(true);
+  });
+
+  it('accepts Hepburn long vowels written with a macron or circumflex', () => {
+    expect(kanaMatches('gakkō', 'がっこう')).toBe(true);
+    expect(kanaMatches('Tōkyō', 'とうきょう')).toBe(true);
+    expect(kanaMatches('ōkii', 'おおきい')).toBe(true);
+    expect(kanaMatches('onēsan', 'おねえさん')).toBe(true);
+    expect(kanaMatches('sensē', 'せんせい')).toBe(true);
+    expect(kanaMatches('jûsho', 'じゅうしょ')).toBe(true);
+    expect(kanaMatches('kōhī', ['コーヒー', 'こおひい'])).toBe(true);
+    expect(kanaMatches('gakkō', 'がこう')).toBe(false);
+  });
+
+  it('reads "nn" before a vowel or y either as ん alone or as ん plus an n-syllable', () => {
+    expect(kanaMatches('kinnyoubi', 'きんようび')).toBe(true);
+    expect(kanaMatches("kin'youbi", 'きんようび')).toBe(true);
+    expect(kanaMatches('konnyaku', 'こんにゃく')).toBe(true);
+    expect(kanaMatches('minna', 'みんな')).toBe(true);
+    expect(kanaMatches('minna', 'みな')).toBe(false);
   });
 });
 

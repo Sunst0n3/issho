@@ -3,7 +3,7 @@
 //
 //   node scripts/build-data.ts        (npm run build:data)
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
@@ -17,10 +17,11 @@ import type {
 } from '../src/lib/types.ts';
 import {
   CONTENT_KINDS,
-  checkContent,
   contentFileName,
   emptyContent,
   itemKanji,
+  lateGrammarTags,
+  mergeContent,
   type ContentItem,
   type ContentKind,
 } from './lib/content.ts';
@@ -28,7 +29,15 @@ import { buildCurriculum } from './lib/curriculum.ts';
 import { readJMdict } from './lib/jmdict.ts';
 import { buildKanaTable, isStrokeKana } from './lib/kana.ts';
 import { readKanjidic, type KanjidicEntry } from './lib/kanjidic.ts';
-import { componentsOf, descendants, elementStrokes, readKanjiVG, type KvgChar } from './lib/kanjivg.ts';
+import {
+  componentsOf,
+  descendants,
+  elementStrokes,
+  ignoredElements,
+  readKanjiVG,
+  type KvgChar,
+} from './lib/kanjivg.ts';
+import { WORD_OVERRIDES } from './lib/word-overrides.ts';
 import { selectWord } from './lib/words.ts';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
@@ -42,6 +51,9 @@ const RAW_FILES = {
   kanjidic: ['kanjidic2.xml.gz', 'http://www.edrdg.org/kanjidic/kanjidic2.xml.gz'],
   jmdict: ['JMdict_e.gz', 'http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz'],
 } as const;
+
+/** An ignored KanjiVG component used by this many jōyō kanji should be taught as a radical. */
+const COMMON_COMPONENT_USERS = 20;
 
 class BuildError extends Error {}
 
@@ -61,8 +73,29 @@ function readJson(path: string): unknown {
 
 interface LoadedContent {
   kind: ContentKind;
+  /** Where it was authored, for messages: "content/grammar.json" or "content/sentences". */
+  label: string;
   data: unknown;
   items: ContentItem[];
+}
+
+const naturalOrder = new Intl.Collator('en', { numeric: true }).compare;
+
+/**
+ * The files a content kind is authored in. Sentences are split by curriculum
+ * band into content/sentences/*.json (merged in file-name order), and a
+ * single content/sentences.json is still read after them.
+ */
+function contentFiles(kind: ContentKind): string[] {
+  const files: string[] = [];
+  const dir = join(CONTENT, kind);
+  if (kind === 'sentences' && existsSync(dir)) {
+    const names = readdirSync(dir).filter((f) => f.endsWith('.json')).sort(naturalOrder);
+    files.push(...names.map((f) => join(dir, f)));
+  }
+  const single = join(CONTENT, contentFileName(kind));
+  if (existsSync(single)) files.push(single);
+  return files;
 }
 
 /** Validates every content file up front so a typo fails fast, before the slow parsing. */
@@ -70,20 +103,22 @@ function loadContent(): LoadedContent[] {
   const errors: string[] = [];
   const loaded: LoadedContent[] = [];
   for (const kind of CONTENT_KINDS) {
-    const path = join(CONTENT, contentFileName(kind));
-    if (!existsSync(path)) {
-      warn(`content/${contentFileName(kind)} is missing; writing an empty placeholder`);
-      loaded.push({ kind, data: emptyContent(kind), items: [] });
+    const files = contentFiles(kind);
+    const label = kind === 'sentences' ? 'content/sentences' : `content/${contentFileName(kind)}`;
+    if (files.length === 0) {
+      warn(`${label} is missing; writing an empty placeholder`);
+      loaded.push({ kind, label, data: emptyContent(kind), items: [] });
       continue;
     }
-    let data = readJson(path);
-    const report = checkContent(kind, data);
-    for (const e of report.errors) errors.push(`content/${contentFileName(kind)} ${e}`);
-    for (const w of report.warnings) warn(`content/${contentFileName(kind)} ${w}`);
+    const sources = files.map((path) => ({ file: relative(ROOT, path), data: readJson(path) }));
+    const merged = mergeContent(kind, sources);
+    errors.push(...merged.errors);
+    for (const w of merged.warnings) warn(w);
+    let data = merged.data;
     if (kind === 'grammar' && Array.isArray(data)) {
       data = [...data].sort((a, b) => (a as { order: number }).order - (b as { order: number }).order);
     }
-    loaded.push({ kind, data, items: report.items });
+    loaded.push({ kind, label, data, items: merged.items });
   }
   if (errors.length > 0) {
     throw new BuildError(`content has ${errors.length} error(s):\n  ${errors.join('\n  ')}`);
@@ -91,12 +126,14 @@ function loadContent(): LoadedContent[] {
   return loaded;
 }
 
-/** Cross-file checks that need the curriculum: unknown kanji, mnemonics, grammar ids. */
+/** Cross-file checks that need the curriculum: unknown kanji, mnemonics, grammar ids and phases. */
 function crossCheckContent(content: LoadedContent[], curriculum: Curriculum): void {
   const taught = new Set(curriculum.units.map((u) => u.char));
-  const grammarIds = new Set(content.find((c) => c.kind === 'grammar')?.items.map((i) => i.id));
-  for (const { kind, data, items } of content) {
-    const file = `content/${contentFileName(kind)}`;
+  const grammar = content.find((c) => c.kind === 'grammar')?.data;
+  const grammarPhase = new Map(
+    (Array.isArray(grammar) ? (grammar as { id: string; phase: number }[]) : []).map((g) => [g.id, g.phase]),
+  );
+  for (const { kind, label: file, data, items } of content) {
     const unknown = new Map<string, string[]>();
     for (const item of items) {
       for (const ch of itemKanji(item)) {
@@ -113,7 +150,12 @@ function crossCheckContent(content: LoadedContent[], curriculum: Curriculum): vo
     if (kind === 'sentences' && Array.isArray(data)) {
       for (const s of data as { id?: string; grammar?: unknown }[]) {
         if (!Array.isArray(s.grammar)) continue;
-        for (const g of s.grammar) if (!grammarIds.has(g)) warn(`${file}: ${s.id} refers to unknown grammar "${g}"`);
+        for (const g of s.grammar) if (!grammarPhase.has(g)) warn(`${file}: ${s.id} refers to unknown grammar "${g}"`);
+      }
+      for (const late of lateGrammarTags(data, curriculum.units, grammarPhase)) {
+        warn(
+          `${file}: ${late.id} unlocks in phase ${late.unlockPhase} but uses "${late.grammar}" from phase ${late.grammarPhase}`,
+        );
       }
     }
   }
@@ -225,10 +267,26 @@ async function main(): Promise<void> {
 
   const isTeachable = (el: string) => kanjidic.has(el) || radicalChars.has(el);
   const components = new Map<string, string[]>();
+  const ignoredBy = new Map<string, Set<string>>();
   for (const k of kanjidic.keys()) {
     const glyph = kvg.get(k);
-    if (glyph) components.set(k, componentsOf(glyph, isTeachable));
-    else warn(`KanjiVG has no entry for jōyō kanji ${k}; it gets no components or strokes`);
+    if (!glyph) {
+      warn(`KanjiVG has no entry for jōyō kanji ${k}; it gets no components or strokes`);
+      continue;
+    }
+    components.set(k, componentsOf(glyph, isTeachable));
+    // Lone strokes (丿 丶 丨) are KanjiVG elements too, but not components worth a unit.
+    for (const g of ignoredElements(glyph, isTeachable)) {
+      if (g.strokes.length < 2) continue;
+      let users = ignoredBy.get(g.element!);
+      if (!users) ignoredBy.set(g.element!, (users = new Set()));
+      users.add(k);
+    }
+  }
+  for (const [el, users] of ignoredBy) {
+    if (users.size < COMMON_COMPONENT_USERS) continue;
+    const some = [...users].slice(0, 8).join('');
+    warn(`component ${el} is used by ${users.size} jōyō kanji (${some}…) but is not in content/radicals.json`);
   }
 
   const curriculum = buildCurriculum({
@@ -237,6 +295,8 @@ async function main(): Promise<void> {
     radicals: radicalChars,
     words,
     coreWords,
+    overrides: WORD_OVERRIDES,
+    warn,
   });
   const unitIndex = new Map(curriculum.units.map((u) => [u.char, u.index]));
 

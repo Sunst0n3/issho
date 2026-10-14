@@ -10,6 +10,7 @@ export interface Config {
   /** The built PWA (vite `dist/`). */
   staticDir: string;
   householdCode: string;
+  /** HOUSEHOLD_NAME. A name set with the admin CLI (stored in the database) takes precedence. */
   householdName: string;
   anthropicApiKey: string | null;
   anthropicModel: string;
@@ -41,15 +42,27 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   return {
     port: parsePort(env.PORT),
     host: env.HOST?.trim() || '0.0.0.0',
-    dataDir: resolveDir(env.DATA_DIR, './data'),
+    ...loadAdminConfig(env),
     staticDir: resolveDir(env.STATIC_DIR, '../dist'),
     householdCode,
-    householdName: env.HOUSEHOLD_NAME?.trim() || 'Our home',
     anthropicApiKey: env.ANTHROPIC_API_KEY?.trim() || null,
     anthropicModel: env.ANTHROPIC_MODEL?.trim() || DEFAULT_ANTHROPIC_MODEL,
     trustProxy: parseTrustProxy(env.TRUST_PROXY),
     logLevel: env.LOG_LEVEL?.trim() || 'info',
   };
+}
+
+/** What the admin CLI shares with the server. Unlike loadConfig() it needs no HOUSEHOLD_CODE. */
+export function loadAdminConfig(env: NodeJS.ProcessEnv = process.env): Pick<Config, 'dataDir' | 'householdName'> {
+  return {
+    dataDir: resolveDir(env.DATA_DIR, './data'),
+    householdName: env.HOUSEHOLD_NAME?.trim() || 'Our home',
+  };
+}
+
+/** Where things live inside DATA_DIR. */
+export function dataPaths(dataDir: string): { database: string; voice: string } {
+  return { database: path.join(dataDir, 'issho.db'), voice: path.join(dataDir, 'voice') };
 }
 
 function parsePort(value: string | undefined): number {

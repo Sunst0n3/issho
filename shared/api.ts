@@ -151,6 +151,12 @@ export interface AiTranslateResponse {
   note: string;
 }
 
+/**
+ * WebSocket close code (policy violation) for a device that is no longer paired: it was
+ * signed out or removed with the admin CLI. The phone should pair again, not reconnect.
+ */
+export const WS_CLOSE_UNPAIRED = 1008;
+
 // WebSocket /api/ws?token=… — server → client events (JSON, one per frame).
 export type ServerEvent =
   | { type: 'message'; message: ChatMessage }

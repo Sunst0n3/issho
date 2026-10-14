@@ -1,7 +1,7 @@
 // @vitest-environment node
 // Sanity checks on the generated public/data files (skipped until
 // `npm run build:data` has produced them).
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
 import type {
@@ -13,8 +13,10 @@ import type {
   StrokesFile,
   WordEntry,
 } from '../src/lib/types.ts';
+import { LEAD_MEANINGS } from './lib/kanjidic.ts';
 
 const DATA = fileURLToPath(new URL('../public/data/', import.meta.url));
+const CONTENT = fileURLToPath(new URL('../content/', import.meta.url));
 const built = existsSync(`${DATA}curriculum.json`) && existsSync(`${DATA}strokes.json`);
 const read = <T,>(file: string): T => JSON.parse(readFileSync(DATA + file, 'utf8')) as T;
 
@@ -62,6 +64,27 @@ describe.skipIf(!built)('generated data', () => {
     expect(kanji['水'].meanings[0]).toBe('water');
   });
 
+  it('leads with the everyday meaning and has no numeric or symbolic glosses', () => {
+    for (const [char, lead] of Object.entries(LEAD_MEANINGS)) expect(kanji[char].meanings[0], char).toBe(lead);
+    expect(kanji['校'].meanings[0]).toBe('school');
+    expect(kanji['京'].meanings).toEqual(['capital', 'ten quadrillion']);
+    expect(kanji['積'].meanings).toContain('product');
+    for (const k of Object.values(kanji)) {
+      expect(k.meanings.length, k.char).toBeGreaterThan(0);
+      for (const m of k.meanings) expect(m, k.char).not.toMatch(/\d|[*%&]|\bradical\b/);
+    }
+  });
+
+  it('gives no hand-picked lead meaning to a second kanji of phases 2–3', () => {
+    // Lessons, the library and write prompts name a kanji by its first meaning.
+    const lead = (char: string) => kanji[char].meanings[0].toLowerCase();
+    const early = kanjiUnits.filter((u) => u.index < phaseEnds['3']).map((u) => u.char);
+    const clashes = Object.keys(LEAD_MEANINGS).flatMap((char) =>
+      early.filter((other) => other !== char && lead(other) === lead(char)).map((other) => `${char} and ${other}: ${lead(char)}`),
+    );
+    expect(clashes).toEqual([]);
+  });
+
   it('keeps on readings in katakana and kun readings in hiragana', () => {
     for (const k of Object.values(kanji)) {
       for (const r of k.on) expect(r, `${k.char} on`).toMatch(/^[ァ-ヺー]+$/);
@@ -92,6 +115,17 @@ describe.skipIf(!built)('generated data', () => {
     for (const u of radicalUnits) expect(u.words).toEqual([]);
     const usedAsComponent = new Set(kanjiUnits.flatMap((u) => kanji[u.char].components));
     for (const r of radicals) expect(usedAsComponent.has(r.char), r.char).toBe(true);
+  });
+
+  it('teaches the common components 𠂉 毋 几 匚 as radicals before their first kanji', () => {
+    expect(kanji['毎'].components).toEqual(['𠂉', '毋']);
+    expect(kanji['風'].components).toContain('几');
+    expect(kanji['巨'].components).toContain('匚');
+    for (const ch of ['𠂉', '毋', '几', '匚']) {
+      expect(units[unitIndex.get(ch)!].type, ch).toBe('radical');
+      expect(strokes[ch]?.length, ch).toBeGreaterThan(0);
+    }
+    expect(radicals.find((r) => r.char === '毋')).toMatchObject({ meaning: 'mother', variantOf: '母' });
   });
 
   it('has sensible phase boundaries', () => {
@@ -158,6 +192,19 @@ describe.skipIf(!built)('generated data', () => {
       if (!first || u.words.length === 1) continue;
       expect(first.pos.every((p) => bound.has(p)) || /^-|-$/.test(first.meanings[0]), `${u.char} ${first.written}`).toBe(false);
     }
+  });
+
+  it('ships content/sentences/*.json merged in file order, and every mnemonic', () => {
+    const files = readdirSync(`${CONTENT}sentences`).filter((f) => f.endsWith('.json'));
+    const source = files
+      .sort(new Intl.Collator('en', { numeric: true }).compare)
+      .flatMap((f) => JSON.parse(readFileSync(`${CONTENT}sentences/${f}`, 'utf8')) as { id: string }[]);
+    const shipped = read<{ id: string }[]>('content/sentences.json');
+    expect(shipped.length).toBeGreaterThanOrEqual(400);
+    expect(shipped.map((s) => s.id)).toEqual(source.map((s) => s.id));
+    const hooks = read<Record<string, string>>('content/mnemonics.json');
+    expect(hooks).toEqual(JSON.parse(readFileSync(`${CONTENT}mnemonics.json`, 'utf8')));
+    expect(Object.keys(hooks).length).toBeGreaterThanOrEqual(300);
   });
 
   it('lists kana in teaching order', () => {

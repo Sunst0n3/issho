@@ -2,6 +2,8 @@
 // role-plays, survival words, mnemonics). Used by build-data and check-content.
 
 import { isKanaOnly, isKanji, kanjiIn, parseRuby, validateRuby } from '../../src/lib/ruby.ts';
+import type { CurriculumUnit } from '../../src/lib/types.ts';
+import { isCounterReading, toHiragana } from './readings.ts';
 
 export type ContentKind = 'grammar' | 'sentences' | 'roleplays' | 'survival-words' | 'mnemonics';
 
@@ -278,6 +280,46 @@ export function checkContent(kind: ContentKind, data: unknown): ContentReport {
   return { items, errors: c.errors, warnings: c.warnings };
 }
 
+/** One parsed content file. `file` prefixes its messages: "content/sentences/s1.json". */
+export interface ContentSource {
+  file: string;
+  data: unknown;
+}
+
+/**
+ * Checks several files of one kind (content/sentences/*.json) and merges them
+ * in the order given: arrays are concatenated, mnemonic maps combined. An id
+ * (or mnemonic character) used by two files is an error.
+ */
+export function mergeContent(kind: ContentKind, sources: readonly ContentSource[]): ContentReport & { data: unknown } {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const items: ContentItem[] = [];
+  const firstFile = new Map<string, string>();
+  const list: unknown[] = [];
+  const map: Obj = {};
+  for (const { file, data } of sources) {
+    const report = checkContent(kind, data);
+    errors.push(...report.errors.map((e) => `${file} ${e}`));
+    warnings.push(...report.warnings.map((w) => `${file} ${w}`));
+    items.push(...report.items);
+    for (const id of declaredIds(data)) {
+      const first = firstFile.get(id);
+      if (first === undefined) firstFile.set(id, file);
+      else if (first !== file) errors.push(`${file}: id "${id}" is also used in ${first}`);
+    }
+    if (Array.isArray(data)) list.push(...data);
+    else if (isObj(data)) Object.assign(map, data);
+  }
+  return { data: kind === 'mnemonics' ? map : list, items, errors, warnings };
+}
+
+function declaredIds(data: unknown): string[] {
+  if (isObj(data)) return Object.keys(data);
+  if (!Array.isArray(data)) return [];
+  return data.flatMap((entry) => (isObj(entry) && typeof entry.id === 'string' ? [entry.id] : []));
+}
+
 /** Guesses the kind from a file name, falling back to the shape of the data. */
 export function detectContentKind(fileName: string, data: unknown): ContentKind | undefined {
   const base = fileName.toLowerCase().replace(/^.*[\\/]/, '');
@@ -329,14 +371,51 @@ export function unlockOf(item: ContentItem, unitIndex: ReadonlyMap<string, numbe
   return out;
 }
 
-const toHiragana = (s: string) =>
-  s.replace(/[ァ-ヶ]/g, (ch) => String.fromCodePoint(ch.codePointAt(0)! - 0x60));
+export interface LateGrammar {
+  /** Sentence id. */
+  id: string;
+  grammar: string;
+  grammarPhase: number;
+  /** Phase of the unit that unlocks the sentence; 1 for kana-only sentences. */
+  unlockPhase: number;
+}
+
+/**
+ * Grammar tags a learner can meet before the grammar is taught: the sentence
+ * unlocks (its last kanji is taught) in an earlier phase than the tagged
+ * point's. Unknown grammar ids and untaught kanji are reported elsewhere.
+ */
+export function lateGrammarTags(
+  sentences: unknown,
+  units: readonly Pick<CurriculumUnit, 'char' | 'index' | 'phase'>[],
+  grammarPhase: ReadonlyMap<string, number>,
+): LateGrammar[] {
+  if (!Array.isArray(sentences)) return [];
+  const unitOf = new Map(units.map((u) => [u.char, u]));
+  const out: LateGrammar[] = [];
+  for (const s of sentences) {
+    if (!isObj(s) || typeof s.id !== 'string' || typeof s.jp !== 'string' || !Array.isArray(s.grammar)) continue;
+    let unlockPhase = 1;
+    let last = -1;
+    for (const ch of kanjiIn(s.jp)) {
+      const unit = unitOf.get(ch);
+      if (unit && unit.index > last) [last, unlockPhase] = [unit.index, unit.phase];
+    }
+    for (const grammar of s.grammar) {
+      const phase = typeof grammar === 'string' ? grammarPhase.get(grammar) : undefined;
+      if (phase !== undefined && phase > unlockPhase) out.push({ id: s.id, grammar, grammarPhase: phase, unlockPhase });
+    }
+  }
+  return out;
+}
 
 const LEADING_HIRAGANA_RE = /^[ぁ-ゖ]+/;
 const TRAILING_HIRAGANA_RE = /[ぁ-ゖ]{1,2}$/;
 /** Text after a single kanji that may be okurigana or a blank, so its reading can't be judged alone. */
 const CONTINUES_RE = /^[ぁ-ゖァ-ヺー＿]/;
 const SOKUON_SOURCES = new Set(['つ', 'ち', 'く', 'き']);
+/** Text ending in a numeral, so a number after it closes a range: {二|に}、{三日|さんにち}. */
+const RANGE_START_RE = /[一二三四五六七八九十][、・]?$/;
 
 /** First kana without its voicing marks, so rendaku (か → が, は → ば/ぱ) still matches. */
 const unvoiceFirst = (s: string) => {
@@ -369,22 +448,34 @@ export interface ReadingMismatch {
 }
 
 /**
- * Ruby readings that differ from words.json where the ruby base is exactly a
- * word's written form, e.g. {明日|みょうにち} when words.json reads 明日 as あした.
+ * Ruby readings that differ from a dictionary (words.json, or every JMdict
+ * reading in check-content) where the ruby base is exactly a word's written
+ * form, e.g. {明日|みょうにち} when words.json reads 明日 as あした.
  * Okurigana and a honorific prefix are taken into account: {行|い}く is checked
  * as 行く (いく) and ご{飯|はん} as ご飯 (ごはん), not as the nouns 行 (ぎょう) or
  * 飯 (めし). A single kanji followed by kana or a drill blank that does not
  * complete a known word ({食|た}べたい) is skipped: its reading can't be judged.
+ * A number with a counter may be read as one ({五分|ごふん}, not ごぶ "half"),
+ * and a day count closing a range with にち ({二|に}、{三日|さんにち}).
  * Survival words compare their `written` form with their `kana`.
+ *
+ * `words` are the spellings okurigana or a prefix may complete. With the full
+ * JMdict as `readingsByWritten`, pass the common words only: JMdict also lists
+ * 今日は (こんにちは) and 様です (ようです), which would swallow
+ * {今日|きょう}は and {様|さま}です.
  */
 export function readingMismatches(
   item: ContentItem,
   readingsByWritten: ReadonlyMap<string, readonly string[]>,
+  words: { has(written: string): boolean } = readingsByWritten,
 ): ReadingMismatch[] {
   const out: ReadingMismatch[] = [];
-  const check = (path: string, written: string, reading: string) => {
+  const check = (path: string, written: string, reading: string, endsRange = false) => {
     const expected = readingsByWritten.get(written);
-    if (expected && !expected.some((k) => readingsAgree(reading, k))) out.push({ path, written, reading, expected });
+    if (!expected || expected.some((k) => readingsAgree(reading, k)) || isCounterReading(written, reading, endsRange)) {
+      return;
+    }
+    out.push({ path, written, reading, expected });
   };
 
   for (const f of item.fields) {
@@ -403,11 +494,12 @@ export function readingMismatches(
           const head = prefix.slice(prefix.length - m);
           const tail = okurigana.slice(0, n);
           const written = head + seg.text + tail;
-          if (readingsByWritten.has(written)) return check(f.path, written, head + seg.reading + tail);
+          if (words.has(written)) return check(f.path, written, head + seg.reading + tail);
         }
       }
       if ([...seg.text].length === 1 && CONTINUES_RE.test(after)) return;
-      check(f.path, seg.text, seg.reading);
+      const before = segments.slice(0, i).map((s) => s.text).join('');
+      check(f.path, seg.text, seg.reading, RANGE_START_RE.test(before));
     });
   }
   const written = item.fields.find((f) => f.path.endsWith('.written'));

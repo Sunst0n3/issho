@@ -13,7 +13,7 @@ export class FakeSocket {
   sent: string[] = [];
   onopen: ((ev: Event) => void) | null = null;
   onmessage: ((ev: MessageEvent) => void) | null = null;
-  onclose: ((ev: Event) => void) | null = null;
+  onclose: ((ev: CloseEvent) => void) | null = null;
   onerror: ((ev: Event) => void) | null = null;
 
   constructor(url: string) {
@@ -43,7 +43,13 @@ export class FakeSocket {
   drop() {
     this.readyState = FakeSocket.CLOSED;
     this.onerror?.(new Event('error'));
-    this.onclose?.(new Event('close'));
+    this.onclose?.(new CloseEvent('close', { code: 1006 }));
+  }
+
+  /** The server closes the connection on purpose, with `code`. */
+  closeFromServer(code: number) {
+    this.readyState = FakeSocket.CLOSED;
+    this.onclose?.(new CloseEvent('close', { code }));
   }
 
   static latest(): FakeSocket {

@@ -1,5 +1,5 @@
-import { lazy, Suspense } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { lazy, Suspense, useLayoutEffect } from 'react';
+import { Route, Routes, useLocation, useNavigationType } from 'react-router-dom';
 import { TabBar } from './components/ui.tsx';
 
 const Today = lazy(() => import('./screens/Today.tsx'));
@@ -23,10 +23,25 @@ const QuizRun = lazy(() => import('./screens/QuizRun.tsx'));
 /** Screens that show the bottom tab bar. Full-screen flows (session, chat, …) hide it. */
 const TAB_PATHS = new Set(['/', '/learn', '/write', '/together']);
 
+/**
+ * Opens each new page at the top instead of where the last one was scrolled to.
+ * Back and forward are left to the browser's scroll restoration. Rendered before
+ * the routes so a screen's own layout effects (the chat scrolling to its newest
+ * message) run after this one.
+ */
+function ScrollReset({ pathname }: { pathname: string }) {
+  const navigationType = useNavigationType();
+  useLayoutEffect(() => {
+    if (navigationType !== 'POP') document.documentElement.scrollTop = 0;
+  }, [pathname, navigationType]);
+  return null;
+}
+
 export default function App() {
   const { pathname } = useLocation();
   return (
     <>
+      <ScrollReset pathname={pathname} />
       <Suspense fallback={<div className="screen" aria-busy="true" />}>
         <Routes>
           <Route path="/" element={<Today />} />

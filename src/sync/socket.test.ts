@@ -1,12 +1,16 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { ServerEvent } from '../../shared/api.ts';
+import { WS_CLOSE_UNPAIRED, type ServerEvent } from '../../shared/api.ts';
+import { db, getSettings, updateSettings } from '../lib/db.ts';
+import { wasRemoved } from './client.ts';
 import {
   connectSocket,
   disconnectSocket,
+  getPresence,
   getServerStatus,
   onServerEvent,
   sendClientEvent,
+  usePresence,
   useServerStatus,
 } from './socket.ts';
 import { FakeSocket, installFakeSocket } from './testSocket.ts';
@@ -218,5 +222,77 @@ describe('events', () => {
     FakeSocket.latest().accept();
     vi.advanceTimersByTime(25_000 * 2);
     expect(FakeSocket.latest().sent).toEqual(['{"type":"ping"}', '{"type":"ping"}']);
+  });
+});
+
+describe('presence', () => {
+  it('tracks who is online from app start, whoever listens later', () => {
+    connectSocket(URL_A);
+    expect(getPresence('ken')).toBeUndefined();
+    const sock = FakeSocket.latest();
+    sock.accept();
+    // The server's first frames list who is online.
+    sock.receive({ type: 'presence', memberId: 'ken', online: true });
+    expect(getPresence('ken')).toBe(true);
+    expect(getPresence('third')).toBe(false);
+
+    const { result } = renderHook(() => usePresence('ken'));
+    expect(result.current).toBe(true);
+    act(() => sock.receive({ type: 'presence', memberId: 'ken', online: false }));
+    expect(result.current).toBe(false);
+    act(() => sock.receive({ type: 'roleplay', memberId: 'ken', state: { sessionId: 's', scriptId: 'rp', role: 'a', lineIndex: 0, status: 'waiting' } }));
+    expect(result.current).toBe(true);
+  });
+
+  it('treats everyone as offline once a new connection has had time to list them', () => {
+    connectSocket(URL_A);
+    FakeSocket.latest().accept();
+    expect(getPresence('ken')).toBeUndefined();
+    vi.advanceTimersByTime(1_500);
+    expect(getPresence('ken')).toBe(false);
+  });
+
+  it('forgets presence when the connection drops, and relearns it on the next one', () => {
+    connectSocket(URL_A);
+    FakeSocket.latest().accept();
+    FakeSocket.latest().receive({ type: 'presence', memberId: 'ken', online: true });
+    const { result } = renderHook(() => usePresence('ken'));
+    expect(result.current).toBe(true);
+
+    act(() => FakeSocket.latest().drop());
+    expect(result.current).toBeUndefined();
+    act(() => { vi.advanceTimersByTime(1_000); });
+    act(() => FakeSocket.latest().accept());
+    expect(result.current).toBeUndefined();
+    act(() => FakeSocket.latest().receive({ type: 'presence', memberId: 'ken', online: true }));
+    expect(result.current).toBe(true);
+  });
+});
+
+describe('a phone the server signed out', () => {
+  it('stops reconnecting and forgets the pairing', async () => {
+    // fake-indexeddb runs on setImmediate, which must stay real for the settings write.
+    vi.useRealTimers();
+    await Promise.all(db.tables.map((t) => t.clear()));
+    localStorage.clear();
+    await updateSettings({ deviceToken: 't', memberId: 'm1' });
+    connectSocket(URL_A);
+    FakeSocket.latest().accept();
+
+    FakeSocket.latest().closeFromServer(WS_CLOSE_UNPAIRED);
+    expect(getServerStatus()).toBe('unpaired');
+    await vi.waitFor(async () => expect((await getSettings()).deviceToken).toBeUndefined());
+    expect(wasRemoved()).toBe(true);
+    await new Promise((resolve) => setTimeout(resolve, 1_100));
+    expect(FakeSocket.instances).toHaveLength(1);
+  });
+
+  it('reconnects after any other close', () => {
+    connectSocket(URL_A);
+    FakeSocket.latest().accept();
+    FakeSocket.latest().closeFromServer(1001);
+    expect(getServerStatus()).toBe('offline');
+    vi.advanceTimersByTime(1_000);
+    expect(FakeSocket.instances).toHaveLength(2);
   });
 });

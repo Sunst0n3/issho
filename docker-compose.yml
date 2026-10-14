@@ -3,6 +3,8 @@
 #   mkdir -p issho-data                        # on Linux it must be writable by uid 1000:
 #   sudo chown 1000:1000 issho-data            #   (skip if your user already is uid 1000)
 #   docker compose up -d --build
+# Members, devices and the household name, also while it runs:
+#   docker compose exec issho node server/src/admin.ts list      (or: help)
 services:
   issho:
     build: .

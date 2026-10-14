@@ -6,18 +6,26 @@
 ARG NODE_IMAGE=node:24-slim
 
 # 1. Build the web app.
-# The static data in public/data/ is not rebuilt here. Its sources (data-raw/) are git-ignored, so a
-# fresh clone on the home server couldn't rebuild it, and shipping the files you already built and
-# tested is reproducible. Run `npm run build:data` on your computer (and commit public/data/)
-# whenever content/ or data-raw/ changes, then rebuild the image.
+# The study data in public/data/ is committed, and the image ships it as is: its sources (data-raw/)
+# are git-ignored, so a fresh clone couldn't rebuild it, and the files you built and tested are the
+# reproducible choice. Only a checkout without public/data/ but with data-raw/ builds it here.
+# After changing content/ or data-raw/, run `npm run build:data` and commit public/data/.
 FROM ${NODE_IMAGE} AS web
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-RUN for name in kana kanji radicals words curriculum strokes; do \
+RUN if [ -s public/data/curriculum.json ]; then \
+      echo "Using the committed public/data/"; \
+    elif [ -d data-raw ]; then \
+      npm run build:data; \
+    else \
+      echo "public/data/ is missing and there is no data-raw/ to build it from: run 'npm run build:data' first" >&2; \
+      exit 1; \
+    fi \
+ && for name in kana kanji radicals words curriculum strokes; do \
       test -s "public/data/$name.json" || { \
-        echo "public/data/$name.json is missing: run 'npm run build:data' before building the image" >&2; \
+        echo "public/data/$name.json is missing: run 'npm run build:data' and commit public/data/" >&2; \
         exit 1; \
       }; \
     done \

@@ -1,8 +1,7 @@
 import { accessSync, constants, mkdirSync } from 'node:fs';
-import path from 'node:path';
 import { createAnthropicAi } from './ai.ts';
 import { buildApp, loggerOptions } from './app.ts';
-import { ConfigError, loadConfig, type Config } from './config.ts';
+import { ConfigError, dataPaths, loadConfig, type Config } from './config.ts';
 import { Store } from './db.ts';
 
 /** Below Docker's default 10 s stop timeout, so we exit on our own terms before SIGKILL. */
@@ -31,7 +30,7 @@ try {
   );
 }
 
-const store = new Store(path.join(config.dataDir, 'issho.db'));
+const store = new Store(dataPaths(config.dataDir).database);
 const ai = config.anthropicApiKey
   ? createAnthropicAi({ apiKey: config.anthropicApiKey, model: config.anthropicModel })
   : null;
@@ -72,6 +71,6 @@ if (config.householdCode.length < 8) {
   app.log.warn('HOUSEHOLD_CODE is shorter than 8 characters; anyone who guesses it can join');
 }
 app.log.info(
-  { household: config.householdName, aiEnabled: ai !== null, model: ai ? config.anthropicModel : undefined },
+  { household: store.householdName() ?? config.householdName, aiEnabled: ai !== null, model: ai ? config.anthropicModel : undefined },
   'issho server ready',
 );

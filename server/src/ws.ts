@@ -1,8 +1,8 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
 import type { RawData } from 'ws';
 import { z } from 'zod';
 import type { ClientEvent, Member } from '../../shared/api.ts';
-import { authHook, currentMember } from './auth.ts';
+import { authHook, currentMember, hashToken } from './auth.ts';
 import type { AppContext } from './context.ts';
 
 export const WS_PATH = '/api/ws';
@@ -25,13 +25,7 @@ const ClientEventSchema = z.discriminatedUnion('type', [
 /** GET /api/ws?token=… — must be registered in its own scope (its auth hook reads the query). */
 export function websocketRoutes(app: FastifyInstance, ctx: AppContext): void {
   // Browsers can't set headers on a WebSocket, so the device token travels in the query string.
-  app.addHook(
-    'onRequest',
-    authHook(ctx, (request) => {
-      const { token } = request.query as { token?: unknown };
-      return typeof token === 'string' ? token : null;
-    }),
-  );
+  app.addHook('onRequest', authHook(ctx, queryToken));
 
   app.get(WS_PATH, { websocket: true }, (socket, request) => {
     const member = currentMember(request);
@@ -47,7 +41,7 @@ export function websocketRoutes(app: FastifyInstance, ctx: AppContext): void {
       }
     });
 
-    const cameOnline = ctx.hub.join(member.id, socket);
+    const cameOnline = ctx.hub.join(member.id, socket, hashToken(queryToken(request)!));
     for (const memberId of ctx.hub.onlineMemberIds()) {
       if (memberId !== member.id) ctx.hub.send(socket, { type: 'presence', memberId, online: true });
     }
@@ -55,6 +49,11 @@ export function websocketRoutes(app: FastifyInstance, ctx: AppContext): void {
       ctx.hub.broadcast({ type: 'presence', memberId: member.id, online: true }, { exceptMemberId: member.id });
     }
   });
+}
+
+function queryToken(request: FastifyRequest): string | null {
+  const { token } = request.query as { token?: unknown };
+  return typeof token === 'string' ? token : null;
 }
 
 function handleClientEvent(ctx: AppContext, member: Member, data: RawData): void {

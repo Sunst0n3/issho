@@ -5,7 +5,7 @@
 // first update; browsers have one Blob and do not have this problem.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ChatMessage, SendMessageRequest } from '../../shared/api.ts';
-import { db, updateSettings } from '../lib/db.ts';
+import { db, getSettings, updateSettings } from '../lib/db.ts';
 import { storeMessages } from './chat.ts';
 import {
   discardMessage,
@@ -203,12 +203,17 @@ describe('queueChatMessage + flushOutbox', () => {
     });
   });
 
-  it('treats an expired token as temporary, not as a rejected message', async () => {
+  it('keeps a message for after pairing again when the server no longer accepts this phone', async () => {
     server.routes.message = () => json({ error: 'unauthorized' }, 401);
     await queueChatMessage({ kind: 'text', text: 'hi' });
     const result = await flushOutbox();
     expect(result.blocked).toBe(true);
     expect((await pendingRows())[0].failed).toBeUndefined();
+    // The pairing is forgotten, so later flushes wait without calling the server.
+    expect((await getSettings()).deviceToken).toBeUndefined();
+    server.fetchMock.mockClear();
+    expect(await flushOutbox()).toEqual({ sent: 0, remaining: 1, blocked: true });
+    expect(server.fetchMock).not.toHaveBeenCalled();
   });
 
   it('sends nothing while unpaired', async () => {

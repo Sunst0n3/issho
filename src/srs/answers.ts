@@ -40,15 +40,38 @@ function kanaKey(s: string): string {
     .replace(/[\s、。・,.!?！？「」『』…~〜]/g, '');
 }
 
+/** Long vowels toKana reads one way (おう, えい) that can also stand for おお and ええ (ōkii, onēsan). */
+const OTHER_LONG_VOWELS: Record<string, readonly string[]> = {
+  ō: ['ou', 'oo'], ô: ['ou', 'oo'], ē: ['ei', 'ee'], ê: ['ei', 'ee'],
+};
+const MAX_SPELLINGS = 32;
+
+/**
+ * The romaji spellings a typed answer may stand for: as typed, with ō/ē read
+ * either way, and with "nn" before a vowel or y read as ん alone, as IMEs do
+ * (kinnyoubi → きんようび; toKana keeps minna → みんな).
+ */
+function typedSpellings(input: string): string[] {
+  let spellings = [''];
+  for (const ch of input.normalize('NFKC').toLowerCase()) {
+    const options = OTHER_LONG_VOWELS[ch] ?? [ch];
+    spellings = spellings.length * options.length > MAX_SPELLINGS
+      ? spellings.map((s) => s + options[0])
+      : spellings.flatMap((s) => options.map((o) => s + o));
+  }
+  return [...spellings, ...spellings.map((s) => s.replace(/nn(?=[aiueoy])/g, "n'"))];
+}
+
 /**
  * A typed kana answer (kana or romaji) against the expected kana, which may be
  * ruby markup or a list of accepted readings. Hiragana and katakana are equal.
  */
 export function kanaMatches(input: string, expected: string | readonly string[]): boolean {
-  const typed = kanaKey(toKana(input));
-  if (!typed) return false;
+  const typed = new Set(typedSpellings(input).map((s) => kanaKey(toKana(s))));
+  typed.delete('');
+  if (!typed.size) return false;
   const accepted = typeof expected === 'string' ? [expected] : expected;
-  return accepted.some((e) => kanaKey(rubyToKana(e)) === typed);
+  return accepted.some((e) => typed.has(kanaKey(rubyToKana(e))));
 }
 
 // ---------------------------------------------------------------------------

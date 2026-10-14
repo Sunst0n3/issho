@@ -4,20 +4,9 @@ import path from 'node:path';
 import { after, before, describe, it } from 'node:test';
 import type { ChatMessage, RegisterResponse, UploadVoiceResponse } from '../../shared/api.ts';
 import { MAX_VOICE_BYTES } from '../src/routes/voice.ts';
-import { bearer, createTestServer, type TestServer } from './helpers.ts';
+import { bearer, createTestServer, multipart, WEBM, type TestServer } from './helpers.ts';
 
-const WEBM = Buffer.concat([Buffer.from([0x1a, 0x45, 0xdf, 0xa3]), Buffer.alloc(60, 7)]);
 const MP4 = Buffer.concat([Buffer.from([0, 0, 0, 0x20]), Buffer.from('ftypM4A '), Buffer.alloc(40, 1)]);
-
-async function multipart(field: string, bytes: Buffer, type: string) {
-  const form = new FormData();
-  form.append(field, new Blob([new Uint8Array(bytes)], { type }), 'clip');
-  const request = new Request('http://localhost/', { method: 'POST', body: form });
-  return {
-    payload: Buffer.from(await request.arrayBuffer()),
-    contentType: request.headers.get('content-type')!,
-  };
-}
 
 describe('voice', () => {
   let server: TestServer;

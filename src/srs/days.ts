@@ -26,6 +26,15 @@ export function daysBetween(from: string, to: string): number {
   return Math.round((keyToUtc(to) - keyToUtc(from)) / DAY_MS);
 }
 
+/**
+ * Where a date-indexed query for "today" can start: a study day lasts at most
+ * 25 hours (on a daylight-saving change), so this reaches back past its start.
+ * Keep the rows whose dayKey is today's.
+ */
+export function studyDayLookback(now: Date): Date {
+  return new Date(now.getTime() - 26 * 60 * 60 * 1000);
+}
+
 /** Monday of the ISO week (Mon–Sun) containing `key`. */
 export function weekStart(key: string): string {
   const weekday = new Date(keyToUtc(key)).getUTCDay(); // 0 = Sunday

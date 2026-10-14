@@ -86,6 +86,23 @@ describe('health and registration', () => {
   });
 });
 
+describe('registration with a very long household code', () => {
+  it('reports a wrong code of any length as invalid_code, so the form names the right field', async () => {
+    const server = await createTestServer();
+    try {
+      const res = await server.app.inject({
+        method: 'POST',
+        url: '/api/register',
+        payload: { householdCode: 'x'.repeat(5_000), name: 'Carter' },
+      });
+      assert.equal(res.statusCode, 401);
+      assert.deepEqual(res.json(), { error: 'invalid_code' });
+    } finally {
+      await server.close();
+    }
+  });
+});
+
 describe('registration rate limit', () => {
   it('allows 5 attempts per minute per IP', async () => {
     const server = await createTestServer();

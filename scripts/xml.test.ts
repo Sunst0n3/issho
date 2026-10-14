@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { readJMdict, type JmEntry } from './lib/jmdict.ts';
-import { componentsOf, elementStrokes, readKanjiVG, type KvgChar } from './lib/kanjivg.ts';
+import { componentsOf, elementStrokes, ignoredElements, readKanjiVG, type KvgChar } from './lib/kanjivg.ts';
 import { EntityRewriter, parseXmlGz, rewriteEntities } from './lib/xml.ts';
 
 const dir = mkdtempSync(join(tmpdir(), 'issho-xml-'));
@@ -119,6 +119,14 @@ describe('KanjiVG', () => {
     expect(componentsOf(go, (el) => teachable.has(el))).toEqual(['言', '五', '口']);
     expect(componentsOf(go, (el) => el === '口' || el === '二')).toEqual(['口', '二']);
     expect(componentsOf(go, () => false)).toEqual([]);
+  });
+
+  it('lists the elements it looks through, with their strokes', () => {
+    const teachable = new Set(['言', '五', '口']);
+    const ignored = (isTeachable: (el: string) => boolean) =>
+      ignoredElements(go, isTeachable).map((g) => `${g.element}:${g.strokes.length}`);
+    expect(ignored((el) => teachable.has(el))).toEqual(['吾:4']);
+    expect(ignored((el) => el === '口')).toEqual(['言:2', '吾:4', '五:3', '二:1', '二:1']);
   });
 
   it('extracts the strokes of one element inside a host', () => {

@@ -1,0 +1,140 @@
+/* Kanji library, kanji page, kana chart, practice pad and bottom sheet.
+   Colours are tokens only. */
+
+.lib-title { font-size: 17px; font-weight: 700; }
+.lib-summary { font-size: 14px; }
+
+/* ---- Tiles ---- */
+.lib-grid-wrap { display: flex; flex-direction: column; gap: 10px; }
+.lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; }
+.lib-tile {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  min-width: 0; min-height: 72px; padding: 8px 4px; border-radius: 12px;
+  border: 1px solid var(--line-strong); background: var(--card); color: var(--ink); text-decoration: none;
+}
+.lib-tile.next { border: 2px solid var(--shu); padding: 7px 3px; }
+.lib-tile.locked { border-color: var(--line); background: transparent; color: var(--muted); }
+.lib-tile.locked > :first-child { opacity: 0.55; }
+.lib-meaning {
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; color: var(--muted);
+}
+.lib-flag { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--shu); }
+.lib-more { align-self: center; }
+.lib-tile-skeleton { height: 72px; border-radius: 12px; }
+
+/* ---- Phase groups ---- */
+.lib-group { display: flex; flex-direction: column; gap: 10px; }
+.lib-group-head { font-size: inherit; }
+.lib-group-head button {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 52px; padding: 0 14px;
+  border-radius: 14px; border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  font-size: 15px; text-align: left; cursor: pointer;
+}
+.lib-group-name { flex: 1; min-width: 0; font-weight: 700; }
+.lib-group-count { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lib-chevron { display: inline-flex; color: var(--muted); transition: transform 150ms ease; }
+.lib-chevron.open { transform: rotate(90deg); }
+.lib-group-title { font-size: 15px; font-weight: 700; }
+
+/* ---- Kanji page ---- */
+.kd-topbar { font-size: 15px; font-weight: 500; color: var(--muted); }
+.kd-hero { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px; }
+.kd-glyph {
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 128px; height: 128px; border-radius: 16px; border: 1px solid var(--line); background: var(--paper); color: var(--ink);
+}
+.kd-glyph.small { width: 88px; height: 88px; }
+.kd-hero-text { flex: 1; min-width: 150px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.kd-meaning { font-family: var(--font-display); font-size: 28px; font-weight: 700; line-height: 1.2; }
+.kd-also { font-size: 14px; }
+.kd-readings { display: flex; flex-direction: column; gap: 6px; margin: 0; }
+.kd-reading { display: flex; align-items: baseline; gap: 10px; }
+.kd-reading dt { flex-shrink: 0; width: 32px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: var(--muted); }
+.kd-reading dd { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0; }
+.kd-reading-item { display: inline-flex; flex-direction: column; }
+.kd-kana { font-family: var(--font-display); font-size: 18px; }
+.kd-okurigana { color: var(--muted); }
+.kd-romaji { font-size: 12px; color: var(--muted); }
+
+.kd-status { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 14px; }
+.kd-status > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.kd-stat-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.kd-stat { font-size: 14px; font-weight: 700; }
+.kd-coming { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+
+.kd-hook {
+  display: flex; flex-direction: column; gap: 8px; padding: 14px 16px;
+  border-radius: var(--r-lg); background: var(--shu-tint); color: var(--shu-ink);
+}
+.kd-hook-label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.kd-hook-text { font-size: 16px; }
+.kd-hook-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-left: -12px; }
+.kd-hook .btn.ghost { color: var(--shu-ink); }
+.kd-hook-input {
+  width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line-strong);
+  background: var(--card); color: var(--ink); font-size: 16px; resize: vertical;
+}
+.btn.kd-show-hook { align-self: flex-start; }
+
+.kd-section { display: flex; flex-direction: column; gap: 10px; }
+.kd-first { font-weight: 400; text-transform: none; letter-spacing: 0; }
+.kd-anim { width: 100%; max-width: 200px; align-self: center; }
+.kd-related { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.kd-words { display: flex; flex-direction: column; margin: 0; padding: 4px 16px; list-style: none; }
+.kd-words li { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
+.kd-words li + li { border-top: 1px solid var(--line); }
+.kd-word-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.kd-word-written { font-family: var(--font-display); font-size: 20px; }
+.kd-word-kana { font-size: 14px; color: var(--muted); }
+.kd-word-meaning { font-size: 14px; }
+.kd-hero-skeleton { height: 180px; }
+.kd-strokes-skeleton { height: 140px; }
+.kd-words-skeleton { height: 150px; }
+
+/* ---- Practice pad ---- */
+.hm-practice { display: flex; flex-direction: column; gap: 12px; }
+.hm-practice-note {
+  min-height: 2.6em; padding: 10px 14px; border-radius: 14px;
+  background: var(--ai-tint); color: var(--ai-ink); font-size: 14px;
+}
+.hm-practice-note:empty { visibility: hidden; }
+.hm-practice-note.bad { background: var(--shu-tint); color: var(--shu-ink); }
+.hm-practice-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.hm-practice-actions .btn { padding: 0 8px; }
+.hm-practice-again { grid-column: 1 / -1; }
+
+/* ---- Bottom sheet ---- */
+.hm-sheet-layer { position: fixed; inset: 0; z-index: 30; display: flex; align-items: flex-end; justify-content: center; }
+.hm-sheet-backdrop { position: absolute; inset: 0; background: var(--ink); opacity: 0.35; }
+.hm-sheet {
+  position: relative; display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 560px;
+  max-height: calc(100dvh - 24px - var(--safe-top)); overflow-y: auto; overscroll-behavior: contain;
+  padding: 12px 20px calc(24px + var(--safe-bottom)); border-radius: 24px 24px 0 0; background: var(--paper);
+  animation: hm-sheet-up 220ms ease-out;
+}
+.hm-sheet-grip { align-self: center; width: 40px; height: 4px; border-radius: 2px; background: var(--line-strong); }
+.hm-sheet-close { position: absolute; top: 8px; right: 8px; }
+@keyframes hm-sheet-up { from { transform: translateY(32px); opacity: 0; } }
+
+/* ---- Kana chart ---- */
+.kana-section { display: flex; flex-direction: column; gap: 8px; }
+.kana-grid { display: grid; gap: 6px; }
+.kana-grid.cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.kana-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.kana-cell {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-width: 0; min-height: 60px; padding: 6px 2px; border-radius: 12px;
+  border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer;
+}
+.kana-cell.learned { border-color: var(--line-strong); background: var(--card); color: var(--ink); }
+.kana-cell.gap { border: 0; cursor: default; }
+.kana-char { font-family: var(--font-display); font-size: 26px; line-height: 1.1; }
+.kana-romaji { font-size: 11px; color: var(--muted); }
+.kana-sheet-head { display: flex; align-items: center; gap: 16px; padding-right: 44px; }
+.kana-sheet-text { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; }
+.kana-sheet-romaji { font-size: 28px; font-weight: 700; line-height: 1.1; }
+.kana-yoon-note { padding: 12px 14px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); }
+.kana-sheet-chip { margin-left: 8px; vertical-align: 1px; }

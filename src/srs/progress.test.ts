@@ -3,20 +3,21 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { db } from '../lib/db.ts';
 import type { CardRecord, ReviewLogRecord } from '../lib/types.ts';
 import { DAY_MS } from './days.ts';
-import { introduceItem } from './items.ts';
+import { introduceItem, markKnownMany } from './items.ts';
 import {
   addStudyTime,
   completeSession,
   hardestKanji,
   knownKanji,
+  learnedToday,
   rankHardKanji,
   streak,
   streakFromDays,
   summary,
   weekStats,
 } from './progress.ts';
-import { newCardRecord } from './scheduler.ts';
-import { at, resetDb } from './test-fixtures.ts';
+import { gradeCard, newCardRecord } from './scheduler.ts';
+import { at, inTimeZone, resetDb } from './test-fixtures.ts';
 
 beforeEach(resetDb);
 
@@ -261,5 +262,43 @@ describe('knownKanji', () => {
     await introduceItem('kanji', '一', at(2026, 10, 13, 9));
     await introduceItem('radical', '亻', at(2026, 10, 12, 9));
     expect(await knownKanji()).toEqual(['一', '人']);
+  });
+});
+
+describe('learnedToday', () => {
+  it('lists the items introduced this study day, in the order they came', async () => {
+    await introduceItem('kana', 'い', at(2026, 10, 14, 3)); // still the 13th
+    await introduceItem('kana', 'あ', at(2026, 10, 14, 4));
+    await introduceItem('kanji', '一', at(2026, 10, 14, 9));
+    await introduceItem('word', '1001', at(2026, 10, 14, 9));
+    await introduceItem('kana', 'う', at(2026, 10, 15, 2)); // still the 14th
+    await introduceItem('kana', 'え', at(2026, 10, 15, 4));
+
+    const day = ['kana:あ', 'kanji:一', 'word:1001', 'kana:う'];
+    expect(await learnedToday(at(2026, 10, 14, 12))).toEqual(day);
+    expect(await learnedToday(at(2026, 10, 15, 3, 59))).toEqual(day);
+    expect(await learnedToday(at(2026, 10, 15, 9))).toEqual(['kana:え']);
+    expect(await learnedToday(at(2026, 10, 16, 9))).toEqual([]);
+  });
+
+  it('covers a 25-hour study day when the clocks go back', () =>
+    inTimeZone('America/New_York', async () => {
+      // The study day of Sat 2026-10-31 runs from 04:00 EDT to Sun 04:00 EST.
+      await introduceItem('kana', 'い', new Date(2026, 9, 31, 3, 59));
+      await introduceItem('kana', 'あ', new Date(2026, 9, 31, 4, 0));
+      await introduceItem('kana', 'う', new Date(2026, 10, 1, 3, 0));
+      expect(await learnedToday(new Date(2026, 10, 1, 3, 59))).toEqual(['kana:あ', 'kana:う']);
+      expect(await learnedToday(new Date(2026, 10, 1, 4, 0))).toEqual([]);
+    }));
+
+  it('leaves out items marked as already known', async () => {
+    const now = at(2026, 10, 14, 9);
+    await markKnownMany([{ kind: 'kana', key: 'あ' }, { kind: 'kana', key: 'い' }], now);
+    await introduceItem('kana', 'う', now);
+    await introduceItem('kana', 'え', now);
+    for (const id of ['kana:え|read', 'kana:え|write']) {
+      await gradeCard(id, Rating.Good, { durationMs: 1, mode: 'choice', now });
+    }
+    expect(await learnedToday(now)).toEqual(['kana:う', 'kana:え']);
   });
 });

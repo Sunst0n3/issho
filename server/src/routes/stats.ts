@@ -30,7 +30,7 @@ export function statsRoutes(app: FastifyInstance, ctx: AppContext): void {
   app.post('/api/stats', async (request) => {
     const member = currentMember(request);
     const upload = parseWith(StatsUploadSchema, request.body);
-    ctx.store.saveStats(member.id, upload, ctx.now());
+    ctx.store.saveStats(member.id, upload, ctx.now(), reportedDay(ctx, upload));
     ctx.hub.broadcast({ type: 'stats', memberId: member.id });
     return { ok: true };
   });
@@ -54,7 +54,7 @@ export function statsRoutes(app: FastifyInstance, ctx: AppContext): void {
     });
 
     return {
-      householdName: ctx.config.householdName,
+      householdName: ctx.householdName(),
       me: me.id,
       members,
       sharedStreak: sharedStreak(ctx.store.daysEveryoneCompleted(), today),
@@ -71,4 +71,14 @@ function householdToday(ctx: AppContext): string {
   const serverToday = dayKey(ctx.now());
   const reported = ctx.store.newestDay(addDays(serverToday, 1));
   return reported !== undefined && reported > serverToday ? reported : serverToday;
+}
+
+/**
+ * The uploading phone's study day: the newest day it sent (phones send a window ending today).
+ * null when it sent none, or when its clock is clearly wrong, which would otherwise let that
+ * phone's streak outrank the member's other device for weeks.
+ */
+function reportedDay(ctx: AppContext, upload: StatsUploadRequest): string | null {
+  const newest = upload.days.reduce<string | null>((max, day) => (max === null || day.date > max ? day.date : max), null);
+  return newest !== null && newest <= addDays(dayKey(ctx.now()), 1) ? newest : null;
 }

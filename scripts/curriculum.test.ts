@@ -125,6 +125,68 @@ describe('buildCurriculum', () => {
   });
 });
 
+describe('word overrides', () => {
+  const kanji: CurriculumKanji[] = [
+    { char: '上', jlptOld: 4, freq: 35, strokeCount: 3, kun: ['うえ', 'あ.がる', 'あ.げる'] },
+    { char: '行', jlptOld: 4, freq: 20, strokeCount: 6, kun: ['い.く', 'おこな.う'] },
+    { char: '銀', jlptOld: 3, freq: 300, strokeCount: 14 },
+  ];
+  const ue = word('上', 'うえ', 49);
+  const agaru = word('上がる', 'あがる', 13, ['v5r']);
+  const ageru = word('上げる', 'あげる', 42, ['v1']);
+  const agattari = word('上がったり', 'あがったり', 2);
+  const iku = word('行く', 'いく', 49, ['v5k-s']);
+  const okonau = word('行う', 'おこなう', 1, ['v5u']);
+  const gyou = word('行', 'ぎょう', 8);
+  const ginkou = word('銀行', 'ぎんこう', 1);
+  const vocab = [ue, agaru, ageru, agattari, iku, okonau, gyou, ginkou];
+  const ref = (w: WordEntry) => [w.id, w.written, w.kana] as const;
+
+  const build = (overrides: Record<string, (readonly [string, string, string])[]>) => {
+    const warnings: string[] = [];
+    const { units } = buildCurriculum({
+      kanji,
+      components: new Map(),
+      radicals: new Set(),
+      words: vocab,
+      overrides,
+      warn: (m) => warnings.push(m),
+    });
+    const wordsOf = (ch: string) =>
+      units.find((u) => u.char === ch)!.words.map((id) => vocab.find((w) => w.id === id)!.written);
+    return { wordsOf, warnings };
+  };
+
+  it('teaches exactly the listed words, in order', () => {
+    expect(build({}).wordsOf('上')).toEqual(['上', '上がったり', '上がる']);
+    const { wordsOf, warnings } = build({ 上: [ref(ue), ref(agaru), ref(ageru)], 行: [ref(iku)] });
+    expect(wordsOf('上')).toEqual(['上', '上がる', '上げる']);
+    expect(wordsOf('行')).toEqual(['行く']);
+    expect(warnings).toEqual([]);
+  });
+
+  it('falls back to the automatic pick, with a warning, for a word that needs a later kanji', () => {
+    const { wordsOf, warnings } = build({ 行: [ref(iku), ref(ginkou)] });
+    expect(wordsOf('行')).toEqual(['行く', '行う']);
+    expect(wordsOf('銀')).toEqual(['銀行']);
+    expect(warnings).toEqual([
+      `word override for 行: 銀行 ぎんこう (${ginkou.id}) needs 銀, which is taught later; using the automatic pick`,
+    ]);
+  });
+
+  it('reports words missing from words.json, respelled or without the kanji', () => {
+    const { wordsOf, warnings } = build({
+      上: [['999999', '上る', 'のぼる'], [ue.id, '上', 'かみ'], ref(iku)],
+    });
+    expect(wordsOf('上')).toEqual(['上', '上がったり', '上がる']);
+    expect(warnings).toEqual([
+      'word override for 上: 上る のぼる (999999) is not in words.json; using the automatic pick',
+      `word override for 上: 上 かみ (${ue.id}) is now 上 うえ; using the automatic pick`,
+      `word override for 上: 行く いく (${iku.id}) does not contain 上; using the automatic pick`,
+    ]);
+  });
+});
+
 describe('pickUnitWords', () => {
   it('skips affix-only entries for the first slot', () => {
     const picked = pickUnitWords('日', [word('日', 'じつ', 1, ['suf']), word('日', 'ひ', 40)]);

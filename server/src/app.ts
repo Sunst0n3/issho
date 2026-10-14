@@ -1,5 +1,4 @@
 import { mkdirSync, readFileSync } from 'node:fs';
-import path from 'node:path';
 import fastifyMultipart from '@fastify/multipart';
 import fastifyWebsocket from '@fastify/websocket';
 import Fastify, {
@@ -10,7 +9,7 @@ import Fastify, {
 } from 'fastify';
 import { AiError, describeAiFailure, type AiService } from './ai.ts';
 import { authHook, bearerToken } from './auth.ts';
-import type { Config } from './config.ts';
+import { dataPaths, type Config } from './config.ts';
 import type { AppContext } from './context.ts';
 import type { Store } from './db.ts';
 import { clientErrorCode, HttpError } from './errors.ts';
@@ -24,6 +23,7 @@ import { registerRoutes } from './routes/register.ts';
 import { statsRoutes } from './routes/stats.ts';
 import { voiceRoutes } from './routes/voice.ts';
 import { notFoundHandler, registerStatic } from './static.ts';
+import { startVoiceCleanup } from './voice-cleanup.ts';
 import { websocketRoutes, WS_MAX_PAYLOAD, WS_PATH } from './ws.ts';
 
 /** JSON bodies are small (the largest is a stats upload with ~2,000 known kanji). */
@@ -42,6 +42,8 @@ export interface BuildAppOptions {
   ai?: AiService | null;
   now?: () => Date;
   logger?: FastifyServerOptions['logger'];
+  /** WebSocket ping interval; tests shorten it. */
+  heartbeatMs?: number;
 }
 
 /** pino options for Fastify: info level to stdout, with device tokens scrubbed from logged URLs. */
@@ -73,10 +75,11 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
   const ctx: AppContext = {
     config,
     store,
-    hub: new Hub(),
+    hub: new Hub({ isPaired: (tokenHash) => store.memberForTokenHash(tokenHash) !== undefined }),
     ai: options.ai ?? null,
     now: options.now ?? (() => new Date()),
-    voiceDir: path.join(config.dataDir, 'voice'),
+    householdName: () => store.householdName() ?? config.householdName,
+    voiceDir: dataPaths(config.dataDir).voice,
     version: VERSION,
     limits: {
       register: new RateLimiter(5, MINUTE),
@@ -128,7 +131,9 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
   const hasApp = await registerStatic(app, config.staticDir);
   app.setNotFoundHandler(notFoundHandler(hasApp));
 
-  ctx.hub.startHeartbeat();
+  ctx.hub.startHeartbeat(options.heartbeatMs);
+  const voiceCleanup = await startVoiceCleanup({ store, voiceDir: ctx.voiceDir, now: ctx.now, log: app.log });
+  app.addHook('onClose', async () => voiceCleanup.stop());
   return app;
 }
 

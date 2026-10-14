@@ -12,6 +12,8 @@ export interface AppContext {
   /** null when ANTHROPIC_API_KEY is not set. */
   ai: AiService | null;
   now: () => Date;
+  /** Read on every request: the admin CLI can change it while the server runs. */
+  householdName: () => string;
   voiceDir: string;
   version: string;
   limits: {

@@ -1,6 +1,7 @@
 // Teaching order for radicals and kanji (see SPEC "curriculum.json").
 
 import type { Curriculum, CurriculumUnit, WordEntry } from '../../src/lib/types.ts';
+import type { OverrideWord } from './word-overrides.ts';
 
 export interface CurriculumKanji {
   char: string;
@@ -20,6 +21,10 @@ export interface CurriculumInput {
   words: readonly WordEntry[];
   /** Ids of neutral-register words in JMdict's basic-vocabulary list (ichi1); see pickUnitWords. */
   coreWords?: ReadonlySet<string>;
+  /** Hand-picked word lists that replace the automatic pick for some kanji (see word-overrides.ts). */
+  overrides?: Readonly<Record<string, readonly OverrideWord[]>>;
+  /** Reports override words that cannot be used. */
+  warn?: (message: string) => void;
 }
 
 export const MAX_UNIT_WORDS = 3;
@@ -121,9 +126,16 @@ export function pickUnitWords(
   return picked;
 }
 
+/**
+ * Units in teaching order (see SPEC). A kanji listed in `overrides` gets
+ * exactly its listed words; an override word that cannot be used (unknown id,
+ * changed spelling, a kanji taught later, already used) is reported through
+ * `warn` and its slot goes to the automatic pick.
+ */
 export function buildCurriculum(input: CurriculumInput): Curriculum {
   const kanjiSet = new Set(input.kanji.map((k) => k.char));
   const kunOf = new Map(input.kanji.map((k) => [k.char, k.kun ?? []]));
+  const wordById = new Map(input.words.map((w) => [w.id, w]));
   const wordsByKanji = new Map<string, WordEntry[]>();
   for (const w of input.words) {
     for (const ch of w.kanji) {
@@ -138,11 +150,37 @@ export function buildCurriculum(input: CurriculumInput): Curriculum {
   const usedWords = new Set<string>();
   const inProgress = new Set<string>();
 
+  const overrideProblem = (char: string, [id, written, kana]: OverrideWord, picked: readonly WordEntry[]) => {
+    const w = wordById.get(id);
+    if (!w) return 'is not in words.json';
+    if (w.written !== written || w.kana !== kana) return `is now ${w.written} ${w.kana}`;
+    if (!w.kanji.includes(char)) return `does not contain ${char}`;
+    const late = w.kanji.find((c) => !taught.has(c));
+    if (late) return `needs ${late}, which is taught later`;
+    if (usedWords.has(id) || picked.includes(w)) return 'is already used';
+    return undefined;
+  };
+
+  const overrideWords = (char: string, list: readonly OverrideWord[]): WordEntry[] => {
+    const picked: WordEntry[] = [];
+    for (const word of list) {
+      const problem = overrideProblem(char, word, picked);
+      if (problem) input.warn?.(`word override for ${char}: ${word[1]} ${word[2]} (${word[0]}) ${problem}; using the automatic pick`);
+      else picked.push(wordById.get(word[0])!);
+    }
+    return picked;
+  };
+
   const unitWords = (char: string): string[] => {
+    const override = input.overrides?.[char];
+    const fixed = override ? overrideWords(char, override) : [];
+    const wanted = Math.min(override?.length ?? MAX_UNIT_WORDS, MAX_UNIT_WORDS);
     const candidates = (wordsByKanji.get(char) ?? []).filter(
-      (w) => !usedWords.has(w.id) && w.kanji.every((c) => taught.has(c)),
+      (w) =>
+        !usedWords.has(w.id) && !fixed.some((f) => f.written === w.written) && w.kanji.every((c) => taught.has(c)),
     );
-    const picked = pickUnitWords(char, candidates, input.coreWords, kunOf.get(char)).map((w) => w.id);
+    const automatic = fixed.length < wanted ? pickUnitWords(char, candidates, input.coreWords, kunOf.get(char)) : [];
+    const picked = [...fixed, ...automatic].slice(0, wanted).map((w) => w.id);
     for (const id of picked) usedWords.add(id);
     return picked;
   };

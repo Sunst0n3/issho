@@ -130,7 +130,7 @@ ruby rt { font-size: 0.5em; color: var(--muted); font-family: var(--font-body); 
 .label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 .segmented { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 4px; border-radius: 12px; background: var(--paper-deep); }
 .segmented button {
-  min-height: 40px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); cursor: pointer;
+  min-height: var(--tap); border: 0; border-radius: 9px; background: transparent; color: var(--muted); cursor: pointer;
 }
 .segmented button[aria-checked="true"] { background: var(--card); color: var(--ink); font-weight: 700; }
 .choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }

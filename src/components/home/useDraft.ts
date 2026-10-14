@@ -1,0 +1,37 @@
+import { useEffect, useRef, useState } from 'react';
+
+/**
+ * Local state for a control bound to a live setting. Changes show at once and
+ * are saved after a short pause, so dragging a slider or tapping + quickly never
+ * fights with the database echoing back older values. Outside changes (a backup
+ * restore) still come through when nothing is waiting to be saved.
+ */
+export function useDraft<T>(value: T, save: (value: T) => unknown, delayMs = 250): [T, (value: T) => void] {
+  const [draft, setDraft] = useState(value);
+  const pending = useRef<{ value: T } | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout>>();
+  const saveRef = useRef(save);
+  saveRef.current = save;
+
+  useEffect(() => {
+    if (!pending.current) setDraft(value);
+  }, [value]);
+
+  // Leaving the screen saves whatever is still waiting.
+  useEffect(() => () => {
+    clearTimeout(timer.current);
+    if (pending.current) void saveRef.current(pending.current.value);
+  }, []);
+
+  const set = (next: T) => {
+    setDraft(next);
+    pending.current = { value: next };
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      pending.current = null;
+      void saveRef.current(next);
+    }, delayMs);
+  };
+  return [draft, set];
+}
+

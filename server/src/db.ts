@@ -10,8 +10,11 @@ import type {
   StatsUploadRequest,
 } from '../../shared/api.ts';
 
-/** Append-only: each entry upgrades the schema by one `user_version`. Never edit a shipped entry. */
-const MIGRATIONS: readonly string[] = [
+/**
+ * Append-only: each entry upgrades the schema by one `user_version`. Never edit a shipped entry.
+ * They run with foreign keys off (so tables can be rebuilt) and are checked before committing.
+ */
+export const MIGRATIONS: readonly string[] = [
   `
   CREATE TABLE members (
     id TEXT PRIMARY KEY,
@@ -80,7 +83,54 @@ const MIGRATIONS: readonly string[] = [
   CREATE INDEX quizzes_to ON quizzes(to_member_id, created_at);
   CREATE INDEX quizzes_from ON quizzes(from_member_id, created_at);
   `,
+  `
+  -- The chat outlives a removed member: messages and their recordings stop referencing members
+  -- (removing one used to cascade into the chat history).
+  CREATE TABLE voice_v2 (
+    id TEXT PRIMARY KEY,
+    member_id TEXT NOT NULL,
+    content_type TEXT NOT NULL,
+    file_name TEXT NOT NULL,
+    size INTEGER NOT NULL,
+    created_at TEXT NOT NULL
+  );
+  INSERT INTO voice_v2 (id, member_id, content_type, file_name, size, created_at)
+    SELECT id, member_id, content_type, file_name, size, created_at FROM voice;
+  DROP TABLE voice;
+  ALTER TABLE voice_v2 RENAME TO voice;
+
+  CREATE TABLE messages_v2 (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    client_id TEXT NOT NULL,
+    member_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    kind TEXT NOT NULL CHECK (kind IN ('text', 'voice', 'system')),
+    text TEXT NOT NULL,
+    transcript TEXT,
+    audio_id TEXT REFERENCES voice(id),
+    UNIQUE (member_id, client_id)
+  );
+  INSERT INTO messages_v2 (id, client_id, member_id, created_at, kind, text, transcript, audio_id)
+    SELECT id, client_id, member_id, created_at, kind, text, transcript, audio_id FROM messages;
+  -- Keep the AUTOINCREMENT high-water mark: message ids are the phones' sync cursor and must never be reused.
+  DELETE FROM sqlite_sequence WHERE name = 'messages_v2';
+  UPDATE sqlite_sequence SET name = 'messages_v2' WHERE name = 'messages';
+  DROP TABLE messages;
+  ALTER TABLE messages_v2 RENAME TO messages;
+  CREATE INDEX messages_audio ON messages(audio_id);
+
+  -- The study day of the upload that last set the streak, to merge a member's devices.
+  ALTER TABLE member_stats ADD COLUMN reported_day TEXT;
+
+  -- Household settings changed from the admin CLI.
+  CREATE TABLE settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  ) WITHOUT ROWID;
+  `,
 ];
+
+const HOUSEHOLD_NAME_SETTING = 'household_name';
 
 type MemberRow = { id: string; name: string; joined_at: string; last_seen_at: string | null };
 type DayRow = {
@@ -96,6 +146,7 @@ type MemberStatsRow = {
   kanji_known: number;
   known_kanji: string;
   phase: number;
+  reported_day: string | null;
   updated_at: string;
 };
 type MessageRow = {
@@ -140,6 +191,14 @@ export interface VoiceRecord {
   fileName: string;
   size: number;
   createdAt: string;
+}
+
+export interface RemovedMember {
+  devices: number;
+  /** Their chat messages, which stay in the history. */
+  messagesKept: number;
+  /** Recordings no message used, deleted with them: the caller removes these files. */
+  voiceFiles: string[];
 }
 
 export interface NewMessage {
@@ -223,27 +282,89 @@ export class Store {
     return row && toMember(row);
   }
 
+  deviceCount(memberId: string): number {
+    const row = this.sql('SELECT COUNT(*) AS count FROM devices WHERE member_id = ?').get(memberId) as {
+      count: number;
+    };
+    return row.count;
+  }
+
+  /** The caller checks that no other member already has the name (name_key is unique). */
+  renameMember(id: string, name: string): Member {
+    const row = this.sql('UPDATE members SET name = ?, name_key = ? WHERE id = ? RETURNING *').get(
+      name,
+      nameKey(name),
+      id,
+    ) as MemberRow;
+    return toMember(row);
+  }
+
+  /** Signs out every device of a member. Returns how many there were. */
+  revokeDevices(memberId: string): number {
+    return Number(this.sql('DELETE FROM devices WHERE member_id = ?').run(memberId).changes);
+  }
+
+  /** Deletes a member with their devices, stats and quizzes. Their chat messages stay. */
+  removeMember(id: string): RemovedMember {
+    return this.transaction(() => {
+      const devices = this.deviceCount(id);
+      const { count: messagesKept } = this.sql('SELECT COUNT(*) AS count FROM messages WHERE member_id = ?').get(
+        id,
+      ) as { count: number };
+      const voice = this.sql(`
+        DELETE FROM voice
+        WHERE member_id = ? AND NOT EXISTS (SELECT 1 FROM messages WHERE audio_id = voice.id)
+        RETURNING file_name
+      `).all(id) as { file_name: string }[];
+      this.sql('DELETE FROM members WHERE id = ?').run(id);
+      return { devices, messagesKept, voiceFiles: voice.map((row) => row.file_name) };
+    });
+  }
+
+  // Household settings
+
+  /** Set with the admin CLI; when unset the server uses HOUSEHOLD_NAME. */
+  householdName(): string | undefined {
+    const row = this.sql('SELECT value FROM settings WHERE key = ?').get(HOUSEHOLD_NAME_SETTING) as
+      | { value: string }
+      | undefined;
+    return row?.value;
+  }
+
+  setHouseholdName(name: string): void {
+    this.sql(
+      'INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = excluded.value',
+    ).run(HOUSEHOLD_NAME_SETTING, name);
+  }
+
   // Study stats
 
-  saveStats(memberId: string, upload: StatsUploadRequest, now: Date): void {
+  /**
+   * Merges an upload into the member's stats. A member can study on two devices, each uploading
+   * its own numbers for the same days, so no device's upload may wipe out another's: each day
+   * keeps the larger value of every field. `reportedDay` is the uploading device's study day
+   * (null when unknown), which decides whose streak counts (see mergeSummary).
+   */
+  saveStats(memberId: string, upload: StatsUploadRequest, now: Date, reportedDay: string | null): void {
     const upsertDay = this.sql(`
       INSERT INTO day_stats (member_id, date, study_minutes, reviews, correct, new_items, session_complete)
       VALUES (?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT (member_id, date) DO UPDATE SET
-        study_minutes = excluded.study_minutes,
-        reviews = excluded.reviews,
-        correct = excluded.correct,
-        new_items = excluded.new_items,
-        session_complete = excluded.session_complete
+        study_minutes = MAX(study_minutes, excluded.study_minutes),
+        reviews = MAX(reviews, excluded.reviews),
+        correct = MAX(correct, excluded.correct),
+        new_items = MAX(new_items, excluded.new_items),
+        session_complete = MAX(session_complete, excluded.session_complete)
     `);
     const upsertSummary = this.sql(`
-      INSERT INTO member_stats (member_id, streak, kanji_known, known_kanji, phase, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO member_stats (member_id, streak, kanji_known, known_kanji, phase, reported_day, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT (member_id) DO UPDATE SET
         streak = excluded.streak,
         kanji_known = excluded.kanji_known,
         known_kanji = excluded.known_kanji,
         phase = excluded.phase,
+        reported_day = excluded.reported_day,
         updated_at = excluded.updated_at
     `);
     this.transaction(() => {
@@ -258,12 +379,17 @@ export class Store {
           day.sessionComplete ? 1 : 0,
         );
       }
+      const stored = this.sql('SELECT * FROM member_stats WHERE member_id = ?').get(memberId) as
+        | MemberStatsRow
+        | undefined;
+      const summary = mergeSummary(stored, upload, reportedDay);
       upsertSummary.run(
         memberId,
-        upload.streak,
-        upload.kanjiKnown,
-        JSON.stringify([...new Set(upload.knownKanji)]),
-        upload.phase,
+        summary.streak,
+        summary.kanjiKnown,
+        JSON.stringify(summary.knownKanji),
+        summary.phase,
+        summary.reportedDay,
         now.toISOString(),
       );
     });
@@ -375,6 +501,21 @@ export class Store {
     );
   }
 
+  voiceFileNames(): Set<string> {
+    const rows = this.sql('SELECT file_name FROM voice').all() as { file_name: string }[];
+    return new Set(rows.map((row) => row.file_name));
+  }
+
+  /** Deletes recordings created before `createdBefore` that no message uses; returns their file names. */
+  deleteOrphanedVoice(createdBefore: string): string[] {
+    const rows = this.sql(`
+      DELETE FROM voice
+      WHERE created_at < ? AND NOT EXISTS (SELECT 1 FROM messages WHERE audio_id = voice.id)
+      RETURNING file_name
+    `).all(createdBefore) as { file_name: string }[];
+    return rows.map((row) => row.file_name);
+  }
+
   // Quizzes
 
   insertQuiz(quiz: Omit<Quiz, 'id' | 'result'>): Quiz {
@@ -437,22 +578,82 @@ export class Store {
     }
   }
 
+  private userVersion(): number {
+    return (this.db.prepare('PRAGMA user_version').get() as { user_version: number }).user_version;
+  }
+
   private migrate(): void {
-    const { user_version: version } = this.db.prepare('PRAGMA user_version').get() as {
-      user_version: number;
-    };
+    const version = this.userVersion();
     if (version > MIGRATIONS.length) {
       throw new Error(
         `Database schema version ${version} is newer than this server understands (${MIGRATIONS.length}). Upgrade the server.`,
       );
     }
-    for (let next = version; next < MIGRATIONS.length; next++) {
-      this.transaction(() => {
-        this.db.exec(MIGRATIONS[next]);
-        this.db.exec(`PRAGMA user_version = ${next + 1}`);
-      });
+    if (version === MIGRATIONS.length) return;
+
+    // Rebuilding a table must not fire ON DELETE actions. The switch only works outside a transaction.
+    this.db.exec('PRAGMA foreign_keys = OFF');
+    try {
+      let migrated = true;
+      while (migrated) migrated = this.transaction(() => this.applyNextMigration());
+    } finally {
+      this.db.exec('PRAGMA foreign_keys = ON');
     }
   }
+
+  /**
+   * Applies one migration; false when already up to date. The version is read inside the
+   * transaction because the server and the admin CLI may open the same file at once.
+   */
+  private applyNextMigration(): boolean {
+    const version = this.userVersion();
+    if (version >= MIGRATIONS.length) return false;
+    this.db.exec(MIGRATIONS[version]);
+    if (this.db.prepare('PRAGMA foreign_key_check').all().length > 0) {
+      throw new Error(`Database migration ${version + 1} left broken references; nothing was changed.`);
+    }
+    this.db.exec(`PRAGMA user_version = ${version + 1}`);
+    return true;
+  }
+}
+
+interface Summary {
+  streak: number;
+  kanjiKnown: number;
+  knownKanji: string[];
+  phase: number;
+  reportedDay: string | null;
+}
+
+/**
+ * Folds an upload into a member's stored summary. Known kanji and the phase only grow, so the union
+ * and the larger values win; the count is never below the union's size. A streak drops when a day
+ * is missed, so the device reporting the latest study day decides it; within one day it only grows,
+ * so there the larger wins. An upload without a study day can't be ordered, so it keeps a dated streak.
+ */
+function mergeSummary(
+  stored: MemberStatsRow | undefined,
+  upload: StatsUploadRequest,
+  reportedDay: string | null,
+): Summary {
+  const storedKanji = stored ? (JSON.parse(stored.known_kanji) as string[]) : [];
+  const knownKanji = [...new Set([...storedKanji, ...upload.knownKanji])];
+  const merged: Summary = {
+    streak: upload.streak,
+    kanjiKnown: Math.max(upload.kanjiKnown, stored?.kanji_known ?? 0, knownKanji.length),
+    knownKanji,
+    phase: Math.max(upload.phase, stored?.phase ?? 1),
+    reportedDay: reportedDay ?? stored?.reported_day ?? null,
+  };
+  if (stored?.reported_day) {
+    if (reportedDay === stored.reported_day) {
+      merged.streak = Math.max(upload.streak, stored.streak);
+    } else if (reportedDay === null || reportedDay < stored.reported_day) {
+      merged.streak = stored.streak;
+      merged.reportedDay = stored.reported_day;
+    }
+  }
+  return merged;
 }
 
 function toMember(row: MemberRow): Member {

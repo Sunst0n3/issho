@@ -30,12 +30,12 @@
   },
   {
     "id": "s-s3-004",
-    "jp": "{走|はし}るのが{楽|たの}しくて、{自己|じこ}ベストも{出|で}た!",
+    "jp": "{走|はし}るのが{楽|たの}しくて、{自己|じこ}ベストも{出|で}ました!",
     "en": "Running is so much fun, and I even set a personal best!",
     "grammar": [
       "dictionary-form",
       "te-form",
-      "casual-past"
+      "masu-forms"
     ]
   },
   {
@@ -78,11 +78,10 @@
   },
   {
     "id": "s-s3-009",
-    "jp": "{中央口|ちゅうおうぐち}のほうが{近|ちか}いよ。",
-    "en": "The central exit is closer.",
+    "jp": "{中央口|ちゅうおうぐち}が{近|ちか}いですよ。",
+    "en": "The central exit is the close one.",
     "grammar": [
-      "yori-hou",
-      "casual-speech"
+      "i-adjectives"
     ]
   },
   {
@@ -96,11 +95,12 @@
   },
   {
     "id": "s-s3-011",
-    "jp": "あなたの{好|す}きな{豆|まめ}のスープを{作|つく}ったよ。",
+    "jp": "あなたの{好|す}きな{豆|まめ}のスープを{作|つく}りました。",
     "en": "I made the bean soup you like.",
     "grammar": [
       "na-adjectives",
-      "casual-past"
+      "wo-object",
+      "masu-forms"
     ]
   },
   {
@@ -113,19 +113,20 @@
   },
   {
     "id": "s-s3-013",
-    "jp": "{動物|どうぶつ}にえさを{与|あた}えないでください。",
-    "en": "Please don't feed the animals.",
+    "jp": "{動物|どうぶつ}にえさを{与|あた}えましょう。",
+    "en": "Let's feed the animals.",
     "grammar": [
-      "nai-form",
-      "te-kudasai"
+      "wo-object",
+      "masenka-mashou"
     ]
   },
   {
     "id": "s-s3-014",
-    "jp": "{兄|あに}は{頭|あたま}がいいけど、{字|じ}が{下手|へた}です。",
-    "en": "My older brother is smart, but his handwriting is messy.",
+    "jp": "{兄|あに}は{頭|あたま}がいいです。でも、{字|じ}が{下手|へた}です。",
+    "en": "My older brother is smart. But his handwriting is messy.",
     "grammar": [
-      "kedo-but"
+      "i-adjectives",
+      "na-adjectives"
     ]
   },
   {
@@ -165,11 +166,11 @@
   },
   {
     "id": "s-s3-019",
-    "jp": "{少|すこ}し{太|ふと}ったから、{毎日|まいにち}{歩|ある}くことにした。",
-    "en": "I've put on a little weight, so I've decided to walk every day.",
+    "jp": "{少|すこ}し{太|ふと}って、{毎日|まいにち}{歩|ある}いています。",
+    "en": "I've put on a little weight, so I walk every day now.",
     "grammar": [
-      "kara-because",
-      "casual-past"
+      "te-form",
+      "te-imasu"
     ]
   },
   {

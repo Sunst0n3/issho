@@ -99,18 +99,37 @@ export function* descendants(root: KvgGroup): Generator<KvgGroup> {
  */
 export function componentsOf(char: KvgChar, isTeachable: (element: string) => boolean): string[] {
   const out: string[] = [];
-  const visit = (group: KvgGroup) => {
-    for (const child of group.children) {
-      const el = child.element;
-      if (el && el !== char.char && isTeachable(el)) {
-        if (!out.includes(el)) out.push(el);
-      } else {
-        visit(child);
-      }
-    }
-  };
-  visit(char.root);
+  for (const { group, teachable } of elementGroups(char, isTeachable)) {
+    if (teachable && !out.includes(group.element!)) out.push(group.element!);
+  }
   return out;
+}
+
+/**
+ * The element groups componentsOf looks through because they are not
+ * teachable (吾 in 語, or a lone stroke such as 丿), in document order.
+ */
+export function ignoredElements(char: KvgChar, isTeachable: (element: string) => boolean): KvgGroup[] {
+  const out: KvgGroup[] = [];
+  for (const { group, teachable } of elementGroups(char, isTeachable)) if (!teachable) out.push(group);
+  return out;
+}
+
+/** The walk behind componentsOf: a teachable group ends its branch, any other group is looked through. */
+function* elementGroups(
+  char: KvgChar,
+  isTeachable: (element: string) => boolean,
+): Generator<{ group: KvgGroup; teachable: boolean }> {
+  function* walk(parent: KvgGroup): Generator<{ group: KvgGroup; teachable: boolean }> {
+    for (const group of parent.children) {
+      const el = group.element;
+      const isElement = el !== undefined && el !== char.char;
+      const teachable = isElement && isTeachable(el);
+      if (isElement) yield { group, teachable };
+      if (!teachable) yield* walk(group);
+    }
+  }
+  yield* walk(char.root);
 }
 
 /**

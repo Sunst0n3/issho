@@ -3,12 +3,38 @@
 import { State } from 'ts-fsrs';
 import { dayKey, db } from '../lib/db.ts';
 import type { CardRecord, DayRecord } from '../lib/types.ts';
-import { addDays, countableMs, DAY_MS, emptyDay, updateDay, weekStart } from './days.ts';
+import { addDays, countableMs, DAY_MS, emptyDay, studyDayLookback, updateDay, weekStart } from './days.ts';
 
 /** Every introduced kanji, oldest first. */
 export async function knownKanji(): Promise<string[]> {
   const items = await db.items.where('kind').equals('kanji').toArray();
   return items.sort((a, b) => a.introducedAt.getTime() - b.introducedAt.getTime()).map((i) => i.key);
+}
+
+/**
+ * Ids of the items introduced today, in the order they were introduced. Words
+ * that came with a kanji are included (filter by kind as needed); items the
+ * learner marked as already known are not, since they weren't learned today.
+ */
+export async function learnedToday(now: Date = new Date()): Promise<string[]> {
+  const today = dayKey(now);
+  const items = await db.items
+    .where('introducedAt')
+    .aboveOrEqual(studyDayLookback(now))
+    .filter((i) => dayKey(i.introducedAt) === today)
+    .toArray();
+  if (!items.length) return [];
+
+  const ids = items.map((i) => i.id);
+  const [cards, logs] = await Promise.all([
+    db.cards.where('itemId').anyOf(ids).toArray(),
+    db.reviewLogs.where('itemId').anyOf(ids).toArray(),
+  ]);
+  // markKnown moves cards straight to Review without grading them: an item with
+  // neither a review nor a card still waiting for its first one was marked known.
+  const graded = new Set(logs.map((l) => l.itemId));
+  const unseen = new Set(cards.filter((c) => c.reps === 0).map((c) => c.itemId));
+  return ids.filter((id) => graded.has(id) || unseen.has(id));
 }
 
 // ---------------------------------------------------------------------------

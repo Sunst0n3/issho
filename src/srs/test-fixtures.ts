@@ -51,23 +51,42 @@ export const SURVIVAL: SurvivalWord[] = [
   { id: 'sw-kokoa', kana: 'ココア', en: 'cocoa' },
 ];
 
-function grammarPoint(id: string, order: number, phase: GrammarPoint['phase']): GrammarPoint {
-  return {
-    id,
-    order,
-    phase,
-    title: id,
-    pattern: '〜',
-    explanation: '',
-    examples: [],
-    drills: [{ prompt: 'あ＿＿', options: ['い', 'う'], answer: 0, en: '' }],
-  };
+function grammarPoint(
+  id: string,
+  order: number,
+  phase: GrammarPoint['phase'],
+  text: Pick<GrammarPoint, 'pattern' | 'examples' | 'drills'>,
+): GrammarPoint {
+  return { id, order, phase, title: id, explanation: '', ...text };
 }
 
+const drill = (prompt: string, options: string[]) => ({ prompt, options, answer: 0, en: '' });
+
+/** The kana g-wa needs: か (pattern), あ い こ (example furigana; っ is skipped), こ (drill), え お (options). */
+export const G_WA_KANA = ['か', 'あ', 'い', 'こ', 'え', 'お'];
+
 export const GRAMMAR: GrammarPoint[] = [
-  grammarPoint('g-ka', 2, 1),
-  grammarPoint('g-wa', 1, 1),
-  grammarPoint('g-te', 3, 2),
+  // Needs が; きゃ く (a yōon counts as one); き う (きょ isn't in this course,
+  // so ょ is skipped); ご (ー is skipped); い う.
+  grammarPoint('g-ka', 2, 1, {
+    pattern: '〜が',
+    examples: [
+      { jp: 'きゃく', en: 'guest' },
+      { jp: 'きょう', en: 'today' },
+    ],
+    drills: [drill('ごー＿＿', ['い', 'う'])],
+  }),
+  grammarPoint('g-wa', 1, 1, {
+    pattern: '〜か',
+    examples: [{ jp: '{赤|あか}いっこ', en: 'one red one' }],
+    drills: [drill('こ＿＿', ['え', 'お'])],
+  }),
+  // Needs コ ア; カ; イ ウ.
+  grammarPoint('g-te', 3, 2, {
+    pattern: '〜て',
+    examples: [{ jp: 'ココア', en: 'cocoa' }],
+    drills: [drill('カ＿＿', ['イ', 'ウ'])],
+  }),
 ];
 
 export const CURRICULUM: Curriculum = {
@@ -155,4 +174,16 @@ export async function resetDb(): Promise<void> {
 /** A local date-time; day keys roll over at 4 a.m. local time. */
 export function at(y: number, month: number, d: number, h = 12, min = 0): Date {
   return new Date(y, month - 1, d, h, min);
+}
+
+/** Runs `fn` in another local time zone (Node picks up a changed TZ at once). */
+export async function inTimeZone<T>(tz: string, fn: () => Promise<T>): Promise<T> {
+  const saved = process.env.TZ;
+  process.env.TZ = tz;
+  try {
+    return await fn();
+  } finally {
+    if (saved === undefined) delete process.env.TZ;
+    else process.env.TZ = saved;
+  }
 }

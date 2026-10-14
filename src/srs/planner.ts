@@ -1,4 +1,9 @@
 // Today's session: due reviews (capped per day), new items, and i+1 reading.
+//
+// The daily review cap only looks at Review-state cards. Cards still in their
+// first steps (new, learning, relearning) are always shown when due: they are
+// part of finishing today's work. Since nothing caps them, they do count
+// toward the backlog that pauses new items.
 
 import { State } from 'ts-fsrs';
 import { dayKey, db, getSettings } from '../lib/db.ts';
@@ -6,11 +11,14 @@ import { loadKana, loadSentences } from '../lib/data.ts';
 import { kanjiIn, rubyToKana } from '../lib/ruby.ts';
 import type { CardRecord, SentenceEntry } from '../lib/types.ts';
 import { currentPhase, knownKanaSet, nextNewItems, requiredKana, type NewItemPlan, type Phase } from './course.ts';
-import { daysBetween, getDay } from './days.ts';
+import { daysBetween, getDay, studyDayLookback } from './days.ts';
 import { knownKanji } from './progress.ts';
 
 export interface SessionPlan {
-  /** Due card ids in the order to review them, capped by what's left of today's limit. */
+  /**
+   * Due card ids in the order to review them: every card still in its first
+   * steps, then Review-state cards up to what's left of today's limit.
+   */
   reviews: string[];
   newItems: NewItemPlan[];
   /** Set when new items are paused because of a review backlog. */
@@ -22,7 +30,7 @@ export interface SessionPlan {
   estimateMinutes: number;
 }
 
-/** New items pause while more than this many reviews are due (or 2× the daily cap, if lower). */
+/** New items pause while more than this many cards are due (or 2× the daily cap, if lower). */
 export const BACKLOG_LIMIT = 150;
 
 export function backlogThreshold(maxReviewsPerDay: number): number {
@@ -46,8 +54,27 @@ export function orderReviews(cards: readonly CardRecord[]): CardRecord[] {
   return [...cards].sort((a, b) => rank(a) - rank(b) || a.due.getTime() - b.due.getTime());
 }
 
+/**
+ * Due cards in review order with the daily cap applied: `room` limits the
+ * Review-state cards only; cards in their first steps all stay.
+ */
+export function capReviews(due: readonly CardRecord[], room: number): CardRecord[] {
+  const firstSteps = due.filter((c) => c.state !== State.Review).length;
+  return orderReviews(due).slice(0, firstSteps + Math.max(0, room));
+}
+
 async function dueCards(now: Date): Promise<CardRecord[]> {
   return db.cards.where('due').belowOrEqual(now).filter((c) => !c.suspended).toArray();
+}
+
+/** Reviews of Review-state cards done today: what counts toward maxReviewsPerDay. */
+async function cappedReviewsDone(now: Date): Promise<number> {
+  const today = dayKey(now);
+  return db.reviewLogs
+    .where('reviewedAt')
+    .aboveOrEqual(studyDayLookback(now))
+    .filter((log) => log.prevState === State.Review && dayKey(log.reviewedAt) === today)
+    .count();
 }
 
 export async function dueCount(now: Date = new Date()): Promise<number> {
@@ -78,12 +105,13 @@ export async function planToday(now: Date = new Date()): Promise<SessionPlan> {
   const due = await dueCards(now);
   const backlog = due.length;
 
-  const reviewRoom = Math.max(0, settings.maxReviewsPerDay - today.reviews);
-  const reviews = orderReviews(due).slice(0, reviewRoom).map((c) => c.id);
+  const reviewRoom = settings.maxReviewsPerDay - (await cappedReviewsDone(now));
+  const reviews = capReviews(due, reviewRoom).map((c) => c.id);
 
   const threshold = backlogThreshold(settings.maxReviewsPerDay);
-  const blocked = backlog > threshold;
   const newRoom = Math.max(0, settings.newPerDay - today.newItems);
+  // Only a pause that holds new items back is worth reporting.
+  const blocked = newRoom > 0 && backlog > threshold;
   const newItems = blocked ? [] : await nextNewItems(newRoom, now);
 
   const phase = await currentPhase();
@@ -151,25 +179,27 @@ export function pickIPlusOne(
 const SHOWN_KEY = 'issho.srs.sentencesShown';
 /** Sentences shown within this many days are skipped. */
 export const SHOWN_COOLDOWN_DAYS = 7;
-let shownFallback: Record<string, string> = {};
+/** The in-memory copy, used once localStorage has refused a write (full or blocked). */
+let shownFallback: Record<string, string> | null = null;
 
 // Per-device memory of when each sentence was last shown: id → day key. Kept in
-// localStorage (with an in-memory fallback when storage is unavailable).
+// localStorage, or in memory for this visit when storage is unavailable.
 function readShown(): Record<string, string> {
+  if (shownFallback) return shownFallback;
   try {
     const raw = localStorage.getItem(SHOWN_KEY);
-    return raw ? (JSON.parse(raw) as Record<string, string>) : shownFallback;
+    return raw ? (JSON.parse(raw) as Record<string, string>) : {};
   } catch {
-    return shownFallback;
+    return {};
   }
 }
 
 function writeShown(shown: Record<string, string>): void {
-  shownFallback = shown;
   try {
     localStorage.setItem(SHOWN_KEY, JSON.stringify(shown));
+    shownFallback = null;
   } catch {
-    // Storage full or blocked: the in-memory copy still covers this visit.
+    shownFallback = shown;
   }
 }
 
@@ -185,6 +215,16 @@ export function markSentencesShown(ids: readonly string[], now: Date = new Date(
   const kept = Object.fromEntries(Object.entries(shown).filter(([, day]) => daysBetween(day, today) < 30));
   for (const id of ids) kept[id] = today;
   writeShown(kept);
+}
+
+/** Forgets which sentences were shown, so none are resting (used when all progress is reset). */
+export function resetSentencesShown(): void {
+  shownFallback = null;
+  try {
+    localStorage.removeItem(SHOWN_KEY);
+  } catch {
+    // Storage blocked: only the in-memory copy was in use.
+  }
 }
 
 /** Kanji introduced most recently first. */

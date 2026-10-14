@@ -1,16 +1,35 @@
 import type { WebSocket } from 'ws';
-import type { ServerEvent } from '../../shared/api.ts';
+import { WS_CLOSE_UNPAIRED, type ServerEvent } from '../../shared/api.ts';
+
+export { WS_CLOSE_UNPAIRED };
 
 const HEARTBEAT_MS = 30_000;
+
+export interface HubOptions {
+  /**
+   * Whether a device (its token hash) is still paired. Checked on every heartbeat, so a phone
+   * revoked or removed with the admin CLI (another process) stops receiving the household's events.
+   */
+  isPaired?: (tokenHash: string) => boolean;
+}
 
 /** Live WebSocket connections per member, for pushing ServerEvents and tracking presence. */
 export class Hub {
   private readonly sockets = new Map<string, Set<WebSocket>>();
   private readonly alive = new WeakSet<WebSocket>();
+  private readonly devices = new WeakMap<WebSocket, string>();
+  private readonly isPaired: (tokenHash: string) => boolean;
   private heartbeat: NodeJS.Timeout | undefined;
 
-  /** Returns true when this is the member's first open connection (they just came online). */
-  join(memberId: string, socket: WebSocket): boolean {
+  constructor(options: HubOptions = {}) {
+    this.isPaired = options.isPaired ?? (() => true);
+  }
+
+  /**
+   * Adds a socket opened with the device token `tokenHash`. Returns true when this is the
+   * member's first open connection (they just came online).
+   */
+  join(memberId: string, socket: WebSocket, tokenHash: string): boolean {
     let set = this.sockets.get(memberId);
     const first = !set || set.size === 0;
     if (!set) {
@@ -19,6 +38,7 @@ export class Hub {
     }
     set.add(socket);
     this.alive.add(socket);
+    this.devices.set(socket, tokenHash);
     socket.on('pong', () => this.alive.add(socket));
     return first;
   }
@@ -56,7 +76,10 @@ export class Hub {
     deliver([socket], JSON.stringify(event));
   }
 
-  /** Pings every socket periodically and drops the ones that stopped answering (phones that slept). */
+  /**
+   * Pings every socket periodically, drops the ones that stopped answering (phones that slept)
+   * and closes the ones whose device is no longer paired.
+   */
   startHeartbeat(intervalMs = HEARTBEAT_MS): void {
     this.stopHeartbeat();
     this.heartbeat = setInterval(() => {
@@ -64,6 +87,10 @@ export class Hub {
         for (const socket of set) {
           if (!this.alive.has(socket)) {
             socket.terminate();
+            continue;
+          }
+          if (!this.isPaired(this.devices.get(socket)!)) {
+            socket.close(WS_CLOSE_UNPAIRED, 'device not paired');
             continue;
           }
           this.alive.delete(socket);

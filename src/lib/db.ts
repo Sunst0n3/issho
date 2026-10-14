@@ -58,10 +58,13 @@ export async function getSettings(): Promise<Settings> {
   return { ...DEFAULT_SETTINGS, ...s };
 }
 
-export async function updateSettings(patch: Partial<Omit<Settings, 'id'>>): Promise<Settings> {
-  const next = { ...(await getSettings()), ...patch, id: 'me' as const };
-  await db.settings.put(next);
-  return next;
+/** Merges `patch` into the stored settings. One transaction, so two quick changes can't both read the old row. */
+export function updateSettings(patch: Partial<Omit<Settings, 'id'>>): Promise<Settings> {
+  return db.transaction('rw', db.settings, async () => {
+    const next = { ...(await getSettings()), ...patch, id: 'me' as const };
+    await db.settings.put(next);
+    return next;
+  });
 }
 
 /** Local calendar date key, 'YYYY-MM-DD'. A study day rolls over at 4 a.m. local time (DST-safe). */

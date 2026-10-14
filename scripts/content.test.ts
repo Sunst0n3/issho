@@ -4,6 +4,8 @@ import {
   checkContent,
   detectContentKind,
   itemKanji,
+  lateGrammarTags,
+  mergeContent,
   readingMismatches,
   readingsAgree,
   unlockOf,
@@ -88,6 +90,66 @@ describe('checkContent', () => {
   });
 });
 
+describe('mergeContent', () => {
+  const s1 = [
+    { id: 's-1', jp: '{水|みず}', en: 'water' },
+    { id: 's-2', jp: '{火|ひ}', en: 'fire' },
+  ];
+
+  it('concatenates the files in order and prefixes their messages', () => {
+    const merged = mergeContent('sentences', [
+      { file: 'content/sentences/s1.json', data: s1 },
+      { file: 'content/sentences/s2.json', data: [{ id: 's-3', jp: '水', en: 'water' }] },
+    ]);
+    expect((merged.data as { id: string }[]).map((s) => s.id)).toEqual(['s-1', 's-2', 's-3']);
+    expect(merged.items.map((i) => i.id)).toEqual(['s-1', 's-2', 's-3']);
+    expect(merged.errors).toEqual(['content/sentences/s2.json [0] s-3.jp: kanji "水" has no reading in "水"']);
+  });
+
+  it('reports an id used by two files', () => {
+    const { errors } = mergeContent('sentences', [
+      { file: 'a.json', data: s1 },
+      { file: 'b.json', data: [{ id: 's-2', jp: 'みず', en: 'water' }] },
+    ]);
+    expect(errors).toEqual(['b.json: id "s-2" is also used in a.json']);
+  });
+
+  it('combines mnemonic maps', () => {
+    const merged = mergeContent('mnemonics', [
+      { file: 'a.json', data: { 水: 'Drops.' } },
+      { file: 'b.json', data: { 火: 'Sparks.', 水: 'Again.' } },
+    ]);
+    expect(merged.data).toEqual({ 水: 'Again.', 火: 'Sparks.' });
+    expect(merged.errors).toEqual(['b.json: id "水" is also used in a.json']);
+  });
+});
+
+describe('lateGrammarTags', () => {
+  const units = [
+    { char: '水', index: 0, phase: 2 },
+    { char: '話', index: 1, phase: 3 },
+  ];
+  const phases = new Map([
+    ['wa-desu', 1],
+    ['te-form', 2],
+    ['casual-past', 3],
+  ]);
+
+  it('finds grammar taught in a later phase than the sentence unlocks', () => {
+    const sentences = [
+      { id: 'kana', jp: 'これはペンです。', en: 'x', grammar: ['wa-desu', 'te-form'] },
+      { id: 'water', jp: '{水|みず}を{飲|の}んだ。', en: 'x', grammar: ['casual-past', 'unknown'] },
+      { id: 'talk', jp: '{話|はな}した。', en: 'x', grammar: ['casual-past'] },
+      { id: 'untagged', jp: '{水|みず}', en: 'x' },
+    ];
+    expect(lateGrammarTags(sentences, units, phases)).toEqual([
+      { id: 'kana', grammar: 'te-form', grammarPhase: 2, unlockPhase: 1 },
+      { id: 'water', grammar: 'casual-past', grammarPhase: 3, unlockPhase: 2 },
+    ]);
+    expect(lateGrammarTags({ not: 'a list' }, units, phases)).toEqual([]);
+  });
+});
+
 describe('unlock index', () => {
   const unitIndex = new Map([
     ['日', 0],
@@ -148,6 +210,32 @@ describe('reading mismatches', () => {
     expect(readingsAgree('ガカリ', 'かかり')).toBe(true);
     expect(readingsAgree('よん', 'し')).toBe(false);
     expect(check('{受付|うけつけ}{係|がかり}と{一|いっ}{回|かい}')).toEqual([]);
+  });
+
+  it('accepts a number and counter read together', () => {
+    const withGobu = new Map([
+      ...readings,
+      ['五分', ['ごぶ']],
+      ['一本', ['いっぽん']],
+      ['四時', ['よじ', 'しじ']],
+      ['三日', ['みっか']],
+    ]);
+    const flagged = (jp: string) =>
+      readingMismatches(checkContent('sentences', [{ id: 's', jp, en: 'x' }]).items[0], withGobu).map((m) => m.reading);
+    expect(flagged('{五分|ごふん}')).toEqual([]);
+    expect(flagged('{一本|いっぽん}')).toEqual([]);
+    expect(flagged('{五分|ごふ}')).toEqual(['ごふ']);
+    // The counter rules never overrule the dictionary on a set reading.
+    expect(flagged('{四時|よんじ}')).toEqual(['よんじ']);
+    expect(flagged('{三日|さんにち}')).toEqual(['さんにち']);
+    expect(flagged('{二|に}、{三日|さんにち}')).toEqual([]);
+  });
+
+  it('completes okurigana only to the given words', () => {
+    const jmdict = new Map([...readings, ['今日', ['きょう', 'こんにち']], ['今日は', ['こんにちは']]]);
+    const [item] = checkContent('sentences', [{ id: 's', jp: '{今日|きょう}は{雨|あめ}', en: 'x' }]).items;
+    expect(readingMismatches(item, jmdict).map((m) => m.written)).toEqual(['今日は']);
+    expect(readingMismatches(item, jmdict, new Set(['今日']))).toEqual([]);
   });
 
   it('compares a survival word with its written form', () => {

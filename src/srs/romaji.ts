@@ -57,6 +57,12 @@ const TABLE = new Map<string, string>(
   }),
 );
 
+/** Hepburn long vowels (macron or circumflex) as typed out; ō and ē are usually おう and えい. */
+const LONG_VOWELS: Record<string, string> = {
+  ā: 'aa', ī: 'ii', ū: 'uu', ē: 'ei', ō: 'ou',
+  â: 'aa', î: 'ii', û: 'uu', ê: 'ei', ô: 'ou',
+};
+
 const MAX_KEY = Math.max(...[...TABLE.keys()].map((k) => k.length));
 
 /** Proper prefixes of table keys: an unfinished syllable while typing. */
@@ -117,10 +123,11 @@ export interface ToKanaOptions {
 /**
  * Converts romaji to kana the way a Japanese IME does: double consonants → っ,
  * n'/nn → ん, shi/chi/tsu/fu/ja…, kya/sha/cha…, x/l prefix for small kana.
- * Kana and other characters pass through unchanged.
+ * Hepburn long vowels are written out (gakkō → がっこう). Kana and other
+ * characters pass through unchanged.
  */
 export function toKana(input: string, { katakana = false, partial = false }: ToKanaOptions = {}): string {
-  const s = input.normalize('NFKC').toLowerCase().replace(/[‘’`]/g, "'");
+  const s = input.normalize('NFKC').toLowerCase().replace(/[‘’`]/g, "'").replace(/[āīūēōâîûêô]/g, (v) => LONG_VOWELS[v]);
   let out = '';
   let i = 0;
   while (i < s.length) {

@@ -78,6 +78,33 @@ export async function isPaired(): Promise<boolean> {
   return isPairedSettings(await getSettings());
 }
 
+const REMOVED_KEY = 'issho.sync.removed';
+
+/** The home server stopped accepting this phone (removed from the household) and it hasn't paired again since. */
+export function wasRemoved(): boolean {
+  try {
+    return localStorage.getItem(REMOVED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Forgets a pairing the home server no longer accepts (a 401 'unauthorized', or the
+ * socket closed as unpaired: the phone was removed with the admin CLI, or the server's
+ * data was reset), so the app offers to pair again instead of retrying forever. Does
+ * nothing when `token` is no longer this phone's, i.e. it has paired again since.
+ */
+export async function forgetRevokedPairing(token: string): Promise<void> {
+  if (!token || (await getSettings()).deviceToken !== token) return;
+  try {
+    localStorage.setItem(REMOVED_KEY, '1');
+  } catch {
+    // Only the "this phone was disconnected" note is lost.
+  }
+  await unpair();
+}
+
 interface RequestOptions {
   method?: 'GET' | 'POST';
   /** JSON-serialized unless it is FormData. */
@@ -126,6 +153,9 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
         const err = (await res.json()) as { error?: unknown };
         if (typeof err?.error === 'string') code = err.error;
       } catch { /* non-JSON error body */ }
+      if (auth && code === 'unauthorized') {
+        await forgetRevokedPairing(settings.deviceToken!).catch((e: unknown) => console.error('could not forget the pairing', e));
+      }
       throw new ApiError(res.status, code);
     }
     if (as === 'blob') return (await res.blob()) as T;
@@ -179,6 +209,11 @@ export async function pair(opts: { serverUrl: string; householdCode: string; nam
     householdName: res.householdName,
     ...(before.name ? {} : { name: opts.name.trim() }),
   });
+  try {
+    localStorage.removeItem(REMOVED_KEY);
+  } catch {
+    // Storage blocked: there was no note to clear.
+  }
   return res;
 }
 

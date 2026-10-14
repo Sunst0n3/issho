@@ -2,11 +2,13 @@
 // presence, role-play). Reconnects with exponential backoff; reconnects at once
 // when the network comes back or the app returns to the foreground, because iOS
 // silently kills sockets of backgrounded PWAs and leaves them looking open.
+// Presence is tracked here from app start: the server lists who is online only
+// once, right after a connection opens.
 
 import { useSyncExternalStore } from 'react';
-import type { ClientEvent, ServerEvent } from '../../shared/api.ts';
+import { WS_CLOSE_UNPAIRED, type ClientEvent, type ServerEvent } from '../../shared/api.ts';
 import { getSettings } from '../lib/db.ts';
-import { socketUrl } from './client.ts';
+import { forgetRevokedPairing, socketUrl } from './client.ts';
 
 export type ServerStatus = 'unpaired' | 'offline' | 'connecting' | 'online';
 
@@ -16,6 +18,11 @@ const MAX_BACKOFF_MS = 30_000;
 const PING_INTERVAL_MS = 25_000;
 /** After this long in the background, assume the socket is dead even if it claims to be open. */
 const HIDDEN_STALE_MS = 15_000;
+/**
+ * The server sends who is online as the first frames on a new connection. When
+ * nobody else is, nothing comes: after this long, anyone not listed is offline.
+ */
+const PRESENCE_SETTLE_MS = 1_500;
 
 type Listener<T> = (value: T) => void;
 
@@ -31,6 +38,38 @@ let removeLifecycle: (() => void) | null = null;
 
 const eventListeners = new Set<Listener<ServerEvent>>();
 const statusListeners = new Set<Listener<ServerStatus>>();
+
+/** Other members on this connection: true while their phone is connected. */
+const presence = new Map<string, boolean>();
+/** The server's initial list has arrived (or had time to), so unlisted members are offline. */
+let presenceSettled = false;
+let presenceTimer: ReturnType<typeof setTimeout> | undefined;
+const presenceListeners = new Set<() => void>();
+
+function presenceChanged() {
+  for (const cb of [...presenceListeners]) cb();
+}
+
+function resetPresence() {
+  clearTimeout(presenceTimer);
+  presenceTimer = undefined;
+  presence.clear();
+  presenceSettled = false;
+  presenceChanged();
+}
+
+function trackPresence(ev: ServerEvent) {
+  if (ev.type === 'presence') {
+    presence.set(ev.memberId, ev.online);
+    presenceSettled = true;
+  } else if (ev.type === 'roleplay') {
+    // Only a connected phone can send its role-play state.
+    presence.set(ev.memberId, true);
+  } else {
+    return;
+  }
+  presenceChanged();
+}
 
 function setStatus(next: ServerStatus) {
   if (next === status) return;
@@ -61,6 +100,7 @@ function dropSocket() {
   const sock = ws;
   ws = null;
   if (!sock) return;
+  resetPresence();
   sock.onopen = sock.onmessage = sock.onclose = sock.onerror = null;
   try { sock.close(); } catch { /* already closed */ }
 }
@@ -86,16 +126,30 @@ function open() {
     attempt = 0;
     clearInterval(pingTimer);
     pingTimer = setInterval(() => sendClientEvent({ type: 'ping' }), PING_INTERVAL_MS);
+    resetPresence();
+    presenceTimer = setTimeout(() => {
+      presenceSettled = true;
+      presenceChanged();
+    }, PRESENCE_SETTLE_MS);
     setStatus('online');
   };
   sock.onmessage = (msg) => {
     const ev = parseEvent(msg.data);
-    if (ev) dispatch(ev);
+    if (!ev) return;
+    trackPresence(ev);
+    dispatch(ev);
   };
-  sock.onclose = () => {
+  sock.onclose = (ev) => {
     if (ws !== sock) return;
     dropSocket();
-    scheduleReconnect();
+    if (ev.code !== WS_CLOSE_UNPAIRED) {
+      scheduleReconnect();
+      return;
+    }
+    // This phone was signed out on the server: stop retrying and offer to pair again.
+    const token = new URL(sock.url).searchParams.get('token') ?? '';
+    disconnectSocket();
+    void forgetRevokedPairing(token).catch((e: unknown) => console.error('could not forget the pairing', e));
   };
   // 'close' always follows 'error', and reconnecting is handled there.
   sock.onerror = () => {};
@@ -212,4 +266,24 @@ function subscribeStatus(onChange: () => void) {
 
 export function useServerStatus(): ServerStatus {
   return useSyncExternalStore(subscribeStatus, getServerStatus, getServerStatus);
+}
+
+/** Whether another member's phone is connected; undefined while unknown (this phone offline, or just connected). */
+export function getPresence(memberId: string): boolean | undefined {
+  if (status !== 'online') return undefined;
+  return presence.get(memberId) ?? (presenceSettled ? false : undefined);
+}
+
+function subscribePresence(onChange: () => void) {
+  presenceListeners.add(onChange);
+  const offStatus = onStatusChange(onChange);
+  return () => {
+    presenceListeners.delete(onChange);
+    offStatus();
+  };
+}
+
+export function usePresence(memberId: string | undefined): boolean | undefined {
+  const read = () => (memberId ? getPresence(memberId) : undefined);
+  return useSyncExternalStore(subscribePresence, read, read);
 }

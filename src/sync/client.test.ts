@@ -13,6 +13,7 @@ import {
   sendMessage,
   socketUrl,
   uploadVoice,
+  wasRemoved,
 } from './client.ts';
 
 /** Fakes timeouts only: fake-indexeddb runs on setImmediate, which must stay real or Dexie stalls. */
@@ -30,6 +31,7 @@ function lastCall() {
 
 beforeEach(async () => {
   await Promise.all(db.tables.map((t) => t.clear()));
+  localStorage.clear();
   await updateSettings({ serverUrl: 'http://192.168.1.20:8787', deviceToken: 'tok-123', memberId: 'm1' });
   fetchMock.mockReset();
   vi.stubGlobal('fetch', fetchMock);
@@ -137,6 +139,37 @@ describe('errors', () => {
     await vi.advanceTimersByTimeAsync(20_000);
     await expect(pending).resolves.toMatchObject({ ok: true });
     expect(aborted).toBe(false);
+  });
+});
+
+describe('a phone the server no longer accepts', () => {
+  it('forgets the pairing on 401 unauthorized, and pairing again clears the note', async () => {
+    fetchMock.mockResolvedValueOnce(json({ error: 'unauthorized' }, 401));
+    await expect(getHousehold()).rejects.toMatchObject({ status: 401, code: 'unauthorized' });
+    expect(await getSettings()).toMatchObject({ deviceToken: undefined, memberId: undefined, serverUrl: 'http://192.168.1.20:8787' });
+    expect(wasRemoved()).toBe(true);
+
+    fetchMock.mockResolvedValueOnce(json({ deviceToken: 'tok-2', memberId: 'm1', householdName: 'Home' }));
+    await pair({ serverUrl: 'http://192.168.1.20:8787', householdCode: 'x', name: 'Carter' });
+    expect(wasRemoved()).toBe(false);
+  });
+
+  it('keeps a pairing made since the rejected request was sent', async () => {
+    let answer!: (res: Response) => void;
+    fetchMock.mockReturnValueOnce(new Promise((resolve) => { answer = resolve; }));
+    const request = getHousehold().catch((e: unknown) => e);
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    await updateSettings({ deviceToken: 'tok-new' });
+    answer(json({ error: 'unauthorized' }, 401));
+    expect(await request).toMatchObject({ code: 'unauthorized' });
+    expect((await getSettings()).deviceToken).toBe('tok-new');
+    expect(wasRemoved()).toBe(false);
+  });
+
+  it('keeps the pairing for other 401s, such as a proxy asking for a password', async () => {
+    fetchMock.mockResolvedValueOnce(new Response('Authorization required', { status: 401 }));
+    await expect(getHousehold()).rejects.toMatchObject({ status: 401, code: 'http_401' });
+    expect((await getSettings()).deviceToken).toBe('tok-123');
   });
 });
 

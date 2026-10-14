@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { cleanGloss, cleanGlosses } from './lib/gloss.ts';
-import { cleanKanjiMeanings, cleanReadings, kunReadings, onReadings } from './lib/kanjidic.ts';
+import { LEAD_MEANINGS, cleanKanjiMeanings, cleanReadings, kunReadings, onReadings } from './lib/kanjidic.ts';
 
 describe('cleanGloss', () => {
   it('drops parenthetical notes', () => {
@@ -53,6 +53,51 @@ describe('KANJIDIC clean-up', () => {
     expect(cleanKanjiMeanings(['one', 'one radical (no.1)'])).toEqual(['one']);
     expect(cleanKanjiMeanings(['spring', 'spring (season)', '(kokuji)'])).toEqual(['spring', 'spring (season)']);
     expect(cleanKanjiMeanings(['a', 'b', 'c', 'd', 'e'])).toHaveLength(4);
+  });
+
+  it('names powers of ten and symbols, and drops the ones without an everyday name', () => {
+    expect(cleanKanjiMeanings(['capital', '10**16'])).toEqual(['capital', 'ten quadrillion']);
+    expect(cleanKanjiMeanings(['portent', '10**12', 'trillion', 'sign'])).toEqual(['portent', 'trillion', 'sign']);
+    expect(cleanKanjiMeanings(['correct', 'justice', '10**40'])).toEqual(['correct', 'justice']);
+    expect(cleanKanjiMeanings(['ratio', 'rate', 'proportion', '%'])).toEqual(['ratio', 'rate', 'proportion', 'percent']);
+    expect(cleanKanjiMeanings(['ten thousand', '10,000'])).toEqual(['ten thousand']);
+  });
+
+  it('drops zodiac hours and units, and strips arithmetic notes', () => {
+    expect(cleanKanjiMeanings(['child', 'sign of the rat', '11PM-1AM', 'first sign of Chinese zodiac'])).toEqual([
+      'child',
+      'sign of the rat',
+      'first sign of Chinese zodiac',
+    ]);
+    expect(cleanKanjiMeanings(['monkey sign', '3-5PM'])).toEqual(['monkey sign']);
+    expect(cleanKanjiMeanings(['axe', '1.32 lb', 'catty'])).toEqual(['axe', 'catty']);
+    expect(cleanKanjiMeanings(['volume', 'product (x*y)', 'acreage'])).toEqual(['volume', 'product', 'acreage']);
+    expect(cleanKanjiMeanings(['second (1/60 minute)'])).toEqual(['second']);
+    expect(cleanKanjiMeanings(['latitude', '(parallels of) latitude'])).toEqual(['latitude', '(parallels of) latitude']);
+  });
+
+  it('spells out abbreviations and ampersands', () => {
+    expect(cleanKanjiMeanings(['Inst.', 'institution', 'temple'])).toEqual(['institution', 'temple']);
+    expect(cleanKanjiMeanings(['No.', 'residence'])).toEqual(['number (ordinal)', 'residence']);
+    expect(cleanKanjiMeanings(['limb', 'arms & legs'])).toEqual(['limb', 'arms and legs']);
+  });
+
+  it('puts a hand-picked lead meaning first, merging its other spelling', () => {
+    expect(cleanKanjiMeanings(['exam', 'school', 'printing', 'proof', 'correction'], 'school')).toEqual([
+      'school',
+      'exam',
+      'printing',
+      'proof',
+    ]);
+    expect(cleanKanjiMeanings(['-times', 'round', 'game'], 'times')).toEqual(['times', 'round', 'game']);
+    expect(cleanKanjiMeanings(['wherefore', 'a reason'], 'reason')).toEqual(['reason', 'wherefore']);
+    expect(cleanKanjiMeanings(['lamp', 'a light', 'light'])).toEqual(['lamp', 'light']);
+    expect(LEAD_MEANINGS['校']).toBe('school');
+  });
+
+  it('never gives two kanji the same hand-picked lead meaning', () => {
+    const leads = Object.values(LEAD_MEANINGS).map((m) => m.toLowerCase());
+    expect(leads.filter((m, i) => leads.indexOf(m) !== i)).toEqual([]);
   });
 
   it('strips affix hyphens from readings and de-duplicates', () => {

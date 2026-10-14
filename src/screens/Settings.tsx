@@ -1,11 +1,34 @@
+import { useLiveQuery } from 'dexie-react-hooks';
+import { AboutSection, DataSection } from '../components/home/SettingsData.tsx';
+import { AppearanceSection, KanaSection, StudySection, YouSection } from '../components/home/SettingsStudy.tsx';
+import { TogetherSection } from '../components/home/SettingsTogether.tsx';
 import { Screen, TopBar } from '../components/ui.tsx';
+import { getSettings } from '../lib/db.ts';
+import '../components/home/home.css';
+import '../components/home/settings.css';
 
-// Placeholder: replaced during the build.
 export default function Settings() {
+  const settings = useLiveQuery(() => getSettings(), []);
+
   return (
-    <Screen>
-      <TopBar back title="Settings" />
-      <p className="empty">Not built yet.</p>
+    <Screen label="Settings">
+      <TopBar back="/" title={<h1 className="set-title">Settings</h1>} />
+      {settings ? (
+        <>
+          <YouSection settings={settings} />
+          <StudySection settings={settings} />
+          <KanaSection settings={settings} />
+          <TogetherSection settings={settings} />
+          <DataSection />
+          <AppearanceSection />
+          <AboutSection />
+        </>
+      ) : (
+        <div className="hm-skeleton-stack" aria-busy="true" aria-label="Loading settings">
+          <div className="hm-skeleton card-sized" />
+          <div className="hm-skeleton card-sized" />
+        </div>
+      )}
     </Screen>
   );
 }

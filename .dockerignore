@@ -6,9 +6,8 @@ dist
 server/data
 issho-data
 
-# The image ships the pre-built public/data/ (see the Dockerfile), so the raw dictionaries
-# it is generated from aren't needed.
-data-raw
+# public/data/ (committed) is what the image ships. data-raw/, when present, stays in the context
+# so a checkout without public/data/ can still build it (see the Dockerfile).
 
 # Secrets and noise.
 **/.env

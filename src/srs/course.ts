@@ -2,13 +2,22 @@
 //
 // The core track is the kana course (hiragana basic → dakuten/handakuten →
 // yōon, then katakana the same way) followed by the curriculum units (radicals
-// and kanji, each kanji with up to 3 words). Survival words (max 2 a day, once
-// all their kana are known) and grammar points (one every 2nd study day) are
-// mixed in alongside it.
+// and kanji, each kanji with up to 3 words). Survival words (max 2 a day) and
+// grammar points (one every 2nd study day) are mixed in alongside it, each once
+// all the kana it is written with are known.
 
 import { dayKey, db, getSettings, itemId } from '../lib/db.ts';
 import { loadCurriculum, loadGrammar, loadKana, loadSurvivalWords } from '../lib/data.ts';
-import type { Curriculum, CurriculumUnit, GrammarPoint, KanaEntry, KanaScript, SurvivalWord } from '../lib/types.ts';
+import { rubyToKana } from '../lib/ruby.ts';
+import type {
+  Curriculum,
+  CurriculumUnit,
+  GrammarPoint,
+  KanaEntry,
+  KanaScript,
+  RubyText,
+  SurvivalWord,
+} from '../lib/types.ts';
 import { isStudyDay } from './days.ts';
 import { introduceItem, markKnownMany, type IntroduceResult } from './items.ts';
 
@@ -92,6 +101,10 @@ export interface CourseSnapshot {
   grammarDue: boolean;
   /** Survival words already introduced today. */
   vocabToday: number;
+  /** Grammar points already introduced today. */
+  grammarToday?: number;
+  /** Items already introduced today that counted as new (DayRecord.newItems). */
+  newToday?: number;
 }
 
 type PhaseInput = Pick<CourseSnapshot, 'kana' | 'curriculum' | 'introduced' | 'knowsHiragana' | 'knowsKatakana'>;
@@ -103,11 +116,9 @@ function knownScripts(s: Pick<CourseSnapshot, 'knowsHiragana' | 'knowsKatakana'>
 const kanaId = (char: string) => itemId('kana', char);
 const unitId = (unit: CurriculumUnit) => itemId(unit.type, unit.char);
 
-function basicKanaDone(s: PhaseInput, script?: KanaScript): boolean {
+function basicKanaDone(s: PhaseInput): boolean {
   const known = knownScripts(s);
-  return s.kana.every(
-    (k) => k.kind !== 'basic' || (script && k.script !== script) || known[k.script] || s.introduced.has(kanaId(k.char)),
-  );
+  return s.kana.every((k) => k.kind !== 'basic' || known[k.script] || s.introduced.has(kanaId(k.char)));
 }
 
 /**
@@ -129,47 +140,75 @@ export function knownKanaSet(s: Pick<CourseSnapshot, 'kana' | 'introduced' | 'kn
   return new Set(s.kana.filter((k) => known[k.script] || s.introduced.has(kanaId(k.char))).map((k) => k.char));
 }
 
+/** The first `n` curriculum units not yet introduced, in teaching order. */
+export function upcomingUnits(curriculum: Curriculum, introduced: ReadonlySet<string>, n = Infinity): CurriculumUnit[] {
+  if (n <= 0) return [];
+  return curriculum.units
+    .filter((u) => !introduced.has(unitId(u)))
+    .sort((a, b) => a.index - b.index)
+    .slice(0, n);
+}
+
 function coreQueue(s: CourseSnapshot): NewItemPlan[] {
   const kana = orderKanaCourse(s.kana, knownScripts(s))
     .filter((k) => !s.introduced.has(kanaId(k.char)))
     .map((k): NewItemPlan => ({ itemId: kanaId(k.char), kind: 'kana', key: k.char }));
-  const units = s.curriculum.units
-    .filter((u) => !s.introduced.has(unitId(u)))
-    .sort((a, b) => a.index - b.index)
-    .map((u): NewItemPlan => {
-      const plan: NewItemPlan = { itemId: unitId(u), kind: u.type, key: u.char };
-      if (u.type === 'kanji') plan.words = u.words.filter((w) => !s.introduced.has(itemId('word', w)));
-      return plan;
-    });
+  const units = upcomingUnits(s.curriculum, s.introduced).map((u): NewItemPlan => {
+    const plan: NewItemPlan = { itemId: unitId(u), kind: u.type, key: u.char };
+    if (u.type === 'kanji') plan.words = u.words.filter((w) => !s.introduced.has(itemId('word', w)));
+    return plan;
+  });
   return [...kana, ...units];
 }
 
+/** Everything a grammar point shows the learner in Japanese. */
+function grammarTexts(g: GrammarPoint): RubyText[] {
+  return [g.pattern, ...g.examples.map((e) => e.jp), ...g.drills.flatMap((d) => [d.prompt, ...d.options])];
+}
+
+/** A check that the learner can read texts: every course kana in them (furigana included) is known. */
+function kanaReader(s: CourseSnapshot): (...texts: RubyText[]) => boolean {
+  const course = new Set(s.kana.map((k) => k.char));
+  const known = knownKanaSet(s);
+  return (...texts) => texts.every((t) => requiredKana(rubyToKana(t), course).every((k) => known.has(k)));
+}
+
 function nextGrammar(s: CourseSnapshot, phase: Phase): GrammarPoint | undefined {
-  // Phase-1 drills are written in hiragana, so they wait until it can be read.
-  if (phase === 1 && !s.knowsHiragana && !basicKanaDone(s, 'hiragana')) return undefined;
-  return s.grammar
+  const next = s.grammar
     .filter((g) => g.phase <= phase && !s.introduced.has(itemId('grammar', g.id)))
     .sort((a, b) => a.order - b.order)[0];
+  // Grammar builds on itself, so a point that can't be read yet holds back the
+  // ones after it rather than letting them jump the queue.
+  return next && kanaReader(s)(...grammarTexts(next)) ? next : undefined;
 }
 
 function eligibleSurvivalWords(s: CourseSnapshot): SurvivalWord[] {
-  const course = new Set(s.kana.map((k) => k.char));
-  const known = knownKanaSet(s);
-  return s.survival.filter(
-    (w) => !s.introduced.has(itemId('vocab', w.id)) && requiredKana(w.kana, course).every((k) => known.has(k)),
-  );
+  const readable = kanaReader(s);
+  return s.survival.filter((w) => !s.introduced.has(itemId('vocab', w.id)) && readable(w.kana));
 }
 
 /**
- * Today's next `count` new items. At least half the slots go to the core track
- * while it lasts; the rest take a grammar point (when due) and survival words.
- * Core items come first, so words and grammar are taught after the kana/kanji.
+ * Today's next `count` new items. At least half of the day's slots go to the
+ * core track while it lasts; the rest take a grammar point (when due) and
+ * survival words. Core items come first, so words and grammar are taught after
+ * the kana/kanji.
+ *
+ * `count` is what is left of the day's budget. The split is worked out on the
+ * whole day, counting what was already introduced today (newToday, vocabToday,
+ * grammarToday), so a second session picks up where the first stopped instead
+ * of squeezing the day's words and grammar out with fresh core items.
  */
 export function planNewItems(s: CourseSnapshot, count: number): NewItemPlan[] {
   if (count <= 0) return [];
   const phase = phaseFor(s);
   const core = coreQueue(s);
-  let free = count - Math.min(core.length, Math.ceil(count / 2));
+
+  // Already introduced today: words and grammar ("extras"), and core items.
+  const extrasDone = s.vocabToday + (s.grammarToday ?? 0);
+  const coreDone = Math.max(0, (s.newToday ?? 0) - extrasDone);
+  const dayTotal = coreDone + extrasDone + count;
+  const coreShare = Math.min(coreDone + core.length, Math.ceil(dayTotal / 2));
+  let free = Math.max(0, Math.min(count, dayTotal - coreShare - extrasDone));
 
   const extras: NewItemPlan[] = [];
   const grammar = s.grammarDue && free > 0 ? nextGrammar(s, phase) : undefined;
@@ -203,6 +242,8 @@ async function loadSnapshot(now: Date): Promise<CourseSnapshot> {
   const today = dayKey(now);
   const grammarDays = dated.filter((i) => i.kind === 'grammar').map((i) => dayKey(i.introducedAt));
   const studyDays = days.filter(isStudyDay).map((d) => d.date);
+  const introducedToday = (kind: 'grammar' | 'vocab') =>
+    dated.filter((i) => i.kind === kind && dayKey(i.introducedAt) === today).length;
   return {
     kana,
     curriculum,
@@ -212,11 +253,17 @@ async function loadSnapshot(now: Date): Promise<CourseSnapshot> {
     knowsHiragana: settings.knowsHiragana,
     knowsKatakana: settings.knowsKatakana,
     grammarDue: grammarDueToday(grammarDays, studyDays, today),
-    vocabToday: dated.filter((i) => i.kind === 'vocab' && dayKey(i.introducedAt) === today).length,
+    vocabToday: introducedToday('vocab'),
+    grammarToday: introducedToday('grammar'),
+    newToday: days.find((d) => d.date === today)?.newItems ?? 0,
   };
 }
 
-/** The next `count` new items to teach (read-only; see introducePlanItem). */
+/**
+ * The next `count` new items to teach today (read-only; see introducePlanItem).
+ * Pass what is left of the day's budget: items already introduced today are
+ * taken into account (see planNewItems).
+ */
 export async function nextNewItems(count: number, now: Date = new Date()): Promise<NewItemPlan[]> {
   if (count <= 0) return [];
   return planNewItems(await loadSnapshot(now), count);
@@ -231,6 +278,14 @@ async function loadPhaseInput(): Promise<PhaseInput> {
 
 export async function currentPhase(): Promise<Phase> {
   return phaseFor(await loadPhaseInput());
+}
+
+/** The next `n` curriculum units not yet introduced, in teaching order ("Next up"). */
+export async function nextUnits(n: number): Promise<CurriculumUnit[]> {
+  if (n <= 0) return [];
+  const curriculum = await loadCurriculum();
+  const introduced = new Set(await db.items.where('kind').anyOf('radical', 'kanji').primaryKeys());
+  return upcomingUnits(curriculum, introduced, n);
 }
 
 /**

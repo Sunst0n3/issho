@@ -147,7 +147,7 @@ describe('stats and household', () => {
     assert.deepEqual(carterStats.days[6], day('2026-10-14', true));
     assert.deepEqual(carterStats.days[2], emptyDay('2026-10-10'));
 
-    // Aiko finishes today; re-uploading a day replaces it.
+    // Aiko finishes today; re-uploading a day updates it.
     await upload(aiko.deviceToken, {
       days: [day('2026-10-14', true, 25)],
       streak: 3,
@@ -188,6 +188,77 @@ describe('stats and household', () => {
         assert.equal(member.days[6].date, '2026-10-15');
         assert.equal(member.days[6].sessionComplete, true);
       }
+    } finally {
+      await own.close();
+    }
+  });
+
+  it('merges the uploads of a member studying on two devices', async () => {
+    const own = await createTestServer({ now: () => now });
+    try {
+      const phone = await own.register('Carter');
+      const tablet = await own.register('carter');
+      assert.equal(tablet.memberId, phone.memberId);
+      const send = (device: RegisterResponse, body: StatsUploadRequest) =>
+        own.app.inject({ method: 'POST', url: '/api/stats', headers: bearer(device.deviceToken), payload: body });
+      const stats = async () => {
+        const res = await own.app.inject({ method: 'GET', url: '/api/household', headers: bearer(phone.deviceToken) });
+        const member = res.json<HouseholdResponse>().members[0];
+        return { ...member, day: (date: string) => member.days.find((d) => d.date === date) };
+      };
+      // [studyMinutes, reviews, correct, newItems, sessionComplete]
+      type Numbers = [number, number, number, number, boolean];
+      const studied = (date: string, [studyMinutes, reviews, correct, newItems, sessionComplete]: Numbers): DayStats => ({
+        date,
+        studyMinutes,
+        reviews,
+        correct,
+        newItems,
+        sessionComplete,
+      });
+
+      await send(phone, {
+        days: [studied('2026-10-13', [20, 40, 35, 5, true]), studied('2026-10-14', [10, 15, 12, 0, false])],
+        streak: 5,
+        kanjiKnown: 3,
+        knownKanji: ['日', '月', '水'],
+        phase: 2,
+      });
+      // The tablet knows less, but what it adds counts.
+      await send(tablet, {
+        days: [studied('2026-10-13', [5, 50, 30, 2, false]), studied('2026-10-14', [12, 10, 10, 3, true])],
+        streak: 1,
+        kanjiKnown: 2,
+        knownKanji: ['日', '火'],
+        phase: 1,
+      });
+
+      let carter = await stats();
+      assert.deepEqual(carter.day('2026-10-13'), studied('2026-10-13', [20, 50, 35, 5, true]));
+      assert.deepEqual(carter.day('2026-10-14'), studied('2026-10-14', [12, 15, 12, 3, true]));
+      assert.equal(carter.streak, 5);
+      assert.deepEqual(carter.knownKanji, ['日', '月', '水', '火']);
+      // The count agrees with the merged list, which neither device had on its own.
+      assert.equal(carter.kanjiKnown, 4);
+      assert.equal(carter.phase, 2);
+
+      // A new study day: the streak comes from the device reporting it, even when it's lower
+      // (a missed day breaks a streak)…
+      await send(tablet, { days: [studied('2026-10-15', [0, 0, 0, 0, false])], streak: 0, kanjiKnown: 2, knownKanji: [], phase: 1 });
+      assert.equal((await stats()).streak, 0);
+      // …and a device still on yesterday can't put the old streak back.
+      await send(phone, { days: [studied('2026-10-14', [10, 15, 12, 0, false])], streak: 5, kanjiKnown: 3, knownKanji: [], phase: 2 });
+      carter = await stats();
+      assert.equal(carter.streak, 0);
+      assert.equal(carter.day('2026-10-14')?.studyMinutes, 12);
+      assert.deepEqual(carter.knownKanji, ['日', '月', '水', '火']);
+
+      // A device whose clock is weeks ahead can't set the streak, nor sneak it in as the larger
+      // value once a correct device reports the same day again.
+      await send(phone, { days: [studied('2026-12-01', [0, 0, 0, 0, false])], streak: 40, kanjiKnown: 3, knownKanji: [], phase: 2 });
+      assert.equal((await stats()).streak, 0);
+      await send(tablet, { days: [studied('2026-10-15', [0, 0, 0, 0, false])], streak: 0, kanjiKnown: 2, knownKanji: [], phase: 1 });
+      assert.equal((await stats()).streak, 0);
     } finally {
       await own.close();
     }

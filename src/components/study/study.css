@@ -1,0 +1,306 @@
+/* Study screens: session, cards, lessons, writing, reading, grammar.
+   Colours come only from the tokens in src/styles/global.css. */
+
+/* ---- Layout helpers ---- */
+.st-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.st-grow { flex: 1 1 auto; }
+.st-center { align-self: center; justify-content: center; }
+.st-section { display: flex; flex-direction: column; gap: 8px; }
+.st-block, .st-learn, .st-reading, .st-write, .st-summary, .st-drill {
+  flex: 1 0 auto; display: flex; flex-direction: column; gap: 14px;
+}
+/* A review card's question sits right above its feedback. */
+.st-block > .st-question { flex-grow: 0; }
+.st-intro { color: var(--muted); font-size: 14px; text-align: center; }
+.st-note { font-size: 14px; color: var(--muted); }
+.st-error { display: flex; flex-direction: column; gap: 12px; }
+.st-empty-card { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 28px 20px; text-align: center; }
+.st-empty-card h2 { font-size: 20px; }
+.st-done-card { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.st-chip-muted { background: var(--paper-deep); color: var(--muted); }
+.st-eyebrow { font-family: var(--font-display); color: var(--shu); font-size: 15px; letter-spacing: 0.1em; }
+
+/* Bottom actions stay in reach while the content scrolls. */
+.st-footer {
+  position: sticky; bottom: 0; z-index: 4;
+  display: flex; align-items: center; gap: 10px;
+  margin: auto 0 calc(-24px - var(--safe-bottom));
+  padding: 16px 0 calc(16px + var(--safe-bottom));
+  background: linear-gradient(to bottom, transparent, var(--paper) 16px);
+}
+.screen.with-tabs .st-footer { bottom: calc(64px + var(--safe-bottom)); margin-bottom: 0; padding-bottom: 12px; }
+.st-footer .icon-btn.outlined { width: 52px; height: 52px; border-radius: 14px; }
+
+/* Quiet loading placeholders: they only fade in when loading takes a moment. */
+.st-skeleton {
+  background: var(--paper-deep); border: 0; border-radius: var(--r-lg);
+  animation: st-appear 200ms ease-out 300ms both, st-pulse 1.6s ease-in-out 500ms infinite;
+}
+.st-skeleton-card { min-height: 300px; }
+.st-skeleton-lesson { min-height: 440px; }
+.st-skeleton-list { min-height: 240px; }
+.st-skeleton-grid { min-height: 200px; }
+@keyframes st-appear { from { opacity: 0; } to { opacity: 1; } }
+@keyframes st-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+/* ---- Session chrome ---- */
+.st-header {
+  position: sticky; top: 0; z-index: 5;
+  margin: calc(-16px - var(--safe-top)) -20px 0;
+  padding: calc(8px + var(--safe-top)) 20px 8px;
+  background: var(--paper);
+}
+.st-count { flex-shrink: 0; min-width: 4.5em; text-align: right; font-size: 14px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+
+.st-backdrop {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 16px 16px calc(16px + var(--safe-bottom));
+  /* --ink-soft is dark in both themes, so the scrim always dims. */
+  background: color-mix(in srgb, var(--ink-soft) 55%, transparent);
+  animation: st-appear 150ms ease-out both;
+}
+.st-dialog {
+  width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 18px;
+  padding: 22px 20px 20px; border-radius: var(--r-xl); background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 40px color-mix(in srgb, var(--ink-soft) 30%, transparent);
+  animation: st-rise 200ms ease-out both;
+}
+@keyframes st-rise { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.st-dialog-title { font-size: 20px; }
+.st-dialog-title span { display: block; margin-top: 4px; font-size: 15px; font-weight: 400; color: var(--muted); }
+.st-dialog-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ---- Questions ---- */
+.st-question { display: flex; flex-direction: column; gap: 10px; }
+.st-ask { font-size: 17px; font-weight: 700; }
+.st-prompt {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  min-height: 150px; padding: 28px 16px; text-align: center;
+}
+.st-big { font-family: var(--font-display); font-size: 64px; line-height: 1.2; }
+.st-big-kana { font-size: 88px; line-height: 1.1; }
+/* One line where it can: the size shrinks with the number of characters (--chars, see fitStyle). */
+.st-fit { font-size: clamp(24px, calc((min(100vw, 560px) - 96px) / var(--chars, 4)), 56px); line-height: 1.3; overflow-wrap: anywhere; }
+.st-big-glyph { display: flex; justify-content: center; color: var(--ink); }
+.st-english { font-size: 24px; font-weight: 700; line-height: 1.3; }
+.st-target {
+  text-decoration: underline 3px var(--shu);
+  text-underline-offset: 0.3em;
+  text-decoration-skip-ink: none;
+}
+.st-sentence {
+  font-family: var(--font-display); font-size: clamp(26px, 7.6vw, 32px); line-height: 1.9;
+  line-break: strict; text-wrap: balance;
+}
+.st-translation { color: var(--muted); font-size: 15px; }
+.st-practice-chip { align-self: center; }
+
+.st-answer { display: flex; flex-direction: column; gap: 10px; }
+.st-choices .choice { position: relative; overflow-wrap: anywhere; }
+.st-choices .choice[lang="ja"] { font-family: var(--font-display); font-size: 22px; }
+.st-choices.wide { grid-template-columns: minmax(0, 1fr); }
+.st-choices.wide .choice { min-height: 52px; text-align: left; font-size: 16px; padding: 10px 16px 10px 32px; }
+.st-choices.wide .choice[lang="ja"] { font-size: 20px; }
+.st-choices .st-dim { opacity: 0.55; }
+.st-key { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .st-key { display: block; position: absolute; top: 6px; left: 9px; font-family: var(--font-body); font-size: 11px; font-weight: 700; opacity: 0.6; }
+}
+.st-mode-toggle { align-self: center; }
+
+.st-typed { display: flex; flex-direction: column; gap: 8px; }
+.st-typed-input.good { border-color: var(--good); background: var(--ai-tint); color: var(--ai-ink); }
+.st-typed-input.bad { border-color: var(--shu); background: var(--shu-tint); color: var(--shu-ink); }
+.st-typed-hint { min-height: 30px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+.st-preview { font-family: var(--font-display); font-size: 22px; }
+.st-retry { color: var(--shu-ink); font-weight: 700; font-size: 14px; }
+.st-typed-actions { display: flex; justify-content: space-between; gap: 10px; }
+
+/* ---- Feedback ---- */
+.st-feedback { gap: 6px; }
+.st-fb-title { font-size: 17px; font-weight: 700; }
+.st-fb-title [lang="ja"] { font-family: var(--font-display); font-size: 21px; }
+.st-fb-note { display: flex; flex-wrap: wrap; gap: 2px 12px; font-size: 15px; }
+.st-fb-note [lang="ja"] { font-family: var(--font-display); font-size: 17px; }
+.st-fb-breakdown { font-size: 15px; }
+.st-fb-char { font-family: var(--font-display); font-size: 18px; }
+.st-fb-when { font-size: 13px; opacity: 0.85; }
+
+.st-selfgrade { display: flex; flex-direction: column; gap: 8px; }
+.st-selfgrade-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.st-grade {
+  min-height: 60px; padding: 6px 4px; border-radius: 14px; border: 1px solid var(--line);
+  background: var(--card); color: var(--ink); font-weight: 700; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+}
+.st-grade.again { background: var(--shu-tint); color: var(--shu-ink); border-color: transparent; }
+.st-grade.good { background: var(--ai-tint); color: var(--ai-ink); border-color: transparent; }
+.st-grade-when { font-size: 12px; font-weight: 400; opacity: 0.8; }
+
+/* ---- Writing ---- */
+.st-write-prompt { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+.st-write-prompt .st-ask { font-size: 15px; font-weight: 400; color: var(--muted); }
+.st-write-target { font-family: var(--font-display); font-size: 26px; font-weight: 700; line-height: 1.3; }
+.st-write-reading { margin-left: 4px; font-size: 22px; font-weight: 500; color: var(--muted); }
+.st-write-romaji { font-family: var(--font-body); font-size: 34px; }
+/* The pad gets the height left once the prompt, coach, tools and any bottom
+   button are on screen (--st-pad-room, by screen), but stays big enough for a finger. */
+.st-write { --st-pad-room: 350px; }
+.st-write.st-write-steps { --st-pad-room: 416px; }
+.screen.with-tabs .st-write { --st-pad-room: 424px; }
+.st-write .writing-pad {
+  max-width: min(360px, 52vh);
+  max-width: min(360px, max(220px, calc(100svh - var(--st-pad-room) - var(--safe-top) - var(--safe-bottom))));
+}
+.st-write .writing-pad.st-skeleton { aspect-ratio: 1 / 1; width: 100%; margin: 0 auto; }
+
+.st-passes { display: flex; justify-content: center; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.st-passes li {
+  display: flex; align-items: center; gap: 6px; padding: 4px 12px 4px 4px; border-radius: 999px;
+  background: var(--paper-deep); color: var(--muted); font-size: 13px; font-weight: 700;
+}
+.st-passes li.current { background: var(--ink); color: var(--on-ink); }
+.st-passes li.done { background: var(--ai-tint); color: var(--ai-ink); }
+.st-pass-dot {
+  width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--card); color: var(--ink); font-size: 12px;
+}
+.st-passes li.done .st-pass-dot { color: var(--ai); }
+
+.st-coach { min-height: 66px; padding: 12px 16px; border-radius: 16px; background: var(--ai-tint); color: var(--ai-ink); }
+.st-coach.bad { background: var(--shu-tint); color: var(--shu-ink); }
+.st-coach-head { font-weight: 700; }
+.st-coach-next { font-size: 14px; }
+.st-padtools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.st-padtools .btn { padding: 0 8px; gap: 6px; }
+.st-strip-peek summary { min-height: var(--tap); display: flex; align-items: center; color: var(--ai); font-weight: 700; cursor: pointer; }
+
+.st-paper { display: flex; flex-direction: column; gap: 12px; }
+.st-paper-note { text-align: center; color: var(--muted); }
+.st-paper-answer {
+  display: grid; place-items: center; padding: 24px; border-radius: var(--r-lg);
+  background: var(--card); border: 1px solid var(--line);
+}
+
+/* ---- New-item lessons ---- */
+.st-lesson { display: flex; flex-direction: column; gap: 14px; }
+.st-lesson-head { display: flex; align-items: center; gap: 16px; }
+.st-glyph-box {
+  width: 128px; height: 128px; flex-shrink: 0; display: grid; place-items: center;
+  border-radius: var(--r-lg); background: var(--paper); color: var(--ink);
+}
+.st-lesson-gloss { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.st-lesson-meaning { font-family: var(--font-display); font-size: 28px; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
+.st-lesson-kana { align-items: center; text-align: center; }
+.st-kana-big { font-family: var(--font-display); font-size: 112px; line-height: 1.1; }
+.st-lesson-title { font-size: 18px; font-weight: 700; }
+.st-pattern { font-family: var(--font-display); font-size: 26px; line-height: 1.8; }
+.st-explanation { font-size: 15px; line-height: 1.7; }
+
+.st-readings { display: grid; gap: 8px; margin: 0; }
+.st-readings > div { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: baseline; gap: 8px; }
+.st-readings dt abbr { text-decoration: none; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: var(--shu); }
+.st-readings dd { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 0; }
+.st-kanji-reading [lang="ja"] { font-family: var(--font-display); font-size: 20px; }
+.st-romaji { margin-left: 6px; font-size: 13px; color: var(--muted); }
+.st-okuri { color: var(--muted); }
+
+.st-hook { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: var(--r-lg); background: var(--shu-tint); color: var(--shu-ink); }
+.st-hook .label { color: var(--shu-ink); }
+.st-hook .btn.ghost { color: var(--shu-ink); min-height: 36px; padding: 0 8px; }
+.st-hook-input { min-height: 76px; padding: 10px 12px; font-size: 16px; resize: vertical; }
+
+.st-words { list-style: none; margin: 0; padding: 2px 12px 2px 16px; }
+.st-words li, .st-examples-list li, .st-saved li {
+  display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line);
+}
+.st-words li:last-child, .st-examples-list li:last-child, .st-saved li:last-child { border-bottom: 0; }
+.st-word-written { font-family: var(--font-display); font-size: 20px; min-width: 3em; }
+.st-word-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.st-word-kana { font-size: 14px; color: var(--muted); }
+.st-word-en { font-size: 14px; }
+
+.st-examples { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.st-examples li { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 6px; }
+.st-example-meaning { font-size: 13px; color: var(--muted); text-align: center; overflow-wrap: anywhere; }
+.st-example-word {
+  display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 14px;
+  border-radius: var(--r-md); background: var(--paper); text-align: left;
+}
+.st-examples-list { list-style: none; margin: 0; padding: 2px 12px 2px 16px; }
+.st-example-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.st-example-jp { font-family: var(--font-display); font-size: 20px; line-height: 1.8; }
+
+/* ---- Grammar drills ---- */
+.st-drill-card { min-height: 0; }
+.st-drill-en { color: var(--muted); font-size: 15px; }
+.st-drill-sentence { font-family: var(--font-display); font-size: clamp(22px, 6.4vw, 26px); line-height: 1.9; line-break: strict; }
+.st-gap {
+  display: inline-block; min-width: 2.2em; margin: 0 0.15em; line-height: 1.3; text-align: center;
+  border-bottom: 3px solid var(--shu);
+}
+.st-gap.filled { color: var(--ai); border-bottom-color: var(--ai); }
+
+/* ---- Reading & shadowing ---- */
+.st-shadow { display: flex; flex-direction: column; gap: 8px; }
+.st-level { flex: 1 1 80px; height: 8px; border-radius: 4px; background: var(--paper-deep); overflow: hidden; }
+.st-level > span { display: block; height: 100%; background: var(--shu); transform-origin: left; transition: transform 80ms linear; }
+.st-shadow-score { font-weight: 700; color: var(--shu-ink); }
+.st-shadow-score.good { color: var(--ai-ink); }
+.st-shadow-note { font-size: 14px; color: var(--muted); }
+
+.st-start { display: flex; flex-direction: column; gap: 12px; }
+.st-start-title { font-family: var(--font-display); font-size: 22px; }
+.st-saved { list-style: none; margin: 0; padding: 2px 4px 2px 16px; }
+.st-saved li { gap: 4px; padding: 0; }
+.st-saved-text {
+  flex: 1; min-width: 0; min-height: var(--tap); display: flex; flex-direction: column; gap: 2px;
+  padding: 10px 0; border: 0; background: none; color: var(--ink); text-align: left; cursor: pointer;
+}
+.st-saved-jp { font-family: var(--font-display); font-size: 18px; line-height: 1.8; }
+
+/* ---- Summary and empty session ---- */
+.st-summary-title { font-family: var(--font-display); font-size: 32px; }
+.st-streak { display: flex; align-items: center; gap: 12px; }
+.st-streak-badge {
+  width: 44px; height: 44px; flex-shrink: 0; display: grid; place-items: center; border-radius: 50%;
+  background: var(--shu); color: var(--on-accent);
+}
+.st-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.st-stats > div { padding: 12px; border-radius: var(--r-lg); border: 1px solid var(--line); background: var(--card); }
+.st-stats dt { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.st-stats dd { margin: 0; font-size: 28px; font-weight: 700; }
+.st-learned-row { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; }
+.st-learned {
+  min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 10px 6px; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--card);
+}
+.st-learned-text { font-family: var(--font-display); font-size: 18px; text-align: center; overflow-wrap: anywhere; }
+.st-learned-meaning { max-width: 100%; font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-links { display: flex; flex-direction: column; gap: 10px; }
+.st-link { display: flex; align-items: center; gap: 12px; min-height: 64px; color: var(--ink); text-decoration: none; }
+.st-link > span { flex: 1; display: flex; flex-direction: column; }
+.st-link .muted { font-size: 14px; }
+
+/* ---- Write tab and grammar list ---- */
+.st-page-head { display: flex; flex-direction: column; gap: 2px; padding-top: 8px; }
+.st-page-title { font-family: var(--font-display); font-size: 32px; }
+.st-char-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; }
+.st-char {
+  width: 100%; min-height: 84px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  border: 1px solid var(--line); border-radius: var(--r-md); background: var(--card); color: var(--ink); cursor: pointer;
+}
+.st-char-meaning { max-width: 100%; font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.st-grammar-list { list-style: none; margin: 0; padding: 0; overflow: hidden; }
+.st-grammar-list li + li { border-top: 1px solid var(--line); }
+.st-grammar-row { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 10px 12px 10px 16px; color: var(--ink); text-decoration: none; }
+.st-grammar-row.locked { color: var(--muted); }
+.st-grammar-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.st-grammar-pattern { font-family: var(--font-display); font-size: 18px; }
+.st-grammar-title { font-size: 13px; color: var(--muted); }
+
+/* Headings take focus when the content changes; the ring is only for keyboards. */
+.st-ask:focus:not(:focus-visible), .st-summary-title:focus:not(:focus-visible) { outline: none; }
