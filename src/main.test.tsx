@@ -45,6 +45,9 @@ describe('app start', () => {
     await vi.waitFor(() => expect((window as Window & { __issho?: { devSeed: unknown } }).__issho?.devSeed).toBe(boot.devSeed));
   });
 
-  // Checked at release, when the temporary localhost-silence block in main.tsx is removed (TECH-DESIGN §3.5.6).
-  it.todo('does not silence a production build opened on localhost');
+  it('silences only development builds, never a production build by its host name', async () => {
+    const src = (await import('./main.tsx?raw')).default;
+    expect(src).toMatch(/if \(import\.meta\.env\.DEV\) silenceInDev\(\);/);
+    expect(src).not.toMatch(/location\.hostname/);
+  });
 });

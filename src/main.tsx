@@ -12,9 +12,8 @@ import { startSync } from './sync/index.ts';
 import { silenceInDev } from './devSilence.ts';
 import './styles/global.css';
 
-// TEMPORARY while testing on this machine: also silence local production builds.
-// Removed in the release commit; DEV silence and its 'issho.dev-sound' opt-in stay.
-if (import.meta.env.DEV || ['localhost', '127.0.0.1'].includes(location.hostname)) silenceInDev();
+// Development stays silent unless localStorage 'issho.dev-sound' is '1'.
+if (import.meta.env.DEV) silenceInDev();
 
 // Development: window.__issho.devSeed(N) seeds a course at day N for manual checks.
 if (import.meta.env.DEV) {
