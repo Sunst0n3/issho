@@ -1,0 +1,102 @@
+{
+  "id": "st-l0-06",
+  "level": "L0",
+  "unit": 7,
+  "title": "A rainy Sunday",
+  "titleJp": "{雨|あめ}の にちようび",
+  "topic": "home",
+  "grammar": [
+    "wa-desu",
+    "no-possession",
+    "mo-also",
+    "masu-forms",
+    "wo-object",
+    "masu-past",
+    "de-place-means",
+    "deshita",
+    "dictionary-form",
+    "adjective-past",
+    "he-direction",
+    "casual-speech",
+    "te-form"
+  ],
+  "sentences": [
+    {
+      "jp": "にちようびの／あさ、／{外|そと}は／{雨|あめ}でした。",
+      "en": "On Sunday morning, it was raining outside."
+    },
+    {
+      "jp": "ケンと／エマは／おそく／おきました。",
+      "en": "Ken and Emma got up late."
+    },
+    {
+      "jp": "「{今日|きょう}、／こうえんへ／{行|い}く？」",
+      "en": "\"Shall we go to the park today?\""
+    },
+    {
+      "jp": "「{雨|あめ}だよ。」",
+      "en": "\"It's raining.\""
+    },
+    {
+      "jp": "「じゃあ、／うちで／えいが、／{見|み}る？」",
+      "en": "\"Then shall we watch a movie at home?\""
+    },
+    {
+      "jp": "「うん、／いいね！」",
+      "en": "\"Yeah, sounds good!\""
+    },
+    {
+      "jp": "ケンは／コーヒーを／いれて、／エマは／あさごはんを／つくりました。",
+      "en": "Ken made coffee, and Emma made breakfast."
+    },
+    {
+      "jp": "ふたりは／ソファーで／あさごはんを／{食|た}べて、／えいがを／{見|み}ました。",
+      "en": "They ate breakfast on the sofa and watched a movie."
+    },
+    {
+      "jp": "ちょっと／かなしい／えいがでした。",
+      "en": "It was a bit of a sad movie."
+    },
+    {
+      "jp": "エマは／なきました。",
+      "en": "Emma cried."
+    },
+    {
+      "jp": "ケンも／ちょっと／なきました。",
+      "en": "Ken cried a little too."
+    },
+    {
+      "jp": "ひるごはんは／いっしょに／ラーメンを／つくりました。",
+      "en": "For lunch, they made ramen together."
+    },
+    {
+      "jp": "ごごは／{本|ほん}を／{読|よ}んで、／ちょっと／ねました。",
+      "en": "In the afternoon, they read and had a little nap."
+    },
+    {
+      "jp": "よるも／まだ／{雨|あめ}でした。",
+      "en": "In the evening, it was still raining."
+    },
+    {
+      "jp": "でも、／{雨|あめ}の／にちようびは／たのしかったです。",
+      "en": "But the rainy Sunday was fun."
+    },
+    {
+      "jp": "「あしたも／にちようびが／いい！」",
+      "en": "\"I wish tomorrow was Sunday too!\""
+    },
+    {
+      "jp": "エマは／わらいました。",
+      "en": "Emma laughed."
+    }
+  ],
+  "gist": {
+    "q": "How did Ken and Emma spend the rainy Sunday?",
+    "options": [
+      "At the park, in the rain",
+      "At home: a movie, cooking, reading and a nap",
+      "At work"
+    ],
+    "answer": 1
+  }
+}

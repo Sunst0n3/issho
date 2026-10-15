@@ -1,0 +1,76 @@
+{
+  "id": "rp-u24",
+  "unit": 24,
+  "title": "Just got to the station!",
+  "titleJp": "{今|いま}、{駅|えき}に{着|つ}いたところ",
+  "setting": "Your anniversary evening. Aoi is already outside the restaurant; Hikaru phones from the station.",
+  "level": 3,
+  "register": "plain",
+  "targets": [
+    "grammar:tokoro",
+    "grammar:embedded-questions",
+    "grammar:nakutemo-ii",
+    "grammar:te-oku",
+    "core:cw-0775",
+    "core:cw-1390",
+    "core:cw-0777"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "もしもし、ごめん！ {今|いま}、{駅|えき}に{着|つ}いたところ。",
+      "en": "Hello — sorry! I've just got to the station.",
+      "hint": "た-form + ところ = \"have just done\".",
+      "cue": "sorry · just arrived · station"
+    },
+    {
+      "role": "b",
+      "jp": "よかった。{私|わたし}は{今|いま}、お{店|みせ}に{入|はい}るところだよ。",
+      "en": "Phew. I'm just about to go into the restaurant.",
+      "hint": "Dictionary form + ところ = \"just about to do\".",
+      "cue": "about to go in · restaurant"
+    },
+    {
+      "role": "a",
+      "jp": "{駅|えき}からどうやって{行|い}けばいいか、{教|おし}えてくれる？",
+      "en": "Can you tell me how to get there from the station?",
+      "hint": "A question can sit inside a sentence: 〜か + 教えてくれる？",
+      "cue": "how to get there · tell me"
+    },
+    {
+      "role": "b",
+      "jp": "{改札|かいさつ}を{出|で}て、{右|みぎ}にまっすぐ。パン{屋|や}の{隣|となり}だよ。",
+      "en": "Go out through the ticket gate and straight on to the right. It's next to the bakery.",
+      "cue": "ticket gate · right · next to bakery"
+    },
+    {
+      "role": "a",
+      "jp": "わかった。{何分|なんぷん}ぐらいかかるか、わかる？",
+      "en": "Got it. Do you know roughly how many minutes it takes?",
+      "cue": "how many minutes · know"
+    },
+    {
+      "role": "b",
+      "jp": "{五分|ごふん}ぐらいかな。お{店|みせ}の{人|ひと}に{言|い}っておくから、{急|いそ}がなくてもいいよ。",
+      "en": "About five minutes, I think. I'll let the staff know, so there's no need to rush.",
+      "cue": "five minutes · tell staff · no rush"
+    },
+    {
+      "role": "a",
+      "jp": "ありがとう。{今|いま}、{走|はし}っているところ！",
+      "en": "Thanks. I'm running right now!",
+      "hint": "て-form + いるところ = \"right in the middle of doing\".",
+      "cue": "thanks · running now"
+    }
+  ]
+}

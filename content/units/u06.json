@@ -11,17 +11,22 @@
     "dictionary-form",
     "suki-kirai"
   ],
-  "coreWordCeiling": 485,
+  "coreWordCeiling": 535,
   "canDos": [
     {
       "id": "u06-cd1",
       "text": "Tell each other which foods, drinks and pastimes you like and dislike, and find something you both love.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (or the AI) asks you the four questions below, one at a time. Answer each in a full sentence, then ask the same question back. Find at least one thing you both like. About 2 minutes.",
+        "material": "{好|す}きな{食|た}べ{物|もの}は{何|なん}ですか。\n{嫌|きら}いな{食|た}べ{物|もの}はありますか。\nお{酒|さけ}は{好|す}きですか。\n{休|やす}みの{日|ひ}は{何|なに}をしますか。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Names at least two likes with 〜が好きです or 〜が大好きです",
+          "Names one dislike, or softens it with あまり好きじゃないです",
+          "Uses が (not を) before 好き and 嫌い",
+          "Asks a question back and finds one shared like (私も好きです！)"
+        ]
       }
     },
     {
@@ -29,10 +34,15 @@
       "text": "Write a few lines about your week: what you always, often, sometimes and never do.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner sent you the message below. Reply with 4–5 sentences about your own week. Use at least three of いつも, よく, 時々 and たまに, and say one thing you hardly or never do (あまり / 全然 + 〜ません).",
+        "material": "{私|わたし}は{毎朝|まいあさ}コーヒーを{飲|の}みます。{週末|しゅうまつ}はよく{散歩|さんぽ}します。{時々|ときどき}{映画|えいが}を{見|み}ます。ゲームは{全然|ぜんぜん}しません。あなたは？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Uses at least three frequency words (いつも, よく, 時々, たまに)",
+          "Uses あまり or 全然 with a negative verb (あまり飲みません)",
+          "Each sentence has a ます-form verb, with を / に / で in the right places",
+          "Writes at least four sentences"
+        ]
       }
     },
     {
@@ -40,9 +50,37 @@
       "text": "Listen to a friend describe a place they like (quiet, pretty, lively) and what they often do there.",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Listen to a friend talking about a place she likes. You can play it twice. Then answer the questions.",
+        "material": "{私|わたし}の{家|いえ}の{近|ちか}くに{公園|こうえん}があります。あまり{大|おお}きくないです。でも、とてもきれいな{公園|こうえん}です。{朝|あさ}は{静|しず}かです。{私|わたし}は{毎朝|まいあさ}そこで{散歩|さんぽ}します。{週末|しゅうまつ}は{子|こ}どもがたくさんいます。{時々|ときどき}、{夫|おっと}と{一緒|いっしょ}にそこでお{弁当|べんとう}を{食|た}べます。{夏|なつ}はとても{暑|あつ}いです。{私|わたし}は{秋|あき}の{公園|こうえん}が{大好|だいす}きです。",
+        "questions": [
+          {
+            "q": "What is the park like in the morning?",
+            "options": [
+              "Big and noisy",
+              "Quiet",
+              "Full of children"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What does she do there every morning?",
+            "options": [
+              "Goes for a walk",
+              "Eats a packed lunch",
+              "Plays with the children"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "In which season does she love the park?",
+            "options": [
+              "Spring",
+              "Summer",
+              "Autumn"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -50,10 +88,15 @@
       "text": "Decide what to eat in casual Japanese: ask what your partner feels like, offer two options and settle on one.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Play this with your partner (or the AI), who opens with the line below. In casual Japanese (plain verbs, no です or ます): ask what they feel like, offer two options with か, react with a like or dislike, and settle on one with 〜にする. About 1 minute.",
+        "material": "{晩|ばん}ご{飯|はん}、{何|なに}にする？\n・カレー\n・お{寿司|すし}\n・ラーメン\n・サラダとパン",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Asks in plain form: 何食べる？ or 何にする？",
+          "Offers two options joined with か (カレーかラーメン)",
+          "Reacts with 好き / 大好き / あまり好きじゃない",
+          "Settles on one with 〜にする (じゃあ、ラーメンにする)"
+        ]
       }
     },
     {
@@ -61,9 +104,37 @@
       "text": "Read a short profile of a new friend (likes, dislikes, favourite places) and find things you have in common.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Read the profile a new friend posted in your Japanese class group, then answer the questions.",
+        "material": "【はじめまして！】\n{名前|なまえ}：リサ\n{仕事|しごと}：{英語|えいご}の{先生|せんせい}\n{趣味|しゅみ}：{料理|りょうり}、{写真|しゃしん}\n{好|す}きな{食|た}べ{物|もの}：カレー、{魚|さかな}\n{嫌|きら}いな{食|た}べ{物|もの}：{肉|にく}\n{好|す}きな{町|まち}：{京都|きょうと}\n{毎朝|まいあさ}、{公園|こうえん}を{散歩|さんぽ}します。{週末|しゅうまつ}はよく{友達|ともだち}とカフェに{行|い}きます。お{酒|さけ}はあまり{飲|の}みません。よろしくお{願|ねが}いします！",
+        "questions": [
+          {
+            "q": "Which food does Lisa dislike?",
+            "options": [
+              "Fish",
+              "Meat",
+              "Curry"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What does she often do at the weekend?",
+            "options": [
+              "Walks in the park",
+              "Cooks for friends",
+              "Goes to cafés with friends"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "Which of these is true about Lisa?",
+            "options": [
+              "She drinks a lot",
+              "She doesn't drink much",
+              "She never takes photos"
+            ],
+            "answer": 1
+          }
+        ]
       }
     }
   ],
@@ -72,17 +143,91 @@
     "id": "u06-task",
     "canDo": "u06-cd4",
     "goal": "Decide what to have for dinner tonight: share your likes, dislikes and cravings, and agree on one meal you're both happy with.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "What are you having for dinner tonight, and are you eating in or out?",
     "roles": {
       "a": "Knows what's in the fridge and what they don't like (card A)",
       "b": "Knows what they're craving and what they can't eat (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "Card A — you're at home. In the fridge: 野菜 (vegetables), 卵 (eggs), ご飯 (rice) and パン (bread). There is no 肉 (meat) and no 魚 (fish). You don't like spicy food (辛い料理はあまり好きじゃない). You're tired and want to eat at home tonight (今日はうちで食べたい). Ask what your partner feels like (何食べる？), say what's in the fridge, and suggest ideas with か.",
+    "infoB": "Card B — you feel like ラーメン or カレー tonight. You can't eat eggs (卵はちょっと… / 卵はだめ). You love vegetables (野菜が大好き). Spicy food is fine for you, and you don't mind eating in or out. Say what you feel like, ask what's at home (うちに何がある？), and settle on one dish together with 〜にする.",
+    "targets": [
+      "grammar:ka-or-ni-suru",
+      "grammar:suki-kirai",
+      "grammar:dictionary-form",
+      "core:cw-0161",
+      "core:cw-0253",
+      "core:cw-0356",
+      "core:cw-0347"
+    ],
+    "register": "plain",
+    "twist": "Repeat it 2–7 days later with new cards: the fridge has only ご飯 and 卵, the partner who was hungry is now the tired one, and you choose between cooking, a コンビニ run and eating out (うちで食べる？ 外で食べる？).",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "{晩|ばん}ご{飯|はん}、{何|なに}{食|た}べる？",
+        "en": "What shall we have for dinner?"
+      },
+      {
+        "role": "b",
+        "jp": "えっと…ラーメンかカレーがいい。うちに{何|なに}がある？",
+        "en": "Hmm… ramen or curry. What have we got at home?"
+      },
+      {
+        "role": "a",
+        "jp": "{野菜|やさい}と{卵|たまご}とご{飯|はん}。パンもある。",
+        "en": "Vegetables, eggs and rice. There's bread too."
+      },
+      {
+        "role": "b",
+        "jp": "じゃあ、{駅|えき}の{近|ちか}くのラーメンの{店|みせ}に{行|い}く？",
+        "en": "Then shall we go to the ramen place near the station?"
+      },
+      {
+        "role": "a",
+        "jp": "ごめん、{今日|きょう}はうちで{食|た}べたい。{卵|たまご}ご{飯|はん}にする？",
+        "en": "Sorry, I'd rather eat at home tonight. How about egg on rice?"
+      },
+      {
+        "role": "b",
+        "jp": "{卵|たまご}はちょっと…。{私|わたし}、{卵|たまご}はだめ。",
+        "en": "Eggs are a bit… I can't eat eggs."
+      },
+      {
+        "role": "a",
+        "jp": "そうか。じゃあ、カレーは？ {野菜|やさい}がたくさんある。",
+        "en": "Oh, right. Then how about curry? We have lots of vegetables."
+      },
+      {
+        "role": "b",
+        "jp": "いいね！ {野菜|やさい}のカレー、{大好|だいす}き。",
+        "en": "Great! I love vegetable curry."
+      },
+      {
+        "role": "a",
+        "jp": "でも、{私|わたし}は{辛|から}い{料理|りょうり}があまり{好|す}きじゃない。",
+        "en": "But I'm not really into spicy food."
+      },
+      {
+        "role": "b",
+        "jp": "{大丈夫|だいじょうぶ}。{甘|あま}いカレーにする？",
+        "en": "No problem. Shall we make it a mild curry?"
+      },
+      {
+        "role": "a",
+        "jp": "うん、カレーにする！ ご{飯|はん}もあるね。",
+        "en": "Yes, curry it is! And we've got rice."
+      },
+      {
+        "role": "b",
+        "jp": "じゃあ、{一緒|いっしょ}に{作|つく}る？",
+        "en": "Shall we cook it together, then?"
+      },
+      {
+        "role": "a",
+        "jp": "うん、{作|つく}る！",
+        "en": "Yeah, let's make it!"
+      }
+    ]
   },
   "capstone": {
     "title": "First date, again",

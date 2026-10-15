@@ -1,0 +1,103 @@
+{
+  "id": "st-start-06",
+  "level": "start",
+  "unit": 2,
+  "title": "Ramen night",
+  "titleJp": "ラーメンの よる",
+  "topic": "food",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "ne-yo",
+    "masu-forms",
+    "koko-soko-asoko"
+  ],
+  "sentences": [
+    {
+      "jp": "よるです。",
+      "en": "It's evening."
+    },
+    {
+      "jp": "でんわです。",
+      "en": "The phone rings."
+    },
+    {
+      "jp": "「エマ、／ケンです。」",
+      "en": "\"Emma, it's Ken.\""
+    },
+    {
+      "jp": "「いま、／どこですか。」",
+      "en": "\"Where are you now?\""
+    },
+    {
+      "jp": "「えきです。」",
+      "en": "\"At the station.\""
+    },
+    {
+      "jp": "「いま／かえります。」",
+      "en": "\"I'm heading home now.\""
+    },
+    {
+      "jp": "「きょうの／ごはんは／ラーメンですよ。」",
+      "en": "\"Dinner tonight is ramen.\""
+    },
+    {
+      "jp": "「ラーメン、／いいね！」",
+      "en": "\"Ramen? Sounds great!\""
+    },
+    {
+      "jp": "「ケン、／たまご、／おねがいします。」",
+      "en": "\"Ken, could you get some eggs, please?\""
+    },
+    {
+      "jp": "「コンビニは／えきの／となりですよ。」",
+      "en": "\"The convenience store is right next to the station.\""
+    },
+    {
+      "jp": "「わかりました。」",
+      "en": "\"Got it.\""
+    },
+    {
+      "jp": "「ただいま！」",
+      "en": "\"I'm home!\""
+    },
+    {
+      "jp": "「おかえりなさい！」",
+      "en": "\"Welcome back!\""
+    },
+    {
+      "jp": "「はい、／ビール！」",
+      "en": "\"Here you go—beer!\""
+    },
+    {
+      "jp": "「ビール？」",
+      "en": "\"Beer?\""
+    },
+    {
+      "jp": "「たまごは？」",
+      "en": "\"What about the eggs?\""
+    },
+    {
+      "jp": "「あ…／ごめん！」",
+      "en": "\"Oh... sorry!\""
+    },
+    {
+      "jp": "「いってきます！」",
+      "en": "\"Off I go again!\""
+    },
+    {
+      "jp": "「すぐ／かえります！」",
+      "en": "\"I'll be right back!\""
+    }
+  ],
+  "gist": {
+    "q": "Why does Ken go out again at the end?",
+    "options": [
+      "He wants more beer.",
+      "He left his phone at the station.",
+      "He forgot the eggs."
+    ],
+    "answer": 2
+  }
+}

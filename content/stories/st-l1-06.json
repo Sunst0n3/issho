@@ -1,0 +1,131 @@
+{
+  "id": "st-l1-06",
+  "level": "L1",
+  "unit": 18,
+  "title": "The guitar in the box",
+  "titleJp": "{箱|はこ}の{中|なか}のギター",
+  "topic": "hobbies",
+  "grammar": [
+    "konna-donna",
+    "koto-ga-dekiru",
+    "te-miru",
+    "kamoshirenai",
+    "toki-when",
+    "te-imasu",
+    "yori-hou",
+    "hou-ga-ii",
+    "kedo-but",
+    "dake-shika"
+  ],
+  "sentences": [
+    {
+      "jp": "{日曜日|にちようび}、／ケンと／ミキは／{部屋|へや}を／{片付|かたづ}けていました。",
+      "en": "On Sunday, Ken and Miki were tidying their room."
+    },
+    {
+      "jp": "{古|ふる}い／{箱|はこ}の／{中|なか}に、／ギターが／ありました。",
+      "en": "There was a guitar in an old box."
+    },
+    {
+      "jp": "「あ、／ギター！／これ、／ケンの？」",
+      "en": "\"Oh, a guitar! Is this yours, Ken?\""
+    },
+    {
+      "jp": "「うん。／{大学|だいがく}の／とき、／よく／{弾|ひ}いていたんだ。」",
+      "en": "\"Yeah. I used to play it a lot when I was at university.\""
+    },
+    {
+      "jp": "「へえ、／{知|し}らなかった！／どんな／{歌|うた}を／{弾|ひ}いていたの？」",
+      "en": "\"Wow, I didn't know! What kind of songs did you play?\""
+    },
+    {
+      "jp": "「こんな／{歌|うた}だよ。」",
+      "en": "\"Songs like this.\""
+    },
+    {
+      "jp": "ケンは／{少|すこ}し／{弾|ひ}いて／みました。",
+      "en": "Ken tried playing a little."
+    },
+    {
+      "jp": "でも、／{指|ゆび}が／うまく／{動|うご}きません。",
+      "en": "But his fingers wouldn't move well."
+    },
+    {
+      "jp": "「おかしいな。／{昔|むかし}は／{上手|じょうず}に／{弾|ひ}く／ことが／できたんだけど…。」",
+      "en": "\"That's strange. I used to be able to play well...\""
+    },
+    {
+      "jp": "「でも、／いい／{音|おと}だね。」",
+      "en": "\"But it sounds nice.\""
+    },
+    {
+      "jp": "「ミキも／{弾|ひ}いて／みる？」",
+      "en": "\"Do you want to try playing too, Miki?\""
+    },
+    {
+      "jp": "ミキは／ギターを／{持|も}って／みました。／{思|おも}ったより／{重|おも}かったです。",
+      "en": "Miki tried holding the guitar. It was heavier than she thought."
+    },
+    {
+      "jp": "「{難|むずか}しい！／{私|わたし}は／{歌|うた}うほうが／いいな。」",
+      "en": "\"It's hard! I'd rather sing.\""
+    },
+    {
+      "jp": "それで、／ケンが／{弾|ひ}いて、／ミキが／{歌|うた}いました。",
+      "en": "So Ken played, and Miki sang."
+    },
+    {
+      "jp": "{二人|ふたり}は／{夜|よる}まで／{歌|うた}いました。",
+      "en": "They sang until night."
+    },
+    {
+      "jp": "「ねえ、／{来月|らいげつ}の／{友達|ともだち}の／パーティーで、／この／{歌|うた}を／やって／みない？」",
+      "en": "\"Hey, why don't we try doing this song at our friend's party next month?\""
+    },
+    {
+      "jp": "「え、／みんなの／{前|まえ}で？／{恥|は}ずかしい！」",
+      "en": "\"What, in front of everyone? That's embarrassing!\""
+    },
+    {
+      "jp": "「{間違|まちが}えるかもしれないけど、／きっと／{楽|たの}しいよ。」",
+      "en": "\"We might make mistakes, but I bet it'll be fun.\""
+    },
+    {
+      "jp": "それから、／{二人|ふたり}は／{毎晩|まいばん}／{少|すこ}しずつ／{練習|れんしゅう}しました。",
+      "en": "After that, they practised a little every night."
+    },
+    {
+      "jp": "パーティーの／{日|ひ}、／ミキは／とても／{緊張|きんちょう}しました。",
+      "en": "On the day of the party, Miki was very nervous."
+    },
+    {
+      "jp": "ケンは／{二回|にかい}／{間違|まちが}えました。",
+      "en": "Ken made two mistakes."
+    },
+    {
+      "jp": "でも、／みんなも／{一緒|いっしょ}に／{歌|うた}って、／{部屋|へや}は／とても／にぎやかに／なりました。",
+      "en": "But everyone sang along, and the room got really lively."
+    },
+    {
+      "jp": "{帰|かえ}る／とき、／ミキが／「{次|つぎ}は／どんな／{歌|うた}を／{練習|れんしゅう}する？」と／{聞|き}きました。",
+      "en": "On the way home, Miki asked, \"What kind of song shall we practise next?\""
+    },
+    {
+      "jp": "「{今度|こんど}は、／ミキも／ギターを／{弾|ひ}いて／みる？」",
+      "en": "\"Next time, do you want to try playing the guitar too?\""
+    },
+    {
+      "jp": "「そうだね…。／{私|わたし}は／{歌|うた}だけで／いいよ。」",
+      "en": "\"Hmm... I'm happy just singing.\""
+    }
+  ],
+  "gist": {
+    "q": "What do Ken and Miki do at their friend's party?",
+    "options": [
+      "They cook dinner for everyone",
+      "Ken plays the guitar and Miki sings",
+      "They go to a concert together"
+    ],
+    "answer": 1
+  }
+}

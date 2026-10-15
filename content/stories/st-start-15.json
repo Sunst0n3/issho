@@ -1,0 +1,106 @@
+{
+  "id": "st-start-15",
+  "level": "start",
+  "unit": 5,
+  "title": "Ken's cake",
+  "titleJp": "ケンの ケーキ",
+  "topic": "family",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "masu-forms",
+    "wo-object",
+    "counting-tsu",
+    "ni-time-place",
+    "masu-past",
+    "i-adjectives",
+    "de-place-means",
+    "masenka-mashou",
+    "arimasu-imasu",
+    "to-with"
+  ],
+  "sentences": [
+    {
+      "jp": "あしたは／エマの／たんじょうびです。",
+      "en": "Tomorrow is Emma's birthday."
+    },
+    {
+      "jp": "ケンは／ケーキを／つくります。",
+      "en": "Ken is going to make a cake."
+    },
+    {
+      "jp": "でも、／ケーキは／ちょっと／むずかしいです。",
+      "en": "But cakes are a bit difficult."
+    },
+    {
+      "jp": "れいぞうこに／たまごと／ぎゅうにゅうが／あります。",
+      "en": "There are eggs and milk in the fridge."
+    },
+    {
+      "jp": "でも、／チョコレートが／ありません。",
+      "en": "But there's no chocolate."
+    },
+    {
+      "jp": "ケンは／スーパーに／いきました。",
+      "en": "Ken went to the supermarket."
+    },
+    {
+      "jp": "チョコレートを／みっつ／かいました。",
+      "en": "He bought three bars of chocolate."
+    },
+    {
+      "jp": "{夜|よる}、／エマは／ともだちと／でかけました。",
+      "en": "That evening, Emma went out with a friend."
+    },
+    {
+      "jp": "ケンは／うちで／ケーキを／つくりました。",
+      "en": "Ken made the cake at home."
+    },
+    {
+      "jp": "ケーキは／ちょっと／ちいさいです。",
+      "en": "The cake is a little small."
+    },
+    {
+      "jp": "でも、／とても／かわいいです。",
+      "en": "But it's very cute."
+    },
+    {
+      "jp": "たんじょうびの／あさです。",
+      "en": "It's the morning of Emma's birthday."
+    },
+    {
+      "jp": "「エマ、／おたんじょうび／おめでとう！」",
+      "en": "\"Happy birthday, Emma!\""
+    },
+    {
+      "jp": "「ケン、／これ、／つくりましたか。」",
+      "en": "\"Ken, did you make this?\""
+    },
+    {
+      "jp": "「はい、／ちょっと／ちいさいです…」",
+      "en": "\"Yes... it's a bit small...\""
+    },
+    {
+      "jp": "「ありがとう！」",
+      "en": "\"Thank you!\""
+    },
+    {
+      "jp": "「とても／うれしいです。」",
+      "en": "\"I'm so happy.\""
+    },
+    {
+      "jp": "「いっしょに／たべましょう！」",
+      "en": "\"Let's eat it together!\""
+    }
+  ],
+  "gist": {
+    "q": "Why did Ken go to the supermarket?",
+    "options": [
+      "To buy chocolate for the cake",
+      "To buy a cake",
+      "To buy a birthday card"
+    ],
+    "answer": 0
+  }
+}

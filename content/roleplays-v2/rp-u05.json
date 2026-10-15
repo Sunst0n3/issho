@@ -1,0 +1,76 @@
+{
+  "id": "rp-u05",
+  "unit": 5,
+  "title": "Shall we go out on Sunday?",
+  "titleJp": "{日曜日|にちようび}、{出|で}かけませんか",
+  "setting": "Friday night at home: after a rainy week, one of you suggests going out together this weekend.",
+  "level": 1,
+  "register": "polite",
+  "targets": [
+    "core:cw-0286",
+    "core:cw-0409",
+    "core:cw-0344",
+    "core:cw-0447",
+    "grammar:deshita",
+    "grammar:tai-want",
+    "grammar:masenka-mashou",
+    "grammar:ni-time-place"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "{先週|せんしゅう}の{週末|しゅうまつ}は{雨|あめ}でしたね。",
+      "en": "It rained all last weekend, didn't it?",
+      "hint": "でした is the past of です.",
+      "cue": "last weekend · rain"
+    },
+    {
+      "role": "b",
+      "jp": "そうですね。{今週|こんしゅう}は{出|で}かけたいです。",
+      "en": "It did. This week I want to go out.",
+      "cue": "yes · this week · go out"
+    },
+    {
+      "role": "a",
+      "jp": "じゃあ、{日曜日|にちようび}に{公園|こうえん}に{行|い}きませんか。{晴|は}れですよ。",
+      "en": "Then shall we go to the park on Sunday? It's going to be sunny.",
+      "hint": "ませんか invites and leaves room for a no.",
+      "cue": "Sunday · park · sunny"
+    },
+    {
+      "role": "b",
+      "jp": "いいですね。{何時|なんじ}に{出|で}かけますか。",
+      "en": "Sounds good. What time shall we leave?",
+      "cue": "sounds good · what time?"
+    },
+    {
+      "role": "a",
+      "jp": "{十時|じゅうじ}はどうですか。お{弁当|べんとう}を{作|つく}りましょうか。",
+      "en": "How about ten? Shall I make a packed lunch?",
+      "hint": "ましょうか offers to do something.",
+      "cue": "ten? · make bento?"
+    },
+    {
+      "role": "b",
+      "jp": "うれしい！ じゃあ、{私|わたし}はコンビニでお{茶|ちゃ}を{買|か}います。",
+      "en": "Yay! Then I'll buy some tea at the convenience store.",
+      "cue": "yay · convenience store · tea"
+    },
+    {
+      "role": "a",
+      "jp": "はい。{楽|たの}しみですね。",
+      "en": "Great. I can't wait.",
+      "cue": "okay · can't wait"
+    }
+  ]
+}

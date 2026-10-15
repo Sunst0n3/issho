@@ -1,0 +1,108 @@
+{
+  "id": "st-l0-15",
+  "level": "L0",
+  "unit": 11,
+  "title": "Two Kinds of Sunday",
+  "titleJp": "{日曜日|にちようび}の {朝|あさ}",
+  "topic": "free time",
+  "grammar": [
+    "no-ga-suki",
+    "te-kara",
+    "relative-clauses",
+    "kedo-but",
+    "casual-speech",
+    "nai-form",
+    "he-direction",
+    "ni-iku-purpose",
+    "te-imasu",
+    "tai-want",
+    "adjective-past"
+  ],
+  "sentences": [
+    {
+      "jp": "{日曜日|にちようび}の／{朝|あさ}です。",
+      "en": "It's Sunday morning."
+    },
+    {
+      "jp": "{夫|おっと}は／{走|はし}るのが／{好|す}きです。",
+      "en": "My husband likes running."
+    },
+    {
+      "jp": "{毎週|まいしゅう}、／{日曜日|にちようび}の{朝|あさ}は／{公園|こうえん}を／{走|はし}ります。",
+      "en": "Every Sunday morning he goes running in the park."
+    },
+    {
+      "jp": "わたしは／{寝|ね}るのが／{好|す}きです。",
+      "en": "I like sleeping."
+    },
+    {
+      "jp": "{日曜日|にちようび}の{朝|あさ}は、／ベッドで／ゆっくり／{寝|ね}ます。",
+      "en": "On Sunday mornings I have a nice long sleep in bed."
+    },
+    {
+      "jp": "「いっしょに／{走|はし}らない？」",
+      "en": "\"Want to come running with me?\""
+    },
+    {
+      "jp": "「{走|はし}るのは／ちょっと……。／でも、／{走|はし}ってから、／カフェに／{行|い}かない？」",
+      "en": "\"Running's not really my thing… But after your run, shall we go to a café?\""
+    },
+    {
+      "jp": "「いいね！」",
+      "en": "\"Sounds good!\""
+    },
+    {
+      "jp": "{夫|おっと}は／{公園|こうえん}へ／{行|い}きました。",
+      "en": "My husband set off for the park."
+    },
+    {
+      "jp": "わたしは／もう{少|すこ}し／{寝|ね}ました。",
+      "en": "I slept a little longer."
+    },
+    {
+      "jp": "{夫|おっと}が／{帰|かえ}ってから、／{駅|えき}の{近|ちか}くの／カフェに／{行|い}きました。",
+      "en": "After he got home, we went to a café near the station."
+    },
+    {
+      "jp": "{先月|せんげつ}／{見|み}つけた／{小|ちい}さい／カフェです。",
+      "en": "It's a little café we found last month."
+    },
+    {
+      "jp": "{夫|おっと}は／パンを／{三|みっ}つ／{食|た}べました。",
+      "en": "My husband ate three rolls."
+    },
+    {
+      "jp": "それから、／わたしが／{見|み}たかった／{映画|えいが}を／{見|み}に／{行|い}きました。",
+      "en": "After that, we went to see a movie I had wanted to see."
+    },
+    {
+      "jp": "{映画|えいが}は／{少|すこ}し／{長|なが}かったけど、／とても／{面白|おもしろ}かったです。",
+      "en": "The movie was a little long, but really good."
+    },
+    {
+      "jp": "でも、／{夫|おっと}は／ずっと／{静|しず}かでした。",
+      "en": "But my husband was quiet the whole time."
+    },
+    {
+      "jp": "{横|よこ}を／{見|み}ました。",
+      "en": "I looked over at him."
+    },
+    {
+      "jp": "{夫|おっと}は／{寝|ね}ていました。",
+      "en": "He was asleep."
+    },
+    {
+      "jp": "{走|はし}るのが／{好|す}きな／{夫|おっと}も、／{寝|ね}るのが／{好|す}きです。",
+      "en": "So my husband, who loves running, likes sleeping too!"
+    }
+  ],
+  "gist": {
+    "q": "What happened at the movie?",
+    "options": [
+      "The husband went running",
+      "The husband fell asleep",
+      "The wife said the movie was boring"
+    ],
+    "answer": 1
+  }
+}

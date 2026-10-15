@@ -1,0 +1,82 @@
+{
+  "id": "rp-u07",
+  "unit": 7,
+  "title": "Welcome home",
+  "titleJp": "お{帰|かえ}り！",
+  "setting": "A weekday evening. One of you gets home from work; the other is in the kitchen and dinner is nearly ready.",
+  "level": 1,
+  "register": "plain",
+  "targets": [
+    "grammar:casual-speech",
+    "grammar:adjective-past",
+    "grammar:te-form",
+    "grammar:position-words",
+    "core:cw-0052",
+    "core:cw-0232",
+    "core:cw-0577"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "ただいま！",
+      "en": "I'm home!",
+      "cue": "I'm home"
+    },
+    {
+      "role": "b",
+      "jp": "お{帰|かえ}り！ {今日|きょう}、{忙|いそが}しかった？",
+      "en": "Welcome back! Was today busy?",
+      "hint": "Casual past of an い-adjective: drop です from 忙しかったです.",
+      "cue": "welcome back · busy today?"
+    },
+    {
+      "role": "a",
+      "jp": "うん、ちょっと。でも、{楽|たの}しかったよ。{晩|ばん}ご{飯|はん}、{何|なに}？",
+      "en": "Yeah, a bit. But it was fun. What's for dinner?",
+      "cue": "a bit · fun · dinner?"
+    },
+    {
+      "role": "b",
+      "jp": "カレーだよ。ビールは{冷蔵庫|れいぞうこ}の{中|なか}にあるよ。",
+      "en": "Curry. There's beer in the fridge.",
+      "hint": "In casual speech a noun takes だ: カレーだよ.",
+      "cue": "curry · beer · in the fridge"
+    },
+    {
+      "role": "a",
+      "jp": "ありがとう！ シャワーを{浴|あ}びて、すぐ{来|く}るね。",
+      "en": "Thanks! I'll have a quick shower and be right back.",
+      "hint": "The て-form joins actions in order; the last verb sets the tense.",
+      "cue": "thanks · shower · right back"
+    },
+    {
+      "role": "b",
+      "jp": "うん。{食|た}べて、{一緒|いっしょ}に{映画|えいが}を{見|み}る？",
+      "en": "Okay. After we eat, shall we watch a movie together?",
+      "cue": "eat · then · movie together?"
+    },
+    {
+      "role": "a",
+      "jp": "いいね！ あ、{私|わたし}のスマホ、どこ？",
+      "en": "Sounds good! Oh, where's my phone?",
+      "cue": "sounds good · my phone · where?"
+    },
+    {
+      "role": "b",
+      "jp": "ソファーの{上|うえ}にあるよ。",
+      "en": "It's on the sofa.",
+      "hint": "Reference point + の + position word + に ある.",
+      "cue": "on the sofa"
+    }
+  ]
+}

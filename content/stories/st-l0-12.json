@@ -1,0 +1,125 @@
+{
+  "id": "st-l0-12",
+  "level": "L0",
+  "unit": 9,
+  "title": "Where is Tama?",
+  "titleJp": "タマは どこ？",
+  "topic": "animals",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "mo-also",
+    "ne-yo",
+    "masu-forms",
+    "ni-time-place",
+    "masu-past",
+    "arimasu-imasu",
+    "adverbs-frequency",
+    "he-direction",
+    "casual-speech",
+    "position-words",
+    "te-form",
+    "adverbs-degree",
+    "nai-form",
+    "te-kudasai",
+    "dates-days",
+    "te-imasu",
+    "casual-past"
+  ],
+  "sentences": [
+    {
+      "jp": "タマは／となりの／{田中|たなか}さんの／ねこです。",
+      "en": "Tama is Ms Tanaka's cat from next door."
+    },
+    {
+      "jp": "タマは／まいあさ、／ケンと／エマの／うちに／{来|き}ます。",
+      "en": "Every morning, Tama comes to Ken and Emma's house."
+    },
+    {
+      "jp": "でも、／げつようびも／かようびも／すいようびも、／タマは／{来|き}ませんでした。",
+      "en": "But on Monday, Tuesday and Wednesday, Tama didn't come."
+    },
+    {
+      "jp": "「タマ、／{来|こ}ないね…」",
+      "en": "\"Tama's not coming, is she...\""
+    },
+    {
+      "jp": "ケンは／しんぱいしています。",
+      "en": "Ken is worried."
+    },
+    {
+      "jp": "「びょうき？」",
+      "en": "\"Is she sick?\""
+    },
+    {
+      "jp": "「だいじょうぶ？」",
+      "en": "\"Is she okay?\""
+    },
+    {
+      "jp": "もくようびの／あさ、／ふたりは／{田中|たなか}さんの／うちへ／{行|い}きました。",
+      "en": "On Thursday morning, they went to Ms Tanaka's house."
+    },
+    {
+      "jp": "「すみません。」",
+      "en": "\"Excuse me.\""
+    },
+    {
+      "jp": "「タマは／げんきですか。」",
+      "en": "\"Is Tama all right?\""
+    },
+    {
+      "jp": "「ええ、／げんきですよ。」",
+      "en": "\"Yes, she's fine.\""
+    },
+    {
+      "jp": "「ちょっと／{見|み}てください。」",
+      "en": "\"Come and have a look.\""
+    },
+    {
+      "jp": "げんかんに／おおきい／はこが／ありました。",
+      "en": "There was a big box in the entrance."
+    },
+    {
+      "jp": "はこの／{中|なか}に／タマが／いました。",
+      "en": "Tama was inside the box."
+    },
+    {
+      "jp": "タマの／となりに／ちいさい／ねこが／{四匹|よんひき}／いました。",
+      "en": "Next to Tama were four little kittens."
+    },
+    {
+      "jp": "「タマの／あかちゃんですよ。」",
+      "en": "\"They're Tama's babies.\""
+    },
+    {
+      "jp": "「かわいい！」",
+      "en": "\"They're so cute!\""
+    },
+    {
+      "jp": "タマは／{今|いま}、／ねています。",
+      "en": "Tama is sleeping now."
+    },
+    {
+      "jp": "「タマ、／つかれたね。」",
+      "en": "\"You must be tired, Tama.\""
+    },
+    {
+      "jp": "ケンは／とても／うれしかったです。",
+      "en": "Ken was very happy."
+    },
+    {
+      "jp": "「また／あした／{来|き}ます！」",
+      "en": "\"We'll come again tomorrow!\""
+    }
+  ],
+  "gist": {
+    "q": "Why didn't Tama come for three days?",
+    "options": [
+      "She was sick",
+      "She had four kittens",
+      "Ms Tanaka moved away"
+    ],
+    "answer": 1
+  }
+}

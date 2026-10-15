@@ -1,0 +1,107 @@
+{
+  "id": "st-l0-25",
+  "level": "L0",
+  "unit": 14,
+  "title": "Where Are You?",
+  "titleJp": "どこに いるの？",
+  "topic": "transport",
+  "grammar": [
+    "toki-when",
+    "duration-kakaru",
+    "adjectives-te",
+    "adj-naru",
+    "n-desu",
+    "relative-clauses",
+    "te-kudasai",
+    "te-imasu",
+    "ni-iku-purpose",
+    "de-amount"
+  ],
+  "sentences": [
+    {
+      "jp": "{金曜日|きんようび}の{夜|よる}、／{妻|つま}と／{駅|えき}で／{会|あ}う／{約束|やくそく}が／ありました。",
+      "en": "On Friday evening, I had plans to meet my wife at the station."
+    },
+    {
+      "jp": "{七時|しちじ}に／なりました。",
+      "en": "It turned seven o'clock."
+    },
+    {
+      "jp": "でも、／{妻|つま}は／{来|き}ません。",
+      "en": "But my wife didn't come."
+    },
+    {
+      "jp": "{七時五分|しちじごふん}に、／メッセージが／{来|き}ました。",
+      "en": "At five past seven, a message came."
+    },
+    {
+      "jp": "「ごめん！／{電車|でんしゃ}が／{遅|おく}れているの。」",
+      "en": "\"Sorry! My train's running late.\""
+    },
+    {
+      "jp": "「{駅|えき}まで／あと／{二十分|にじゅっぷん}ぐらい／かかる。」",
+      "en": "\"It'll take about twenty more minutes to get to the station.\""
+    },
+    {
+      "jp": "「{寒|さむ}いから、／{駅|えき}の／カフェで／{待|ま}っていて。」",
+      "en": "\"It's cold, so wait in the café at the station.\""
+    },
+    {
+      "jp": "{僕|ぼく}は／カフェに／{入|はい}って、／{温|あたた}かい／コーヒーを／{頼|たの}みました。",
+      "en": "I went into the café and ordered a hot coffee."
+    },
+    {
+      "jp": "{七時半|しちじはん}に、／また／メッセージが／{来|き}ました。",
+      "en": "At seven-thirty, another message came."
+    },
+    {
+      "jp": "「{着|つ}いた！／カフェは／どこ？」",
+      "en": "\"I'm here! Where's the café?\""
+    },
+    {
+      "jp": "「{出口|でぐち}の／{近|ちか}くだよ。／{本屋|ほんや}の／{隣|となり}。」",
+      "en": "\"Near the exit. Next to the bookshop.\""
+    },
+    {
+      "jp": "{十分|じゅっぷん}／{待|ま}ちました。",
+      "en": "I waited ten minutes."
+    },
+    {
+      "jp": "でも、／{妻|つま}は／まだ／{来|き}ません。",
+      "en": "But she still didn't come."
+    },
+    {
+      "jp": "{電話|でんわ}を／かけた／とき、／{後|うし}ろで／{電話|でんわ}の／{音|おと}が／しました。",
+      "en": "When I called her, I heard a phone ringing behind me."
+    },
+    {
+      "jp": "{後|うし}ろを／{見|み}ました。",
+      "en": "I turned around."
+    },
+    {
+      "jp": "{妻|つま}が／いました！",
+      "en": "There was my wife!"
+    },
+    {
+      "jp": "カフェは／{広|ひろ}くて、／{人|ひと}が／{多|おお}かったです。",
+      "en": "The café was big, and it was full of people."
+    },
+    {
+      "jp": "{僕|ぼく}たちは／{同|おな}じ／カフェで、／{十分|じゅっぷん}／{待|ま}っていました。",
+      "en": "We had both been waiting in the same café for ten minutes."
+    },
+    {
+      "jp": "{二人|ふたり}で／{笑|わら}って、／{晩|ばん}ご{飯|はん}を／{食|た}べに／{行|い}きました。",
+      "en": "We had a good laugh and went off to have dinner."
+    }
+  ],
+  "gist": {
+    "q": "Why didn't they find each other at first?",
+    "options": [
+      "The wife's train never came",
+      "They were in the same big, crowded café",
+      "The husband went to the wrong station"
+    ],
+    "answer": 1
+  }
+}

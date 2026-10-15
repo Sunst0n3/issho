@@ -11,17 +11,22 @@
     "wo-kudasai",
     "ni-time-place"
   ],
-  "coreWordCeiling": 300,
+  "coreWordCeiling": 338,
   "canDos": [
     {
       "id": "u03-cd1",
       "text": "Tell your partner what time you get up, leave home and go to bed on weekdays, and ask about theirs.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (or the app) asks about your weekdays. Answer each question with a real time, then ask the same questions back.",
+        "material": "「{平日|へいじつ}は{何時|なんじ}に{起|お}きますか。」\n「{何時|なんじ}にうちを{出|で}ますか。」\n「{夜|よる}は{何時|なんじ}に{寝|ね}ますか。」",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Answers each question with a clock time (七時, 七時半, 六時四十五分)",
+          "Puts に after the time: 七時に起きます",
+          "Uses the right verb each time: 起きます, 出ます, 寝ます",
+          "Asks at least one question back (…は何時に寝ますか？)"
+        ]
       }
     },
     {
@@ -29,9 +34,37 @@
       "text": "Catch the times in a short message about someone's day: when they leave, arrive and get home.",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Your partner leaves you a voice message about tomorrow. You can play it twice. Then answer the questions.",
+        "material": "「あ、{私|わたし}です。あしたは{早|はや}いです。{五時半|ごじはん}に{起|お}きます。{六時十五分|ろくじじゅうごふん}にうちを{出|で}ます。{夜|よる}は{七時|しちじ}ごろ{帰|かえ}ります。{晩|ばん}ご{飯|はん}、お{願|ねが}いします！」",
+        "questions": [
+          {
+            "q": "What time will your partner leave home?",
+            "options": [
+              "5:30",
+              "6:15",
+              "6:50"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "When will they be home?",
+            "options": [
+              "At 7:30 p.m.",
+              "Around 6 p.m.",
+              "Around 7 p.m."
+            ],
+            "answer": 2
+          },
+          {
+            "q": "What do they ask you to do?",
+            "options": [
+              "Make dinner",
+              "Get up early with them",
+              "Buy bread on the way home"
+            ],
+            "answer": 0
+          }
+        ]
       }
     },
     {
@@ -39,10 +72,15 @@
       "text": "Write your partner a short note about tomorrow: what time you'll leave, where you're going and when you'll be back.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner left this note on the fridge. Write a short reply (2–3 sentences): what time you'll leave tomorrow, where you're going and when you'll be back.",
+        "material": "あしたは{何時|なんじ}にうちを{出|で}ますか？\nどこに{行|い}きますか？\n{何時|なんじ}ごろ{帰|かえ}りますか？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Gives a leaving time with 〜時に出ます (or 〜時にうちを出ます)",
+          "Says where they're going with 〜に行きます",
+          "Says when they'll be back with 〜時ごろ帰ります",
+          "Uses polite ます forms throughout"
+        ]
       }
     },
     {
@@ -50,10 +88,15 @@
       "text": "Buy things at a bakery or convenience store, asking for one, two or three of something.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "You're buying lunch for both of you at a convenience store. Check the prices, then ask the clerk (the app) for three rice balls and two teas, and ask how much it comes to.",
+        "material": "おにぎり　150{円|えん}\nお{茶|ちゃ}　130{円|えん}\n{水|みず}　100{円|えん}\nパン　180{円|えん}\nりんご　120{円|えん}",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Names each item with を and a number: おにぎりをみっつ、お茶をふたつ",
+          "Asks with ください or お願いします",
+          "Uses the counting words ひとつ, ふたつ, みっつ (not いち, に, さん)",
+          "Asks the total with いくらですか"
+        ]
       }
     }
   ],
@@ -62,17 +105,87 @@
     "id": "u03-task",
     "canDo": "u03-cd1",
     "goal": "Compare your schedules for tomorrow and agree on a time to eat dinner together at home.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "What time are you eating dinner tomorrow, and who is buying what on the way home?",
     "roles": {
       "a": "Starts early tomorrow (schedule card A)",
       "b": "Works late tomorrow (schedule card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "Schedule card A (tomorrow): you get up at 5:30 (五時半に起きます) and leave home at 6:30. You finish early and get home around 5:00 (五時ごろ帰ります). You must be in bed by 10:00 (十時に寝ます). You'll cook dinner, but you need six eggs (卵をむっつ) and three apples (りんごをみっつ): ask your partner to buy them.",
+    "infoB": "Schedule card B (tomorrow): you get up at 8:00 (八時に起きます) and leave home at 9:00. Work runs late: you leave the office at 7:30 (七時半に会社を出ます) and get home around 8:15. There's a supermarket by the station, so you can shop on the way home (帰りに). Find out when your partner goes to bed, and agree a dinner time.",
+    "targets": [
+      "core:cw-0303",
+      "core:cw-0184",
+      "core:cw-0134",
+      "core:cw-0185",
+      "core:cw-0297",
+      "grammar:time-telling",
+      "grammar:ni-time-place",
+      "grammar:counting-tsu"
+    ],
+    "register": "polite",
+    "twist": "Swap cards. This time the late partner gets home at 9:00 (九時に帰ります), so agree a new dinner time or move it to breakfast together (朝ご飯), and change the shopping list (four apples, よっつ).",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "あしたは{何時|なんじ}に{起|お}きますか。",
+        "en": "What time are you getting up tomorrow?"
+      },
+      {
+        "role": "b",
+        "jp": "{八時|はちじ}に{起|お}きます。{九時|くじ}にうちを{出|で}ます。",
+        "en": "I'm getting up at eight. I'm leaving home at nine."
+      },
+      {
+        "role": "a",
+        "jp": "{私|わたし}は{五時半|ごじはん}に{起|お}きます。{六時半|ろくじはん}に{出|で}ます。",
+        "en": "I'm getting up at five thirty. I'm leaving at six thirty."
+      },
+      {
+        "role": "b",
+        "jp": "{早|はや}いですね！ {何時|なんじ}に{帰|かえ}りますか。",
+        "en": "That's early! What time will you be home?"
+      },
+      {
+        "role": "a",
+        "jp": "{五時|ごじ}ごろ{帰|かえ}ります。",
+        "en": "I'll be home around five."
+      },
+      {
+        "role": "b",
+        "jp": "{私|わたし}は{七時半|しちじはん}に{会社|かいしゃ}を{出|で}ます。{八時十五分|はちじじゅうごふん}ごろ{帰|かえ}ります。",
+        "en": "I'm leaving the office at seven thirty. I'll be home around eight fifteen."
+      },
+      {
+        "role": "a",
+        "jp": "じゃあ、{晩|ばん}ご{飯|はん}、{八時半|はちじはん}はどうですか。",
+        "en": "Then how about dinner at eight thirty?"
+      },
+      {
+        "role": "b",
+        "jp": "いいですね。でも、{何時|なんじ}に{寝|ね}ますか。",
+        "en": "Sounds good. But what time are you going to bed?"
+      },
+      {
+        "role": "a",
+        "jp": "{十時|じゅうじ}に{寝|ね}ます。{大丈夫|だいじょうぶ}ですよ。",
+        "en": "At ten. It's fine."
+      },
+      {
+        "role": "b",
+        "jp": "じゃあ、{八時半|はちじはん}ですね。{帰|かえ}りにスーパーに{行|い}きます。",
+        "en": "Eight thirty, then. I'll stop at the supermarket on the way home."
+      },
+      {
+        "role": "a",
+        "jp": "ありがとう！ {卵|たまご}をむっつ、お{願|ねが}いします。それから、りんごもみっつください。",
+        "en": "Thanks! Six eggs, please. And three apples, too."
+      },
+      {
+        "role": "b",
+        "jp": "わかりました。{卵|たまご}むっつ、りんごみっつですね。",
+        "en": "Got it. Six eggs and three apples."
+      }
+    ]
   },
   "capstone": {
     "title": "A day in our life",

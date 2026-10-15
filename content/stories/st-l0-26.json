@@ -1,0 +1,99 @@
+{
+  "id": "st-l0-26",
+  "level": "L0",
+  "unit": 14,
+  "title": "Bikes to the Sea",
+  "titleJp": "{海|うみ}まで {自転車|じてんしゃ}で",
+  "topic": "transport",
+  "grammar": [
+    "ichiban",
+    "duration-kakaru",
+    "adjectives-te",
+    "adj-naru",
+    "yori-hou",
+    "volitional",
+    "te-kara",
+    "ka-or-ni-suru",
+    "relative-clauses",
+    "to-iu"
+  ],
+  "sentences": [
+    {
+      "jp": "{土曜日|どようび}、／トムと／エマは／{海|うみ}に／{行|い}きます。",
+      "en": "On Saturday, Tom and Emma are going to the sea."
+    },
+    {
+      "jp": "「{海|うみ}まで、／どうやって／{行|い}こうか。」",
+      "en": "\"How shall we get to the sea?\""
+    },
+    {
+      "jp": "バスで／{一時間|いちじかん}／かかります。",
+      "en": "By bus it takes an hour."
+    },
+    {
+      "jp": "{安|やす}いけど、／{遅|おそ}いです。",
+      "en": "It's cheap, but slow."
+    },
+    {
+      "jp": "{電車|でんしゃ}は／{三十分|さんじゅっぷん}です。",
+      "en": "By train it's thirty minutes."
+    },
+    {
+      "jp": "{速|はや}くて／{便利|べんり}だけど、／{高|たか}いです。",
+      "en": "It's fast and convenient, but expensive."
+    },
+    {
+      "jp": "{自転車|じてんしゃ}で／{一時間半|いちじかんはん}／かかります。",
+      "en": "By bike it takes an hour and a half."
+    },
+    {
+      "jp": "「{自転車|じてんしゃ}が／いちばん／{安|やす}くて、／いちばん／{楽|たの}しいよ！」",
+      "en": "\"The bike is the cheapest and the most fun!\""
+    },
+    {
+      "jp": "トムが／そう／{言|い}ったから、／{自転車|じてんしゃ}に／しました。",
+      "en": "Since Tom said so, they decided on bikes."
+    },
+    {
+      "jp": "{最初|さいしょ}は／{涼|すず}しくて、／{気持|きも}ちが／よかったです。",
+      "en": "At first it was cool, and it felt great."
+    },
+    {
+      "jp": "でも、／{一時間|いちじかん}／{走|はし}ってから、／{足|あし}が／{痛|いた}くなりました。",
+      "en": "But after riding for an hour, their legs started to hurt."
+    },
+    {
+      "jp": "それに、／{暑|あつ}くなりました。",
+      "en": "On top of that, it got hot."
+    },
+    {
+      "jp": "「エマ、／ごめん。／{電車|でんしゃ}の{方|ほう}が／よかったね。」",
+      "en": "\"Sorry, Emma. The train would have been better.\""
+    },
+    {
+      "jp": "{二時間|にじかん}／かかって、／やっと／{海|うみ}に／{着|つ}きました。",
+      "en": "It took two hours, but at last they reached the sea."
+    },
+    {
+      "jp": "{海|うみ}は／{広|ひろ}くて、／とても／きれいでした。",
+      "en": "The sea was wide and very beautiful."
+    },
+    {
+      "jp": "「{今度|こんど}は／{電車|でんしゃ}で／{来|こ}ようね。」と／エマが／{言|い}いました。",
+      "en": "\"Next time, let's come by train,\" said Emma."
+    },
+    {
+      "jp": "「うん。／でも、／{自転車|じてんしゃ}から／{見|み}た／{景色|けしき}が／いちばん／きれいだったよ。」",
+      "en": "\"Okay. But the view from the bikes was the most beautiful of all.\""
+    }
+  ],
+  "gist": {
+    "q": "How did Tom and Emma get to the sea?",
+    "options": [
+      "By train",
+      "By bus",
+      "By bicycle"
+    ],
+    "answer": 2
+  }
+}

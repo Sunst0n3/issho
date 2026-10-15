@@ -1,0 +1,83 @@
+{
+  "id": "rp-u06",
+  "unit": 6,
+  "title": "What are you having?",
+  "titleJp": "{何|なに}にする？",
+  "setting": "A Sunday afternoon at a small café near home. You each choose a drink and a cake, and talk about what you like.",
+  "level": 1,
+  "register": "plain",
+  "targets": [
+    "grammar:ka-or-ni-suru",
+    "grammar:suki-kirai",
+    "grammar:adverbs-frequency",
+    "grammar:na-adjectives",
+    "grammar:dictionary-form",
+    "core:cw-0252",
+    "core:cw-0253"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "{何|なに}にする？",
+      "en": "What are you having?",
+      "hint": "何にする？ is the casual way to ask someone to choose.",
+      "cue": "what · having?"
+    },
+    {
+      "role": "b",
+      "jp": "えっと…コーヒーか{紅茶|こうちゃ}。{紅茶|こうちゃ}にする。",
+      "en": "Um… coffee or tea. I'll go with tea.",
+      "hint": "か between two nouns means \"or\"; 〜にする means \"I'll go with …\".",
+      "cue": "coffee or tea · tea"
+    },
+    {
+      "role": "a",
+      "jp": "{私|わたし}はコーヒー。ケーキも{食|た}べる？",
+      "en": "I'll have coffee. Want some cake too?",
+      "cue": "coffee · cake too?"
+    },
+    {
+      "role": "b",
+      "jp": "うん！ チョコレートケーキが{大好|だいす}き。",
+      "en": "Yes! I love chocolate cake.",
+      "hint": "好き and 大好き take が, not を.",
+      "cue": "yes · love · chocolate cake"
+    },
+    {
+      "role": "a",
+      "jp": "{私|わたし}はチョコレートはあまり{好|す}きじゃない。りんごのケーキにする。",
+      "en": "I'm not really into chocolate. I'll get the apple cake.",
+      "hint": "あまり〜じゃない softens a dislike; it sounds kinder than 嫌い.",
+      "cue": "chocolate · not really · apple cake"
+    },
+    {
+      "role": "b",
+      "jp": "いいね。ここ、よく{来|く}る？",
+      "en": "Nice. Do you come here often?",
+      "cue": "nice · come here often?"
+    },
+    {
+      "role": "a",
+      "jp": "うん、{時々|ときどき}。{静|しず}かなカフェが{好|す}き。",
+      "en": "Yeah, sometimes. I like quiet cafés.",
+      "hint": "な-adjectives take な before a noun: 静かなカフェ.",
+      "cue": "sometimes · like · quiet cafés"
+    },
+    {
+      "role": "b",
+      "jp": "{私|わたし}も！ じゃあ、{週末|しゅうまつ}はいつもここにする？",
+      "en": "Me too! So shall we make this our weekend place?",
+      "cue": "me too · weekends · always here?"
+    }
+  ]
+}

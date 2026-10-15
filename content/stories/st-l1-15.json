@@ -1,0 +1,155 @@
+{
+  "id": "st-l1-15",
+  "level": "L1",
+  "unit": 24,
+  "title": "An anniversary dinner",
+  "titleJp": "{記念日|きねんび}のレストラン",
+  "topic": "eating out",
+  "grammar": [
+    "tokoro",
+    "keigo-verbs",
+    "embedded-questions",
+    "keigo-set-phrases",
+    "koto-ni-suru",
+    "nagara",
+    "node",
+    "temo-ii",
+    "potential-form",
+    "te-imasu"
+  ],
+  "sentences": [
+    {
+      "jp": "{来月|らいげつ}の／{十日|とおか}は、／ケンと／ミキの／{結婚|けっこん}{記念日|きねんび}です。",
+      "en": "The tenth of next month is Ken and Miki's wedding anniversary."
+    },
+    {
+      "jp": "ケンは、／{町|まち}で／{人気|にんき}の／レストランを／{予約|よやく}することに／しました。",
+      "en": "Ken decided to book a popular restaurant in town."
+    },
+    {
+      "jp": "ケンは／{少|すこ}し／{緊張|きんちょう}しながら、／{電話|でんわ}を／かけました。",
+      "en": "Feeling a little nervous, Ken made the call."
+    },
+    {
+      "jp": "「お{電話|でんわ}／ありがとうございます。／レストラン「さくら」で／ございます。」",
+      "en": "\"Thank you for calling. This is Restaurant Sakura.\""
+    },
+    {
+      "jp": "「あの、／{予約|よやく}を／お{願|ねが}いしたいんですが。」",
+      "en": "\"Um, I'd like to make a reservation, please.\""
+    },
+    {
+      "jp": "「ありがとうございます。／いつ／いらっしゃいますか。」",
+      "en": "\"Thank you. When will you be coming?\""
+    },
+    {
+      "jp": "「{来月|らいげつ}の／{十日|とおか}、／{夜|よる}{七時|しちじ}に／{二人|ふたり}です。」",
+      "en": "\"On the tenth of next month, at seven in the evening, for two.\""
+    },
+    {
+      "jp": "「{少々|しょうしょう}／お{待|ま}ち／ください。」",
+      "en": "\"One moment, please.\""
+    },
+    {
+      "jp": "「お{待|ま}たせしました。／{七時|しちじ}は、／お{席|せき}が／ございます。」",
+      "en": "\"Thank you for waiting. We have a table at seven.\""
+    },
+    {
+      "jp": "「よかった！／それから、／ケーキを／{持|も}って／{行|い}っても／いいか、／{聞|き}きたいんですが…。」",
+      "en": "\"Great! Also, I wanted to ask whether it's okay to bring a cake...\""
+    },
+    {
+      "jp": "「はい、／{大丈夫|だいじょうぶ}です。／{記念日|きねんび}で／いらっしゃいますか。」",
+      "en": "\"Yes, that's fine. Is it a special occasion?\""
+    },
+    {
+      "jp": "「はい、／{結婚|けっこん}{記念日|きねんび}なんです。」",
+      "en": "\"Yes, it's our wedding anniversary.\""
+    },
+    {
+      "jp": "「おめでとうございます。／お{名前|なまえ}を／お{願|ねが}いします。」",
+      "en": "\"Congratulations. May I have your name, please?\""
+    },
+    {
+      "jp": "「{山田|やまだ}と／{申|もう}します。」",
+      "en": "\"My name is Yamada.\""
+    },
+    {
+      "jp": "「{山田|やまだ}{様|さま}、／{十日|とおか}の／{七時|しちじ}、／{二名|にめい}{様|さま}で／ございますね。」",
+      "en": "\"Mr Yamada, the tenth at seven, for two people. Is that right?\""
+    },
+    {
+      "jp": "「はい。／あ、／{何時|なんじ}に／{閉|し}まるか、／{教|おし}えていただけますか。」",
+      "en": "\"Yes. Oh, could you tell me what time you close?\""
+    },
+    {
+      "jp": "「{夜|よる}{十一時|じゅういちじ}で／ございます。」",
+      "en": "\"At eleven at night.\""
+    },
+    {
+      "jp": "{電話|でんわ}の／{後|あと}、／ケンは／{安心|あんしん}しました。",
+      "en": "After the call, Ken felt relieved."
+    },
+    {
+      "jp": "{記念日|きねんび}の／{夜|よる}、／ケンは／{先|さき}に／お{店|みせ}に／{着|つ}きました。",
+      "en": "On the night of their anniversary, Ken got to the restaurant first."
+    },
+    {
+      "jp": "ケンは／ケーキを／{店員|てんいん}さんに／{渡|わた}して、／ミキに／メッセージを／{送|おく}りました。",
+      "en": "Ken handed the cake to a member of staff and sent Miki a message."
+    },
+    {
+      "jp": "「{今|いま}、／{着|つ}いた／ところ。／ミキは？」",
+      "en": "\"I've just arrived. Where are you?\""
+    },
+    {
+      "jp": "「ごめん！／{今|いま}、／{会社|かいしゃ}を／{出|で}る／ところ！」",
+      "en": "\"Sorry! I'm just about to leave the office!\""
+    },
+    {
+      "jp": "{少|すこ}し／{後|あと}で、／また／メッセージが／{来|き}ました。",
+      "en": "A little later, another message came."
+    },
+    {
+      "jp": "「{今|いま}、／{電車|でんしゃ}に／{乗|の}っている／ところ。／もうすぐ／{着|つ}くよ。」",
+      "en": "\"I'm on the train right now. I'll be there soon.\""
+    },
+    {
+      "jp": "{店員|てんいん}さんが／{来|き}て、／「お{飲|の}み{物|もの}は／いかが／なさいますか。」と／{聞|き}きました。",
+      "en": "A waiter came over and asked, \"What would you like to drink?\""
+    },
+    {
+      "jp": "「もう／{一人|ひとり}／{来|く}るので、／{少|すこ}し／{待|ま}ちます。」",
+      "en": "\"Someone else is coming, so I'll wait a little.\""
+    },
+    {
+      "jp": "{七時|しちじ}{半|はん}、／ミキが／{走|はし}って／{来|き}ました。／「お{待|ま}たせ！」",
+      "en": "At half past seven, Miki came running in. \"Sorry to keep you waiting!\""
+    },
+    {
+      "jp": "{二人|ふたり}は／ワインで／{乾杯|かんぱい}しました。",
+      "en": "They toasted with wine."
+    },
+    {
+      "jp": "{最後|さいご}に、／{店員|てんいん}さんが／あの／ケーキを／{持|も}ってきました。",
+      "en": "At the end, the waiter brought out that cake."
+    },
+    {
+      "jp": "「{結婚|けっこん}{記念日|きねんび}、／おめでとうございます。」",
+      "en": "\"Happy wedding anniversary.\""
+    },
+    {
+      "jp": "ミキは／びっくりして、／とても／{喜|よろこ}びました。",
+      "en": "Miki was surprised and absolutely delighted."
+    }
+  ],
+  "gist": {
+    "q": "What did Ken ask the restaurant about on the phone?",
+    "options": [
+      "Whether he could bring a cake, and what time they close",
+      "Whether they had a vegetarian menu",
+      "How to get there from the station"
+    ],
+    "answer": 0
+  }
+}

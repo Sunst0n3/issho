@@ -1,0 +1,135 @@
+{
+  "id": "st-l1-08",
+  "level": "L1",
+  "unit": 19,
+  "title": "The same present",
+  "titleJp": "{同|おな}じプレゼント",
+  "topic": "celebrations",
+  "grammar": [
+    "ageru-morau",
+    "kureru",
+    "potential-form",
+    "te-shimau",
+    "tara-conditional",
+    "relative-clauses",
+    "to-omou",
+    "volitional",
+    "n-desu",
+    "adjectives-te"
+  ],
+  "sentences": [
+    {
+      "jp": "{来週|らいしゅう}は、／ケンと／ミキの／{結婚|けっこん}{記念日|きねんび}です。",
+      "en": "Next week is Ken and Miki's wedding anniversary."
+    },
+    {
+      "jp": "{先週|せんしゅう}、／ミキは／{大好|だいす}きな／カップを／{割|わ}ってしまいました。",
+      "en": "Last week, Miki broke her favourite mug."
+    },
+    {
+      "jp": "ミキは／とても／{悲|かな}しかったです。",
+      "en": "Miki was very sad."
+    },
+    {
+      "jp": "「{記念日|きねんび}に、／ミキに／{新|あたら}しい／カップを／あげよう。」と／ケンは／{思|おも}いました。",
+      "en": "\"I'll give Miki a new mug for our anniversary,\" Ken thought."
+    },
+    {
+      "jp": "{次|つぎ}の／{日|ひ}、／ケンは／{駅|えき}の／{近|ちか}くの／{小|ちい}さい／{店|みせ}に／{行|い}きました。",
+      "en": "The next day, Ken went to a small shop near the station."
+    },
+    {
+      "jp": "{青|あお}くて／きれいな／カップが／ありました。",
+      "en": "There was a pretty blue mug."
+    },
+    {
+      "jp": "「これを／ください。／プレゼントです。」",
+      "en": "\"I'll take this one, please. It's a present.\""
+    },
+    {
+      "jp": "その／{日|ひ}の／{午後|ごご}、／ミキも／{同|おな}じ／{店|みせ}に／{来|き}ました。",
+      "en": "That same afternoon, Miki came to the same shop."
+    },
+    {
+      "jp": "ケンの／カップは、／もう／とても／{古|ふる}いです。",
+      "en": "Ken's mug is very old now."
+    },
+    {
+      "jp": "「{記念日|きねんび}に、／ケンにも／{新|あたら}しい／カップを／あげたいな。」",
+      "en": "\"I'd like to give Ken a new mug for our anniversary too.\""
+    },
+    {
+      "jp": "ミキは／{青|あお}い／カップを／{選|えら}びました。",
+      "en": "Miki chose a blue mug."
+    },
+    {
+      "jp": "{店員|てんいん}さんは／{少|すこ}し／{笑|わら}いました。",
+      "en": "The shop assistant smiled a little."
+    },
+    {
+      "jp": "{記念日|きねんび}の／{夜|よる}、／{二人|ふたり}は／プレゼントを／{出|だ}しました。",
+      "en": "On the night of their anniversary, they both brought out their presents."
+    },
+    {
+      "jp": "「はい、／これ。／{僕|ぼく}から。」",
+      "en": "\"Here you go. This is from me.\""
+    },
+    {
+      "jp": "「ありがとう。／{私|わたし}からも、／はい。」",
+      "en": "\"Thank you. And here's one from me.\""
+    },
+    {
+      "jp": "{二人|ふたり}は／{一緒|いっしょ}に／{箱|はこ}を／{開|あ}けました。",
+      "en": "They opened the boxes together."
+    },
+    {
+      "jp": "{箱|はこ}の／{中|なか}には、／{同|おな}じ／{青|あお}い／カップが／ありました。",
+      "en": "Inside the boxes were the same blue mugs."
+    },
+    {
+      "jp": "「え！／{同|おな}じ！」",
+      "en": "\"What! They're the same!\""
+    },
+    {
+      "jp": "{二人|ふたり}は／たくさん／{笑|わら}いました。",
+      "en": "They laughed and laughed."
+    },
+    {
+      "jp": "「だから、／{店員|てんいん}さんが／{笑|わら}っていたんだね。」",
+      "en": "\"So that's why the shop assistant was smiling.\""
+    },
+    {
+      "jp": "「{私|わたし}が／ケンに／あげた／カップと、／ケンが／{私|わたし}に／くれた／カップ。」",
+      "en": "\"The mug I gave you, and the mug you gave me.\""
+    },
+    {
+      "jp": "「{二|ふた}つで／ちょうど／いいね。」",
+      "en": "\"Two of them — that's just right.\""
+    },
+    {
+      "jp": "「これで、／{毎朝|まいあさ}／{同|おな}じ／カップで／コーヒーが／{飲|の}めるね。」",
+      "en": "\"Now we can drink our coffee from matching mugs every morning.\""
+    },
+    {
+      "jp": "{次|つぎ}の／{朝|あさ}、／{二人|ふたり}は／{新|あたら}しい／カップで／コーヒーを／{飲|の}みました。",
+      "en": "The next morning, they drank coffee from their new mugs."
+    },
+    {
+      "jp": "「{来年|らいねん}の／{記念日|きねんび}は、／{何|なに}を／あげたら／いい？」と／ケンが／{聞|き}きました。",
+      "en": "\"What should I give you for our next anniversary?\" Ken asked."
+    },
+    {
+      "jp": "「{来年|らいねん}は、／{一緒|いっしょ}に／{選|えら}ぼう。」",
+      "en": "\"Next year, let's choose together.\""
+    }
+  ],
+  "gist": {
+    "q": "What surprised Ken and Miki on their anniversary?",
+    "options": [
+      "They had bought each other the same present",
+      "The shop was closed",
+      "Miki's new mug was broken"
+    ],
+    "answer": 0
+  }
+}

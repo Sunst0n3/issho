@@ -10,17 +10,22 @@
     "you-da",
     "nakutemo-ii"
   ],
-  "coreWordCeiling": 1390,
+  "coreWordCeiling": 1416,
   "canDos": [
     {
       "id": "u22-cd1",
       "text": "Talk about how your life and skills have changed this year (I can read kanji now, I've started cooking more).",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner asks how this year has changed you (the audio plays the question). Answer for 45–60 seconds: say at least two things you can do now that you couldn't before, and one habit that has changed.",
+        "material": "{日本語|にほんご}を{始|はじ}めて、もうすぐ{一年|いちねん}だね。{何|なに}ができるようになった？ {生活|せいかつ}で{変|か}わったことはある？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says at least two new abilities with 〜ようになった (漢字が読めるようになった)",
+          "Describes one habit that has changed (毎朝走るようになった / あまりお酒を飲まなくなった)",
+          "Gives an example or a reason for at least one change",
+          "Keeps talking for about 45 seconds"
+        ]
       }
     },
     {
@@ -28,9 +33,37 @@
       "text": "Read instructions for a machine or a local rule (press this and…, if you put the rubbish out late…) and say what happens.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "This sheet came with the keys to your new flat. Read it and answer the questions.",
+        "material": "ごみの{出|だ}し{方|かた}\n・{台所|だいどころ}のごみ：{月曜日|げつようび}と{木曜日|もくようび}。{朝|あさ}{八時|はちじ}までに{出|だ}してください。\n・ペットボトル：{水曜日|すいようび}。{中|なか}を{洗|あら}ってから{出|だ}してください。\n・{八時|はちじ}を{過|す}ぎると、{持|も}っていってもらえません。\n・{夜|よる}{出|だ}すと、{鳥|とり}や{猫|ねこ}が{袋|ふくろ}を{開|あ}けてしまいます。{朝|あさ}に{出|だ}してください。\n・{袋|ふくろ}に{名前|なまえ}は{書|か}かなくてもいいです。\n・{家具|かぐ}などの{大|おお}きいごみは、{前|まえ}に{電話|でんわ}で{連絡|れんらく}してください。",
+        "questions": [
+          {
+            "q": "When should kitchen rubbish go out?",
+            "options": [
+              "On Wednesday morning",
+              "On Monday and Thursday, by 8 a.m.",
+              "The night before collection"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What happens if you put your rubbish out the night before?",
+            "options": [
+              "Birds and cats open the bags",
+              "It gets collected early",
+              "You have to phone first"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "Which of these do you NOT have to do?",
+            "options": [
+              "Rinse out plastic bottles",
+              "Phone before putting out furniture",
+              "Write your name on the bag"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -38,10 +71,15 @@
       "text": "Show your partner how to use something at home, step by step (when you press this, it starts).",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner has never used this microwave. Using the note stuck on it, explain step by step how to heat a cup of milk: what to press, what happens next, and one thing they don't need to do.",
+        "material": "{電子|でんし}レンジのメモ\n・{温|あたた}めるときは、▲▼で{時間|じかん}を{決|き}めて、{緑|みどり}のボタン。\n・{牛乳|ぎゅうにゅう}（コップ{一|ひと}つ）は{一分|いっぷん}{半|はん}。\n・{終|お}わると、{三回|さんかい}{鳴|な}る。\n・{途中|とちゅう}で{止|と}めるときは、{赤|あか}いボタン。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Explains at least three steps in order (まず…、それから…)",
+          "Uses 〜と for what happens (緑のボタンを押すと、始まる)",
+          "Tells the partner one thing they don't have to do with 〜なくてもいい (赤いボタンは押さなくてもいい)",
+          "Checks the partner has understood (わかった？ / やってみて)"
+        ]
       }
     },
     {
@@ -49,9 +87,37 @@
       "text": "Understand someone guessing from what they notice (it seems the shop is closed, it looks like nobody's home).",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Your partner left you a voice message on the way home. Listen, then answer the questions.",
+        "material": "もしもし、{私|わたし}。{今|いま}、{山田|やまだ}さんの{家|いえ}の{前|まえ}なんだけど、{誰|だれ}もいないみたい。{電気|でんき}が{消|き}えてるし、{車|くるま}もないし。{旅行|りょこう}に{行|い}ってるようだね。お{土産|みやげ}は、{明日|あした}また{持|も}ってくる。あと、{駅|えき}の{前|まえ}のパン{屋|や}に、{人|ひと}がたくさん{並|なら}んでた。{新|あたら}しいパンが{出|で}たみたい。{二|ふた}つ{買|か}って{帰|かえ}るね。",
+        "questions": [
+          {
+            "q": "Why does your partner think nobody is home at the Yamadas'?",
+            "options": [
+              "Nobody answered the phone",
+              "The lights are off and the car isn't there",
+              "A neighbour said they'd gone away"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What will your partner do with the gift they brought?",
+            "options": [
+              "Leave it at the door",
+              "Give it to a neighbour",
+              "Bring it round again tomorrow"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "Why does your partner think people are queuing at the bakery?",
+            "options": [
+              "A new kind of bread seems to have come out",
+              "There's a sale today",
+              "The shop is closing soon"
+            ],
+            "answer": 0
+          }
+        ]
       }
     },
     {
@@ -59,10 +125,15 @@
       "text": "Reassure your partner in a message about what they don't have to do today (cook, hurry, pick you up).",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner sent this message. Reply in 2–4 sentences: reassure them, and tell them at least two things they don't have to do (hurry, cook, buy anything…).",
+        "material": "ごめん、{電車|でんしゃ}が{事故|じこ}で{止|と}まってる…。{帰|かえ}るの、{一時間|いちじかん}ぐらい{遅|おく}れそう。{晩|ばん}ご{飯|はん}、まだ{何|なに}も{買|か}ってないし、どうしよう。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Reassures the partner (大丈夫だよ / 気をつけてね)",
+          "Uses 〜なくてもいい for at least two things (急がなくてもいい, 買わなくてもいい)",
+          "Says what you'll do instead (私が作っておくね)",
+          "Uses a casual, warm style suited to a partner"
+        ]
       }
     }
   ],
@@ -71,17 +142,87 @@
     "id": "u22-task",
     "canDo": "u22-cd3",
     "goal": "Teach your partner to use a new appliance until they can tell you back what each button does.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "How do you set a wash to be finished by 7 a.m., and which clothes must never go in the dryer?",
     "roles": {
       "a": "Has the instruction sheet (card A)",
       "b": "Has only a picture of the machine's buttons (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "Card A — the instruction sheet for your new washing machine (洗濯機). 電源 (the round button) turns it on. スタート (the green button) starts the wash. コース chooses the programme: 標準 normal (45 min), お急ぎ quick (20 min), 毛布 for blankets. 予約 (timer): press it, then ▲ to choose when the wash should finish, e.g. 7:00. 乾燥 (dry): it dries the clothes too, so you don't have to hang them out (干さなくてもいい) — but sweaters (セーター) seem to shrink, so never dry them. When it finishes it beeps three times (三回鳴る). If the red light comes on, the door isn't shut. Explain one button at a time with 〜と (このボタンを押すと…) and check your partner can say it back.",
+    "infoB": "Card B — a photo of the new washing machine's buttons, with labels you can't read yet: a round button (電源), a green button (スタート), コース (標準 / お急ぎ / 毛布), 予約 with ▲▼, 乾燥, and a small red light. Ask what each one does (これを押すと、どうなる？), repeat each answer back, and at the end explain the whole machine to your partner in your own words. Your goal for tonight: put a wash on so it's finished — and dry — by 7 a.m.",
+    "targets": [
+      "grammar:to-conditional",
+      "grammar:you-ni-naru",
+      "grammar:nakutemo-ii",
+      "grammar:you-da",
+      "core:cw-0608",
+      "core:cw-1130",
+      "core:cw-1377",
+      "core:cw-1372"
+    ],
+    "register": "plain",
+    "twist": "Swap roles and appliances: B now has the instructions for the new air-conditioner remote (冷房 cooling, 暖房 heating, ▲▼ temperature, タイマー), and A has only a picture of it. Goal: the room is warm when you wake up.",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "{新|あたら}しい{洗濯機|せんたくき}、{一緒|いっしょ}に{使|つか}ってみよう。",
+        "en": "Let's try the new washing machine together."
+      },
+      {
+        "role": "b",
+        "jp": "うん。ボタンが{多|おお}くて、よくわからないんだ。",
+        "en": "Okay. There are so many buttons — I don't really get it."
+      },
+      {
+        "role": "a",
+        "jp": "まず、この{丸|まる}いボタンを{押|お}すと、{電気|でんき}がつくよ。",
+        "en": "First, when you press this round button, it comes on."
+      },
+      {
+        "role": "b",
+        "jp": "それから{服|ふく}と{洗剤|せんざい}を{入|い}れて…この{緑|みどり}のボタンを{押|お}すの？",
+        "en": "Then I put the clothes and the detergent in… and press this green button?"
+      },
+      {
+        "role": "a",
+        "jp": "そう。{緑|みどり}のボタンを{押|お}すと{始|はじ}まって、{終|お}わると{音|おと}が{三回|さんかい}{鳴|な}るよ。",
+        "en": "Yes. When you press the green one it starts, and when it's done it beeps three times."
+      },
+      {
+        "role": "b",
+        "jp": "この「{予約|よやく}」は{何|なに}？",
+        "en": "What's this 予約 one?"
+      },
+      {
+        "role": "a",
+        "jp": "{予約|よやく}を{押|お}して、▲で{時間|じかん}を{決|き}めると、その{時間|じかん}に{終|お}わるよ。",
+        "en": "Press 予約, set a time with ▲, and it'll finish at that time."
+      },
+      {
+        "role": "b",
+        "jp": "{便利|べんり}だね。じゃあ、{乾燥|かんそう}を{使|つか}えば、{干|ほ}さなくてもいいの？",
+        "en": "That's handy. So if I use 乾燥, I don't have to hang the washing out?"
+      },
+      {
+        "role": "a",
+        "jp": "うん。でも、セーターは{小|ちい}さくなるみたいだから、{入|い}れないでね。",
+        "en": "Right. But sweaters seem to shrink, so don't put them in."
+      },
+      {
+        "role": "b",
+        "jp": "わかった。じゃあ、{言|い}ってみるね。{丸|まる}いボタンを{押|お}して、{服|ふく}と{洗剤|せんざい}を{入|い}れて、{予約|よやく}で{七時|しちじ}にして、{緑|みどり}のボタン！",
+        "en": "Got it. Let me say it back: press the round button, put in the clothes and detergent, set 予約 to seven, then the green button!"
+      },
+      {
+        "role": "a",
+        "jp": "すごい！ もう{使|つか}えるようになったね。",
+        "en": "Brilliant! You can already use it."
+      },
+      {
+        "role": "b",
+        "jp": "{明日|あした}の{朝|あさ}は{干|ほ}さなくてもいいから、{楽|らく}だね。",
+        "en": "And tomorrow morning will be easy — no hanging the washing out."
+      }
+    ]
   },
   "capstone": {
     "title": "Our new habits",

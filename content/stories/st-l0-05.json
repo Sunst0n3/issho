@@ -1,0 +1,115 @@
+{
+  "id": "st-l0-05",
+  "level": "L0",
+  "unit": 7,
+  "title": "Where's the key?",
+  "titleJp": "かぎは どこ？",
+  "topic": "home",
+  "grammar": [
+    "wa-desu",
+    "no-possession",
+    "mo-also",
+    "masu-forms",
+    "wo-object",
+    "time-telling",
+    "ni-time-place",
+    "masu-past",
+    "de-place-means",
+    "arimasu-imasu",
+    "to-with",
+    "casual-speech",
+    "position-words",
+    "te-form"
+  ],
+  "sentences": [
+    {
+      "jp": "げつようびの／あさです。",
+      "en": "It's Monday morning."
+    },
+    {
+      "jp": "もう／{八時|はちじ}です。",
+      "en": "It's already eight o'clock."
+    },
+    {
+      "jp": "「エマ、／かぎ、／どこ？」",
+      "en": "\"Emma, where's my key?\""
+    },
+    {
+      "jp": "「テーブルの／{上|うえ}は？」",
+      "en": "\"Is it on the table?\""
+    },
+    {
+      "jp": "ケンは／テーブルの／{上|うえ}を／{見|み}ます。",
+      "en": "Ken looks on the table."
+    },
+    {
+      "jp": "でも、／かぎは／ありません。",
+      "en": "But the key isn't there."
+    },
+    {
+      "jp": "「かばんの／{中|なか}は？」",
+      "en": "\"What about in your bag?\""
+    },
+    {
+      "jp": "かばんの／{中|なか}にも／ありません。",
+      "en": "It isn't in the bag, either."
+    },
+    {
+      "jp": "「じゃあ、／ソファーの／{下|した}は？」",
+      "en": "\"Then how about under the sofa?\""
+    },
+    {
+      "jp": "ソファーの／{下|した}に／{本|ほん}が／あります。",
+      "en": "There's a book under the sofa."
+    },
+    {
+      "jp": "「あ、／わたしの／{本|ほん}！」",
+      "en": "\"Oh, my book!\""
+    },
+    {
+      "jp": "でも、／かぎは／ありません。",
+      "en": "But there's no key."
+    },
+    {
+      "jp": "ケンは／いすに／すわって、／まどの／{外|そと}を／{見|み}ます。",
+      "en": "Ken sits down on a chair and looks out of the window."
+    },
+    {
+      "jp": "{外|そと}に／となりの／ねこの／タマが／います。",
+      "en": "Tama, the cat from next door, is outside."
+    },
+    {
+      "jp": "タマの／{下|した}に／かぎが／あります！",
+      "en": "The key is under Tama!"
+    },
+    {
+      "jp": "きのうの／{夜|よる}、／ケンは／{外|そと}で／タマと／あそびました。",
+      "en": "Last night, Ken played with Tama outside."
+    },
+    {
+      "jp": "ケンは／まどを／あけて、／かぎを／{取|と}ります。",
+      "en": "Ken opens the window and picks up the key."
+    },
+    {
+      "jp": "「タマ、／ありがとう！」",
+      "en": "\"Thanks, Tama!\""
+    },
+    {
+      "jp": "「いってきます！」",
+      "en": "\"I'm off!\""
+    },
+    {
+      "jp": "タマは／まどの／{外|そと}で／ねます。",
+      "en": "Tama curls up for a nap outside the window."
+    }
+  ],
+  "gist": {
+    "q": "Where was Ken's key?",
+    "options": [
+      "In his bag",
+      "Under the sofa",
+      "Outside, under Tama the cat"
+    ],
+    "answer": 2
+  }
+}

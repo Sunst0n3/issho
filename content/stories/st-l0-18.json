@@ -1,0 +1,103 @@
+{
+  "id": "st-l0-18",
+  "level": "L0",
+  "unit": 12,
+  "title": "Friends at Six",
+  "titleJp": "{六時|ろくじ}に {友達|ともだち}が {来|く}る",
+  "topic": "home",
+  "grammar": [
+    "mou-mada",
+    "de-amount",
+    "te-iru-state",
+    "ni-iku-purpose",
+    "te-kara",
+    "relative-clauses",
+    "kedo-but",
+    "casual-speech",
+    "casual-past",
+    "masenka-mashou"
+  ],
+  "sentences": [
+    {
+      "jp": "{今日|きょう}は／{土曜日|どようび}です。",
+      "en": "Today is Saturday."
+    },
+    {
+      "jp": "{六時|ろくじ}に、／{友達|ともだち}が／{二人|ふたり}／{来|き}ます。",
+      "en": "Two friends are coming at six."
+    },
+    {
+      "jp": "{今|いま}、／{四時|よじ}です。",
+      "en": "It's four o'clock now."
+    },
+    {
+      "jp": "「トム、／もう／{部屋|へや}を／{掃除|そうじ}した？」",
+      "en": "\"Tom, have you cleaned the room yet?\""
+    },
+    {
+      "jp": "「うん、／もう／{掃除|そうじ}した。／リビングも／トイレも／きれいだよ。」",
+      "en": "\"Yep, already done. The living room and the toilet are clean too.\""
+    },
+    {
+      "jp": "「ビールは？」",
+      "en": "\"What about the beer?\""
+    },
+    {
+      "jp": "「もう／{買|か}った。／{冷蔵庫|れいぞうこ}に／{入|はい}ってるよ。」",
+      "en": "\"Already bought it. It's in the fridge.\""
+    },
+    {
+      "jp": "「エマは？／{料理|りょうり}は／もう／{作|つく}った？」",
+      "en": "\"What about you, Emma? Have you made the food yet?\""
+    },
+    {
+      "jp": "「ううん、／まだ。／カレーを／{作|つく}りたいけど、／{肉|にく}が／ない。」",
+      "en": "\"No, not yet. I want to make curry, but we don't have any meat.\""
+    },
+    {
+      "jp": "「じゃあ、／{僕|ぼく}が／スーパーに／{買|か}いに／{行|い}くよ。」",
+      "en": "\"Then I'll go to the supermarket and get some.\""
+    },
+    {
+      "jp": "トムは／{急|いそ}いで／{出|で}かけました。",
+      "en": "Tom hurried out."
+    },
+    {
+      "jp": "{五時半|ごじはん}、／{玄関|げんかん}に／{友達|ともだち}が／{二人|ふたり}／いました。",
+      "en": "At half past five, there were two friends at the front door."
+    },
+    {
+      "jp": "「こんにちは！／ちょっと／{早|はや}いけど、／いい？」",
+      "en": "\"Hi! We're a bit early. Is that okay?\""
+    },
+    {
+      "jp": "「どうぞ、／{入|はい}って！／でも、／ご{飯|はん}は／まだ／できていないよ。」",
+      "en": "\"Come on in! But dinner isn't ready yet.\""
+    },
+    {
+      "jp": "{友達|ともだち}は／{笑|わら}いました。",
+      "en": "Their friends laughed."
+    },
+    {
+      "jp": "「じゃあ、／みんなで／{作|つく}りましょう！」",
+      "en": "\"Then let's all make it together!\""
+    },
+    {
+      "jp": "トムが／{肉|にく}を／{持|も}って／{帰|かえ}ってから、／{四人|よにん}で／カレーを／{作|つく}りました。",
+      "en": "After Tom came home with the meat, the four of them made curry."
+    },
+    {
+      "jp": "{四人|よにん}で／{作|つく}った／カレーは、／とても／おいしかったです。",
+      "en": "The curry the four of them made together was delicious."
+    }
+  ],
+  "gist": {
+    "q": "What did they do when their friends arrived early?",
+    "options": [
+      "They all made curry together",
+      "They went out to eat",
+      "They watched TV and waited for Tom"
+    ],
+    "answer": 0
+  }
+}

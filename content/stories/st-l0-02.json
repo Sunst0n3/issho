@@ -1,0 +1,104 @@
+{
+  "id": "st-l0-02",
+  "level": "L0",
+  "unit": 6,
+  "title": "The cat next door",
+  "titleJp": "となりの ねこ",
+  "topic": "animals",
+  "grammar": [
+    "wa-desu",
+    "no-possession",
+    "mo-also",
+    "masu-forms",
+    "wo-object",
+    "ni-time-place",
+    "arimasu-imasu",
+    "to-with",
+    "adverbs-frequency",
+    "na-adjectives",
+    "suki-kirai"
+  ],
+  "sentences": [
+    {
+      "jp": "となりの／{田中|たなか}さんの／うちに／ねこが／います。",
+      "en": "There's a cat at Ms Tanaka's house next door."
+    },
+    {
+      "jp": "{名前|なまえ}は／タマです。",
+      "en": "Her name is Tama."
+    },
+    {
+      "jp": "タマは／しずかな／ねこです。",
+      "en": "Tama is a quiet cat."
+    },
+    {
+      "jp": "そして、／きれいな／ねこです。",
+      "en": "And she's a pretty cat."
+    },
+    {
+      "jp": "タマは／よく／ケンと／エマの／うちに／{来|き}ます。",
+      "en": "Tama often comes to Ken and Emma's house."
+    },
+    {
+      "jp": "タマは／{魚|さかな}が／だいすきです。",
+      "en": "Tama loves fish."
+    },
+    {
+      "jp": "でも、／{雨|あめ}が／きらいです。",
+      "en": "But she hates rain."
+    },
+    {
+      "jp": "{雨|あめ}の／あさは／{来|き}ません。",
+      "en": "On rainy mornings she doesn't come."
+    },
+    {
+      "jp": "エマは／ねこが／だいすきです。",
+      "en": "Emma loves cats."
+    },
+    {
+      "jp": "「ケン、／ねこ、／すき？」",
+      "en": "\"Ken, do you like cats?\""
+    },
+    {
+      "jp": "「ううん、／あまり。」",
+      "en": "\"Nah, not really.\""
+    },
+    {
+      "jp": "でも、／ケンは／まいあさ／まどを／あけます。",
+      "en": "But every morning Ken opens the window."
+    },
+    {
+      "jp": "そして、／タマを／まちます。",
+      "en": "And he waits for Tama."
+    },
+    {
+      "jp": "「タマ、／おはよう！」",
+      "en": "\"Morning, Tama!\""
+    },
+    {
+      "jp": "ケンは／タマと／よく／あそびます。",
+      "en": "Ken often plays with Tama."
+    },
+    {
+      "jp": "エマは／わらいます。",
+      "en": "Emma laughs."
+    },
+    {
+      "jp": "ケンは／ほんとうは／タマが／だいすきです。",
+      "en": "The truth is, Ken loves Tama."
+    },
+    {
+      "jp": "{雨|あめ}の／あさは、／ケンは／ちょっと／さびしいです。",
+      "en": "On rainy mornings, Ken is a little lonely."
+    }
+  ],
+  "gist": {
+    "q": "How does Ken really feel about Tama?",
+    "options": [
+      "He doesn't like her at all",
+      "He is scared of her",
+      "He loves her and waits for her every morning"
+    ],
+    "answer": 2
+  }
+}

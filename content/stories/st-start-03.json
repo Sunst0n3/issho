@@ -1,0 +1,106 @@
+{
+  "id": "st-start-03",
+  "level": "start",
+  "unit": 1,
+  "title": "Good morning, good night",
+  "titleJp": "おはよう、おやすみ",
+  "topic": "greetings",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "kore-sore-are",
+    "mo-also"
+  ],
+  "sentences": [
+    {
+      "jp": "「おはよう、／エマ。」",
+      "en": "\"Morning, Emma.\""
+    },
+    {
+      "jp": "「おはよう。」",
+      "en": "\"Morning.\""
+    },
+    {
+      "jp": "ケンは／きょう／しごとです。",
+      "en": "Ken has work today."
+    },
+    {
+      "jp": "わたしは／やすみです。",
+      "en": "I have the day off."
+    },
+    {
+      "jp": "「いってきます！」",
+      "en": "\"I'm off!\""
+    },
+    {
+      "jp": "「いってらっしゃい！」",
+      "en": "\"Have a good day!\""
+    },
+    {
+      "jp": "「ただいま。」",
+      "en": "\"I'm home.\""
+    },
+    {
+      "jp": "「おかえりなさい。」",
+      "en": "\"Welcome home.\""
+    },
+    {
+      "jp": "「おつかれさま。」",
+      "en": "\"You must be tired.\""
+    },
+    {
+      "jp": "「エマ、／これは／なんですか。」",
+      "en": "\"Emma, what's this?\""
+    },
+    {
+      "jp": "「にほんの／りょうりです。」",
+      "en": "\"It's a Japanese dish.\""
+    },
+    {
+      "jp": "「エマの／りょうりですか。」",
+      "en": "\"Did you make it?\""
+    },
+    {
+      "jp": "「はい、／わたしの／りょうりです。」",
+      "en": "\"Yes, I cooked it.\""
+    },
+    {
+      "jp": "「いただきます！」",
+      "en": "\"Let's eat!\""
+    },
+    {
+      "jp": "「ごちそうさまでした。」",
+      "en": "\"Thank you, that was lovely.\""
+    },
+    {
+      "jp": "「ケン、／あしたも／しごとですか。」",
+      "en": "\"Ken, do you have work tomorrow too?\""
+    },
+    {
+      "jp": "「いいえ、／あしたは／やすみです。」",
+      "en": "\"No, tomorrow is my day off.\""
+    },
+    {
+      "jp": "「わたしも／やすみです。」",
+      "en": "\"I'm off too.\""
+    },
+    {
+      "jp": "「おやすみなさい。」",
+      "en": "\"Good night.\""
+    },
+    {
+      "jp": "「おやすみ。」",
+      "en": "\"Night.\""
+    }
+  ],
+  "gist": {
+    "q": "What does Emma make for Ken in the evening?",
+    "options": [
+      "Coffee",
+      "A Japanese dish",
+      "Nothing; they eat out"
+    ],
+    "answer": 1
+  }
+}

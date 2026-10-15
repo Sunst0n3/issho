@@ -1,0 +1,127 @@
+{
+  "id": "st-l1-04",
+  "level": "L1",
+  "unit": 17,
+  "title": "The best medicine",
+  "titleJp": "いちばんの{薬|くすり}",
+  "topic": "health",
+  "grammar": [
+    "nakereba-naranai",
+    "adverb-form",
+    "deshou",
+    "nagara",
+    "tte-quote",
+    "hou-ga-ii",
+    "naide-kudasai",
+    "no-ga-suki",
+    "volitional",
+    "yori-hou"
+  ],
+  "sentences": [
+    {
+      "jp": "ケンは／{会社|かいしゃ}で／{朝|あさ}から／{夜|よる}まで／パソコンを／{使|つか}います。",
+      "en": "At work, Ken uses a computer from morning till night."
+    },
+    {
+      "jp": "{昼|ひる}ご{飯|はん}も／パソコンを／{見|み}ながら／{食|た}べます。",
+      "en": "He even eats lunch while looking at his computer."
+    },
+    {
+      "jp": "{家|いえ}でも／{夜|よる}{遅|おそ}くまで／スマホを／{見|み}ています。",
+      "en": "At home, too, he looks at his phone until late at night."
+    },
+    {
+      "jp": "{最近|さいきん}、／ケンは／{肩|かた}と／{腰|こし}が／{痛|いた}いです。",
+      "en": "Lately, Ken's shoulders and lower back hurt."
+    },
+    {
+      "jp": "{頭|あたま}も／ときどき／{痛|いた}く／なります。",
+      "en": "Sometimes he gets headaches too."
+    },
+    {
+      "jp": "ミキは／{心配|しんぱい}して、／「{一度|いちど}／{病院|びょういん}に／{行|い}ったほうが／いいよ。」と／{言|い}いました。",
+      "en": "Miki was worried and said, \"You should go to the doctor once.\""
+    },
+    {
+      "jp": "{土曜日|どようび}、／ケンは／{病院|びょういん}に／{行|い}きました。",
+      "en": "On Saturday, Ken went to the clinic."
+    },
+    {
+      "jp": "{先生|せんせい}は／ケンの／{話|はなし}を／{聞|き}いて、／{言|い}いました。",
+      "en": "The doctor listened to Ken and said:"
+    },
+    {
+      "jp": "「{病気|びょうき}では／ないでしょう。／でも、／もっと／{運動|うんどう}しなければなりませんね。」",
+      "en": "\"It's probably not an illness. But you need to get more exercise.\""
+    },
+    {
+      "jp": "「それから、／{夜|よる}は／{早|はや}く／{寝|ね}て／ください。」",
+      "en": "\"Also, please go to bed early.\""
+    },
+    {
+      "jp": "「{食|た}べながら／{仕事|しごと}を／しないで／ください。」",
+      "en": "\"And please don't work while you eat.\""
+    },
+    {
+      "jp": "「{薬|くすり}は／{要|い}りません。／{毎日|まいにち}／{歩|ある}くのが／いちばんの／{薬|くすり}ですよ。」",
+      "en": "\"You don't need medicine. Walking every day is the best medicine.\""
+    },
+    {
+      "jp": "{家|いえ}に／{帰|かえ}って、／ケンは／ミキに／{話|はな}しました。",
+      "en": "When he got home, Ken told Miki."
+    },
+    {
+      "jp": "「{毎日|まいにち}／{歩|ある}かなければならないって。」",
+      "en": "\"He says I have to walk every day.\""
+    },
+    {
+      "jp": "「じゃあ、／{一緒|いっしょ}に／{歩|ある}こう！／{晩|ばん}ご{飯|はん}の／{後|あと}で。」",
+      "en": "\"Then let's walk together! After dinner.\""
+    },
+    {
+      "jp": "その／{日|ひ}から、／{二人|ふたり}は／{毎晩|まいばん}／{散歩|さんぽ}しました。",
+      "en": "From that day on, they went for a walk every evening."
+    },
+    {
+      "jp": "{散歩|さんぽ}の／ときは、／スマホを／うちに／{置|お}いていきます。",
+      "en": "When they go for their walk, they leave their phones at home."
+    },
+    {
+      "jp": "{川|かわ}の／{横|よこ}の／{道|みち}を／ゆっくり／{歩|ある}きます。",
+      "en": "They walk slowly along the river."
+    },
+    {
+      "jp": "{歩|ある}きながら、／{仕事|しごと}の／{話|はなし}や／{週末|しゅうまつ}の／{予定|よてい}を／{話|はな}します。",
+      "en": "While they walk, they talk about work and their plans for the weekend."
+    },
+    {
+      "jp": "ときどき／{猫|ねこ}に／{会|あ}います。／{月|つき}も／きれいです。",
+      "en": "Sometimes they meet a cat. The moon is beautiful, too."
+    },
+    {
+      "jp": "{一|いっ}か{月|げつ}／{歩|ある}いて、／ケンの／{肩|かた}と／{腰|こし}は／{前|まえ}より／ずっと／よく／なりました。",
+      "en": "After a month of walking, Ken's shoulders and back were much better than before."
+    },
+    {
+      "jp": "{夜|よる}も／ぐっすり／{寝|ね}ています。",
+      "en": "He sleeps soundly at night, too."
+    },
+    {
+      "jp": "「あの／{先生|せんせい}は／すごいね。」と／ケンが／{言|い}いました。",
+      "en": "\"That doctor is amazing,\" Ken said."
+    },
+    {
+      "jp": "「うん。／でも、／いちばんの／{薬|くすり}は、／{二人|ふたり}の／{散歩|さんぽ}だね。」",
+      "en": "\"Yes. But the best medicine is our walks together.\""
+    }
+  ],
+  "gist": {
+    "q": "What did the doctor tell Ken to do?",
+    "options": [
+      "Take medicine three times a day",
+      "Stop working for a month",
+      "Walk every day and go to bed early"
+    ],
+    "answer": 2
+  }
+}

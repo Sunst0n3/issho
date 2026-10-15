@@ -1,0 +1,98 @@
+{
+  "id": "st-l0-21",
+  "level": "L0",
+  "unit": 13,
+  "title": "Nothing in the Fridge",
+  "titleJp": "{冷蔵庫|れいぞうこ}に {何|なに}も ない",
+  "topic": "food",
+  "grammar": [
+    "nanika-nanimo",
+    "volitional",
+    "yori-hou",
+    "kara-because",
+    "kedo-but",
+    "to-iu",
+    "te-imasu",
+    "casual-speech",
+    "de-place-means"
+  ],
+  "sentences": [
+    {
+      "jp": "{金曜日|きんようび}の／{夜|よる}{七時|しちじ}です。",
+      "en": "It's seven o'clock on Friday evening."
+    },
+    {
+      "jp": "{外|そと}は／{雨|あめ}が／{降|ふ}っています。",
+      "en": "Outside, it's raining."
+    },
+    {
+      "jp": "「お{腹|なか}が／すいたね。／{何|なに}か／{作|つく}ろうか。」",
+      "en": "\"I'm hungry. Shall we make something?\""
+    },
+    {
+      "jp": "{夫|おっと}が／{冷蔵庫|れいぞうこ}を／{開|あ}けました。",
+      "en": "My husband opened the fridge."
+    },
+    {
+      "jp": "「え？／{何|なに}も／ないよ。」",
+      "en": "\"Huh? There's nothing in here.\""
+    },
+    {
+      "jp": "{冷蔵庫|れいぞうこ}には、／{卵|たまご}が／{三|みっ}つと、／{玉|たま}ねぎが／{一|ひと}つ／ありました。",
+      "en": "In the fridge there were three eggs and one onion."
+    },
+    {
+      "jp": "「カレーが／{食|た}べたかったけど、／{肉|にく}が／ないね。」",
+      "en": "\"I wanted curry, but there's no meat.\""
+    },
+    {
+      "jp": "「スーパーに／{行|い}こうか。」",
+      "en": "\"Shall we go to the supermarket?\""
+    },
+    {
+      "jp": "「{雨|あめ}だから、／{行|い}きたくない。」",
+      "en": "\"It's raining, so I don't want to go.\""
+    },
+    {
+      "jp": "「じゃあ、／{卵|たまご}と／{玉|たま}ねぎで／{何|なに}か／{作|つく}ろう。」",
+      "en": "\"Okay then, let's make something with the eggs and the onion.\""
+    },
+    {
+      "jp": "「スープと／{卵|たまご}ご{飯|はん}、／どっちが／いい？」",
+      "en": "\"Soup or egg on rice — which would you like?\""
+    },
+    {
+      "jp": "「スープの{方|ほう}が／いい。／{寒|さむ}いから。」",
+      "en": "\"Soup's better. It's cold.\""
+    },
+    {
+      "jp": "{夫|おっと}は／{玉|たま}ねぎを／{切|き}りました。",
+      "en": "My husband chopped the onion."
+    },
+    {
+      "jp": "わたしは／{卵|たまご}を／{混|ま}ぜました。",
+      "en": "I beat the eggs."
+    },
+    {
+      "jp": "{卵|たまご}と／{玉|たま}ねぎの／スープが／できました。",
+      "en": "The egg and onion soup was ready."
+    },
+    {
+      "jp": "{簡単|かんたん}な／スープだったけど、／とても／おいしかったです。",
+      "en": "It was a simple soup, but it was really good."
+    },
+    {
+      "jp": "「カレーより／おいしいね。」と／{夫|おっと}が／{言|い}いました。",
+      "en": "\"This is tastier than curry,\" my husband said."
+    }
+  ],
+  "gist": {
+    "q": "Why didn't they make curry?",
+    "options": [
+      "There was no meat",
+      "The husband can't cook",
+      "They had curry yesterday"
+    ],
+    "answer": 0
+  }
+}

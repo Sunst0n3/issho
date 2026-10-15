@@ -1,0 +1,135 @@
+{
+  "id": "st-l1-16",
+  "level": "L1",
+  "unit": 25,
+  "title": "Talking it through",
+  "titleJp": "{二人|ふたり}で{話|はな}し{合|あ}う",
+  "topic": "feelings",
+  "grammar": [
+    "te-hoshii",
+    "noni",
+    "causative",
+    "koto-ni-suru",
+    "kamoshirenai",
+    "tara-conditional",
+    "tte-quote",
+    "mae-ni-ato-de",
+    "nagara",
+    "n-desu"
+  ],
+  "sentences": [
+    {
+      "jp": "{来週|らいしゅう}は／{連休|れんきゅう}です。",
+      "en": "Next week is a long weekend."
+    },
+    {
+      "jp": "{金曜日|きんようび}の／{夜|よる}、／ケンは／{遅|おそ}く／{帰|かえ}ってきました。",
+      "en": "On Friday night, Ken came home late."
+    },
+    {
+      "jp": "「ただいま。／ごめん、／{遅|おそ}く／なって。」",
+      "en": "\"I'm home. Sorry I'm late.\""
+    },
+    {
+      "jp": "ミキは／{怒|おこ}っていました。",
+      "en": "Miki was angry."
+    },
+    {
+      "jp": "「{今日|きょう}は／{早|はや}く／{帰|かえ}って、／カレーを／{作|つく}るって／{言|い}ったのに。」",
+      "en": "\"You said you'd come home early today and make curry.\""
+    },
+    {
+      "jp": "「ずっと／{待|ま}っていたんだよ。」",
+      "en": "\"I've been waiting all this time.\""
+    },
+    {
+      "jp": "「ごめん。／{実|じつ}は、／{同僚|どうりょう}と／キャンプの／{話|はなし}を／していたんだ。」",
+      "en": "\"Sorry. Actually, I was talking with my coworkers about camping.\""
+    },
+    {
+      "jp": "「キャンプ？」",
+      "en": "\"Camping?\""
+    },
+    {
+      "jp": "「うん。／{連休|れんきゅう}に／みんなで／キャンプに／{行|い}くことに／したんだ。／ミキも／{一緒|いっしょ}に／{行|い}こうよ。」",
+      "en": "\"Yeah. We've decided to all go camping over the long weekend. Come with us!\""
+    },
+    {
+      "jp": "ミキは／{何|なに}も／{言|い}いませんでした。",
+      "en": "Miki didn't say anything."
+    },
+    {
+      "jp": "「どうしたの？」",
+      "en": "\"What's wrong?\""
+    },
+    {
+      "jp": "「{連休|れんきゅう}は、／{二人|ふたり}で／ゆっくり／{休|やす}みたかったのに…。」",
+      "en": "\"I wanted the two of us to relax together over the long weekend...\""
+    },
+    {
+      "jp": "「{決|き}める／{前|まえ}に、／{私|わたし}にも／{聞|き}いて／ほしかった。」",
+      "en": "\"I wish you'd asked me before you decided.\""
+    },
+    {
+      "jp": "ケンは／しばらく／{考|かんが}えました。",
+      "en": "Ken thought for a while."
+    },
+    {
+      "jp": "「そうだね。／ミキの／{気持|きも}ちを／{聞|き}かなかった。／{本当|ほんとう}に／ごめん。」",
+      "en": "\"You're right. I didn't ask how you felt. I'm really sorry.\""
+    },
+    {
+      "jp": "「{私|わたし}も／ごめん。／{実|じつ}は、／キャンプが／ちょっと／{苦手|にがて}なの。」",
+      "en": "\"I'm sorry too. To be honest, I'm not really into camping.\""
+    },
+    {
+      "jp": "「どうして？」",
+      "en": "\"Why not?\""
+    },
+    {
+      "jp": "「{子|こ}どもの／とき、／{父|ちち}が／{毎年|まいとし}、／{私|わたし}を／キャンプに／{行|い}かせたの。」",
+      "en": "\"When I was a child, my dad made me go camping every year.\""
+    },
+    {
+      "jp": "「{雨|あめ}の／{日|ひ}も、／{寒|さむ}い／{日|ひ}も。」",
+      "en": "\"Even on rainy days, even on cold days.\""
+    },
+    {
+      "jp": "「そうだったんだ。／{知|し}らなかったよ。」",
+      "en": "\"So that's why. I didn't know.\""
+    },
+    {
+      "jp": "{二人|ふたり}は／{夜|よる}{遅|おそ}くまで／{話|はな}し{合|あ}いました。",
+      "en": "The two of them talked it through until late at night."
+    },
+    {
+      "jp": "「じゃあ、／キャンプは／{一日|いちにち}だけ／{行|い}って、／{次|つぎ}の／{日|ひ}は／うちで／のんびり／しよう。」",
+      "en": "\"Then let's go camping for just one day, and take it easy at home the next day.\""
+    },
+    {
+      "jp": "「いいね。／{晴|は}れたら、／キャンプも／{楽|たの}しいかもしれないね。」",
+      "en": "\"Sounds good. If it's sunny, camping might be fun too.\""
+    },
+    {
+      "jp": "「それから、／{遅|おそ}く／なったけど、／{今|いま}から／{僕|ぼく}に／カレーを／{作|つく}らせて。」",
+      "en": "\"And I know it's late, but let me make the curry now.\""
+    },
+    {
+      "jp": "ミキは／やっと／{笑|わら}いました。／「うん。／{玉|たま}ねぎは／{私|わたし}が／{切|き}るね。」",
+      "en": "Miki finally smiled. \"Okay. I'll cut the onions.\""
+    },
+    {
+      "jp": "その／{夜|よる}、／{二人|ふたり}は／{遅|おそ}い／カレーを／{食|た}べながら、／{連休|れんきゅう}の／{予定|よてい}を／{決|き}めました。",
+      "en": "That night, eating their late curry, they planned their long weekend together."
+    }
+  ],
+  "gist": {
+    "q": "Why was Miki upset at the start of the story?",
+    "options": [
+      "Ken forgot her birthday",
+      "Ken came home late and made weekend plans without asking her",
+      "Ken didn't like her curry"
+    ],
+    "answer": 1
+  }
+}

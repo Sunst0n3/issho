@@ -1,0 +1,139 @@
+{
+  "id": "st-l1-02",
+  "level": "L1",
+  "unit": 16,
+  "title": "The kind old lady",
+  "titleJp": "{優|やさ}しいおばあさん",
+  "topic": "travel",
+  "grammar": [
+    "node",
+    "dake-shika",
+    "tsumori",
+    "wa-contrast",
+    "n-desu",
+    "yori-hou",
+    "masenka-mashou",
+    "he-direction",
+    "ya-nado",
+    "ni-iku-purpose"
+  ],
+  "sentences": [
+    {
+      "jp": "ケンと／ミキは／{旅行|りょこう}で／{古|ふる}い／{町|まち}に／{来|き}ました。",
+      "en": "Ken and Miki came to an old town on a trip."
+    },
+    {
+      "jp": "この／{町|まち}には／{古|ふる}い／お{寺|てら}や／{神社|じんじゃ}が／たくさん／あります。",
+      "en": "There are lots of old temples and shrines in this town."
+    },
+    {
+      "jp": "{今日|きょう}は、／{有名|ゆうめい}な／お{寺|てら}を／{見|み}に／{行|い}く／つもりです。",
+      "en": "Today they plan to go and see a famous temple."
+    },
+    {
+      "jp": "{二人|ふたり}は／{駅|えき}から／お{寺|てら}まで／{歩|ある}きました。",
+      "en": "They walked from the station to the temple."
+    },
+    {
+      "jp": "ケンは／スマホの／{地図|ちず}を／{見|み}て、／ミキは／{町|まち}の／{写真|しゃしん}を／{撮|と}りました。",
+      "en": "Ken looked at the map on his phone, and Miki took photos of the town."
+    },
+    {
+      "jp": "お{寺|てら}は／{大|おお}きくて、／とても／きれいでした。",
+      "en": "The temple was big and very beautiful."
+    },
+    {
+      "jp": "{帰|かえ}る／とき、／ケンが／{言|い}いました。",
+      "en": "On the way back, Ken said:"
+    },
+    {
+      "jp": "「しまった！／スマホの／{充電|じゅうでん}が／ない！」",
+      "en": "\"Oh no! My phone's battery is dead!\""
+    },
+    {
+      "jp": "「え？／{私|わたし}の／スマホは／ホテルだよ。」",
+      "en": "\"What? My phone is at the hotel.\""
+    },
+    {
+      "jp": "{地図|ちず}は／ケンの／スマホの／{中|なか}に／しか／ありません。",
+      "en": "The only map was on Ken's phone."
+    },
+    {
+      "jp": "{近|ちか}くに／{交番|こうばん}も／ありません。",
+      "en": "There was no police box nearby either."
+    },
+    {
+      "jp": "{二人|ふたり}は／{駅|えき}への／{道|みち}が／わかりませんでした。",
+      "en": "They didn't know the way to the station."
+    },
+    {
+      "jp": "その／とき、／{小|ちい}さい／{店|みせ}から／おばあさんが／{出|で}てきました。",
+      "en": "Just then, an old lady came out of a small shop."
+    },
+    {
+      "jp": "ミキは／{日本語|にほんご}で／{聞|き}きました。",
+      "en": "Miki asked her in Japanese."
+    },
+    {
+      "jp": "「すみません、／{駅|えき}は／どちらですか。／{初|はじ}めて／{来|き}たので、／{道|みち}が／わからないんです。」",
+      "en": "\"Excuse me, which way is the station? It's our first time here, so we don't know the way.\""
+    },
+    {
+      "jp": "おばあさんは／{笑|わら}って、／「{駅|えき}は／ちょっと／{遠|とお}いですよ。／{一緒|いっしょ}に／{行|い}きましょう。」と／{言|い}いました。",
+      "en": "The old lady smiled and said, \"The station is a bit far. Let's go together.\""
+    },
+    {
+      "jp": "「いいんですか。／ありがとうございます！」",
+      "en": "\"Are you sure? Thank you so much!\""
+    },
+    {
+      "jp": "{三人|さんにん}は／{一緒|いっしょ}に／{駅|えき}へ／{歩|ある}きました。",
+      "en": "The three of them walked to the station together."
+    },
+    {
+      "jp": "おばあさんは／{町|まち}の／{話|はなし}を／たくさん／しました。",
+      "en": "The old lady told them lots about the town."
+    },
+    {
+      "jp": "「この／{町|まち}は／{秋|あき}が／いちばん／きれいですよ。」",
+      "en": "\"This town is most beautiful in autumn.\""
+    },
+    {
+      "jp": "「{秋|あき}は／{人|ひと}が／{多|おお}いけど、／{冬|ふゆ}は／{静|しず}かです。」",
+      "en": "\"In autumn there are lots of people, but in winter it's quiet.\""
+    },
+    {
+      "jp": "{駅|えき}の／{前|まえ}で、／おばあさんは／かばんから／お{菓子|かし}を／{二|ふた}つ／{出|だ}しました。",
+      "en": "In front of the station, the old lady took two sweets out of her bag."
+    },
+    {
+      "jp": "「どうぞ。／この／{町|まち}の／お{菓子|かし}です。」",
+      "en": "\"Here you are. These are sweets from this town.\""
+    },
+    {
+      "jp": "「ありがとうございます！／{今度|こんど}は、／{秋|あき}に／{来|く}る／つもりです。」",
+      "en": "\"Thank you! Next time, we plan to come in autumn.\""
+    },
+    {
+      "jp": "{帰|かえ}りの／{電車|でんしゃ}で、／{二人|ふたり}は／お{菓子|かし}を／{食|た}べました。／{甘|あま}くて、／おいしかったです。",
+      "en": "On the train home, they ate the sweets. They were sweet and delicious."
+    },
+    {
+      "jp": "「スマホの／{地図|ちず}より、／あの／おばあさんのほうが／ずっと／よかったね。」と／ケンが／{言|い}いました。",
+      "en": "\"That old lady was much better than the map on my phone,\" Ken said."
+    },
+    {
+      "jp": "「うん。／でも、／{今夜|こんや}は／ちゃんと／{充電|じゅうでん}してね。」",
+      "en": "\"Yes. But charge your phone properly tonight, okay?\""
+    }
+  ],
+  "gist": {
+    "q": "How do Ken and Miki get back to the station?",
+    "options": [
+      "They take a taxi",
+      "A kind old lady walks there with them",
+      "They ask a police officer for a map"
+    ],
+    "answer": 1
+  }
+}

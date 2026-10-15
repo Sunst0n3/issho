@@ -11,17 +11,22 @@
     "position-words",
     "te-form"
   ],
-  "coreWordCeiling": 540,
+  "coreWordCeiling": 593,
   "canDos": [
     {
       "id": "u07-cd1",
       "text": "Greet your partner when they come home and ask about their day in casual Japanese.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (or the AI) comes home and says the three lines below, one at a time. Reply in casual Japanese: greet them, ask about their day (忙しかった？ 楽しかった？), react, and answer the dinner question. About 1 minute.",
+        "material": "ただいま！\nうん、とても{忙|いそが}しかった。でも、{仕事|しごと}は{楽|たの}しかったよ。\n{晩|ばん}ご{飯|はん}、{何|なに}{食|た}べる？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Greets with お帰り or お帰りなさい",
+          "Asks about the day with a casual adjective question (今日、忙しかった？ / 楽しかった？)",
+          "Reacts warmly with ね or よ (よかったね / 大変だね)",
+          "Answers the dinner question in plain form, with no です or ます"
+        ]
       }
     },
     {
@@ -29,9 +34,37 @@
       "text": "Follow your partner's directions to find things around the house (on the table, in the fridge, under the sofa).",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Your partner left you a voice message. Listen (twice if you like) and answer the questions.",
+        "material": "{私|わたし}だよ。ごめん、{今日|きょう}は{仕事|しごと}がとても{忙|いそが}しい。{九時|くじ}ごろ{帰|かえ}るね。{晩|ばん}ご{飯|はん}のカレーは{冷蔵庫|れいぞうこ}の{中|なか}にあるよ。お{皿|さら}はテーブルの{上|うえ}。それから、{猫|ねこ}のご{飯|はん}はソファーの{横|よこ}にあるよ。じゃあ、またあとでね。",
+        "questions": [
+          {
+            "q": "Where is the curry?",
+            "options": [
+              "On the table",
+              "In the fridge",
+              "Next to the sofa"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "Where is the cat's food?",
+            "options": [
+              "Next to the sofa",
+              "Under the table",
+              "In the fridge"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "What time will your partner be home?",
+            "options": [
+              "Around 7",
+              "Around 8",
+              "Around 9"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -39,10 +72,15 @@
       "text": "Say what you'll do this evening in order, linking the actions with the て-form.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (or the AI) asks the question below. Answer with at least three things you'll do this evening, in order, joined with the て-form, in casual Japanese. Then ask the same question back. The words in brackets are ideas.",
+        "material": "{今晩|こんばん}、{何|なに}する？\n（{晩|ばん}ご{飯|はん}を{作|つく}る・{食|た}べる・お{風呂|ふろ}に{入|はい}る・テレビを{見|み}る・{寝|ね}る）",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Links at least three actions in order with the て-form (作って、食べて、…)",
+          "Makes the て-forms correctly for different verbs (作って, 食べて, 入って, 見て)",
+          "Ends with a plain verb (寝る / 見る), with no ます",
+          "Asks the question back (何する？)"
+        ]
       }
     },
     {
@@ -50,9 +88,37 @@
       "text": "Read a casual note from your partner saying where they've gone, where things are and what to do.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Your partner left this note on the fridge. Read it and answer the questions.",
+        "material": "おはよう！\n{郵便局|ゆうびんきょく}と{銀行|ぎんこう}へ{行|い}ってきます。{二時|にじ}ごろ{帰|かえ}るね。\nお{昼|ひる}ご{飯|はん}は{冷蔵庫|れいぞうこ}の{中|なか}にあるよ。おにぎりとサラダ。\n{家|いえ}の{鍵|かぎ}はテーブルの{上|うえ}。\n{今日|きょう}はごみの{日|ひ}！ ごみはドアの{横|よこ}にあるよ。お{願|ねが}いします！\n{帰|かえ}って、{一緒|いっしょ}に{掃除|そうじ}する？",
+        "questions": [
+          {
+            "q": "Where has your partner gone?",
+            "options": [
+              "To the station and the supermarket",
+              "To the post office and the bank",
+              "To the hospital"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What does your partner ask you to do?",
+            "options": [
+              "Put out the rubbish by the door",
+              "Make lunch",
+              "Go to the bank"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "Where is your lunch?",
+            "options": [
+              "On the table",
+              "Next to the door",
+              "In the fridge"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -60,10 +126,15 @@
       "text": "Send your partner a short casual message about your day: where you went and how it was.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner sent you the message below. Reply in 3–4 short casual sentences: where you went today, what you did there, and how it was.",
+        "material": "おつかれさま！ {今日|きょう}は{楽|たの}しかった？ {私|わたし}は{今|いま}、{会社|かいしゃ}。{七時|しちじ}ごろ{帰|かえ}るね。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says where they went with へ or に (〜へ行きました is fine)",
+          "Joins two actions with the て-form (〜へ行って、〜を買いました)",
+          "Says how it was with a past adjective (楽しかった, 寒かった, 静かでした)",
+          "Sounds casual and warm: no です after plain adjectives, ends with よ or ね"
+        ]
       }
     }
   ],
@@ -72,17 +143,86 @@
     "id": "u07-task",
     "canDo": "u07-cd2",
     "goal": "Find three things your partner left at home: the one who is out explains by phone where they should be, and the one at home searches the room and reports back.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "Where were the wallet, the keys and the umbrella in the end, and which umbrella was it?",
     "roles": {
       "a": "Out of the house; remembers roughly where they left things (card A)",
       "b": "At home, with a picture of the room (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "Card A — you're out, near the station. You need three things from home: your 財布 (wallet), your 鍵 (keys) and your 傘 (umbrella). You think the wallet is on the kitchen table (台所のテーブルの上) and the keys are in your bag (かばんの中). Your umbrella is the small one (小さい傘), by the door (ドアの横). Ask your partner to check each place (〜の上にある？), and at the end ask them to bring the three things to the station, linking the actions with the て-form (持って、駅へ来る？).",
+    "infoB": "Card B — you're at home, looking around. On the kitchen table: 鍵 (keys) and a コップ (cup). Your partner's bag is on the sofa, and it's empty. Under the sofa (ソファーの下): a 財布 (wallet). By the door (ドアの横): two umbrellas, a big one and a small one. Answer in casual Japanese with position words (〜の上にあるよ / 〜の下にある), and ask which umbrella your partner means (どっち？).",
+    "targets": [
+      "grammar:position-words",
+      "grammar:casual-speech",
+      "grammar:te-form",
+      "grammar:he-direction",
+      "core:cw-0587",
+      "core:cw-0581",
+      "core:cw-0586"
+    ],
+    "register": "plain",
+    "twist": "Swap roles 2–7 days later with a new list: your スマホ, your 時計 (watch) and your train カード. This time the one at home also spots something the other forgot to ask about, and says where it is.",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "{今|いま}、うちにいる？",
+        "en": "Are you at home right now?"
+      },
+      {
+        "role": "b",
+        "jp": "うん、いるよ。{何|なに}？",
+        "en": "Yeah, I am. What's up?"
+      },
+      {
+        "role": "a",
+        "jp": "{私|わたし}の{財布|さいふ}と{鍵|かぎ}と{傘|かさ}、うちにある？",
+        "en": "Are my wallet, keys and umbrella at home?"
+      },
+      {
+        "role": "b",
+        "jp": "ちょっと{待|ま}って。{財布|さいふ}はどこ？",
+        "en": "Hang on. Where's the wallet?"
+      },
+      {
+        "role": "a",
+        "jp": "{台所|だいどころ}のテーブルの{上|うえ}にある？",
+        "en": "Is it on the kitchen table?"
+      },
+      {
+        "role": "b",
+        "jp": "ううん、テーブルの{上|うえ}は{鍵|かぎ}だけだよ。",
+        "en": "No, there's only your keys on the table."
+      },
+      {
+        "role": "a",
+        "jp": "あれ？ {鍵|かぎ}はテーブル？ かばんの{中|なか}じゃない？ じゃあ、{財布|さいふ}は…。",
+        "en": "Huh? The keys are on the table? Not in my bag? Then where's my wallet…"
+      },
+      {
+        "role": "b",
+        "jp": "あ、ソファーの{下|した}にあるよ！",
+        "en": "Oh, it's under the sofa!"
+      },
+      {
+        "role": "a",
+        "jp": "よかった！ {傘|かさ}はドアの{横|よこ}？",
+        "en": "Phew! Is the umbrella by the door?"
+      },
+      {
+        "role": "b",
+        "jp": "うん。{大|おお}きい{傘|かさ}と{小|ちい}さい{傘|かさ}がある。どっち？",
+        "en": "Yes. There's a big one and a small one. Which one?"
+      },
+      {
+        "role": "a",
+        "jp": "{小|ちい}さい{傘|かさ}。{財布|さいふ}と{鍵|かぎ}と{傘|かさ}を{持|も}って、{駅|えき}へ{来|く}る？",
+        "en": "The small one. Could you grab the wallet, keys and umbrella and come to the station?"
+      },
+      {
+        "role": "b",
+        "jp": "いいよ。すぐ{行|い}くね。",
+        "en": "Sure. I'll be right there."
+      }
+    ]
   },
   "capstone": {
     "title": "An evening at home",

@@ -11,16 +11,44 @@
     "de-place-means",
     "counters-people"
   ],
-  "coreWordCeiling": 370,
+  "coreWordCeiling": 415,
   "canDos": [
     {
       "id": "u04-cd1",
       "text": "Understand what staff say as you walk into a restaurant (welcome, how many people?, this way) and answer them.",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Listen to a couple walking into a restaurant. You can play it twice. Then answer the questions.",
+        "material": "「いらっしゃいませ。{何名様|なんめいさま}ですか。」\n「ふたりです。」\n「こちらへどうぞ。メニューです。」\n「ありがとうございます。」\n「ご{注文|ちゅうもん}はお{決|き}まりですか。」\n「すみません、まだです。あ、でも、ビールをふたつお{願|ねが}いします。」\n「かしこまりました。{少々|しょうしょう}お{待|ま}ちください。」",
+        "questions": [
+          {
+            "q": "What does the staff member ask first?",
+            "options": [
+              "Whether you have a booking",
+              "How many people are in your group",
+              "What you'd like to drink"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "When the staff member asks about ordering, what does the customer say?",
+            "options": [
+              "They'd like a recommendation",
+              "They're ready to order everything",
+              "They haven't chosen their food yet, but they'd like two beers"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "What does the staff member say at the end?",
+            "options": [
+              "Please wait a moment",
+              "Please pay at the counter",
+              "The kitchen is closing soon"
+            ],
+            "answer": 0
+          }
+        ]
       }
     },
     {
@@ -28,10 +56,15 @@
       "text": "Tell the staff how many you are and order a dish and a drink each.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "You walk into a restaurant with your partner. The server (the app) asks the two questions below. Answer out loud: say how many you are, then order one dish and one drink for each of you from the menu.",
+        "material": "「いらっしゃいませ。{何名様|なんめいさま}ですか。」\n「ご{注文|ちゅうもん}はお{決|き}まりですか。」\n\nメニュー\nカレー　900{円|えん}\nラーメン　800{円|えん}\nサラダ　500{円|えん}\nビール　550{円|えん}\nお{茶|ちゃ}　250{円|えん}",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says how many with ふたりです",
+          "Orders a dish for each person with を and a number (カレーをひとつ、ラーメンをひとつ)",
+          "Orders a drink for each person with ください or お願いします",
+          "Gets the server's attention or starts the order with すみません"
+        ]
       }
     },
     {
@@ -39,10 +72,15 @@
       "text": "Say what your food is like (tasty, spicy, sweet, not hot) and ask your partner about theirs.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "You're eating dinner out with your partner. Answer their questions about your food out loud, react to what they say, then ask about their food.",
+        "material": "「そのカレー、どうですか。」\n「{辛|から}いですか。」\n「{私|わたし}のラーメンはちょっと{熱|あつ}いです。でも、おいしいですよ。」",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Describes their food with an い-adjective + です (おいしいです, ちょっとからいです)",
+          "Uses a negative with くないです correctly (からくないです, あつくないです)",
+          "Asks about their partner's food with どうですか",
+          "Reacts with ね or よ (おいしいですね, からいですよ)"
+        ]
       }
     },
     {
@@ -50,9 +88,37 @@
       "text": "Read a ramen shop's menu board with prices and find a dish each that fits your budget.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Read the menu board at a ramen shop. You have 2,000 yen for the two of you.",
+        "material": "ラーメン　750{円|えん}\n{辛|から}いラーメン　850{円|えん}\n{野菜|やさい}ラーメン　900{円|えん}\nご{飯|はん}　200{円|えん}\nビール　550{円|えん}\nジュース　250{円|えん}",
+        "questions": [
+          {
+            "q": "Which ramen is the most expensive?",
+            "options": [
+              "The spicy ramen",
+              "The vegetable ramen",
+              "The plain ramen"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "You order one spicy ramen and one vegetable ramen. How much is that?",
+            "options": [
+              "1,600 yen",
+              "1,650 yen",
+              "1,750 yen"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "After those two bowls, what can you still add within 2,000 yen?",
+            "options": [
+              "A beer",
+              "A juice",
+              "A beer and a juice"
+            ],
+            "answer": 1
+          }
+        ]
       }
     },
     {
@@ -60,10 +126,15 @@
       "text": "Text a friend about where you ate yesterday, what you had and how you got there.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "A friend sends you this message. Reply in 2–4 sentences: where you ate yesterday, what you had, and how you got there.",
+        "material": "こんばんは！ きのうの{夜|よる}、{晩|ばん}ご{飯|はん}はどこで{食|た}べましたか？ {何|なに}を{食|た}べましたか？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says where they ate with 〜で食べました",
+          "Says what they had with 〜を食べました or 〜を飲みました",
+          "Says how they got there with 電車で, バスで or 車で行きました",
+          "Uses past ました forms throughout"
+        ]
       }
     }
   ],
@@ -72,17 +143,88 @@
     "id": "u04-task",
     "canDo": "u04-cd2",
     "goal": "Get a table for two at a ramen shop and order a dish and a drink each from the server (played by the AI), keeping the total under 2,500 yen.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "What did each of you order, and what was the total?",
     "roles": {
       "a": "Knows what you both feel like eating",
       "b": "Has the menu with prices and the budget"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "You know what you both feel like tonight. You want something spicy (辛いラーメン) and a cold beer (冷たいビール). Your partner wants vegetables (野菜ラーメン), nothing spicy, and a juice. You can't see the prices: ask. When the server comes, say how many you are (ふたりです) and order.",
+    "infoB": "You have the menu and the budget: 2,500 yen in total (二千五百円), and the total must stay under it. Menu: ラーメン 800円, 辛いラーメン 950円, 野菜ラーメン 1,000円, ご飯 200円, ビール 600円, ジュース 300円; water is free (お水). Tell your partner the prices and agree what to drop.",
+    "targets": [
+      "core:cw-0069",
+      "core:cw-0356",
+      "core:cw-0408",
+      "core:cw-0336",
+      "grammar:counters-people",
+      "grammar:i-adjectives",
+      "grammar:wo-kudasai",
+      "grammar:numbers-prices"
+    ],
+    "register": "polite",
+    "twist": "On the repeat, the server recommends today's special (おすすめ) at 1,200 yen and one of you wants it; the shop also takes cash only (現金だけ) and you have just 2,000 yen. Re-plan the order.",
+    "aiRole": "Ramen shop server who welcomes you, asks how many you are, takes your order and tells you the total",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "おなかがすきましたね。{私|わたし}は{辛|から}いラーメンです。いくらですか。",
+        "en": "I'm so hungry. I'll have the spicy ramen. How much is it?"
+      },
+      {
+        "role": "b",
+        "jp": "{辛|から}いラーメンは{九百五十円|きゅうひゃくごじゅうえん}です。",
+        "en": "The spicy ramen is 950 yen."
+      },
+      {
+        "role": "a",
+        "jp": "ビールは？",
+        "en": "And the beer?"
+      },
+      {
+        "role": "b",
+        "jp": "{六百円|ろっぴゃくえん}です。{私|わたし}は{野菜|やさい}ラーメンです。{千円|せんえん}です。ジュースも{飲|の}みます。{三百円|さんびゃくえん}です。",
+        "en": "600 yen. I'll have the vegetable ramen; that's 1,000 yen. And I'll have a juice too; that's 300 yen."
+      },
+      {
+        "role": "a",
+        "jp": "じゃあ、{二千八百五十円|にせんはっぴゃくごじゅうえん}です。ちょっと{高|たか}いですね。",
+        "en": "So that's 2,850 yen. That's a bit too much."
+      },
+      {
+        "role": "b",
+        "jp": "そうですね。ビールは…ちょっと。",
+        "en": "Yes. Maybe… not the beer?"
+      },
+      {
+        "role": "a",
+        "jp": "でも、{冷|つめ}たいビール…！ わかりました。{私|わたし}はお{水|みず}です。",
+        "en": "But a cold beer…! Okay, fine. I'll have water."
+      },
+      {
+        "role": "b",
+        "jp": "ありがとう。{二千二百五十円|にせんにひゃくごじゅうえん}です。",
+        "en": "Thanks. That's 2,250 yen."
+      },
+      {
+        "role": "a",
+        "jp": "すみません！ {辛|から}いラーメンをひとつ、{野菜|やさい}ラーメンをひとつお{願|ねが}いします。",
+        "en": "Excuse me! One spicy ramen and one vegetable ramen, please."
+      },
+      {
+        "role": "b",
+        "jp": "それから、ジュースをひとつください。",
+        "en": "And one juice, please."
+      },
+      {
+        "role": "a",
+        "jp": "このラーメン、とても{辛|から}いです。でも、おいしいです。",
+        "en": "This ramen is really spicy. But it's good."
+      },
+      {
+        "role": "b",
+        "jp": "{私|わたし}のは{辛|から}くないです。おいしいですよ。",
+        "en": "Mine isn't spicy. It's delicious."
+      }
+    ]
   },
   "capstone": {
     "title": "Dinner out",

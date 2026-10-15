@@ -1,0 +1,98 @@
+{
+  "id": "st-l0-28",
+  "level": "L0",
+  "unit": 15,
+  "title": "The First Snow",
+  "titleJp": "{初|はじ}めての {雪|ゆき}",
+  "topic": "weather",
+  "grammar": [
+    "ta-koto-ga-aru",
+    "tari-tari",
+    "mae-ni-ato-de",
+    "hou-ga-ii",
+    "counters-objects",
+    "adj-naru",
+    "ichiban",
+    "kara-because",
+    "to-iu"
+  ],
+  "sentences": [
+    {
+      "jp": "トムは／{雪|ゆき}を／{見|み}た／ことが／ありません。",
+      "en": "Tom has never seen snow."
+    },
+    {
+      "jp": "トムの／{町|まち}は、／{冬|ふゆ}も／{暖|あたた}かいからです。",
+      "en": "That's because his hometown is warm even in winter."
+    },
+    {
+      "jp": "{十二月|じゅうにがつ}、／トムと／エマは／{北|きた}の／{町|まち}へ／{旅行|りょこう}に／{行|い}きました。",
+      "en": "In December, Tom and Emma took a trip to a town in the north."
+    },
+    {
+      "jp": "エマは／{雪|ゆき}を／{見|み}た／ことが／あります。",
+      "en": "Emma has seen snow before."
+    },
+    {
+      "jp": "「{夜|よる}は／とても／{寒|さむ}いから、／セーターを／{二枚|にまい}／{着|き}た／{方|ほう}が／いいよ。」",
+      "en": "\"It's really cold at night, so you'd better wear two sweaters.\""
+    },
+    {
+      "jp": "{晩|ばん}ご{飯|はん}の／{後|あと}で、／{二人|ふたり}は／ホテルの／{窓|まど}から／{外|そと}を／{見|み}ました。",
+      "en": "After dinner, the two of them looked out of the hotel window."
+    },
+    {
+      "jp": "{白|しろ}い／{雪|ゆき}が／{降|ふ}っていました！",
+      "en": "White snow was falling!"
+    },
+    {
+      "jp": "「すごい！／{雪|ゆき}だ！」",
+      "en": "\"Wow! It's snow!\""
+    },
+    {
+      "jp": "{寝|ね}る／{前|まえ}に、／{二人|ふたり}は／{外|そと}に／{出|で}ました。",
+      "en": "Before going to bed, they went outside."
+    },
+    {
+      "jp": "{雪|ゆき}の{中|なか}を／{歩|ある}いたり、／{写真|しゃしん}を／{撮|と}ったり／しました。",
+      "en": "They walked in the snow, took photos, and so on."
+    },
+    {
+      "jp": "トムは／{雪|ゆき}を／{少|すこ}し／{食|た}べました。",
+      "en": "Tom ate a little snow."
+    },
+    {
+      "jp": "「{冷|つめ}たい！／でも、／{味|あじ}が／ないね。」",
+      "en": "\"Cold! But it doesn't taste of anything.\""
+    },
+    {
+      "jp": "エマは／{笑|わら}いました。",
+      "en": "Emma laughed."
+    },
+    {
+      "jp": "「{雪|ゆき}は／{食|た}べない／{方|ほう}が／いいよ。」",
+      "en": "\"You'd better not eat snow.\""
+    },
+    {
+      "jp": "{手|て}も／{足|あし}も／{冷|つめ}たくなりました。",
+      "en": "Their hands and feet got cold."
+    },
+    {
+      "jp": "ホテルに／{戻|もど}って、／{温|あたた}かい／お{茶|ちゃ}を／{飲|の}みました。",
+      "en": "They went back to the hotel and drank hot tea."
+    },
+    {
+      "jp": "「{今年|ことし}／いちばん／{楽|たの}しい／{夜|よる}だった！」と／トムが／{言|い}いました。",
+      "en": "\"That was the most fun night of the year!\" said Tom."
+    }
+  ],
+  "gist": {
+    "q": "What did Tom do for the first time on this trip?",
+    "options": [
+      "He went skiing",
+      "He saw snow",
+      "He went to a hot spring"
+    ],
+    "answer": 1
+  }
+}

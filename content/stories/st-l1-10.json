@@ -1,0 +1,127 @@
+{
+  "id": "st-l1-10",
+  "level": "L1",
+  "unit": 20,
+  "title": "Yukata and fireworks",
+  "titleJp": "{浴衣|ゆかた}と{花火|はなび}",
+  "topic": "clothes",
+  "grammar": [
+    "sugiru",
+    "no-one",
+    "sou-looks",
+    "te-kureru",
+    "tara-conditional",
+    "te-miru",
+    "koto-ga-dekiru",
+    "relative-clauses",
+    "yori-hou",
+    "kara-because"
+  ],
+  "sentences": [
+    {
+      "jp": "{八月|はちがつ}の／{土曜日|どようび}、／{町|まち}で／お{祭|まつ}りが／あります。",
+      "en": "One Saturday in August, there is a festival in town."
+    },
+    {
+      "jp": "{夜|よる}は／{花火|はなび}も／あります。",
+      "en": "In the evening there are fireworks too."
+    },
+    {
+      "jp": "ミキは／{浴衣|ゆかた}を／{着|き}て／{行|い}きたいです。",
+      "en": "Miki wants to wear a yukata to it."
+    },
+    {
+      "jp": "でも、／{一人|ひとり}で／{着|き}る／ことが／できません。",
+      "en": "But she can't put it on by herself."
+    },
+    {
+      "jp": "ケンの／お{母|かあ}さんが／{来|き}て、／{手伝|てつだ}って／くれました。",
+      "en": "Ken's mother came over and helped her."
+    },
+    {
+      "jp": "ミキの／{浴衣|ゆかた}は、／{白|しろ}に／{青|あお}い／{花|はな}です。",
+      "en": "Miki's yukata is white with blue flowers."
+    },
+    {
+      "jp": "「きれい！／よく／{似合|にあ}うよ。」と／ケンが／{言|い}いました。",
+      "en": "\"Beautiful! It really suits you,\" Ken said."
+    },
+    {
+      "jp": "ケンも／{浴衣|ゆかた}を／{着|き}て／みました。／{黒|くろ}いのです。",
+      "en": "Ken tried his yukata on too. His is a black one."
+    },
+    {
+      "jp": "でも、／ケンの／{浴衣|ゆかた}は／{小|ちい}さすぎました。／{足|あし}が／{見|み}えます。",
+      "en": "But Ken's yukata was too small. You could see his legs."
+    },
+    {
+      "jp": "「お{父|とう}さんのを／{着|き}て／みたら？」と／お{母|かあ}さんが／{言|い}いました。",
+      "en": "\"Why don't you try on your father's?\" his mother said."
+    },
+    {
+      "jp": "お{父|とう}さんのは、／ちょうど／よかったです。",
+      "en": "His father's was just right."
+    },
+    {
+      "jp": "「{二人|ふたり}とも／{素敵|すてき}よ。／{楽|たの}しんできてね。」",
+      "en": "\"You both look lovely. Have fun!\""
+    },
+    {
+      "jp": "お{祭|まつ}りは／{人|ひと}で／いっぱいでした。",
+      "en": "The festival was packed with people."
+    },
+    {
+      "jp": "おいしそうな／{食|た}べ{物|もの}が／たくさん／ありました。",
+      "en": "There was lots of delicious-looking food."
+    },
+    {
+      "jp": "「{全部|ぜんぶ}／おいしそう！」と／ケンが／{言|い}いました。",
+      "en": "\"It all looks delicious!\" said Ken."
+    },
+    {
+      "jp": "{二人|ふたり}は／{冷|つめ}たい／{飲|の}み{物|もの}を／{買|か}って、／{川|かわ}の／{近|ちか}くに／{座|すわ}りました。",
+      "en": "They bought cold drinks and sat down by the river."
+    },
+    {
+      "jp": "{八時|はちじ}に、／{花火|はなび}が／{始|はじ}まりました。",
+      "en": "At eight o'clock, the fireworks began."
+    },
+    {
+      "jp": "{空|そら}に／{大|おお}きい／{花|はな}が／{咲|さ}きました。",
+      "en": "Big flowers bloomed in the sky."
+    },
+    {
+      "jp": "「わあ、／きれい…。」",
+      "en": "\"Wow, beautiful...\""
+    },
+    {
+      "jp": "ミキは／{写真|しゃしん}を／たくさん／{撮|と}りました。",
+      "en": "Miki took lots of photos."
+    },
+    {
+      "jp": "ケンは／{花火|はなび}より、／{花火|はなび}を／{見|み}ている／ミキを／{見|み}ていました。",
+      "en": "Ken was looking at Miki watching the fireworks more than at the fireworks."
+    },
+    {
+      "jp": "{帰|かえ}る／とき、／ミキが／{言|い}いました。",
+      "en": "On the way home, Miki said:"
+    },
+    {
+      "jp": "「お{母|かあ}さんが／{手伝|てつだ}って／くれたから、／{素敵|すてき}な／{夜|よる}に／なったね。」",
+      "en": "\"It turned into a lovely night because your mum helped us.\""
+    },
+    {
+      "jp": "「{来年|らいねん}は、／{自分|じぶん}で／{着|き}たいな。／お{母|かあ}さんに／{教|おし}えて／もらおう。」",
+      "en": "\"Next year I want to put it on myself. I'll get your mum to teach me.\""
+    }
+  ],
+  "gist": {
+    "q": "Who helped Ken and Miki get dressed in their yukata?",
+    "options": [
+      "A shop assistant",
+      "Ken's mother",
+      "Miki's friend"
+    ],
+    "answer": 1
+  }
+}

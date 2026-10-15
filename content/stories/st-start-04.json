@@ -1,0 +1,117 @@
+{
+  "id": "st-start-04",
+  "level": "start",
+  "unit": 2,
+  "title": "The station café",
+  "titleJp": "えきの カフェ",
+  "topic": "drink",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "kore-sore-are",
+    "mo-also",
+    "numbers-prices",
+    "masu-forms",
+    "koko-soko-asoko"
+  ],
+  "sentences": [
+    {
+      "jp": "しゅうまつの／あさです。",
+      "en": "It's a weekend morning."
+    },
+    {
+      "jp": "ここは／えきの／カフェです。",
+      "en": "This is the café at the station."
+    },
+    {
+      "jp": "「コーヒーは／いくらですか。」",
+      "en": "\"How much is a coffee?\""
+    },
+    {
+      "jp": "「よんひゃくえんです。」",
+      "en": "\"It's 400 yen.\""
+    },
+    {
+      "jp": "「こうちゃは？」",
+      "en": "\"And tea?\""
+    },
+    {
+      "jp": "「こうちゃも／よんひゃくえんです。」",
+      "en": "\"Tea is 400 yen too.\""
+    },
+    {
+      "jp": "「ぼくは／コーヒー、／おねがいします。」",
+      "en": "\"A coffee for me, please.\""
+    },
+    {
+      "jp": "「わたしは／こうちゃ、／おねがいします。」",
+      "en": "\"And a tea for me, please.\""
+    },
+    {
+      "jp": "「この／ケーキは／いくらですか。」",
+      "en": "\"How much is this cake?\""
+    },
+    {
+      "jp": "「ろっぴゃくえんです。」",
+      "en": "\"It's 600 yen.\""
+    },
+    {
+      "jp": "「エマ、／ケーキは／たべますか。」",
+      "en": "\"Emma, are you having cake?\""
+    },
+    {
+      "jp": "「いいえ、／きょうは／たべません。」",
+      "en": "\"No, not today.\""
+    },
+    {
+      "jp": "「じゃあ、／ぼくも／たべません。」",
+      "en": "\"Then I won't either.\""
+    },
+    {
+      "jp": "ケーキは／すぐ／そこです…",
+      "en": "The cake is right there..."
+    },
+    {
+      "jp": "「…すみません、／ケーキ、／おねがいします！」",
+      "en": "\"...Excuse me, a piece of cake, please!\""
+    },
+    {
+      "jp": "「ぼくも！」",
+      "en": "\"Me too!\""
+    },
+    {
+      "jp": "「にせんえんです。」",
+      "en": "\"That's 2,000 yen.\""
+    },
+    {
+      "jp": "「はい、／いちまんえんです。」",
+      "en": "\"Here's 10,000 yen.\""
+    },
+    {
+      "jp": "「お{釣|つ}りは／はっせんえんです。」",
+      "en": "\"Your change is 8,000 yen.\""
+    },
+    {
+      "jp": "「いただきます！」",
+      "en": "\"Let's eat!\""
+    },
+    {
+      "jp": "「エマ、／また／きますか。」",
+      "en": "\"Emma, will we come here again?\""
+    },
+    {
+      "jp": "「はい、／また／きます！」",
+      "en": "\"Yes, we'll come again!\""
+    }
+  ],
+  "gist": {
+    "q": "What do Emma and Ken have in the end?",
+    "options": [
+      "Just one coffee and one tea",
+      "A drink and a piece of cake each",
+      "Two pieces of cake and no drinks"
+    ],
+    "answer": 1
+  }
+}

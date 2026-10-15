@@ -1,0 +1,116 @@
+{
+  "id": "st-l0-03",
+  "level": "L0",
+  "unit": 6,
+  "title": "Our Sunday café",
+  "titleJp": "すきな カフェ",
+  "topic": "hobbies",
+  "grammar": [
+    "wa-desu",
+    "no-possession",
+    "mo-also",
+    "masu-forms",
+    "wo-object",
+    "ni-time-place",
+    "i-adjectives",
+    "de-place-means",
+    "arimasu-imasu",
+    "to-with",
+    "adverbs-frequency",
+    "na-adjectives",
+    "ka-or-ni-suru",
+    "dictionary-form",
+    "suki-kirai"
+  ],
+  "sentences": [
+    {
+      "jp": "まちに／ちいさい／カフェが／あります。",
+      "en": "There's a small café in town."
+    },
+    {
+      "jp": "ケンと／エマの／すきな／カフェです。",
+      "en": "It's Ken and Emma's favourite café."
+    },
+    {
+      "jp": "しずかな／カフェです。",
+      "en": "It's a quiet café."
+    },
+    {
+      "jp": "{人|ひと}も／あまり／いません。",
+      "en": "There aren't many people, either."
+    },
+    {
+      "jp": "ふたりは／にちようびの／あさ、／よく／ここに／{来|き}ます。",
+      "en": "The two of them often come here on Sunday mornings."
+    },
+    {
+      "jp": "ケンは／いつも／コーヒーに／します。",
+      "en": "Ken always has coffee."
+    },
+    {
+      "jp": "エマは／コーヒーが／あまり／すきじゃないです。",
+      "en": "Emma doesn't like coffee much."
+    },
+    {
+      "jp": "エマは／こうちゃか／ジュースに／します。",
+      "en": "Emma has tea or juice."
+    },
+    {
+      "jp": "ときどき、／ケーキも／{食|た}べます。",
+      "en": "Sometimes they have cake too."
+    },
+    {
+      "jp": "ここの／ケーキは／おいしいです。",
+      "en": "The cake here is delicious."
+    },
+    {
+      "jp": "ふたりは／ここで／{本|ほん}を／{読|よ}みます。",
+      "en": "They read books here."
+    },
+    {
+      "jp": "ケンは／{日本語|にほんご}の／{本|ほん}を／{読|よ}みます。",
+      "en": "Ken reads a Japanese book."
+    },
+    {
+      "jp": "{日本語|にほんご}は／むずかしいです。",
+      "en": "Japanese is difficult."
+    },
+    {
+      "jp": "でも、／たのしいです。",
+      "en": "But it's fun."
+    },
+    {
+      "jp": "{今日|きょう}も／にちようびです。",
+      "en": "Today is Sunday again."
+    },
+    {
+      "jp": "でも、／ケンは／コーヒーに／しません。",
+      "en": "But Ken doesn't order coffee."
+    },
+    {
+      "jp": "「{今日|きょう}は／こうちゃに／する。」",
+      "en": "\"I'll have tea today.\""
+    },
+    {
+      "jp": "「へえ、／ほんとう？」",
+      "en": "\"Oh? Really?\""
+    },
+    {
+      "jp": "「エマも／こうちゃ、／ぼくも／こうちゃ！」",
+      "en": "\"You're having tea, and I'm having tea too!\""
+    },
+    {
+      "jp": "ふたりは／こうちゃを／{飲|の}みます。",
+      "en": "The two of them drink tea."
+    }
+  ],
+  "gist": {
+    "q": "What is different about this Sunday?",
+    "options": [
+      "The café is closed",
+      "Ken has tea instead of coffee",
+      "Emma has coffee for the first time"
+    ],
+    "answer": 1
+  }
+}

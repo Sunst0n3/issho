@@ -1,0 +1,70 @@
+{
+  "id": "rp-u21",
+  "unit": 21,
+  "title": "Overtime again?",
+  "titleJp": "また{残業|ざんぎょう}？",
+  "setting": "A weeknight at home. Aoi gets home late from work, worn out; Hikaru has heard some news.",
+  "level": 3,
+  "register": "plain",
+  "targets": [
+    "grammar:shi-reasons",
+    "grammar:sou-hearsay",
+    "grammar:te-oku",
+    "grammar:ba-conditional",
+    "core:cw-1005",
+    "core:cw-1004",
+    "core:cw-0344"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "おかえりなさい。{遅|おそ}かったね。また{残業|ざんぎょう}？",
+      "en": "Welcome home. You're late. Overtime again?",
+      "cue": "late · overtime again"
+    },
+    {
+      "role": "b",
+      "jp": "うん。{会議|かいぎ}は{長|なが}いし、メールは{多|おお}いし、もう{疲|つか}れた。",
+      "en": "Yeah. The meetings go on forever, there are so many emails… I'm worn out.",
+      "hint": "〜し、〜し lists reasons one after another: \"the meetings are long, and the emails are many…\"",
+      "cue": "long meetings · emails · tired"
+    },
+    {
+      "role": "a",
+      "jp": "お{疲|つか}れ{様|さま}。そういえば、{田中|たなか}さんの{会社|かいしゃ}、{来年|らいねん}{大阪|おおさか}に{引|ひ}っ{越|こ}すそうだよ。",
+      "en": "You've worked hard. Oh, by the way — I heard Tanaka-san's company is moving to Osaka next year.",
+      "hint": "Plain form + そうだ passes on news: \"I heard that…\". Don't confuse it with 〜そう \"looks…\" (忙しそう).",
+      "cue": "by the way · Tanaka's company · moving"
+    },
+    {
+      "role": "b",
+      "jp": "え、ほんと？ {田中|たなか}さんも{行|い}くの？",
+      "en": "What, really? Is Tanaka-san going too?",
+      "cue": "really · Tanaka going too"
+    },
+    {
+      "role": "a",
+      "jp": "まだわからないって。それより、{明日|あした}も{早|はや}いんでしょう？ お{弁当|べんとう}、{作|つく}っておくね。",
+      "en": "Tanaka-san doesn't know yet, apparently. Anyway, you're early again tomorrow, aren't you? I'll make your lunch ahead of time.",
+      "hint": "〜ておく = do something now, ready for later.",
+      "cue": "doesn't know yet · early tomorrow · bento"
+    },
+    {
+      "role": "b",
+      "jp": "ありがとう。{早|はや}く{終|お}われば、{明日|あした}は{一緒|いっしょ}に{晩|ばん}ご{飯|はん}{食|た}べよう。",
+      "en": "Thanks. If I finish early, let's have dinner together tomorrow.",
+      "hint": "〜ば: 終わる → 終われば \"if (I) finish\".",
+      "cue": "finish early · dinner together"
+    }
+  ]
+}

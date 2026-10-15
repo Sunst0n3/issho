@@ -1,0 +1,70 @@
+{
+  "id": "rp-u22",
+  "unit": 22,
+  "title": "You can read it now!",
+  "titleJp": "{読|よ}めるようになったね",
+  "setting": "Walking home together one evening, you stop outside a new restaurant and read the menu by the door.",
+  "level": 3,
+  "register": "plain",
+  "targets": [
+    "grammar:you-ni-naru",
+    "grammar:to-conditional",
+    "grammar:you-da",
+    "grammar:nakutemo-ii",
+    "core:cw-1027",
+    "core:cw-0335",
+    "core:cw-0887"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "{見|み}て！ この{店|みせ}のメニュー、{全部|ぜんぶ}{読|よ}めるようになった！",
+      "en": "Look! I can read this restaurant's whole menu now!",
+      "hint": "〜ようになった describes a change: \"I've become able to…\".",
+      "cue": "look · menu · can read now"
+    },
+    {
+      "role": "b",
+      "jp": "すごい！ {毎日|まいにち}{練習|れんしゅう}すると、{本当|ほんとう}に{読|よ}めるようになるんだね。",
+      "en": "Amazing! If you practise every day, you really do learn to read it.",
+      "hint": "〜と: when A happens, B naturally follows.",
+      "cue": "amazing · practise daily · really works"
+    },
+    {
+      "role": "a",
+      "jp": "でも、{今日|きょう}は{休|やす}みみたい。{中|なか}が{暗|くら}いよ。",
+      "en": "But it looks like they're closed today. It's dark inside.",
+      "hint": "みたい is the casual 〜ようだ: a guess from what you can see.",
+      "cue": "closed today · seems · dark inside"
+    },
+    {
+      "role": "b",
+      "jp": "{残念|ざんねん}。じゃあ、うちで{何|なに}か{作|つく}ろうか。",
+      "en": "Shame. Shall we make something at home, then?",
+      "cue": "shame · cook at home"
+    },
+    {
+      "role": "a",
+      "jp": "{疲|つか}れてるでしょう？ {今日|きょう}は{作|つく}らなくてもいいよ。コンビニで{何|なに}か{買|か}おう。",
+      "en": "You're tired, aren't you? You don't have to cook tonight. Let's grab something at the konbini.",
+      "hint": "〜なくてもいい = you don't have to.",
+      "cue": "tired · don't have to cook · konbini"
+    },
+    {
+      "role": "b",
+      "jp": "ありがとう。じゃあ、この{店|みせ}はまた{今度|こんど}ね。",
+      "en": "Thanks. We'll try this place another time, then.",
+      "cue": "thanks · this place · next time"
+    }
+  ]
+}

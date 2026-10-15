@@ -11,16 +11,44 @@
     "te-kudasai",
     "ga-subject"
   ],
-  "coreWordCeiling": 595,
+  "coreWordCeiling": 644,
   "canDos": [
     {
       "id": "u08-cd1",
       "text": "Read shop signs with opening hours and work out when you can go together.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "It's Wednesday, 12:30. Read the four signs on your street and answer the questions.",
+        "material": "【スーパー】\n{毎日|まいにち}　{午前|ごぜん}{九時|くじ}から{午後|ごご}{十時|じゅうじ}まで\n\n【カフェ】\n{十一時|じゅういちじ}〜{十八時|じゅうはちじ}\n{定休日|ていきゅうび}：{水曜日|すいようび}\n\n【{郵便局|ゆうびんきょく}】\n{平日|へいじつ}　{九時|くじ}〜{十七時|じゅうしちじ}\n{土曜日|どようび}・{日曜日|にちようび}は{休|やす}み\n\n【{時計|とけい}の{店|みせ}】\n{十時|じゅうじ}〜{十九時|じゅうくじ}\n{昼休|ひるやす}み　{十二時|じゅうにじ}〜{十三時|じゅうさんじ}\n（{今|いま}：{準備中|じゅんびちゅう}）",
+        "questions": [
+          {
+            "q": "Can you two go to the café this afternoon?",
+            "options": [
+              "Yes, until 6 pm",
+              "No, it's closed on Wednesdays",
+              "Only after 6 pm"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "You need the post office on Saturday morning. What is the problem?",
+            "options": [
+              "It's closed at weekends",
+              "It opens at 10",
+              "It closes at noon"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "When can you go into the watch shop today?",
+            "options": [
+              "Right now",
+              "Not until tomorrow",
+              "From 1 pm"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -28,10 +56,15 @@
       "text": "Make simple requests in a shop: ask the clerk to wait, to put things in a bag, or to write the price down.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "You're buying towels. The AI plays the clerk and says the lines below, one at a time. Reply to each with a polite request using 〜てください: (1) you didn't catch the price, so ask them to write it down; (2) ask them to wait while you check with your partner; (3) ask them to put the towels in a bag.",
+        "material": "いらっしゃいませ。このタオルは{二千|にせん}{四百|よんひゃく}{円|えん}です。\nこちらでいいですか。\n{袋|ふくろ}はどうしますか。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Asks for the price in writing: 書いてください",
+          "Asks the clerk to wait: ちょっと待ってください",
+          "Asks for a bag: 袋に入れてください",
+          "Opens politely with すみません and keeps to です / ます with the clerk"
+        ]
       }
     },
     {
@@ -39,10 +72,15 @@
       "text": "Compare things with your partner while shopping (this one's good, it's not very expensive, that's really big) and choose one.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "You and your partner (or the AI) are choosing a new pillow. Look at the three below. In casual Japanese, comment on at least two of them with degree words, say which one you won't buy, and agree on one (どれがいい？ — これがいい).",
+        "material": "A　{大|おお}きい{枕|まくら}　{四千|よんせん}{八百|はっぴゃく}{円|えん}\nB　{小|ちい}さい{枕|まくら}　{千|せん}{二百|にひゃく}{円|えん}\nC　{軽|かる}い{枕|まくら}　{二千|にせん}{五百|ごひゃく}{円|えん}",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Uses とても / すごく / ちょっと with an adjective (ちょっと高い)",
+          "Uses あまり or 全然 with a negative (あまり高くない)",
+          "Says what they won't buy in the plain negative (Aは買わない)",
+          "Asks or answers with が: どれがいい？ — これがいい"
+        ]
       }
     },
     {
@@ -50,9 +88,37 @@
       "text": "Follow a casual chat about what to buy and what you don't need, and tick off a shopping list.",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Listen to a couple deciding what to buy at the supermarket (two voices, taking turns). Their list says 牛乳, 卵, パン, 石けん and お菓子. Then answer the questions.",
+        "material": "スーパーで{何|なに}{買|か}う？\nえっと、{牛乳|ぎゅうにゅう}がない。{牛乳|ぎゅうにゅう}は{買|か}う。\n{卵|たまご}は？\n{卵|たまご}はまだ{冷蔵庫|れいぞうこ}にあるよ。{今日|きょう}は{買|か}わない。\nパンは？ {二|ふた}つ{買|か}う？\nううん、{一|ひと}つでいいよ。あ、それから、トイレの{石|せっ}けんがない。\nじゃあ、{石|せっ}けんも。お{菓子|かし}は？\nお{菓子|かし}は{買|か}わない！ うちにまだたくさんあるよ。",
+        "questions": [
+          {
+            "q": "Which item do they decide not to buy today?",
+            "options": [
+              "Milk",
+              "Eggs",
+              "Soap"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "How much bread do they buy?",
+            "options": [
+              "Two",
+              "None",
+              "One"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "Why don't they buy any sweets?",
+            "options": [
+              "They're too expensive",
+              "There are still lots at home",
+              "The shop has none"
+            ],
+            "answer": 1
+          }
+        ]
       }
     }
   ],
@@ -61,17 +127,88 @@
     "id": "u08-task",
     "canDo": "u08-cd3",
     "goal": "Buy new towels and cups for home for under 5,000 yen: compare the options, agree which ones are best, and ask the clerk (played by the AI) to put them in a bag.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "What did you buy, and how much was it altogether?",
     "roles": {
       "a": "Sees the shelf with the options and prices (card A)",
-      "b": "Knows the budget, the colours you like and what's already at home (card B)"
+      "b": "Knows the budget, what's already at home and what you need (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "Card A — you're at the shelf. Towels (タオル): ① big, ¥1,800 each; ② small, ¥600 each; ③ big and really soft (すごくいい), ¥3,000 each. Cups (コップ): ④ glass, ¥500 each; ⑤ big and a bit heavy (ちょっと重い), ¥900 each. All prices include tax (税込). Describe the options with とても / すごく / ちょっと and あまり〜ない, and give the prices.",
+    "infoB": "Card B — you know what you need. Budget: ¥5,000 altogether (全部で五千円まで). You have lots of small towels at home, so you won't buy those (小さいタオルは買わない); you need two big ones. You need two cups, and you don't like heavy cups (重いコップはあまり好きじゃない). Ask which ones are good (どれがいい？) and how much they are, add up the total, and finish by asking the clerk to put everything in a bag (袋に入れてください).",
+    "targets": [
+      "grammar:adverbs-degree",
+      "grammar:ga-subject",
+      "grammar:nai-form",
+      "grammar:te-kudasai",
+      "grammar:kara-made",
+      "core:cw-0600",
+      "core:cw-0542",
+      "core:cw-0557"
+    ],
+    "register": "mixed",
+    "twist": "Repeat it 2–7 days later with a ¥3,000 budget and a sale: the soft towels (③) are now half price, ¥1,500 each. Redo the maths and choose again; this time the clerk also asks how you will pay (カードですか、現金ですか).",
+    "aiRole": "The shop clerk (店員): greets you, answers price questions politely, and bags the items when asked (いらっしゃいませ / 袋はどうしますか).",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "タオルはこの{三|みっ}つ。どれがいい？",
+        "en": "These are the three towels. Which do you like?"
+      },
+      {
+        "role": "b",
+        "jp": "{大|おお}きいタオルを{二|ふた}つ{買|か}う。{小|ちい}さいタオルは{買|か}わない。うちにたくさんあるよ。",
+        "en": "Let's get two big towels. Not the small ones — we have lots at home."
+      },
+      {
+        "role": "a",
+        "jp": "{大|おお}きいタオルはこれとこれ。これは{千|せん}{八百|はっぴゃく}{円|えん}。これは{三千|さんぜん}{円|えん}で、すごくいいよ。",
+        "en": "The big ones are this and this. This one's 1,800 yen. This one's 3,000 yen, and it's really nice."
+      },
+      {
+        "role": "b",
+        "jp": "{三千|さんぜん}{円|えん}？ ちょっと{高|たか}い。{全部|ぜんぶ}で{五千|ごせん}{円|えん}までだよ。",
+        "en": "3,000 yen? That's a bit pricey. We've only got 5,000 yen altogether."
+      },
+      {
+        "role": "a",
+        "jp": "そうか。じゃあ、{千|せん}{八百|はっぴゃく}{円|えん}のタオルにする？",
+        "en": "Right. Then shall we go with the 1,800-yen towels?"
+      },
+      {
+        "role": "b",
+        "jp": "うん、それがいい。コップは？",
+        "en": "Yes, those are good. What about cups?"
+      },
+      {
+        "role": "a",
+        "jp": "{五百|ごひゃく}{円|えん}のコップと{九百|きゅうひゃく}{円|えん}のコップがある。{九百|きゅうひゃく}{円|えん}のコップはちょっと{重|おも}いよ。",
+        "en": "There are 500-yen cups and 900-yen cups. The 900-yen ones are a bit heavy."
+      },
+      {
+        "role": "b",
+        "jp": "{重|おも}いコップはあまり{好|す}きじゃない。{五百|ごひゃく}{円|えん}のコップを{二|ふた}つ{買|か}う。",
+        "en": "I'm not keen on heavy cups. Let's get two of the 500-yen ones."
+      },
+      {
+        "role": "a",
+        "jp": "{全部|ぜんぶ}でいくら？",
+        "en": "How much is that altogether?"
+      },
+      {
+        "role": "b",
+        "jp": "えっと…{三千|さんぜん}{六百|ろっぴゃく}{円|えん}と{千|せん}{円|えん}で、{四千|よんせん}{六百|ろっぴゃく}{円|えん}。{大丈夫|だいじょうぶ}！",
+        "en": "Um… 3,600 and 1,000 makes 4,600 yen. We're fine!"
+      },
+      {
+        "role": "a",
+        "jp": "よかった。すみません、これをください。",
+        "en": "Great. Excuse me, we'll take these."
+      },
+      {
+        "role": "b",
+        "jp": "それから、{袋|ふくろ}に{入|い}れてください。",
+        "en": "And could you put them in a bag, please?"
+      }
+    ]
   },
   "capstone": {
     "title": "Saturday at the shops",

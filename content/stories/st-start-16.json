@@ -1,0 +1,110 @@
+{
+  "id": "st-start-16",
+  "level": "start",
+  "unit": 5,
+  "title": "The wrong station",
+  "titleJp": "ここは どこ？",
+  "topic": "transport",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "ja-nai-desu",
+    "mo-also",
+    "ne-yo",
+    "masu-forms",
+    "koko-soko-asoko",
+    "wo-object",
+    "counting-tsu",
+    "ni-time-place",
+    "masu-past",
+    "i-adjectives",
+    "de-place-means",
+    "masenka-mashou",
+    "arimasu-imasu",
+    "deshita"
+  ],
+  "sentences": [
+    {
+      "jp": "どようびの／あさです。",
+      "en": "It's Saturday morning."
+    },
+    {
+      "jp": "わたしたちは／でんしゃで／こうえんに／いきます。",
+      "en": "We're taking the train to the park."
+    },
+    {
+      "jp": "でんしゃの／なかで、／ケンは／ねました。",
+      "en": "On the train, Ken fell asleep."
+    },
+    {
+      "jp": "わたしも／ねました。",
+      "en": "I fell asleep too."
+    },
+    {
+      "jp": "「エマ、／ここは／どこですか。」",
+      "en": "\"Emma, where are we?\""
+    },
+    {
+      "jp": "「わかりません…」",
+      "en": "\"I don't know...\""
+    },
+    {
+      "jp": "ここは／こうえんの／{駅|えき}じゃないです！",
+      "en": "This isn't the station for the park!"
+    },
+    {
+      "jp": "わたしたちは／でんしゃを／おりました。",
+      "en": "We got off the train."
+    },
+    {
+      "jp": "ちいさい／{駅|えき}でした。",
+      "en": "It was a small station."
+    },
+    {
+      "jp": "{駅|えき}に／ひとが／いませんでした。",
+      "en": "There was nobody at the station."
+    },
+    {
+      "jp": "「どう／しましょうか。」",
+      "en": "\"What shall we do?\""
+    },
+    {
+      "jp": "「あ、／あそこに／カフェが／ありますよ。」",
+      "en": "\"Oh, there's a café over there.\""
+    },
+    {
+      "jp": "「コーヒーを／のみませんか。」",
+      "en": "\"Shall we have a coffee?\""
+    },
+    {
+      "jp": "「いいですね、／のみましょう。」",
+      "en": "\"Good idea, let's.\""
+    },
+    {
+      "jp": "「ここの／コーヒーは／おいしいですね！」",
+      "en": "\"The coffee here is really good!\""
+    },
+    {
+      "jp": "カフェの／おんなのひとは／とても／やさしい／ひとでした。",
+      "en": "The woman at the café was very kind."
+    },
+    {
+      "jp": "「こうえんは／みっつ／まえの／{駅|えき}ですよ。」",
+      "en": "\"The park is three stations back.\""
+    },
+    {
+      "jp": "「こんどは／ねません！」",
+      "en": "\"This time, no sleeping!\""
+    }
+  ],
+  "gist": {
+    "q": "Why did they end up at the wrong station?",
+    "options": [
+      "They took the wrong train.",
+      "The park station was closed.",
+      "They fell asleep on the train."
+    ],
+    "answer": 2
+  }
+}

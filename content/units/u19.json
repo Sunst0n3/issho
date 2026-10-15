@@ -11,17 +11,21 @@
     "tara-conditional",
     "kureru"
   ],
-  "coreWordCeiling": 1220,
+  "coreWordCeiling": 1260,
   "canDos": [
     {
       "id": "u19-cd1",
       "text": "Talk about presents you've given and received: who gave what to whom, and which one you liked best.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (or the AI) asks you the questions below. Answer in casual Japanese: who gave you what, what you gave someone, and which present you liked best.",
+        "material": "{今|いま}までで{一番|いちばん}うれしかったプレゼントは{何|なに}？\nそれ、{誰|だれ}がくれたの？\n{最近|さいきん}、{誰|だれ}かに{何|なに}かあげた？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says who gave them a present with 〜が くれた or 〜に もらった (ははが セーターを くれた)",
+          "Says what they gave someone with 〜に あげた",
+          "Says which present they liked best and why (いちばん うれしかった / きにいった + から)"
+        ]
       }
     },
     {
@@ -29,10 +33,14 @@
       "text": "Choose a present for a friend together: suggest ideas, and say what to do if they don't like it or can't use it.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (or the AI) says the lines below. Suggest a present for Satomi and give a reason, then say what you'll do if she doesn't like it or can't use it, using 〜たら.",
+        "material": "{来週|らいしゅう}、さとみの{誕生日|たんじょうび}だよね。{何|なに}をあげる？\nさとみは{料理|りょうり}が{好|す}きだけど、お{酒|さけ}は{飲|の}めないよ。\nもし{気|き}に{入|い}らなかったら、どうする？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Suggests a present with a reason (〜は どう？ / 〜を あげよう + から)",
+          "Uses 〜たら for the backup plan (きにいらなかったら、こうかん できる)",
+          "Uses a potential form or できる correctly (つかえる, こうかん できる, のめない)"
+        ]
       }
     },
     {
@@ -40,9 +48,37 @@
       "text": "Understand a friend's story about a celebration that went wrong (forgot the cake, broke a glass) and answer questions.",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Your friend Satomi sent you a voice message about her husband's birthday. Listen (you can play it twice), then answer the questions.",
+        "material": "ねえ、{聞|き}いて！{昨日|きのう}、{夫|おっと}の{誕生日|たんじょうび}だったんだ。\n{朝|あさ}ケーキを{買|か}ったんだけど、{電車|でんしゃ}に{忘|わす}れてしまったの。\nそれで、{家|いえ}で{作|つく}ろうと{思|おも}ったけど、{卵|たまご}がなくて{作|つく}れなかった。\n{夜|よる}は{乾杯|かんぱい}のときに、コップも{割|わ}っちゃった。\nでも、{夫|おっと}は「{二人|ふたり}でいられたら、それでいいよ」って{笑|わら}ってた。\n{来年|らいねん}は、ケーキは{家|いえ}の{近|ちか}くで{買|か}うね！",
+        "questions": [
+          {
+            "q": "What happened to the cake?",
+            "options": [
+              "She dropped it on the way home",
+              "She left it on the train",
+              "Her husband ate it before dinner"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "Why couldn't she make a cake at home?",
+            "options": [
+              "She had no eggs",
+              "The oven was broken",
+              "She didn't have time"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "How did her husband react?",
+            "options": [
+              "He was upset about the broken glass",
+              "He went out to buy another cake",
+              "He laughed and said being together was enough"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -50,10 +86,15 @@
       "text": "Write a thank-you message for a present, saying who gave it and what you'll do with it.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner's aunt Michiko sent you a scarf for your birthday, with the card below. Write a polite thank-you reply in 3–5 sentences: say what you received, how you feel about it, and what you'll do with it.",
+        "material": "お{誕生日|たんじょうび}おめでとう！{小|ちい}さいプレゼントを{送|おく}りました。{気|き}に{入|い}ったらうれしいです。　みちこ",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Thanks her and names the present (すてきな マフラーを ありがとうございました)",
+          "Uses くれました or もらいました in the right direction",
+          "Says what they'll do with it, e.g. with 〜たら (さむく なったら、まいにち つかいます)",
+          "Keeps to polite です/ます throughout"
+        ]
       }
     },
     {
@@ -61,9 +102,37 @@
       "text": "Read a shop's gift service notice (wrapping, delivery, exchanges) and find out what you can and can't do.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Read the gift-service notice at a shop near the station, then answer the questions.",
+        "material": "プレゼントのご{案内|あんない}\n◆プレゼントの{袋|ふくろ}・{箱|はこ}\n　{袋|ふくろ}：{無料|むりょう}　{箱|はこ}：{一|ひと}つ200{円|えん}\n◆{送|おく}る\n　{日本|にほん}のどこにでも、600{円|えん}で{送|おく}ることができます。\n　（5,000{円|えん}{以上|いじょう}{買|か}ったら、{無料|むりょう}で{送|おく}ります）\n◆{交換|こうかん}\n　{買|か}ってから14{日|にち}までできます。レシートを{持|も}ってきてください。\n　※セールの{物|もの}と{食|た}べ{物|もの}はできません。",
+        "questions": [
+          {
+            "q": "How much does wrapping in a box cost?",
+            "options": [
+              "Nothing",
+              "¥200",
+              "¥600"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "You buy a ¥6,000 present and want it sent to a friend. How much is delivery?",
+            "options": [
+              "Free",
+              "¥600",
+              "¥200"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "Which of these can you exchange?",
+            "options": [
+              "A sale item bought last week",
+              "A box of chocolates bought yesterday",
+              "A full-price cup bought 10 days ago, with the receipt"
+            ],
+            "answer": 2
+          }
+        ]
       }
     }
   ],
@@ -72,17 +141,86 @@
     "id": "u19-task",
     "canDo": "u19-cd2",
     "goal": "Choose a birthday present for a friend for under 5,000 yen, and agree what you'll do if it doesn't work out.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "What are you giving Satomi, how much does it cost, and what will you do if she doesn't like it?",
     "roles": {
       "a": "Knows the friend's likes and what others are already giving her (card A)",
       "b": "Has the shop's items, prices and exchange rules (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "Card A: you know your friend Satomi (さとみ). She turns 30 next Saturday. She likes cooking (りょうり), coffee (コーヒー) and the colour green (みどり). She can't drink alcohol (おさけが のめない). She's just moved into a small flat (せまい へや), so nothing big. Her sister is giving her a coffee cup (コーヒーカップを あげる), and her boyfriend is giving her a necklace (ネックレス). Last year she gave the two of you some lovely plates (おさらを くれた). Budget: ¥5,000 in total from both of you.",
+    "infoB": "Card B: you've checked the shop near the station (えきの ちかくの みせ). Small green pot (ちいさい みどりの なべ) ¥3,500 · coffee from a famous café (ゆうめいな みせの コーヒー) ¥2,800 · a nice bottle of wine (ワイン) ¥4,000 · small plant (ちいさい き) ¥4,800 · cookbook (りょうりの ほん) ¥1,800 · big frying pan (おおきい フライパン) ¥6,000. Shop rules: wrapping is free; exchanges within two weeks with the receipt (レシートが あったら こうかん できる); food and drink can't be exchanged (こうかん できない).",
+    "targets": [
+      "grammar:ageru-morau",
+      "grammar:kureru",
+      "grammar:tara-conditional",
+      "grammar:potential-form",
+      "core:cw-1095",
+      "core:cw-1094",
+      "core:cw-1126"
+    ],
+    "register": "plain",
+    "twist": "A different friend: Kenta (けんた) loves sport and is moving abroad next month (がいこくに ひっこす), so he can't take anything big or heavy, and your budget is now ¥3,000. Choose again, and agree what to do if he already has it (もう もっていたら).",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "さとみの{誕生日|たんじょうび}、{何|なに}をあげる？{去年|きょねん}は{私|わたし}たちにすてきなお{皿|さら}をくれたよね。",
+        "en": "What shall we give Satomi for her birthday? Last year she gave us those lovely plates."
+      },
+      {
+        "role": "b",
+        "jp": "うん。{駅|えき}の{近|ちか}くの{店|みせ}に、いいワインがあったよ。{四千円|よんせんえん}。",
+        "en": "Yeah. The shop near the station had a nice bottle of wine. ¥4,000."
+      },
+      {
+        "role": "a",
+        "jp": "さとみはお{酒|さけ}が{飲|の}めないから、だめだよ。",
+        "en": "Satomi can't drink alcohol, so that's no good."
+      },
+      {
+        "role": "b",
+        "jp": "そっか。じゃあ、コーヒーは？{有名|ゆうめい}な{店|みせ}のコーヒーが{二千八百円|にせんはっぴゃくえん}。",
+        "en": "Oh, right. What about coffee, then? There was coffee from a famous café for ¥2,800."
+      },
+      {
+        "role": "a",
+        "jp": "コーヒーは{好|す}きだけど、お{姉|ねえ}さんがコーヒーカップをあげるって。",
+        "en": "She does like coffee, but her sister's giving her a coffee cup."
+      },
+      {
+        "role": "b",
+        "jp": "{小|ちい}さい{緑|みどり}の{鍋|なべ}もあったよ。{三千五百円|さんぜんごひゃくえん}。",
+        "en": "There was a small green pot too. ¥3,500."
+      },
+      {
+        "role": "a",
+        "jp": "いいね！{料理|りょうり}が{好|す}きだから、{毎日|まいにち}{使|つか}えるね。",
+        "en": "Nice! She loves cooking, so she can use it every day."
+      },
+      {
+        "role": "b",
+        "jp": "でも、もし{気|き}に{入|い}らなかったら、どうする？",
+        "en": "But what if she doesn't like it?"
+      },
+      {
+        "role": "a",
+        "jp": "レシートがあったら、{二週間|にしゅうかん}は{交換|こうかん}できるって。",
+        "en": "They said she can exchange it within two weeks if she has the receipt."
+      },
+      {
+        "role": "b",
+        "jp": "じゃあ、レシートも{袋|ふくろ}に{入|い}れよう。",
+        "en": "Then let's put the receipt in the bag too."
+      },
+      {
+        "role": "a",
+        "jp": "うん。{千五百円|せんごひゃくえん}{残|のこ}るから、カードも{買|か}おう。",
+        "en": "Okay. That leaves ¥1,500, so let's get a card too."
+      },
+      {
+        "role": "b",
+        "jp": "いいね。{二人|ふたり}でメッセージを{書|か}こう。さとみ、{喜|よろこ}ぶかな。",
+        "en": "Good idea. Let's write a message together. I hope Satomi likes it."
+      }
+    ]
   },
   "capstone": {
     "title": "Anniversary presents",

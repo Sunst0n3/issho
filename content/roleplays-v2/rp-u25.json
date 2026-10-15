@@ -1,0 +1,67 @@
+{
+  "id": "rp-u25",
+  "unit": 25,
+  "title": "I waited, you know",
+  "titleJp": "{待|ま}ってたのに",
+  "setting": "A late evening at home. Hikaru forgot to message that they'd be late, and Aoi had made dinner and waited.",
+  "level": 3,
+  "register": "plain",
+  "targets": [
+    "grammar:noni",
+    "grammar:te-hoshii",
+    "core:cw-1077",
+    "core:cw-0445",
+    "core:cw-1004",
+    "core:cw-0725"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "ただいま。{遅|おそ}くなってごめん。",
+      "en": "I'm home. Sorry I'm late.",
+      "cue": "home · late · sorry"
+    },
+    {
+      "role": "b",
+      "jp": "{晩|ばん}ご{飯|はん}{作|つく}って{待|ま}ってたのに…。{連絡|れんらく}がなかったから、{心配|しんぱい}したよ。",
+      "en": "I made dinner and waited, you know… You didn't message, so I was worried.",
+      "hint": "〜のに: \"even though / and yet\" — it carries disappointment without blaming.",
+      "cue": "made dinner · waited · worried"
+    },
+    {
+      "role": "a",
+      "jp": "ほんとにごめん。{会議|かいぎ}が{急|きゅう}に{長|なが}くなって、スマホを{見|み}る{時間|じかん}もなかったんだ。",
+      "en": "I'm really sorry. The meeting suddenly ran long, and I didn't even have time to look at my phone.",
+      "cue": "meeting · ran long · no time"
+    },
+    {
+      "role": "b",
+      "jp": "そうだったんだ。でも、{遅|おそ}くなるときは、{短|みじか}いメッセージでいいから{送|おく}ってほしいな。",
+      "en": "I see. But when you're going to be late, I'd like you to send me a message — even a short one is fine.",
+      "hint": "て-form + ほしい = \"I want you to…\". The ending な makes it softer.",
+      "cue": "when late · short message · please"
+    },
+    {
+      "role": "a",
+      "jp": "わかった。{次|つぎ}は{必|かなら}ず{送|おく}るね。{晩|ばん}ご{飯|はん}、{温|あたた}めて{一緒|いっしょ}に{食|た}べよう。",
+      "en": "Okay. Next time I'll definitely send one. Let's warm up dinner and eat together.",
+      "cue": "next time · definitely · warm up · eat together"
+    },
+    {
+      "role": "b",
+      "jp": "うん。お{腹|なか}すいたし、もう{怒|おこ}ってないよ。",
+      "en": "Okay. I'm hungry anyway — and I'm not angry any more.",
+      "cue": "hungry · not angry any more"
+    }
+  ]
+}

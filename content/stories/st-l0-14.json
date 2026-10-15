@@ -1,0 +1,116 @@
+{
+  "id": "st-l0-14",
+  "level": "L0",
+  "unit": 10,
+  "title": "An autumn trip",
+  "titleJp": "{秋|あき}の りょこう",
+  "topic": "travel",
+  "grammar": [
+    "wa-desu",
+    "no-possession",
+    "mo-also",
+    "ne-yo",
+    "masu-forms",
+    "wo-object",
+    "ni-time-place",
+    "masu-past",
+    "de-place-means",
+    "tai-want",
+    "na-adjectives",
+    "casual-speech",
+    "te-form",
+    "adverbs-degree",
+    "te-kudasai",
+    "ga-subject",
+    "dates-days",
+    "te-imasu",
+    "wa-ga-description",
+    "temo-ii",
+    "to-omou",
+    "ni-target",
+    "ya-nado"
+  ],
+  "sentences": [
+    {
+      "jp": "もうすぐ／{秋|あき}です。",
+      "en": "Autumn is almost here."
+    },
+    {
+      "jp": "ケンと／エマは／りょこうの／はなしを／しています。",
+      "en": "Ken and Emma are talking about a trip."
+    },
+    {
+      "jp": "「どこに／{行|い}きたい？」",
+      "en": "\"Where do you want to go?\""
+    },
+    {
+      "jp": "「{京都|きょうと}は？」",
+      "en": "\"How about Kyoto?\""
+    },
+    {
+      "jp": "「{京都|きょうと}は／おてらや／じんじゃが／おおいね。」",
+      "en": "\"Kyoto has lots of temples and shrines.\""
+    },
+    {
+      "jp": "「{秋|あき}の／{京都|きょうと}は／きれいだと／{思|おも}う。」",
+      "en": "\"I think Kyoto is beautiful in autumn.\""
+    },
+    {
+      "jp": "「でも、／{人|ひと}も／おおいと／{思|おも}うよ。」",
+      "en": "\"But I think it'll be crowded, too.\""
+    },
+    {
+      "jp": "「そうだね…」",
+      "en": "\"That's true...\""
+    },
+    {
+      "jp": "「{田中|たなか}さんは／{京都|きょうと}の／{人|ひと}だよ。」",
+      "en": "\"Ms Tanaka is from Kyoto, you know.\""
+    },
+    {
+      "jp": "「じゃあ、／{田中|たなか}さんに／きいて。」",
+      "en": "\"Then ask Ms Tanaka.\""
+    },
+    {
+      "jp": "{夜|よる}、／ケンは／{田中|たなか}さんに／でんわしました。",
+      "en": "That evening, Ken called Ms Tanaka."
+    },
+    {
+      "jp": "{田中|たなか}さんは／しずかな／まちや／いい／ホテルを／おしえました。",
+      "en": "Ms Tanaka told him about quiet towns, good hotels and more."
+    },
+    {
+      "jp": "「ホテルは／わたしが／{予約|よやく}しても／いい？」",
+      "en": "\"Is it okay if I book the hotel?\""
+    },
+    {
+      "jp": "「うん、／ありがとう。」",
+      "en": "\"Yes, thanks.\""
+    },
+    {
+      "jp": "「しんかんせんで／{行|い}く？」",
+      "en": "\"Shall we go by bullet train?\""
+    },
+    {
+      "jp": "「うん、／{十一月|じゅういちがつ}の／しゅうまつは／どう？」",
+      "en": "\"Yes! How about a weekend in November?\""
+    },
+    {
+      "jp": "「いいね！」",
+      "en": "\"Sounds good!\""
+    },
+    {
+      "jp": "ふたりは／{今|いま}から／とても／たのしみです。",
+      "en": "They're already really looking forward to it."
+    }
+  ],
+  "gist": {
+    "q": "Who helps Ken and Emma plan their trip?",
+    "options": [
+      "Ken's mother",
+      "Ms Tanaka, who is from Kyoto",
+      "A travel agent"
+    ],
+    "answer": 1
+  }
+}

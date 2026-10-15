@@ -1,0 +1,101 @@
+{
+  "id": "st-l0-16",
+  "level": "L0",
+  "unit": 11,
+  "title": "At the Library",
+  "titleJp": "{図書館|としょかん}で",
+  "topic": "free time",
+  "grammar": [
+    "tewa-ikenai",
+    "no-ga-suki",
+    "te-kara",
+    "kedo-but",
+    "casual-speech",
+    "te-form",
+    "masu-past",
+    "kara-made"
+  ],
+  "sentences": [
+    {
+      "jp": "{土曜日|どようび}、／エマと／トムは／{図書館|としょかん}に／{行|い}きました。",
+      "en": "On Saturday, Emma and Tom went to the library."
+    },
+    {
+      "jp": "エマは／{本|ほん}を／{読|よ}むのが／{大好|だいす}きです。",
+      "en": "Emma loves reading."
+    },
+    {
+      "jp": "トムは／{本|ほん}が／あまり／{好|す}きじゃないけど、／いっしょに／{行|い}きました。",
+      "en": "Tom doesn't like books much, but he went with her."
+    },
+    {
+      "jp": "「トム、／{図書館|としょかん}の{中|なか}で／{電話|でんわ}を／してはいけないよ。」",
+      "en": "\"Tom, you mustn't talk on the phone inside the library.\""
+    },
+    {
+      "jp": "「{食|た}べ{物|もの}と／{飲|の}み{物|もの}も／だめだよ。」",
+      "en": "\"Food and drinks aren't allowed either.\""
+    },
+    {
+      "jp": "「うん、／わかった。」",
+      "en": "\"Okay, got it.\""
+    },
+    {
+      "jp": "エマは／{本|ほん}を／たくさん／{持|も}ってきて、／{窓|まど}の{近|ちか}くに／{座|すわ}りました。",
+      "en": "Emma brought over lots of books and sat down near the window."
+    },
+    {
+      "jp": "トムは／{雑誌|ざっし}を／{読|よ}みました。",
+      "en": "Tom read a magazine."
+    },
+    {
+      "jp": "{十二時|じゅうにじ}に、／トムは／お{腹|なか}が／すきました。",
+      "en": "At twelve, Tom got hungry."
+    },
+    {
+      "jp": "かばんから／チョコレートを／{出|だ}しました。",
+      "en": "He took some chocolate out of his bag."
+    },
+    {
+      "jp": "「トム！／ここで／{食|た}べてはいけないよ！」",
+      "en": "\"Tom! You mustn't eat in here!\""
+    },
+    {
+      "jp": "「あ、／ごめん。／{外|そと}で／{食|た}べてから、／また／{来|く}るね。」",
+      "en": "\"Oh, sorry. I'll eat it outside and then come back.\""
+    },
+    {
+      "jp": "トムは／{図書館|としょかん}の／{隣|となり}の／{公園|こうえん}に／{行|い}きました。",
+      "en": "Tom went to the park next to the library."
+    },
+    {
+      "jp": "{椅子|いす}に／{座|すわ}って、／チョコレートを／{食|た}べました。",
+      "en": "He sat down on a seat and ate his chocolate."
+    },
+    {
+      "jp": "それから、／エマも／{公園|こうえん}に／{来|き}ました。",
+      "en": "Then Emma came to the park too."
+    },
+    {
+      "jp": "エマの{手|て}に／サンドイッチが／ありました。",
+      "en": "She had a sandwich in her hand."
+    },
+    {
+      "jp": "「わたしも／お{腹|なか}が／すいた！」",
+      "en": "\"I got hungry too!\""
+    },
+    {
+      "jp": "{二人|ふたり}は／{公園|こうえん}で／{昼|ひる}ご{飯|はん}を／{食|た}べました。",
+      "en": "The two of them had lunch in the park."
+    }
+  ],
+  "gist": {
+    "q": "Why did Tom go to the park?",
+    "options": [
+      "To make a phone call",
+      "To buy a magazine",
+      "Because you mustn't eat in the library"
+    ],
+    "answer": 2
+  }
+}

@@ -11,17 +11,22 @@
     "duration-kakaru",
     "ichiban"
   ],
-  "coreWordCeiling": 935,
+  "coreWordCeiling": 987,
   "canDos": [
     {
       "id": "u14-cd1",
       "text": "Ask how to get somewhere and how long it takes, and explain the way from your home to the station.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "The AI asks you how you get to the station. Answer in polite Japanese: explain the way step by step with the て-form and say how long it takes. Then swap: ask the AI how to get to the library and how long it takes.",
+        "material": "1. {家|いえ}から{駅|えき}まで、どうやって{行|い}きますか。\n2. {歩|ある}いて、どのくらいかかりますか。\n3. {駅|えき}まで{一番|いちばん}{近|ちか}い{道|みち}を{教|おし}えてください。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Explains the way in steps with the て-form (まっすぐ行って、二つ目の角を右に曲がって…)",
+          "Says how long it takes (歩いて十分ぐらいかかります)",
+          "Mentions at least one landmark (信号, 橋, コンビニ)",
+          "Asks 〜までどのくらいかかりますか when it is their turn"
+        ]
       }
     },
     {
@@ -29,9 +34,37 @@
       "text": "Follow simple directions (go straight, turn right at the second corner) and find the place on a map.",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "You're looking for the post office and stop a passer-by. Listen to the directions and answer the questions.",
+        "material": "{郵便局|ゆうびんきょく}ですか。この{道|みち}をまっすぐ{行|い}って、{二|ふた}つ{目|め}の{信号|しんごう}を{右|みぎ}に{曲|ま}がってください。{曲|ま}がってから、{少|すこ}し{歩|ある}いてください。{右|みぎ}に{銀行|ぎんこう}があります。{郵便局|ゆうびんきょく}は{銀行|ぎんこう}の{隣|となり}です。{白|しろ}くて{大|おお}きい{建物|たてもの}ですよ。{橋|はし}の{前|まえ}です。ここから{歩|ある}いて{十分|じゅっぷん}ぐらいかかります。",
+        "questions": [
+          {
+            "q": "Where do you turn right?",
+            "options": [
+              "At the first traffic light",
+              "At the second traffic light",
+              "At the bridge"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "Where is the post office?",
+            "options": [
+              "Next to the bank, before the bridge",
+              "On the other side of the bridge",
+              "Opposite the station"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "How long is the walk from here?",
+            "options": [
+              "About five minutes",
+              "About twenty minutes",
+              "About ten minutes"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -39,9 +72,37 @@
       "text": "Read a simple route map or timetable and choose the quickest or cheapest way.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "You're flying tomorrow. Read the route options from a travel app and answer the questions.",
+        "material": "{駅|えき}から{空港|くうこう}まで\n1. {電車|でんしゃ}（{乗|の}り{換|か}え{一回|いっかい}）　{五十分|ごじゅっぷん}　1,200{円|えん}\n2. バス（{乗|の}り{換|か}え0{回|かい}）　{一時間十分|いちじかんじゅっぷん}　1,000{円|えん}\n3. タクシー　{四十分|よんじゅっぷん}　8,000{円|えん}\n4. {地下鉄|ちかてつ}と{電車|でんしゃ}（{乗|の}り{換|か}え{二回|にかい}）　{五十五分|ごじゅうごふん}　900{円|えん}\n※ バスは{荷物|にもつ}が{多|おお}い{人|ひと}に{便利|べんり}です。",
+        "questions": [
+          {
+            "q": "Which way is the cheapest?",
+            "options": [
+              "1 (train)",
+              "2 (bus)",
+              "4 (subway and train)"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "Which way is the quickest?",
+            "options": [
+              "3 (taxi)",
+              "1 (train)",
+              "4 (subway and train)"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "You have a lot of luggage, want to spend under ¥1,500 and don't want to change. Which do you take?",
+            "options": [
+              "1 (train)",
+              "2 (bus)",
+              "3 (taxi)"
+            ],
+            "answer": 1
+          }
+        ]
       }
     },
     {
@@ -49,10 +110,15 @@
       "text": "Text your partner that you'll be late: where you are, how long it'll take, and what to do when you get to the station.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner is waiting for you at the station, but your train has stopped and you'll be about twenty minutes late. Reply to their message: say where you are, how long it'll take, and what they should do until you get there.",
+        "material": "18:05\n{今|いま}どこ？{私|わたし}はもう{駅|えき}に{着|つ}いたよ。{外|そと}、{寒|さむ}くなったね。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says where they are now (今、電車の中にいる／〜駅にいる)",
+          "Says how long it'll take (あと二十分ぐらいかかる)",
+          "Uses とき for what happens on arrival (駅に着いたとき、電話するね)",
+          "Apologises and suggests what the partner does meanwhile (ごめんね, カフェで待っていて)"
+        ]
       }
     }
   ],
@@ -61,17 +127,87 @@
     "id": "u14-task",
     "canDo": "u14-cd1",
     "goal": "Meet up in an unfamiliar part of town: guide your partner from the station to the café and agree how long it'll take.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "Did your partner find the café, which way did they go, and how long did the walk take?",
     "roles": {
       "a": "Is at the station and can see the signs around them (card A)",
       "b": "Has the map with the café marked (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "You've just come out of the station's east exit (ひがしぐち) and you're on the phone to your partner. What you can see (card A):\n• straight ahead: a big white department store (しろくて おおきい デパート)\n• on your right: a convenience store (コンビニ); on your left: a bus stop (バスてい)\n• further on: a traffic light (しんごう)\nYou don't know where the café is. Say what you can see, repeat each direction back to check it (〜ね), and ask how long it takes (どのくらい かかる？).",
+    "infoB": "You're already at Café Mori. Your map (card B):\n• From the east exit, go straight past the department store and turn left at the first traffic light.\n• Walk along the road by the river (かわ) for about five minutes. It's the quickest way (いちばん ちかい).\n• The café is the second building past the bridge (はし), on the right: small and blue (あおくて ちいさい).\n• About ten minutes on foot in all. From the west exit (にしぐち) it's fifteen.\nFirst find out where your partner is and what's around them (まえに なにが ある？).",
+    "targets": [
+      "grammar:duration-kakaru",
+      "grammar:adjectives-te",
+      "grammar:toki-when",
+      "grammar:ichiban",
+      "core:cw-0763",
+      "core:cw-0764",
+      "core:cw-0981"
+    ],
+    "register": "plain",
+    "twist": "Repeat: your partner comes out of the west exit by mistake. Work out where they are from what they can see, and give them a new route (about fifteen minutes from there).",
+    "aiRole": "A friendly passer-by near the station, whom the partner on the street can stop and ask the way in polite Japanese (すみません、〜はどこですか).",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "もしもし、{今|いま}{駅|えき}に{着|つ}いたよ。{東口|ひがしぐち}を{出|で}た。",
+        "en": "Hi, I've just got to the station. I came out of the east exit."
+      },
+      {
+        "role": "b",
+        "jp": "よかった。{前|まえ}に{何|なに}がある？",
+        "en": "Great. What's in front of you?"
+      },
+      {
+        "role": "a",
+        "jp": "{白|しろ}くて{大|おお}きいデパートがあるよ。{右|みぎ}にコンビニ。",
+        "en": "There's a big white department store. And a convenience store on the right."
+      },
+      {
+        "role": "b",
+        "jp": "じゃあ、デパートの{前|まえ}をまっすぐ{行|い}って、{一|ひと}つ{目|め}の{信号|しんごう}を{左|ひだり}に{曲|ま}がって。",
+        "en": "Okay, go straight past the department store and turn left at the first traffic light."
+      },
+      {
+        "role": "a",
+        "jp": "{一|ひと}つ{目|め}の{信号|しんごう}を{左|ひだり}ね。それから？",
+        "en": "Left at the first light. Then?"
+      },
+      {
+        "role": "b",
+        "jp": "{川|かわ}の{横|よこ}の{道|みち}を{五分|ごふん}ぐらい{歩|ある}いて。この{道|みち}が{一番|いちばん}{近|ちか}いよ。",
+        "en": "Walk along the road by the river for about five minutes. That's the quickest way."
+      },
+      {
+        "role": "a",
+        "jp": "{川|かわ}の{横|よこ}ね。カフェはどんな{建物|たてもの}？",
+        "en": "By the river. What does the café look like?"
+      },
+      {
+        "role": "b",
+        "jp": "{橋|はし}の{先|さき}の{二|ふた}つ{目|め}の{建物|たてもの}だよ。{青|あお}くて{小|ちい}さい{店|みせ}。",
+        "en": "It's the second building past the bridge. A small blue place."
+      },
+      {
+        "role": "a",
+        "jp": "どのくらいかかる？",
+        "en": "How long will it take?"
+      },
+      {
+        "role": "b",
+        "jp": "{全部|ぜんぶ}で{十分|じゅっぷん}ぐらいだよ。",
+        "en": "About ten minutes in all."
+      },
+      {
+        "role": "a",
+        "jp": "わかった。{橋|はし}に{着|つ}いたとき、また{電話|でんわ}するね。",
+        "en": "Okay. I'll call you again when I get to the bridge."
+      },
+      {
+        "role": "b",
+        "jp": "うん。{外|そと}は{寒|さむ}くなったから、{気|き}をつけてね。",
+        "en": "Okay. It's got cold out, so take care."
+      }
+    ]
   },
   "capstone": {
     "title": "Lost in a new city",

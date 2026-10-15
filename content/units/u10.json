@@ -11,17 +11,22 @@
     "ni-target",
     "ya-nado"
   ],
-  "coreWordCeiling": 710,
+  "coreWordCeiling": 762,
   "canDos": [
     {
       "id": "u10-cd1",
       "text": "Show family photos and describe each person: what they're like, what they're good at, and what you think of them.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Show your partner (or the AI) a photo of your family or friends. They ask the three questions below about two of the people. For each person, say who they are, describe one feature with は〜が, say what they're good at, and add your opinion with と思う.",
+        "material": "これ、{誰|だれ}？\nどんな{人|ひと}？\n{何|なに}が{上手|じょうず}？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says who each person is with a family word (母, 父, 弟, 妹, 両親…)",
+          "Describes a feature with は〜が (父は背が高い / 妹は髪が長い)",
+          "Says what someone is good at (料理が上手)",
+          "Gives an opinion with と思う, adding だ after nouns and な-adjectives (優しい人だと思う)"
+        ]
       }
     },
     {
@@ -29,9 +34,37 @@
       "text": "Understand a friend talking about their family and match the people they describe to a photo.",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "A friend is showing you a family photo and telling you who's who. Listen (twice if you like), then answer the questions.",
+        "material": "これは{去年|きょねん}の{家族|かぞく}の{写真|しゃしん}です。{左|ひだり}の{人|ひと}は{父|ちち}です。{父|ちち}は{背|せ}が{高|たか}いです。{料理|りょうり}がとても{上手|じょうず}ですよ。{父|ちち}の{隣|となり}は{母|はは}です。{母|はは}は{髪|かみ}が{短|みじか}いです。いつも{優|やさ}しいです。{右|みぎ}の{二人|ふたり}は{妹|いもうと}と{弟|おとうと}です。{妹|いもうと}は{髪|かみ}が{長|なが}いです。めがねの{人|ひと}は{弟|おとうと}です。{弟|おとうと}は{面白|おもしろ}い{人|ひと}だと{思|おも}います。",
+        "questions": [
+          {
+            "q": "Who is the tall person on the left?",
+            "options": [
+              "Her father",
+              "Her younger brother",
+              "Her mother"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "What is her mother like?",
+            "options": [
+              "Long hair, and very funny",
+              "Short hair, and always kind",
+              "Glasses, and a good cook"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "Who wears glasses?",
+            "options": [
+              "Her younger sister",
+              "Her father",
+              "Her younger brother"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -39,10 +72,15 @@
       "text": "Ask for and give permission when visiting someone's home (may I come in, sit here, take a photo?).",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "You're visiting a friend's parents. The AI plays your friend's mother and says the lines below, one at a time. Ask permission politely with 〜てもいいですか at least twice (to come in, to sit down, to take a photo), and give permission when she asks you.",
+        "material": "ようこそ！ どうぞ。\nこちらにどうぞ。お{茶|ちゃ}はいかがですか。\nちょっと{暑|あつ}いですね。{窓|まど}を{開|あ}けてもいいですか。\nこれは{家族|かぞく}の{写真|しゃしん}ですよ。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Asks permission with 〜てもいいですか at least twice (入っても / 座っても / 写真を撮っても)",
+          "Makes the て-forms correctly (入って, 座って, 撮って)",
+          "Gives permission when asked (どうぞ / いいですよ)",
+          "Stays polite with です / ます throughout"
+        ]
       }
     },
     {
@@ -50,10 +88,15 @@
       "text": "Write a short message to a friend about your week: who you met or called, and a few things you did.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "A friend sent you the message below. Reply in 4–5 sentences about your week: who you met or called, a few things you did or bought (use や), and what you thought (と思う).",
+        "material": "{元気|げんき}？ {今週|こんしゅう}はどうだった？ {私|わたし}は{週末|しゅうまつ}、{母|はは}に{会|あ}いに{行|い}ったよ。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says who they met or called with に (友達に会った / 母に電話した)",
+          "Lists a few things with や (肉や野菜を買った)",
+          "Adds an opinion with と思う (いい店だと思う)",
+          "Keeps the past forms consistent (all plain or all polite)"
+        ]
       }
     }
   ],
@@ -62,17 +105,96 @@
     "id": "u10-task",
     "canDo": "u10-cd1",
     "goal": "You each hold half of the names for a family photo; by describing the people and what they are like, work out who everyone is.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "Who are people 1 to 6 in the photo, from left to right?",
     "roles": {
-      "a": "Has the names of the people on the left of the photo (card A)",
-      "b": "Has the names of the people on the right of the photo (card B)"
+      "a": "Has the names for the left of the photo, but can see only the right half (card A)",
+      "b": "Has the names for the right of the photo, but can see only the left half (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "Card A. Your friend Mari's notes on the LEFT of the photo (people 1–3): • お父さん (her dad): tall (背が高い), glasses (めがね), a great cook (料理が上手). • おばあさん (her grandma): short hair (髪が短い), loves sweet things (甘いものが大好き). • お兄さん (her big brother): short hair too, always funny (いつも面白い). What you can see — the RIGHT half (people 4–6): 4: long hair, holding a cake. 5: short hair, with a dog. 6: glasses, sitting on a chair. Describe 4–6 with は〜が (4番の人は髪が長い) and let your partner name them; then name 1–3 as your partner describes them (〜だと思う).",
+    "infoB": "Card B. Mari's notes on the RIGHT of the photo (people 4–6): • お母さん (her mum): long hair (髪が長い), makes great cakes (ケーキが上手). • 妹さん (her little sister): short hair, loves dogs and cats (犬や猫が大好き). • おじいさん (her grandpa): glasses, very kind (とても優しい). What you can see — the LEFT half (people 1–3): 1: short hair, eating cake. 2: tall, glasses, holding a frying pan (フライパン). 3: short hair, laughing. Name 4–6 as your partner describes them (〜だと思う), then describe 1–3 with は〜が.",
+    "targets": [
+      "grammar:wa-ga-description",
+      "grammar:to-omou",
+      "grammar:ya-nado",
+      "core:cw-0758",
+      "core:cw-0759",
+      "core:cw-0432",
+      "core:cw-0436"
+    ],
+    "register": "plain",
+    "twist": "Repeat it 2–7 days later with a real photo of one of your own families or friends, which only the describer can see. This time the describer may not say the family word: describe looks, what each person is doing and what they are like, and let the other guess (お母さんだと思う！).",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "4{番|ばん}の{人|ひと}は{髪|かみ}が{長|なが}いよ。ケーキを{持|も}ってる。{誰|だれ}だと{思|おも}う？",
+        "en": "Number 4 has long hair. She's holding a cake. Who do you think it is?"
+      },
+      {
+        "role": "b",
+        "jp": "{髪|かみ}が{長|なが}い？ じゃあ、お{母|かあ}さんだと{思|おも}う。ケーキがすごく{上手|じょうず}だよ。",
+        "en": "Long hair? Then I think it's her mum. She's brilliant at cakes."
+      },
+      {
+        "role": "a",
+        "jp": "なるほど。5{番|ばん}の{人|ひと}は{髪|かみ}が{短|みじか}い。{犬|いぬ}と{一緒|いっしょ}にいる。",
+        "en": "I see. Number 5 has short hair, and is with a dog."
+      },
+      {
+        "role": "b",
+        "jp": "それは{妹|いもうと}さんだね。{犬|いぬ}や{猫|ねこ}が{大好|だいす}きだよ。",
+        "en": "That must be her little sister. She loves dogs and cats."
+      },
+      {
+        "role": "a",
+        "jp": "6{番|ばん}の{人|ひと}はめがね。{椅子|いす}に{座|すわ}ってる。",
+        "en": "Number 6 has glasses. He's sitting on a chair."
+      },
+      {
+        "role": "b",
+        "jp": "おじいさんだと{思|おも}う。とても{優|やさ}しい{人|ひと}だよ。",
+        "en": "I think that's her grandpa. He's a really kind man."
+      },
+      {
+        "role": "a",
+        "jp": "じゃあ、{今度|こんど}は{左|ひだり}。1{番|ばん}の{人|ひと}は？",
+        "en": "Okay, now the left side. What about number 1?"
+      },
+      {
+        "role": "b",
+        "jp": "1{番|ばん}の{人|ひと}は{髪|かみ}が{短|みじか}い。ケーキを{食|た}べてる。",
+        "en": "Number 1 has short hair. They're eating cake."
+      },
+      {
+        "role": "a",
+        "jp": "ケーキ？ じゃあ、おばあさんだと{思|おも}う。{甘|あま}いものが{大好|だいす}きだよ。",
+        "en": "Cake? Then I think it’s her grandma. She loves sweet things."
+      },
+      {
+        "role": "b",
+        "jp": "2{番|ばん}の{人|ひと}は{背|せ}が{高|たか}い。フライパンを{持|も}ってる。",
+        "en": "Number 2 is tall. He's holding a frying pan."
+      },
+      {
+        "role": "a",
+        "jp": "それはお{父|とう}さん！ {料理|りょうり}がすごく{上手|じょうず}だよ。3{番|ばん}の{人|ひと}は？",
+        "en": "That's her dad! He's a brilliant cook. And number 3?"
+      },
+      {
+        "role": "b",
+        "jp": "3{番|ばん}の{人|ひと}も{髪|かみ}が{短|みじか}い。すごく{笑|わら}ってる。",
+        "en": "Number 3 has short hair too. He's laughing away."
+      },
+      {
+        "role": "a",
+        "jp": "じゃあ、お{兄|にい}さんだね。いつも{面白|おもしろ}いよ。",
+        "en": "Then it's her big brother. He's always funny."
+      },
+      {
+        "role": "b",
+        "jp": "{全部|ぜんぶ}わかった！ いい{家族|かぞく}だと{思|おも}う。",
+        "en": "That's everyone! I think they're a lovely family."
+      }
+    ]
   },
   "capstone": {
     "title": "Visiting the family",

@@ -1,0 +1,103 @@
+{
+  "id": "st-start-05",
+  "level": "start",
+  "unit": 2,
+  "title": "Where's my phone?",
+  "titleJp": "スマホは どこ？",
+  "topic": "home",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "ne-yo",
+    "masu-forms",
+    "koko-soko-asoko"
+  ],
+  "sentences": [
+    {
+      "jp": "あさです。",
+      "en": "It's morning."
+    },
+    {
+      "jp": "「エマ、／ぼくの／スマホは／どこですか。」",
+      "en": "\"Emma, where's my phone?\""
+    },
+    {
+      "jp": "「そこですよ。」",
+      "en": "\"It's right there, next to you.\""
+    },
+    {
+      "jp": "「あ、／ありがとう。」",
+      "en": "\"Oh, thanks.\""
+    },
+    {
+      "jp": "「ぼくの／かさは？」",
+      "en": "\"And my umbrella?\""
+    },
+    {
+      "jp": "「かさは／あそこです。」",
+      "en": "\"Your umbrella is over there.\""
+    },
+    {
+      "jp": "「ぼくの／かばんは／どこですか。」",
+      "en": "\"Where's my bag?\""
+    },
+    {
+      "jp": "「かばんは／ここですよ。」",
+      "en": "\"Your bag is here.\""
+    },
+    {
+      "jp": "「はい、／どうぞ。」",
+      "en": "\"Here you go.\""
+    },
+    {
+      "jp": "「ありがとう。」",
+      "en": "\"Thanks.\""
+    },
+    {
+      "jp": "「じゃあ、／いってきます！」",
+      "en": "\"Right, I'm off!\""
+    },
+    {
+      "jp": "「…ケン、／きょうは／しごとですか。」",
+      "en": "\"...Ken, do you have work today?\""
+    },
+    {
+      "jp": "「えっと…」",
+      "en": "\"Um...\""
+    },
+    {
+      "jp": "「きょうは／やすみですよ。」",
+      "en": "\"You're off today, you know.\""
+    },
+    {
+      "jp": "「…あ。」",
+      "en": "\"...Oh.\""
+    },
+    {
+      "jp": "「…ただいま。」",
+      "en": "\"...I'm home.\""
+    },
+    {
+      "jp": "「おかえりなさい。」",
+      "en": "\"Welcome home.\""
+    },
+    {
+      "jp": "「コーヒー、／のみますか。」",
+      "en": "\"Want some coffee?\""
+    },
+    {
+      "jp": "「はい、／のみます。」",
+      "en": "\"Yes, please.\""
+    }
+  ],
+  "gist": {
+    "q": "Why doesn't Ken go to work?",
+    "options": [
+      "It's his day off.",
+      "He can't find his bag.",
+      "It's raining."
+    ],
+    "answer": 0
+  }
+}

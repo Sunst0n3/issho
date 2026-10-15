@@ -1,0 +1,107 @@
+{
+  "id": "st-start-14",
+  "level": "start",
+  "unit": 5,
+  "title": "Planning a trip",
+  "titleJp": "りょこうの よてい",
+  "topic": "travel",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "mo-also",
+    "ne-yo",
+    "masu-forms",
+    "wo-object",
+    "counting-tsu",
+    "ni-time-place",
+    "i-adjectives",
+    "de-place-means",
+    "masenka-mashou",
+    "tai-want",
+    "arimasu-imasu"
+  ],
+  "sentences": [
+    {
+      "jp": "らいしゅうの／きんようびは／やすみです。",
+      "en": "Next Friday is a day off."
+    },
+    {
+      "jp": "「エマ、／りょこうに／いきませんか。」",
+      "en": "\"Emma, shall we go on a trip?\""
+    },
+    {
+      "jp": "「いいですね！」",
+      "en": "\"Great idea!\""
+    },
+    {
+      "jp": "「どこに／いきたいですか。」",
+      "en": "\"Where do you want to go?\""
+    },
+    {
+      "jp": "「{京都|きょうと}に／いきたいです。」",
+      "en": "\"I want to go to Kyoto.\""
+    },
+    {
+      "jp": "「{京都|きょうと}、／いいですね。」",
+      "en": "\"Kyoto? Sounds good.\""
+    },
+    {
+      "jp": "「ひこうきで／いきますか。」",
+      "en": "\"Shall we fly?\""
+    },
+    {
+      "jp": "「ひこうきは／ちょっと／たかいです。」",
+      "en": "\"Flying is a bit expensive.\""
+    },
+    {
+      "jp": "「じゃあ、／でんしゃで／いきましょう。」",
+      "en": "\"Then let's take the train.\""
+    },
+    {
+      "jp": "「{京都|きょうと}で／なにを／したいですか。」",
+      "en": "\"What do you want to do in Kyoto?\""
+    },
+    {
+      "jp": "「しゃしんを／たくさん／とりたいです。」",
+      "en": "\"I want to take lots of photos.\""
+    },
+    {
+      "jp": "「ぼくは／おいしい／おちゃを／{飲|の}みたいです。」",
+      "en": "\"I want to drink some good green tea.\""
+    },
+    {
+      "jp": "「わたしも！」",
+      "en": "\"Me too!\""
+    },
+    {
+      "jp": "ケンの／にもつは／ちいさい／かばん／ひとつです。",
+      "en": "Ken's luggage is one small bag."
+    },
+    {
+      "jp": "わたしの／にもつは／おおきい／かばん／ふたつです。",
+      "en": "My luggage is two big bags."
+    },
+    {
+      "jp": "「エマ、／にもつが／たくさん／ありますね…」",
+      "en": "\"Emma, that's a lot of luggage...\""
+    },
+    {
+      "jp": "「だいじょうぶです。」",
+      "en": "\"It's fine.\""
+    },
+    {
+      "jp": "「たのしみですね！」",
+      "en": "\"I can't wait!\""
+    }
+  ],
+  "gist": {
+    "q": "How will they travel to Kyoto?",
+    "options": [
+      "By plane",
+      "By train",
+      "By car"
+    ],
+    "answer": 1
+  }
+}

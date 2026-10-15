@@ -10,17 +10,22 @@
     "masu-forms",
     "koko-soko-asoko"
   ],
-  "coreWordCeiling": 190,
+  "coreWordCeiling": 224,
   "canDos": [
     {
       "id": "u02-cd1",
       "text": "Order a drink and something to eat for each of you at a café counter.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "You're at the counter of a small café with your partner. Using the board below, order out loud: a different drink for each of you and something to eat for each of you. Then thank the clerk.",
+        "material": "コーヒー　330{円|えん}\n{紅茶|こうちゃ}　380{円|えん}\nお{茶|ちゃ}　300{円|えん}\nジュース　300{円|えん}\nケーキ　450{円|えん}\nパン　220{円|えん}",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Gets the clerk's attention with すみません",
+          "Orders two different drinks, e.g. コーヒー、お願いします。紅茶もお願いします。",
+          "Orders something to eat for each of you, e.g. ケーキ、ふたつお願いします",
+          "Thanks the clerk with ありがとうございます"
+        ]
       }
     },
     {
@@ -28,9 +33,37 @@
       "text": "Catch prices in yen when a clerk tells you what something costs or what the total is.",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Listen to a customer at a bakery café counter. You can play it twice. Then answer the questions about the prices.",
+        "material": "「すみません、このパンはいくらですか。」\n「そのパンは{二百八十円|にひゃくはちじゅうえん}です。」\n「じゃあ、それ、ふたつお{願|ねが}いします。コーヒーもお{願|ねが}いします。」\n「はい、{九百円|きゅうひゃくえん}です。」\n「はい。」\n「{百円|ひゃくえん}のお{釣|つ}りです。ありがとうございます。」",
+        "questions": [
+          {
+            "q": "How much is one of the breads?",
+            "options": [
+              "180 yen",
+              "280 yen",
+              "380 yen"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What is the total?",
+            "options": [
+              "900 yen",
+              "960 yen",
+              "1,000 yen"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "How much change does the customer get?",
+            "options": [
+              "10 yen",
+              "1,000 yen",
+              "100 yen"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -38,9 +71,37 @@
       "text": "Read a café menu with prices and choose what the two of you can have for 1,000 yen.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "You and your partner have 1,000 yen between you. Read the menu board at a café and answer the questions.",
+        "material": "カフェ\n\nコーヒー　380{円|えん}\n{紅茶|こうちゃ}　420{円|えん}\nジュース　330{円|えん}\nビール　550{円|えん}\nケーキ　480{円|えん}\nパン　200{円|えん}",
+        "questions": [
+          {
+            "q": "Which drink is the cheapest?",
+            "options": [
+              "Coffee",
+              "Black tea",
+              "Juice"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "You want coffee and your partner wants black tea. What can you add and still pay 1,000 yen or less?",
+            "options": [
+              "A piece of cake",
+              "Bread",
+              "Nothing: the two drinks already cost more than 1,000 yen"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "Your partner wants a beer and you want a juice. How much is that?",
+            "options": [
+              "880 yen",
+              "780 yen",
+              "980 yen"
+            ],
+            "answer": 0
+          }
+        ]
       }
     },
     {
@@ -48,9 +109,37 @@
       "text": "Ask where the toilet is and follow a 'here / there / over there' answer.",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Listen to a customer asking a café clerk where things are. You can play it twice. Then answer the questions.",
+        "material": "「すみません。お{水|みず}はどこですか。」\n「お{水|みず}はあそこです。」\n「あそこですか。ありがとうございます。あのう、トイレは？」\n「トイレですか。すぐそこですよ。」",
+        "questions": [
+          {
+            "q": "Where is the water?",
+            "options": [
+              "Right next to the customer",
+              "Over there, away from both of them",
+              "Behind the counter, by the clerk"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "Where is the toilet?",
+            "options": [
+              "Just there, close to the customer",
+              "Over there, far from both of them",
+              "Outside the café"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "What two things does the customer ask about?",
+            "options": [
+              "The menu and the toilet",
+              "The water and the station",
+              "The water and the toilet"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -58,10 +147,15 @@
       "text": "Say what you each drink every day, and react to your food and drinks together with ね and よ.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (or the app) asks about your drinks, then shares some cake with you. Answer each line out loud in a full sentence.",
+        "material": "「{朝|あさ}はコーヒーですか、{紅茶|こうちゃ}ですか。」\n「コーヒーは{毎日|まいにち}{飲|の}みますか。」\n「このケーキ、おいしいですね。」\n「この{店|みせ}はパンもおいしいですよ。」",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says what they drink, using a ます or ません verb at least once (紅茶は毎日飲みます／コーヒーは飲みません)",
+          "Agrees about the cake with そうですね or おいしいですね",
+          "Reacts to the news about the bread with そうですか or へえ",
+          "Adds a fact of their own with よ (e.g. ここはコーヒーも安いですよ)"
+        ]
       }
     }
   ],
@@ -70,17 +164,78 @@
     "id": "u02-task",
     "canDo": "u02-cd1",
     "goal": "Order two drinks and one snack to share from the café clerk (played by the AI), spending no more than 1,000 yen.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "What did you order, and how much did it come to?",
     "roles": {
       "a": "Reads the menu and does the ordering",
       "b": "Holds the 1,000 yen and knows what you both want"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "You have the menu: コーヒー 350円, 紅茶 400円, ジュース 300円, ケーキ 450円, パン 250円. You don't know what your partner wants, so ask (コーヒーですか、紅茶ですか？) and tell them the prices they ask about. Then you order at the counter (〜、お願いします).",
+    "infoB": "You can't see the menu, but you hold the money: exactly 1,000 yen (千円). You want black tea (紅茶); your partner always has coffee. You'd love to share a piece of cake (ケーキ), but bread (パン) is fine too. Ask what things cost (いくらですか) and make sure the total is 1,000 yen or less.",
+    "targets": [
+      "core:cw-0105",
+      "core:cw-0141",
+      "core:cw-0212",
+      "core:cw-0210",
+      "core:cw-0025",
+      "grammar:numbers-prices",
+      "grammar:ne-yo",
+      "grammar:mo-also"
+    ],
+    "register": "polite",
+    "twist": "On the repeat, B has only 900 yen (九百円) and wants juice (ジュース) instead of tea. Work out the order again before you reach the counter.",
+    "aiRole": "Café clerk who greets you, takes your order, tells you the total and gives you your change",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "コーヒーですか、{紅茶|こうちゃ}ですか。",
+        "en": "Coffee or tea?"
+      },
+      {
+        "role": "b",
+        "jp": "{私|わたし}は{紅茶|こうちゃ}です。いくらですか。",
+        "en": "I'll have black tea. How much is it?"
+      },
+      {
+        "role": "a",
+        "jp": "{紅茶|こうちゃ}は{四百円|よんひゃくえん}です。コーヒーは{三百五十円|さんびゃくごじゅうえん}です。",
+        "en": "The tea is 400 yen. The coffee is 350 yen."
+      },
+      {
+        "role": "b",
+        "jp": "ケーキは？",
+        "en": "And the cake?"
+      },
+      {
+        "role": "a",
+        "jp": "ケーキは{四百五十円|よんひゃくごじゅうえん}です。ちょっと{高|たか}いですね。",
+        "en": "The cake is 450 yen. That's a bit pricey, isn't it?"
+      },
+      {
+        "role": "b",
+        "jp": "そうですね。パンはいくらですか。",
+        "en": "It is. How much is the bread?"
+      },
+      {
+        "role": "a",
+        "jp": "{二百五十円|にひゃくごじゅうえん}です。",
+        "en": "It's 250 yen."
+      },
+      {
+        "role": "b",
+        "jp": "じゃあ、パンはどうですか。{千円|せんえん}ですよ。",
+        "en": "Then how about the bread? That makes 1,000 yen."
+      },
+      {
+        "role": "a",
+        "jp": "いいですね。すみません！ コーヒー、お{願|ねが}いします。{紅茶|こうちゃ}もお{願|ねが}いします。",
+        "en": "Good idea. Excuse me! A coffee, please. And a black tea, please."
+      },
+      {
+        "role": "b",
+        "jp": "それから、パン、ひとつお{願|ねが}いします。…はい、{千円|せんえん}です。",
+        "en": "And one bread, please. … Here's 1,000 yen."
+      }
+    ]
   },
   "capstone": {
     "title": "Our little café",

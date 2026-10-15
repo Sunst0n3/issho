@@ -11,17 +11,22 @@
     "to-with",
     "deshita"
   ],
-  "coreWordCeiling": 425,
+  "coreWordCeiling": 472,
   "canDos": [
     {
       "id": "u05-cd1",
       "text": "Invite your partner to do something this weekend, and accept or gently turn down an invitation.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (or the app) invites you twice. Turn down the first invitation gently and give a reason, accept the second, then invite them to something yourself.",
+        "material": "「{土曜日|どようび}、{映画|えいが}を{見|み}ませんか。」\n「じゃあ、{日曜日|にちようび}はどうですか。{公園|こうえん}を{散歩|さんぽ}しませんか。」",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Turns down softly with すみません or ちょっと… and a short reason (土曜日は仕事があります)",
+          "Accepts with いいですね and a ましょう sentence (行きましょう)",
+          "Makes their own invitation with 〜ませんか",
+          "Names a day or time with に (日曜日に, 十時に)"
+        ]
       }
     },
     {
@@ -29,10 +34,14 @@
       "text": "Say where you want to go and what you want to do, and ask what your partner would like to do.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (or the app) asks about the weekend. Answer both questions out loud, then ask your partner what they'd like to do.",
+        "material": "「{週末|しゅうまつ}、どこに{行|い}きたいですか。」\n「{何|なに}をしたいですか。」",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says a place they want to go with 〜に行きたいです",
+          "Says what they want to do there with 〜を〜たいです",
+          "Asks their partner with どこに行きたいですか or 何をしたいですか"
+        ]
       }
     },
     {
@@ -40,9 +49,37 @@
       "text": "Read a friend's invitation message and find the day, time, place and who else is coming.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Your neighbour sends you this message. Read it and answer the questions.",
+        "material": "エマさん、サムさん、こんにちは！\n{来週|らいしゅう}の{土曜日|どようび}は{夫|おっと}の{誕生日|たんじょうび}です。\n{六時半|ろくじはん}に、うちで{一緒|いっしょ}に{晩|ばん}ご{飯|はん}を{食|た}べませんか。\n{山田|やまだ}さんと{奥|おく}さんも{来|き}ます。\nケーキもありますよ！\n{田中|たなか}{美咲|みさき}",
+        "questions": [
+          {
+            "q": "Where is the dinner?",
+            "options": [
+              "At a restaurant near the station",
+              "At Misaki's home",
+              "At your home"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "When is it?",
+            "options": [
+              "This Saturday at 6:30",
+              "Next Saturday at 6:30",
+              "Next Sunday at 6:00"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "Who else is coming?",
+            "options": [
+              "Mr. Yamada and his wife",
+              "Mr. Yamada's friend",
+              "Nobody else"
+            ],
+            "answer": 0
+          }
+        ]
       }
     },
     {
@@ -50,9 +87,37 @@
       "text": "Understand a short voicemail from a friend about their plans: when, where and who they're going with.",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Listen to a voicemail from your friend Kenta. You can play it twice. Then answer the questions.",
+        "material": "「あ、{健太|けんた}です。{日曜日|にちようび}に{妹|いもうと}と{鎌倉|かまくら}に{行|い}きます。{朝|あさ}{九時|くじ}の{電車|でんしゃ}です。{二人|ふたり}も{一緒|いっしょ}に{行|い}きませんか。{駅|えき}で{会|あ}いましょう。じゃあ、また{電話|でんわ}します。」",
+        "questions": [
+          {
+            "q": "When is Kenta going?",
+            "options": [
+              "On Saturday",
+              "On Sunday",
+              "Next Monday"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "Who is he going with?",
+            "options": [
+              "His wife",
+              "His older sister",
+              "His younger sister"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "What does he suggest?",
+            "options": [
+              "Meeting at the station and going together",
+              "Meeting in Kamakura at nine",
+              "Calling him back tonight"
+            ],
+            "answer": 0
+          }
+        ]
       }
     },
     {
@@ -60,10 +125,15 @@
       "text": "Reply to a message: say whether you have time at the weekend and suggest something to do together.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "A friend sends you this message. Write a reply (2–4 sentences): say whether you have time at the weekend and suggest something to do together.",
+        "material": "こんにちは！ {週末|しゅうまつ}、{時間|じかん}がありますか。{一緒|いっしょ}に{出|で}かけませんか。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says when they are free or busy with 時間があります／ありません or 土曜日は仕事があります",
+          "Suggests an activity with 〜ませんか or 〜ましょう",
+          "Names a day and/or time with に (日曜日に, 十一時に)",
+          "Ends warmly (楽しみです, じゃあ、また)"
+        ]
       }
     }
   ],
@@ -72,17 +142,83 @@
     "id": "u05-task",
     "canDo": "u05-cd1",
     "goal": "Agree on one thing to do together this weekend, with a day, a time, a meeting place and who is coming.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "What are you doing this weekend: which day, what time, where are you meeting, and who is coming?",
     "roles": {
       "a": "Has three ideas and their free times (card A)",
       "b": "Has other ideas, a busy Saturday and a friend who wants to come (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "Your ideas: see a movie (映画を見る), walk in the park (公園を散歩する), or try the new restaurant by the station (駅の近くのレストラン). You're free on Saturday afternoon and all day Sunday, but on Sunday you want a slow morning (朝はゆっくりしたいです), so nothing before 11:00.",
+    "infoB": "Your ideas: take photos in the park (公園で写真を撮る), or go shopping. You work all day Saturday (土曜日は仕事があります). Your friend Yuki (友達の由紀さん) wants to come along, but movies aren't her thing (映画はちょっと…). You can meet at the station (駅) any time after 10:00.",
+    "targets": [
+      "core:cw-0206",
+      "core:cw-0160",
+      "core:cw-0233",
+      "core:cw-0409",
+      "grammar:masenka-mashou",
+      "grammar:tai-want",
+      "grammar:to-with",
+      "grammar:arimasu-imasu"
+    ],
+    "register": "polite",
+    "twist": "On the repeat, it's going to rain on Sunday (日曜日は雨です) and Yuki can only come on Saturday evening (土曜日の夜). Find an indoor plan and a new time.",
+    "aiRole": "Your friend Yuki, who calls to ask whether she can come along and what time to meet",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "{週末|しゅうまつ}、{一緒|いっしょ}に{出|で}かけませんか。",
+        "en": "Shall we go out together this weekend?"
+      },
+      {
+        "role": "b",
+        "jp": "いいですね。{何|なに}をしたいですか。",
+        "en": "Sounds good. What do you want to do?"
+      },
+      {
+        "role": "a",
+        "jp": "{映画|えいが}を{見|み}たいです。{公園|こうえん}にも{行|い}きたいです。",
+        "en": "I want to see a movie. I want to go to the park too."
+      },
+      {
+        "role": "b",
+        "jp": "{友達|ともだち}の{由紀|ゆき}さんも{一緒|いっしょ}にいいですか。でも、{由紀|ゆき}さんは{映画|えいが}はちょっと…。",
+        "en": "Is it okay if my friend Yuki comes too? But movies aren't really her thing."
+      },
+      {
+        "role": "a",
+        "jp": "もちろん！ じゃあ、{由紀|ゆき}さんと{一緒|いっしょ}に{公園|こうえん}に{行|い}きましょう。",
+        "en": "Of course! Then let's go to the park with Yuki."
+      },
+      {
+        "role": "b",
+        "jp": "でも、{土曜日|どようび}は{仕事|しごと}があります。{日曜日|にちようび}はどうですか。",
+        "en": "But I have work on Saturday. How about Sunday?"
+      },
+      {
+        "role": "a",
+        "jp": "{日曜日|にちようび}はいいですよ。でも、{朝|あさ}はゆっくりしたいです。",
+        "en": "Sunday is fine. But I want a slow morning."
+      },
+      {
+        "role": "b",
+        "jp": "じゃあ、{十一時|じゅういちじ}はどうですか。{駅|えき}で{会|あ}いましょう。",
+        "en": "Then how about eleven? Let's meet at the station."
+      },
+      {
+        "role": "a",
+        "jp": "いいですね。{公園|こうえん}で{写真|しゃしん}も{撮|と}りたいです。",
+        "en": "Great. I want to take some photos in the park too."
+      },
+      {
+        "role": "b",
+        "jp": "{私|わたし}も！ じゃあ、{日曜日|にちようび}の{十一時|じゅういちじ}に{駅|えき}ですね。",
+        "en": "Me too! So, Sunday at eleven at the station."
+      },
+      {
+        "role": "a",
+        "jp": "はい。{楽|たの}しみです！",
+        "en": "Yes. I can't wait!"
+      }
+    ]
   },
   "capstone": {
     "title": "Planning a date",

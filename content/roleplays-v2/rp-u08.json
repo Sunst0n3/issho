@@ -1,0 +1,82 @@
+{
+  "id": "rp-u08",
+  "unit": 8,
+  "title": "A new pillow",
+  "titleJp": "{新|あたら}しい{枕|まくら}",
+  "setting": "Saturday evening. You want to buy a new pillow before the shop closes, then choose one together at the shop.",
+  "level": 1,
+  "register": "plain",
+  "targets": [
+    "grammar:kara-made",
+    "grammar:adverbs-degree",
+    "grammar:nai-form",
+    "grammar:te-kudasai",
+    "grammar:ga-subject",
+    "core:cw-0604",
+    "core:cw-0606"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "{新|あたら}しい{枕|まくら}、{今日|きょう}{買|か}う？",
+      "en": "Shall we buy the new pillow today?",
+      "cue": "new pillow · today?"
+    },
+    {
+      "role": "b",
+      "jp": "うん。でも、あの{店|みせ}は{何時|なんじ}まで？",
+      "en": "Yeah. But until what time is that shop open?",
+      "hint": "まで = until. 何時まで？ asks when something closes or ends.",
+      "cue": "that shop · open until?"
+    },
+    {
+      "role": "a",
+      "jp": "{十時|じゅうじ}までだよ。まだ{大丈夫|だいじょうぶ}。",
+      "en": "Until ten. We've still got time.",
+      "cue": "until ten · still fine"
+    },
+    {
+      "role": "b",
+      "jp": "どれがいい？ これ、すごく{大|おお}きいね。",
+      "en": "Which one do you like? This one's really big.",
+      "hint": "Question words like どれ take が, never は.",
+      "cue": "which one? · really big"
+    },
+    {
+      "role": "a",
+      "jp": "それはちょっと{高|たか}いよ。これはあまり{高|たか}くない。",
+      "en": "That one's a bit pricey. This one's not too expensive.",
+      "hint": "あまり needs a negative: あまり高くない.",
+      "cue": "bit pricey · this one · not very"
+    },
+    {
+      "role": "b",
+      "jp": "いいね。じゃあ、これにする。",
+      "en": "Nice. Let's get this one, then.",
+      "cue": "nice · this one"
+    },
+    {
+      "role": "a",
+      "jp": "あ、ちょっと{待|ま}って。{毛布|もうふ}は{買|か}わない？",
+      "en": "Oh, wait a sec. Aren't we getting a blanket?",
+      "hint": "Casual request: the て-form on its own (待って). A rising 〜ない？ checks or suggests.",
+      "cue": "wait · blanket · not buying?"
+    },
+    {
+      "role": "b",
+      "jp": "{毛布|もうふ}はうちにあるよ。{今日|きょう}は{枕|まくら}だけ。",
+      "en": "We've got one at home. Just the pillow today.",
+      "cue": "have one · just the pillow"
+    }
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "id": "st-l0-08",
+  "level": "L0",
+  "unit": 8,
+  "title": "Not open yet",
+  "titleJp": "じゅんびちゅう",
+  "topic": "shopping",
+  "grammar": [
+    "wa-desu",
+    "no-possession",
+    "masu-forms",
+    "wo-object",
+    "time-telling",
+    "ni-time-place",
+    "keigo-set-phrases",
+    "masu-past",
+    "i-adjectives",
+    "counters-people",
+    "arimasu-imasu",
+    "to-with",
+    "deshita",
+    "suki-kirai",
+    "adjective-past",
+    "he-direction",
+    "casual-speech",
+    "position-words",
+    "te-form",
+    "kara-made",
+    "adverbs-degree",
+    "te-kudasai"
+  ],
+  "sentences": [
+    {
+      "jp": "にちようびの／あさ、／{十時|じゅうじ}です。",
+      "en": "It's ten o'clock on Sunday morning."
+    },
+    {
+      "jp": "{駅|えき}の／ちかくに／あたらしい／カフェが／あります。",
+      "en": "There's a new café near the station."
+    },
+    {
+      "jp": "{田中|たなか}さんの／すきな／カフェです。",
+      "en": "It's Ms Tanaka's favourite café."
+    },
+    {
+      "jp": "ケンと／エマは／カフェへ／{行|い}きました。",
+      "en": "Ken and Emma went to the café."
+    },
+    {
+      "jp": "でも、／{店|みせ}は／じゅんびちゅうでした。",
+      "en": "But the café wasn't open yet."
+    },
+    {
+      "jp": "{店|みせ}は／{十一時|じゅういちじ}から／{六時|ろくじ}までです。",
+      "en": "The café is open from eleven to six."
+    },
+    {
+      "jp": "「あと／{一時間|いちじかん}…」",
+      "en": "\"Another hour...\""
+    },
+    {
+      "jp": "ふたりは／こうえんへ／{行|い}って、／ちょっと／あるきました。",
+      "en": "They went to the park and walked around a little."
+    },
+    {
+      "jp": "{十一時|じゅういちじ}に、／また／カフェへ／{行|い}きました。",
+      "en": "At eleven, they went to the café again."
+    },
+    {
+      "jp": "こんどは／えいぎょうちゅうでした。",
+      "en": "This time it was open."
+    },
+    {
+      "jp": "「いらっしゃいませ。」",
+      "en": "\"Welcome.\""
+    },
+    {
+      "jp": "「{何名様|なんめいさま}ですか。」",
+      "en": "\"How many are you?\""
+    },
+    {
+      "jp": "「ふたりです。」",
+      "en": "\"Two.\""
+    },
+    {
+      "jp": "{店|みせ}には／{人|ひと}が／たくさん／いました。",
+      "en": "There were lots of people in the café."
+    },
+    {
+      "jp": "「すみません、／ちょっと／まってください。」",
+      "en": "\"Sorry, please wait a moment.\""
+    },
+    {
+      "jp": "ふたりは／{十分|じゅっぷん}／まちました。",
+      "en": "They waited ten minutes."
+    },
+    {
+      "jp": "ふたりは／ケーキと／コーヒーを／たのみました。",
+      "en": "They ordered cake and coffee."
+    },
+    {
+      "jp": "ケーキは／とても／おいしかったです。",
+      "en": "The cake was really good."
+    },
+    {
+      "jp": "そして、／あまり／たかくなかったです。",
+      "en": "And it wasn't very expensive."
+    },
+    {
+      "jp": "「また／{来|く}る？」",
+      "en": "\"Shall we come again?\""
+    },
+    {
+      "jp": "「うん、／でも、／{十一時|じゅういちじ}からね。」",
+      "en": "\"Yes, but not before eleven.\""
+    }
+  ],
+  "gist": {
+    "q": "Why did Ken and Emma go to the park first?",
+    "options": [
+      "The café wasn't open yet",
+      "The café was too expensive",
+      "They wanted to see the park"
+    ],
+    "answer": 0
+  }
+}

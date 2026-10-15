@@ -1,0 +1,82 @@
+{
+  "id": "rp-u03",
+  "unit": 3,
+  "title": "I'm off!",
+  "titleJp": "いってきます！",
+  "setting": "A weekday morning at home: one of you is about to leave for work, grabs breakfast and says when they will be back.",
+  "level": 1,
+  "register": "polite",
+  "targets": [
+    "core:cw-0303",
+    "core:cw-0050",
+    "core:cw-0051",
+    "core:cw-0205",
+    "grammar:time-telling",
+    "grammar:ni-time-place",
+    "grammar:wo-object",
+    "grammar:wo-kudasai"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "b",
+      "jp": "おはよう。{今|いま}、{何時|なんじ}ですか。",
+      "en": "Morning. What time is it?",
+      "cue": "morning · time now?"
+    },
+    {
+      "role": "a",
+      "jp": "{七時十分|しちじじゅっぷん}です。",
+      "en": "It's ten past seven.",
+      "hint": "じゅっぷん: 10 minutes takes ぷん, not ふん.",
+      "cue": "time · 7:10"
+    },
+    {
+      "role": "b",
+      "jp": "もう？ {七時半|しちじはん}にうちを{出|で}ます！",
+      "en": "Already? I'm leaving home at seven thirty!",
+      "hint": "に after a clock time: 七時半に = at 7:30.",
+      "cue": "already · leave · 7:30"
+    },
+    {
+      "role": "a",
+      "jp": "{朝|あさ}ご{飯|はん}は？ パン、{食|た}べますか。",
+      "en": "What about breakfast? Want some bread?",
+      "cue": "breakfast · bread?"
+    },
+    {
+      "role": "b",
+      "jp": "はい、ひとつください。コーヒーもお{願|ねが}いします。",
+      "en": "Yes, one, please. And a coffee, please.",
+      "cue": "yes · one · coffee too"
+    },
+    {
+      "role": "a",
+      "jp": "はい、どうぞ。{今日|きょう}は{何時|なんじ}に{帰|かえ}りますか。",
+      "en": "Here you go. What time will you be home today?",
+      "cue": "here · home · what time?"
+    },
+    {
+      "role": "b",
+      "jp": "{六時|ろくじ}ごろ{帰|かえ}ります。じゃあ、いってきます！",
+      "en": "Around six. Right, I'm off!",
+      "hint": "ごろ = around (a time).",
+      "cue": "around six · I'm off"
+    },
+    {
+      "role": "a",
+      "jp": "いってらっしゃい！",
+      "en": "Have a good day!",
+      "cue": "see you · good day"
+    }
+  ]
+}

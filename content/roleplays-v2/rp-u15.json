@@ -1,0 +1,78 @@
+{
+  "id": "rp-u15",
+  "unit": 15,
+  "title": "Before the rain",
+  "titleJp": "{雨|あめ}が{降|ふ}る{前|まえ}に",
+  "setting": "A sunny spring morning. The cherry blossoms are out in the park nearby, but rain is forecast for tomorrow.",
+  "level": 2,
+  "register": "plain",
+  "targets": [
+    "grammar:ta-koto-ga-aru",
+    "grammar:mae-ni-ato-de",
+    "grammar:tari-tari",
+    "grammar:hou-ga-ii",
+    "grammar:counters-objects",
+    "core:cw-0963"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "{見|み}て、{桜|さくら}が{咲|さ}いているよ。",
+      "en": "Look, the cherry blossoms are out.",
+      "cue": "look · cherry blossoms · out"
+    },
+    {
+      "role": "b",
+      "jp": "きれいだね。{日本|にほん}で{桜|さくら}を{見|み}たことがある？",
+      "en": "They're beautiful. Have you ever seen cherry blossoms in Japan?",
+      "cue": "beautiful · Japan · ever seen?"
+    },
+    {
+      "role": "a",
+      "jp": "ううん、ない。いつか{日本|にほん}の{桜|さくら}も{見|み}たいな。",
+      "en": "No, never. I'd love to see them in Japan someday.",
+      "cue": "no · someday · Japan too"
+    },
+    {
+      "role": "b",
+      "jp": "{明日|あした}は{雨|あめ}だから、{雨|あめ}が{降|ふ}る{前|まえ}に、{今日|きょう}{公園|こうえん}に{行|い}かない？",
+      "en": "It's going to rain tomorrow, so shall we go to the park today, before the rain?",
+      "cue": "rain tomorrow · before · park today?"
+    },
+    {
+      "role": "a",
+      "jp": "いいね！お{弁当|べんとう}を{食|た}べたり、{写真|しゃしん}を{撮|と}ったりしよう。",
+      "en": "Yes! Let's have a picnic and take some photos.",
+      "hint": "〜たり〜たりする lists a couple of things you'll do, among others.",
+      "cue": "picnic · photos · let's"
+    },
+    {
+      "role": "b",
+      "jp": "うん。でも、{夕方|ゆうがた}は{寒|さむ}くなるから、セーターを{持|も}っていったほうがいいよ。",
+      "en": "Okay. But it gets cold in the evening, so you'd better take a sweater.",
+      "cue": "evening · cold · take sweater"
+    },
+    {
+      "role": "a",
+      "jp": "わかった。おにぎりは{何個|なんこ}{作|つく}る？",
+      "en": "Got it. How many rice balls shall I make?",
+      "cue": "rice balls · how many"
+    },
+    {
+      "role": "b",
+      "jp": "{一人|ひとり}{二個|にこ}で、{四個|よんこ}！",
+      "en": "Two each, so four!",
+      "cue": "two each · four"
+    }
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "id": "st-l1-05",
+  "level": "L1",
+  "unit": 18,
+  "title": "Our first yoga class",
+  "titleJp": "{初|はじ}めてのヨガ",
+  "topic": "hobbies",
+  "grammar": [
+    "konna-donna",
+    "koto-ga-dekiru",
+    "te-miru",
+    "kamoshirenai",
+    "to-omou",
+    "tai-want",
+    "tte-quote",
+    "adverb-form",
+    "wa-contrast",
+    "volitional"
+  ],
+  "sentences": [
+    {
+      "jp": "ミキは／{最近|さいきん}、／{何|なに}か／{新|あたら}しい／ことを／{始|はじ}めたいと／{思|おも}っています。",
+      "en": "Lately, Miki has been wanting to start something new."
+    },
+    {
+      "jp": "「ねえ、／ケン。／どんな／ことを／やって／みたい？」",
+      "en": "\"Hey, Ken. What kind of thing would you like to try?\""
+    },
+    {
+      "jp": "「そうだね…。／{僕|ぼく}は／{体|からだ}が／{硬|かた}いから、／スポーツは／ちょっと…。」",
+      "en": "\"Hmm... My body is stiff, so sports are a bit...\""
+    },
+    {
+      "jp": "「じゃあ、／ヨガは／どう？／{駅|えき}の／{近|ちか}くに／ヨガの／クラスが／あるよ。」",
+      "en": "\"Then how about yoga? There's a yoga class near the station.\""
+    },
+    {
+      "jp": "「ヨガ？／{僕|ぼく}に／できるかな。」",
+      "en": "\"Yoga? I wonder if I can do it.\""
+    },
+    {
+      "jp": "「{初|はじ}めての／{人|ひと}も／{大丈夫|だいじょうぶ}だって。」",
+      "en": "\"They say beginners are welcome too.\""
+    },
+    {
+      "jp": "「{一回|いっかい}／やって／みようよ。／{楽|たの}しいかもしれないよ。」",
+      "en": "\"Let's try it once. It might be fun.\""
+    },
+    {
+      "jp": "{土曜日|どようび}の／{朝|あさ}、／{二人|ふたり}は／ヨガの／クラスに／{行|い}きました。",
+      "en": "On Saturday morning, the two of them went to the yoga class."
+    },
+    {
+      "jp": "{先生|せんせい}は／{優|やさ}しい／{女|おんな}の／{人|ひと}でした。",
+      "en": "The teacher was a kind woman."
+    },
+    {
+      "jp": "「{今日|きょう}は、／{木|き}に／なって／みましょう。」",
+      "en": "\"Today, let's try becoming a tree.\""
+    },
+    {
+      "jp": "「{右|みぎ}の／{足|あし}だけで／{立|た}って／ください。」",
+      "en": "\"Please stand on just your right foot.\""
+    },
+    {
+      "jp": "「{手|て}は／{頭|あたま}の／{上|うえ}です。」",
+      "en": "\"Hands above your head.\""
+    },
+    {
+      "jp": "ミキは／{上手|じょうず}に／{立|た}つ／ことが／できました。",
+      "en": "Miki was able to stand nicely."
+    },
+    {
+      "jp": "ミキの／{木|き}は／とても／きれいでした。",
+      "en": "Miki's tree was very beautiful."
+    },
+    {
+      "jp": "でも、／ケンは／{三回|さんかい}／やって／みましたが、／{一回|いっかい}も／できませんでした。",
+      "en": "But Ken tried three times and couldn't do it even once."
+    },
+    {
+      "jp": "「{僕|ぼく}の／{木|き}は、／{風|かぜ}が／{強|つよ}い／{日|ひ}の／{木|き}だね。」と／ケンが／{言|い}いました。",
+      "en": "\"My tree is a tree on a windy day,\" said Ken."
+    },
+    {
+      "jp": "クラスの／みんなが／{笑|わら}いました。",
+      "en": "Everyone in the class laughed."
+    },
+    {
+      "jp": "{先生|せんせい}も／{笑|わら}って、／「{大丈夫|だいじょうぶ}ですよ。／{最初|さいしょ}は／みんな／できません。」と／{言|い}いました。",
+      "en": "The teacher laughed too and said, \"That's okay. Nobody can do it at first.\""
+    },
+    {
+      "jp": "{次|つぎ}は、／{座|すわ}って、／{手|て}で／{足|あし}を／{触|さわ}って／みました。",
+      "en": "Next, they sat down and tried touching their feet with their hands."
+    },
+    {
+      "jp": "ミキの／{手|て}は／すぐ／{足|あし}に／{届|とど}きました。",
+      "en": "Miki's hands reached her feet right away."
+    },
+    {
+      "jp": "ケンの／{手|て}は、／{足|あし}まで／{届|とど}きませんでした。",
+      "en": "Ken's hands didn't reach his feet."
+    },
+    {
+      "jp": "クラスの／{後|あと}、／ケンは／「{体|からだ}が／{痛|いた}い…。／でも、／{気持|きも}ちが／いいね。」と／{言|い}いました。",
+      "en": "After the class, Ken said, \"My body hurts... But it feels good.\""
+    },
+    {
+      "jp": "「{来週|らいしゅう}も／{来|く}る？」と／ミキが／{聞|き}きました。",
+      "en": "\"Shall we come next week too?\" Miki asked."
+    },
+    {
+      "jp": "「うん。／{来週|らいしゅう}は、／{僕|ぼく}も／{木|き}に／なる／ことが／できるかもしれない。」",
+      "en": "\"Yes. Next week, maybe I can become a tree too.\""
+    }
+  ],
+  "gist": {
+    "q": "How does Ken feel at the end of his first yoga class?",
+    "options": [
+      "It was hard, but he wants to go again",
+      "He was better at it than Miki",
+      "He was angry and never wants to go back"
+    ],
+    "answer": 0
+  }
+}

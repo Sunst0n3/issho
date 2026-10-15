@@ -1,0 +1,79 @@
+{
+  "id": "rp-u11",
+  "unit": 11,
+  "title": "A free Sunday",
+  "titleJp": "{明日|あした}、{何|なに}する？",
+  "setting": "Saturday night on the sofa. Tomorrow is a day off for both of you: one of you wants a lazy morning, the other wants to get outside.",
+  "level": 2,
+  "register": "plain",
+  "targets": [
+    "grammar:no-ga-suki",
+    "grammar:relative-clauses",
+    "grammar:kedo-but",
+    "grammar:te-kara",
+    "grammar:tewa-ikenai",
+    "core:cw-0742"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "{明日|あした}、{休|やす}みだね。{何|なに}する？",
+      "en": "We're both off tomorrow. What shall we do?",
+      "cue": "tomorrow · day off · what"
+    },
+    {
+      "role": "b",
+      "jp": "{天気|てんき}がいいから、{先週|せんしゅう}{行|い}った{公園|こうえん}に、また{行|い}かない？",
+      "en": "The weather's nice, so why don't we go back to the park we went to last week?",
+      "hint": "先週行った公園 = \"the park we went to last week\": the describing part goes in front of the noun.",
+      "cue": "nice weather · park · last week · again?"
+    },
+    {
+      "role": "a",
+      "jp": "いいけど、{休|やす}みの{日|ひ}は{朝|あさ}ゆっくり{寝|ね}るのが{好|す}きだから…",
+      "en": "Sure, but on days off I like to sleep in, so…",
+      "hint": "Trailing off after から is a soft way to say \"so… not too early\".",
+      "cue": "OK but · sleep in · like"
+    },
+    {
+      "role": "b",
+      "jp": "じゃあ、お{昼|ひる}を{食|た}べてから{出|で}かけない？",
+      "en": "Then shall we head out after lunch?",
+      "cue": "lunch · after · go out?"
+    },
+    {
+      "role": "a",
+      "jp": "うん。{公園|こうえん}の{近|ちか}くにある{美術館|びじゅつかん}にも{行|い}きたい。",
+      "en": "Okay. I want to go to the art museum near the park, too.",
+      "cue": "museum · near the park · too"
+    },
+    {
+      "role": "b",
+      "jp": "いいね。でも、あそこは{写真|しゃしん}を{撮|と}ってはいけないよ。",
+      "en": "Good idea. But you're not allowed to take photos in there.",
+      "cue": "but · photos · not allowed"
+    },
+    {
+      "role": "a",
+      "jp": "{大丈夫|だいじょうぶ}。{写真|しゃしん}は{公園|こうえん}で{撮|と}るから。",
+      "en": "That's fine. I'll take my photos in the park.",
+      "cue": "fine · photos · in the park"
+    },
+    {
+      "role": "b",
+      "jp": "わかった。じゃあ、{一時|いちじ}ごろね。",
+      "en": "Got it. Around one o'clock, then.",
+      "cue": "got it · around one"
+    }
+  ]
+}

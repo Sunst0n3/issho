@@ -1,0 +1,130 @@
+{
+  "id": "st-l0-11",
+  "level": "L0",
+  "unit": 9,
+  "title": "What are you doing?",
+  "titleJp": "{今|いま}、なに してる？",
+  "topic": "calendar",
+  "grammar": [
+    "wa-desu",
+    "no-possession",
+    "mo-also",
+    "masu-forms",
+    "wo-object",
+    "time-telling",
+    "ni-time-place",
+    "masu-past",
+    "de-place-means",
+    "arimasu-imasu",
+    "to-with",
+    "deshita",
+    "adjective-past",
+    "casual-speech",
+    "position-words",
+    "kara-made",
+    "adverbs-degree",
+    "dates-days",
+    "ni-iku-purpose",
+    "te-imasu",
+    "casual-past"
+  ],
+  "sentences": [
+    {
+      "jp": "{今日|きょう}は／{六月|ろくがつ}／{十日|とおか}、／きんようびです。",
+      "en": "Today is Friday, June 10th."
+    },
+    {
+      "jp": "ケンと／エマの／けっこんきねんびです。",
+      "en": "It's Ken and Emma's wedding anniversary."
+    },
+    {
+      "jp": "ケンは／{今日|きょう}、／やすみです。",
+      "en": "Ken has the day off today."
+    },
+    {
+      "jp": "エマは／かいしゃで／はたらいています。",
+      "en": "Emma is at work at the office."
+    },
+    {
+      "jp": "ひるに、／エマは／メッセージを／おくりました。",
+      "en": "At lunchtime, Emma sent a message."
+    },
+    {
+      "jp": "「{今|いま}、／なに／してる？」",
+      "en": "\"What are you doing right now?\""
+    },
+    {
+      "jp": "「そうじ／してる。」",
+      "en": "\"Cleaning.\""
+    },
+    {
+      "jp": "「へえ、／ありがとう！」",
+      "en": "\"Oh, thank you!\""
+    },
+    {
+      "jp": "{六時|ろくじ}に、／エマは／また／メッセージを／おくりました。",
+      "en": "At six, Emma sent another message."
+    },
+    {
+      "jp": "「{今|いま}、／かいしゃを／{出|で}た。」",
+      "en": "\"I've just left the office.\""
+    },
+    {
+      "jp": "「ケンは？」",
+      "en": "\"What about you?\""
+    },
+    {
+      "jp": "「なに／してる？」",
+      "en": "\"What are you doing?\""
+    },
+    {
+      "jp": "「これから、／スーパーに／かいものに／{行|い}く。」",
+      "en": "\"I'm about to go shopping at the supermarket.\""
+    },
+    {
+      "jp": "「なにを／{買|か}いに／{行|い}く？」",
+      "en": "\"What are you going to buy?\""
+    },
+    {
+      "jp": "「あとで／わかるよ。」",
+      "en": "\"You'll see later.\""
+    },
+    {
+      "jp": "エマが／うちに／かえりました。",
+      "en": "Emma got home."
+    },
+    {
+      "jp": "へやは／とても／きれいでした。",
+      "en": "The room was really clean."
+    },
+    {
+      "jp": "テーブルの／{上|うえ}に／ケーキと／ワインが／ありました。",
+      "en": "There was a cake and some wine on the table."
+    },
+    {
+      "jp": "「きねんび、／おめでとう！」",
+      "en": "\"Happy anniversary!\""
+    },
+    {
+      "jp": "エマも／かばんから／はこを／{出|だ}しました。",
+      "en": "Emma took a box out of her bag too."
+    },
+    {
+      "jp": "はこの／{中|なか}も／ケーキでした！",
+      "en": "Inside the box was a cake too!"
+    },
+    {
+      "jp": "その／{夜|よる}、／ふたりは／ケーキを／たくさん／{食|た}べました。",
+      "en": "That night, the two of them ate a lot of cake."
+    }
+  ],
+  "gist": {
+    "q": "What was the surprise at the end?",
+    "options": [
+      "Ken forgot their anniversary",
+      "They both bought a cake",
+      "The room was very messy"
+    ],
+    "answer": 1
+  }
+}

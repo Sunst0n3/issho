@@ -1,0 +1,67 @@
+{
+  "id": "rp-u23",
+  "unit": 23,
+  "title": "Shall we move?",
+  "titleJp": "{引|ひ}っ{越|こ}す？",
+  "setting": "Sunday evening at home, after the two of you have been to see a flat near Aoi's office.",
+  "level": 3,
+  "register": "plain",
+  "targets": [
+    "grammar:temo-even-if",
+    "grammar:nara",
+    "grammar:koto-ni-suru",
+    "core:cw-1053",
+    "core:cw-1169",
+    "core:cw-1012"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "{今日|きょう}の{部屋|へや}、どうだった？",
+      "en": "So, what did you think of the flat today?",
+      "cue": "today's flat · what did you think"
+    },
+    {
+      "role": "b",
+      "jp": "{広|ひろ}いし、{明|あか}るいし、すごく{気|き}に{入|い}った。でも、{家賃|やちん}が{高|たか}いよね。",
+      "en": "It's spacious and bright — I really liked it. But the rent is high, isn't it?",
+      "cue": "spacious · bright · rent high"
+    },
+    {
+      "role": "a",
+      "jp": "{高|たか}くても、{会社|かいしゃ}に{近|ちか}いなら、いいと{思|おも}うよ。{毎日|まいにち}の{通勤|つうきん}も{楽|らく}だし。",
+      "en": "Even if it's expensive, if it's close to your work, I think it's worth it. Your daily commute would be easy, too.",
+      "hint": "〜ても = even if; 〜なら = if that's the case. 高い → 高くても, 近い → 近いなら.",
+      "cue": "even if expensive · near work · easier commute"
+    },
+    {
+      "role": "b",
+      "jp": "そうだね。{今|いま}の{部屋|へや}は{狭|せま}いし、{上|うえ}の{人|ひと}もうるさいしね。",
+      "en": "True. Our place now is cramped, and the people upstairs are noisy too.",
+      "cue": "our place now · cramped · noisy upstairs"
+    },
+    {
+      "role": "a",
+      "jp": "じゃあ、{引|ひ}っ{越|こ}すことにしようか。",
+      "en": "Shall we decide to move, then?",
+      "hint": "Dictionary form + ことにする = decide to do it; ことにしようか invites your partner to decide together.",
+      "cue": "decide · move"
+    },
+    {
+      "role": "b",
+      "jp": "うん、そうしよう！ {引|ひ}っ{越|こ}すなら、{新|あたら}しいソファーも{買|か}いたいな。",
+      "en": "Yes, let's! And if we're moving, I'd like to get a new sofa too.",
+      "cue": "yes · if moving · new sofa"
+    }
+  ]
+}

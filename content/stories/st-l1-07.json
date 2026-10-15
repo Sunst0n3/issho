@@ -1,0 +1,139 @@
+{
+  "id": "st-l1-07",
+  "level": "L1",
+  "unit": 19,
+  "title": "The strawberry cake",
+  "titleJp": "いちごのケーキ",
+  "topic": "celebrations",
+  "grammar": [
+    "ageru-morau",
+    "potential-form",
+    "te-shimau",
+    "tara-conditional",
+    "kureru",
+    "nagara",
+    "dake-shika",
+    "toki-when",
+    "n-desu",
+    "relative-clauses"
+  ],
+  "sentences": [
+    {
+      "jp": "{来週|らいしゅう}の／{土曜日|どようび}は、／ミキの／{誕生日|たんじょうび}です。",
+      "en": "Next Saturday is Miki's birthday."
+    },
+    {
+      "jp": "ケンは／ミキに／ケーキを／あげたいと／{思|おも}いました。",
+      "en": "Ken wanted to give Miki a cake."
+    },
+    {
+      "jp": "でも、／ケンは／ケーキが／{作|つく}れません。",
+      "en": "But Ken can't make cakes."
+    },
+    {
+      "jp": "ケンは／お{姉|ねえ}さんに／{電話|でんわ}しました。",
+      "en": "Ken phoned his older sister."
+    },
+    {
+      "jp": "お{姉|ねえ}さんは／ケーキを／{作|つく}るのが／とても／{上手|じょうず}です。",
+      "en": "His sister is very good at making cakes."
+    },
+    {
+      "jp": "「{簡単|かんたん}な／いちごの／ケーキを／{作|つく}りたいんだ。／{教|おし}えて！」",
+      "en": "\"I want to make a simple strawberry cake. Teach me!\""
+    },
+    {
+      "jp": "お{姉|ねえ}さんは／すぐ／メールを／くれました。",
+      "en": "His sister sent him an email right away."
+    },
+    {
+      "jp": "「ケーキが／{焼|や}けたら、／{上|うえ}に／いちごを／{置|お}いてね。」",
+      "en": "\"When the cake is baked, put the strawberries on top.\""
+    },
+    {
+      "jp": "{誕生日|たんじょうび}の／{朝|あさ}、／ミキは／{友達|ともだち}と／{出|で}かけました。",
+      "en": "On the morning of her birthday, Miki went out with a friend."
+    },
+    {
+      "jp": "ケンは／{一人|ひとり}で／ケーキを／{作|つく}りました。",
+      "en": "Ken made the cake by himself."
+    },
+    {
+      "jp": "ケーキを／{焼|や}きながら、／ケンは／いちごを／{一|ひと}つ／{食|た}べました。",
+      "en": "While the cake was baking, Ken ate one strawberry."
+    },
+    {
+      "jp": "「おいしい！」／もう／{一|ひと}つ。／もう／{一|ひと}つ…。",
+      "en": "\"Delicious!\" Another one. And another one..."
+    },
+    {
+      "jp": "ケーキが／{焼|や}けた／とき、／いちごは／{一|ひと}つも／ありませんでした。",
+      "en": "When the cake was baked, there wasn't a single strawberry left."
+    },
+    {
+      "jp": "ケンは／いちごを／{全部|ぜんぶ}／{食|た}べてしまったんです。",
+      "en": "Ken had eaten all the strawberries."
+    },
+    {
+      "jp": "「しまった！」",
+      "en": "\"Oh no!\""
+    },
+    {
+      "jp": "{冷蔵庫|れいぞうこ}には／みかんしか／ありません。",
+      "en": "There was nothing in the fridge but mandarin oranges."
+    },
+    {
+      "jp": "ケンは／いちごの／{代|か}わりに、／みかんを／{置|お}きました。",
+      "en": "Ken put mandarin oranges on instead of strawberries."
+    },
+    {
+      "jp": "{夕方|ゆうがた}、／ミキが／{帰|かえ}ってきました。",
+      "en": "In the early evening, Miki came home."
+    },
+    {
+      "jp": "「お{誕生日|たんじょうび}／おめでとう！／この／ケーキ、／{僕|ぼく}が／{作|つく}ったんだ。」",
+      "en": "\"Happy birthday! I made this cake.\""
+    },
+    {
+      "jp": "「え、／ケンは／ケーキが／{作|つく}れるの？／すごい！」",
+      "en": "\"What, you can make cakes? Amazing!\""
+    },
+    {
+      "jp": "「{実|じつ}は、／いちごの／ケーキだったんだけど…。」",
+      "en": "\"Actually, it was supposed to be a strawberry cake...\""
+    },
+    {
+      "jp": "ケンの／{話|はなし}を／{聞|き}いて、／ミキは／たくさん／{笑|わら}いました。",
+      "en": "When she heard Ken's story, Miki laughed and laughed."
+    },
+    {
+      "jp": "「みかんの／ケーキも／おいしいよ。／ありがとう。」",
+      "en": "\"A mandarin cake is delicious too. Thank you.\""
+    },
+    {
+      "jp": "その／{日|ひ}、／ミキは／お{母|かあ}さんから／{花|はな}を／もらいました。",
+      "en": "That day, Miki got flowers from her mother."
+    },
+    {
+      "jp": "{友達|ともだち}は／ネックレスを／くれました。",
+      "en": "Her friend gave her a necklace."
+    },
+    {
+      "jp": "でも、／いちばん／{嬉|うれ}しかった／プレゼントは、／ケンが／{作|つく}った／みかんの／ケーキでした。",
+      "en": "But the present that made her happiest was the mandarin cake Ken made."
+    },
+    {
+      "jp": "「{来年|らいねん}は、／いちごの／ケーキが／{食|た}べたいな。」と／ミキは／{笑|わら}いました。",
+      "en": "\"Next year, I'd like a strawberry cake,\" Miki said with a smile."
+    }
+  ],
+  "gist": {
+    "q": "Why is there no strawberry on Miki's birthday cake?",
+    "options": [
+      "The shop had no strawberries",
+      "Miki doesn't like strawberries",
+      "Ken ate them all while the cake was baking"
+    ],
+    "answer": 2
+  }
+}

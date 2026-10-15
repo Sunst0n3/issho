@@ -1,0 +1,117 @@
+{
+  "id": "st-start-10",
+  "level": "start",
+  "unit": 4,
+  "title": "Dinner out",
+  "titleJp": "レストランの よる",
+  "topic": "food",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "kore-sore-are",
+    "mo-also",
+    "ne-yo",
+    "masu-forms",
+    "wo-object",
+    "counting-tsu",
+    "wo-kudasai",
+    "ni-time-place",
+    "keigo-set-phrases",
+    "masu-past",
+    "i-adjectives",
+    "de-place-means",
+    "counters-people"
+  ],
+  "sentences": [
+    {
+      "jp": "きのう、／わたしたちは／レストランに／いきました。",
+      "en": "Yesterday we went to a restaurant."
+    },
+    {
+      "jp": "「いらっしゃいませ！」",
+      "en": "\"Welcome!\""
+    },
+    {
+      "jp": "「なんめいさまですか。」",
+      "en": "\"How many in your party?\""
+    },
+    {
+      "jp": "「ふたりです。」",
+      "en": "\"Two.\""
+    },
+    {
+      "jp": "「こちらへ／どうぞ。」",
+      "en": "\"This way, please.\""
+    },
+    {
+      "jp": "「おすすめは／なんですか。」",
+      "en": "\"What do you recommend?\""
+    },
+    {
+      "jp": "「きょうは／おさかなです。」",
+      "en": "\"Today it's the fish.\""
+    },
+    {
+      "jp": "「とても／おいしいですよ。」",
+      "en": "\"It's very good.\""
+    },
+    {
+      "jp": "「じゃあ、／それを／ふたつ／おねがいします。」",
+      "en": "\"Then we'll have that for two, please.\""
+    },
+    {
+      "jp": "「かしこまりました。」",
+      "en": "\"Certainly.\""
+    },
+    {
+      "jp": "「この／さかな、／とても／おいしいですね！」",
+      "en": "\"This fish is really good, isn't it!\""
+    },
+    {
+      "jp": "ケンは／ワインを／たくさん／のみました。",
+      "en": "Ken drank a lot of wine."
+    },
+    {
+      "jp": "「アイスも／ひとつ／ください。」",
+      "en": "\"One ice cream too, please.\""
+    },
+    {
+      "jp": "「ケンは？」",
+      "en": "\"What about you, Ken?\""
+    },
+    {
+      "jp": "「ぼくは／おなかいっぱいです。」",
+      "en": "\"I'm full.\""
+    },
+    {
+      "jp": "でも、／ケンは／わたしの／アイスを／ちょっと／たべました。",
+      "en": "But Ken ate a little of my ice cream."
+    },
+    {
+      "jp": "「おかいけいを／おねがいします。」",
+      "en": "\"The bill, please.\""
+    },
+    {
+      "jp": "「カードで／いいですか。」",
+      "en": "\"Is card okay?\""
+    },
+    {
+      "jp": "「はい、／だいじょうぶです。」",
+      "en": "\"Yes, that's fine.\""
+    },
+    {
+      "jp": "「ごちそうさまでした！」",
+      "en": "\"Thank you, it was lovely!\""
+    }
+  ],
+  "gist": {
+    "q": "What did Ken do after saying he was full?",
+    "options": [
+      "He ordered more wine.",
+      "He paid in cash.",
+      "He ate some of Emma's ice cream."
+    ],
+    "answer": 2
+  }
+}

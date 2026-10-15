@@ -1,0 +1,78 @@
+{
+  "id": "rp-u14",
+  "unit": 14,
+  "title": "Train or bus?",
+  "titleJp": "どうやって{行|い}く？",
+  "setting": "Friday evening at home. Tomorrow you're meeting friends in town, and you work out the best way to get there and back.",
+  "level": 2,
+  "register": "plain",
+  "targets": [
+    "grammar:ichiban",
+    "grammar:duration-kakaru",
+    "grammar:adjectives-te",
+    "grammar:toki-when",
+    "grammar:adj-naru",
+    "core:cw-0981"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "{明日|あした}、{町|まち}までどうやって{行|い}く？",
+      "en": "How shall we get into town tomorrow?",
+      "cue": "tomorrow · town · how"
+    },
+    {
+      "role": "b",
+      "jp": "{電車|でんしゃ}が{一番|いちばん}{速|はや}いよ。{三十分|さんじゅっぷん}ぐらいかかる。",
+      "en": "The train's quickest. It takes about thirty minutes.",
+      "cue": "train · quickest · 30 minutes"
+    },
+    {
+      "role": "a",
+      "jp": "でも、{乗|の}り{換|か}えがあるよね。バスは？",
+      "en": "But we have to change, right? What about the bus?",
+      "cue": "but · change trains · bus?"
+    },
+    {
+      "role": "b",
+      "jp": "バスは{安|やす}くて{便利|べんり}だけど、{一時間|いちじかん}かかるよ。",
+      "en": "The bus is cheap and easy, but it takes an hour.",
+      "hint": "安くて joins two descriptions: \"cheap and…\".",
+      "cue": "bus · cheap and easy · an hour"
+    },
+    {
+      "role": "a",
+      "jp": "{一時間|いちじかん}か…。{荷物|にもつ}が{多|おお}いときは、バスがいいけどね。",
+      "en": "An hour, huh… The bus is good when we've got lots of bags, though.",
+      "cue": "an hour · lots of bags · bus good"
+    },
+    {
+      "role": "b",
+      "jp": "{明日|あした}は{荷物|にもつ}が{少|すく}ないから、{電車|でんしゃ}で{行|い}こう。",
+      "en": "We won't have much to carry tomorrow, so let's take the train.",
+      "cue": "not much luggage · train · let's"
+    },
+    {
+      "role": "a",
+      "jp": "うん。でも、{夜|よる}は{寒|さむ}くなるから、{帰|かえ}りはタクシーにしない？",
+      "en": "Okay. But it'll get cold at night, so shall we get a taxi home?",
+      "cue": "cold at night · taxi home?"
+    },
+    {
+      "role": "b",
+      "jp": "タクシーは{高|たか}いよ！{帰|かえ}りも{電車|でんしゃ}にしよう。",
+      "en": "Taxis are expensive! Let's get the train home too.",
+      "cue": "taxi · expensive · train back too"
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "id": "st-start-08",
+  "level": "start",
+  "unit": 3,
+  "title": "Six apples",
+  "titleJp": "むっつの りんご",
+  "topic": "shopping",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "mo-also",
+    "masu-forms",
+    "wo-object",
+    "counting-tsu",
+    "time-telling",
+    "wo-kudasai",
+    "ni-time-place"
+  ],
+  "sentences": [
+    {
+      "jp": "きょうは／どようびです。",
+      "en": "Today is Saturday."
+    },
+    {
+      "jp": "わたしは／スーパーに／いきます。",
+      "en": "I'm going to the supermarket."
+    },
+    {
+      "jp": "「ケン、／なにを／かいますか。」",
+      "en": "\"Ken, what are we buying?\""
+    },
+    {
+      "jp": "「たまごを／むっつ／おねがいします。」",
+      "en": "\"Six eggs, please.\""
+    },
+    {
+      "jp": "「それから、／ぎゅうにゅうも／おねがいします。」",
+      "en": "\"And some milk, please.\""
+    },
+    {
+      "jp": "「わかりました。」",
+      "en": "\"Okay.\""
+    },
+    {
+      "jp": "スーパーです。",
+      "en": "I'm at the supermarket."
+    },
+    {
+      "jp": "たまごを／むっつ／かいます。",
+      "en": "I buy six eggs."
+    },
+    {
+      "jp": "ぎゅうにゅうも／かいます。",
+      "en": "I buy milk too."
+    },
+    {
+      "jp": "りんごも／みっつ／かいます。",
+      "en": "I buy three apples as well."
+    },
+    {
+      "jp": "「ふくろを／ひとつ／ください。」",
+      "en": "\"One bag, please.\""
+    },
+    {
+      "jp": "うちに／かえります。",
+      "en": "I go home."
+    },
+    {
+      "jp": "よじに／ケンも／かえります。",
+      "en": "At four, Ken comes home too."
+    },
+    {
+      "jp": "「エマ、／りんご、／どうぞ！」",
+      "en": "\"Emma, here, apples for you!\""
+    },
+    {
+      "jp": "「りんご？」",
+      "en": "\"Apples?\""
+    },
+    {
+      "jp": "「わたしも／りんごを／みっつ…」",
+      "en": "\"I got three apples too...\""
+    },
+    {
+      "jp": "いま、／りんごは／むっつです。",
+      "en": "Now we have six apples."
+    },
+    {
+      "jp": "「じゃあ、／あした／りんごの／ケーキを／つくります！」",
+      "en": "\"Well then, tomorrow I'll make an apple cake!\""
+    }
+  ],
+  "gist": {
+    "q": "Why do they end up with six apples?",
+    "options": [
+      "The shop gave them extra.",
+      "Ken asked for six.",
+      "Emma and Ken each bought three."
+    ],
+    "answer": 2
+  }
+}

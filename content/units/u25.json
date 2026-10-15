@@ -9,17 +9,22 @@
     "noni",
     "causative"
   ],
-  "coreWordCeiling": 1560,
+  "coreWordCeiling": 1577,
   "canDos": [
     {
       "id": "u25-cd1",
       "text": "Tell your partner kindly what you'd like them to do, or not do, more often.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner asks you this (the audio plays it). Answer kindly for 45–60 seconds: one thing you'd like them to do more often and one thing you'd like them not to do, each with a reason. It's a request, not a complaint.",
+        "material": "ねえ、{私|わたし}にもっとしてほしいこと、ある？ してほしくないことも、{本当|ほんとう}のことを{言|い}ってね。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Makes at least one request with 〜てほしい and one with 〜ないでほしい",
+          "Softens it kindly (できれば, ちょっと, 〜と嬉しい)",
+          "Gives a reason for each request",
+          "Thanks or reassures your partner at the end (いつもありがとう)"
+        ]
       }
     },
     {
@@ -27,10 +32,15 @@
       "text": "Express disappointment without blaming ('I waited, and yet…'), listen to your partner's side, and make up.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner came home two hours late without messaging, and the dinner you made has gone cold. They've just walked in (the audio plays their line). Tell them how you felt using 〜のに, without blaming them; ask what happened; then make up.",
+        "material": "（{夜|よる}{十時|じゅうじ}。{晩|ばん}ご{飯|はん}は{冷|つめ}たくなっている。）\nただいま…。ごめん、{遅|おそ}くなっちゃった。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Expresses disappointment with 〜のに (作って待っていたのに…)",
+          "Says how you felt rather than blaming (寂しかった / 心配した)",
+          "Asks for and listens to your partner's side (何があったの？)",
+          "Makes up: accepts the apology and says what you'd like next time with 〜てほしい"
+        ]
       }
     },
     {
@@ -38,9 +48,37 @@
       "text": "Understand people talking about what someone made them do or let them do (my parents made me practise, let me pay).",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "At a party, a friend's mother talks about growing up and about her own daughter. Listen for who made or let whom do what — you only need to understand these forms. Then answer the questions.",
+        "material": "{子|こ}どものころ、{母|はは}は{毎日|まいにち}{私|わたし}にピアノを{練習|れんしゅう}させました。{友達|ともだち}と{遊|あそ}びたかったのに、{一時間|いちじかん}{練習|れんしゅう}しないと、{外|そと}に{行|い}かせてくれませんでした。でも、{週末|しゅうまつ}は、{父|ちち}が{好|す}きなだけテレビを{見|み}させてくれました。\n{先月|せんげつ}、{娘|むすめ}が{初|はじ}めての{給料|きゅうりょう}で、{晩|ばん}ご{飯|はん}をごちそうしてくれました。{私|わたし}が{財布|さいふ}を{出|だ}したら、「{今日|きょう}は{私|わたし}に{払|はら}わせて」と{言|い}ったんです。{涙|なみだ}が{出|で}そうになりました。",
+        "questions": [
+          {
+            "q": "What did the speaker's mother make her do?",
+            "options": [
+              "Practise the piano every day",
+              "Play outside for an hour",
+              "Watch less TV"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "What did her father let her do at weekends?",
+            "options": [
+              "Skip piano practice",
+              "Watch as much TV as she liked",
+              "Go out with her friends"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What happened at dinner last month?",
+            "options": [
+              "Her daughter made her pay",
+              "Her father paid for everyone",
+              "Her daughter insisted on paying with her first wages"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -48,10 +86,15 @@
       "text": "Write your partner a short anniversary letter: what you're grateful for and what you'd like to do together next year.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "Here is the anniversary card your partner wrote you. Write your own card back in 4–6 sentences: thank them for at least two things, say what you'd like to do together next year, and add one wish with 〜てほしい.",
+        "material": "{記念日|きねんび}おめでとう！\nこの{一年|いちねん}、{仕事|しごと}が{忙|いそが}しかったのに、いつも{笑顔|えがお}でいてくれて、ありがとう。{私|わたし}が{落|お}ち{込|こ}んだときも、{話|はなし}を{聞|き}いてくれて{本当|ほんとう}に{嬉|うれ}しかった。\n{来年|らいねん}は、{二人|ふたり}で{北海道|ほっかいどう}に{行|い}きたいな。それから、もっと{日本語|にほんご}で{話|はな}してほしい！\nこれからもよろしくね。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Thanks your partner for at least two specific things (〜てくれてありがとう)",
+          "Says what you want to do together next year (〜たい / 〜ことにしよう)",
+          "Adds one warm wish with 〜てほしい",
+          "Uses a card shape: a greeting at the top and これからもよろしくね (or similar) at the end"
+        ]
       }
     },
     {
@@ -59,9 +102,37 @@
       "text": "Read a short advice column about couples talking things through and answer questions about it.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Read this advice column from a magazine, then answer the questions.",
+        "material": "【{相談|そうだん}】\n{夫|おっと}は{毎晩|まいばん}、{寝|ね}るまでスマホでゲームをしています。{話|はな}しても、{返事|へんじ}をしてくれません。{二人|ふたり}で{住|す}んでいるのに、とても{寂|さび}しいです。（{妻|つま}・{三十二歳|さんじゅうにさい}）\n【{答|こた}え】\nまず、{自分|じぶん}の{気持|きも}ちを{伝|つた}えてみましょう。「どうしていつもゲームをするの？」と{聞|き}くと、{相手|あいて}は{怒|おこ}られたと{感|かん}じます。「{夜|よる}は{少|すこ}しでも{話|はな}したいな」と、してほしいことを{言|い}うのがいいです。それから、{相手|あいて}の{話|はなし}も{聞|き}いてください。{仕事|しごと}で{疲|つか}れていて、{一人|ひとり}の{時間|じかん}が{欲|ほ}しいのかもしれません。「ゲームは{十時|じゅうじ}まで」など、{二人|ふたり}で{決|き}めるのもいいですね。",
+        "questions": [
+          {
+            "q": "What is the writer's problem?",
+            "options": [
+              "Her husband works late every night",
+              "Her husband plays games on his phone every night and doesn't answer her",
+              "Her husband wants to live alone"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "Why does the column say not to ask 'Why do you always play games?'",
+            "options": [
+              "He'll feel he's being told off",
+              "He won't hear the question",
+              "It makes him play for longer"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "Which of these is NOT one of the column's suggestions?",
+            "options": [
+              "Say what you'd like him to do",
+              "Decide a time limit together",
+              "Hide his phone at night"
+            ],
+            "answer": 2
+          }
+        ]
       }
     }
   ],
@@ -70,17 +141,87 @@
     "id": "u25-task",
     "canDo": "u25-cd2",
     "goal": "Settle a small disagreement about your next long weekend: say what you'd like the other to understand, listen, and agree on a plan you're both happy with.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "What are you doing on each day of the long weekend, and what did each of you give up?",
     "roles": {
       "a": "Wants a quiet hot-spring trip and has reasons (card A)",
       "b": "Wants to see friends in the city and has reasons (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "You want a quiet hot-spring trip (温泉) over the long weekend (連休, Saturday to Monday). Your reasons: you've done overtime (残業) every week and you're exhausted; you already went to Tokyo twice last month; you two haven't had time alone together for ages. What you'd like your partner to understand (〜てほしい): you're not against their friends — you just need rest. Start by saying how you feel, not what they did wrong. You could accept: seeing the friends on one day, if you still get at least one night at a hot spring.",
+    "infoB": "You want to see friends in Tokyo over the long weekend (連休). Your reasons: your best friend is visiting from abroad and flies home on Monday; months ago you promised (約束) to join a dinner on Saturday; a chance (機会) like this is rare. What you'd like your partner to understand (〜てほしい): you weren't ignoring how tired they are — you didn't know it was this bad. Use 〜のに once to say how you feel, without blaming. You could accept: seeing your friend only on Saturday and Sunday morning, if your partner comes to the Saturday dinner.",
+    "targets": [
+      "grammar:te-hoshii",
+      "grammar:noni",
+      "grammar:koto-ni-suru",
+      "core:cw-1306",
+      "core:cw-0877",
+      "core:cw-0463",
+      "core:cw-1547",
+      "core:cw-1075"
+    ],
+    "register": "plain",
+    "twist": "Next time the wishes flip: A wants to go skiing (スキー) with a group of friends, and B wants to stay home and rest all weekend. Use 〜てほしい and 〜のに again, and find a plan where each of you gets one thing.",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "{連休|れんきゅう}、{温泉|おんせん}に{行|い}かない？ {最近|さいきん}、{本当|ほんとう}に{疲|つか}れてて…。",
+        "en": "Shall we go to a hot spring over the long weekend? I've been so tired lately…"
+      },
+      {
+        "role": "b",
+        "jp": "え、{連休|れんきゅう}は{東京|とうきょう}で{友達|ともだち}に{会|あ}うって、{前|まえ}から{約束|やくそく}してたのに。",
+        "en": "Oh — but I promised ages ago that I'd see my friends in Tokyo over the long weekend."
+      },
+      {
+        "role": "a",
+        "jp": "{先月|せんげつ}も{二回|にかい}{東京|とうきょう}に{行|い}ったのに…。たまには{二人|ふたり}でゆっくりしたいんだ。",
+        "en": "But we already went to Tokyo twice last month… Once in a while I'd like the two of us to take it easy."
+      },
+      {
+        "role": "b",
+        "jp": "わかるけど、{一番|いちばん}の{友達|ともだち}が{外国|がいこく}から{来|く}るんだよ。{月曜日|げつようび}には{帰|かえ}っちゃうから、{今|いま}しか{会|あ}えないんだ。",
+        "en": "I get that, but my best friend is coming from abroad. She goes home on Monday, so it's now or never."
+      },
+      {
+        "role": "a",
+        "jp": "そうだったんだ…。{知|し}らなかった。でも、{私|わたし}の{気持|きも}ちもわかってほしいな。{毎週|まいしゅう}{残業|ざんぎょう}で、ちょっと{休|やす}みたいだけなんだ。",
+        "en": "Oh, I see… I didn't know. But I'd like you to understand how I feel, too. I've done overtime every week — I just want a bit of rest."
+      },
+      {
+        "role": "b",
+        "jp": "うん、{最近|さいきん}{本当|ほんとう}に{忙|いそが}しそうだったね。ごめん。",
+        "en": "Yeah, you've looked really busy lately. Sorry."
+      },
+      {
+        "role": "a",
+        "jp": "{友達|ともだち}に{会|あ}うのはいいと{思|おも}うよ。{土曜日|どようび}の{晩|ばん}ご{飯|はん}は、{一緒|いっしょ}に{行|い}こう。",
+        "en": "I think seeing your friends is great. Let's both go to the dinner on Saturday."
+      },
+      {
+        "role": "b",
+        "jp": "ありがとう。じゃあ、{日曜日|にちようび}の{朝|あさ}だけ{友達|ともだち}に{会|あ}って、{午後|ごご}から{温泉|おんせん}に{行|い}かない？ {月曜日|げつようび}まで{泊|と}まろうよ。",
+        "en": "Thanks. Then how about I see my friend just on Sunday morning, and we head to a hot spring in the afternoon? Let's stay till Monday."
+      },
+      {
+        "role": "a",
+        "jp": "いいの？ {月曜日|げつようび}は{友達|ともだち}が{帰|かえ}る{日|ひ}でしょう？",
+        "en": "Are you sure? Monday's the day your friend leaves, isn't it?"
+      },
+      {
+        "role": "b",
+        "jp": "{日曜日|にちようび}の{朝|あさ}に「またね」って{言|い}えば{大丈夫|だいじょうぶ}。{温泉|おんせん}は{二人|ふたり}の{時間|じかん}にしよう。",
+        "en": "If I say goodbye on Sunday morning, it's fine. Let's make the hot spring our time together."
+      },
+      {
+        "role": "a",
+        "jp": "ありがとう。じゃあ、そうすることにしよう。{温泉|おんせん}は{私|わたし}が{予約|よやく}しておくね。",
+        "en": "Thank you. Okay, let's do that. I'll book the hot spring."
+      },
+      {
+        "role": "b",
+        "jp": "うん。これからも、こうやってちゃんと{話|はな}し{合|あ}おうね。",
+        "en": "Okay. Let's keep talking things through properly like this."
+      }
+    ]
   },
   "capstone": {
     "title": "Our anniversary dinner",

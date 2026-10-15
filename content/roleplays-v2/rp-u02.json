@@ -1,0 +1,76 @@
+{
+  "id": "rp-u02",
+  "unit": 2,
+  "title": "Two coffees, please",
+  "titleJp": "コーヒー、ふたつ",
+  "setting": "A Saturday morning at a small café near the station: you look at the prices, order at the counter and try the cake.",
+  "level": 1,
+  "register": "polite",
+  "targets": [
+    "core:cw-0105",
+    "core:cw-0137",
+    "core:cw-0212",
+    "core:cw-0147",
+    "grammar:ne-yo",
+    "grammar:numbers-prices",
+    "grammar:koko-soko-asoko",
+    "grammar:mo-also"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "ここ、いいですね。",
+      "en": "This place is nice, isn't it?",
+      "hint": "ね asks your partner to agree.",
+      "cue": "this place · nice"
+    },
+    {
+      "role": "b",
+      "jp": "そうですね。コーヒーも{安|やす}いですよ。{三百円|さんびゃくえん}です。",
+      "en": "It is. And the coffee is cheap: 300 yen.",
+      "hint": "よ tells your partner something new.",
+      "cue": "yes · coffee cheap · 300 yen"
+    },
+    {
+      "role": "a",
+      "jp": "ケーキはいくらですか。",
+      "en": "How much is the cake?",
+      "cue": "cake · how much?"
+    },
+    {
+      "role": "b",
+      "jp": "{四百円|よんひゃくえん}です。{食|た}べますか。",
+      "en": "It's 400 yen. Shall we have some?",
+      "cue": "400 yen · eat?"
+    },
+    {
+      "role": "a",
+      "jp": "はい！ すみません、コーヒー、ふたつお{願|ねが}いします。ケーキもふたつ。",
+      "en": "Yes! Excuse me, two coffees, please. And two pieces of cake.",
+      "hint": "At a counter, just say the item, the number and お願いします.",
+      "cue": "yes · two coffees · two cakes"
+    },
+    {
+      "role": "b",
+      "jp": "おいしいですね、このケーキ。",
+      "en": "This cake is delicious, isn't it?",
+      "cue": "delicious · this cake"
+    },
+    {
+      "role": "a",
+      "jp": "ほんとうですね。コーヒーもおいしいですよ。",
+      "en": "It really is. The coffee's good too.",
+      "cue": "really · coffee good too"
+    }
+  ]
+}

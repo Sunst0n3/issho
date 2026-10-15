@@ -1,0 +1,93 @@
+{
+  "id": "st-l0-20",
+  "level": "L0",
+  "unit": 12,
+  "title": "A Food Called Natto",
+  "titleJp": "{納豆|なっとう}と いう {食|た}べ{物|もの}",
+  "topic": "food",
+  "grammar": [
+    "to-iu",
+    "mou-mada",
+    "te-iru-state",
+    "te-form",
+    "casual-speech",
+    "casual-past",
+    "adverbs-frequency",
+    "no-possession"
+  ],
+  "sentences": [
+    {
+      "jp": "{日曜日|にちようび}の{朝|あさ}、／{隣|となり}の／{田中|たなか}さんが／{来|き}ました。",
+      "en": "On Sunday morning, Mrs. Tanaka from next door came over."
+    },
+    {
+      "jp": "「これ、／どうぞ。／{体|からだ}に／いいですよ。」",
+      "en": "\"Here, this is for you. It's good for your health.\""
+    },
+    {
+      "jp": "{小|ちい}さい／{箱|はこ}が／{四|よっ}つ／ありました。",
+      "en": "There were four little boxes."
+    },
+    {
+      "jp": "トムは／{箱|はこ}を／{一|ひと}つ／{開|あ}けました。",
+      "en": "Tom opened one of them."
+    },
+    {
+      "jp": "「エマ、／これは／{何|なん}という／{食|た}べ{物|もの}？」",
+      "en": "\"Emma, what's this food called?\""
+    },
+    {
+      "jp": "「{納豆|なっとう}という／{食|た}べ{物|もの}だよ。／{日本|にほん}では／{朝|あさ}ご{飯|はん}に／よく／{食|た}べるよ。」",
+      "en": "\"It's called natto. In Japan, people often have it for breakfast.\""
+    },
+    {
+      "jp": "エマは／{納豆|なっとう}が／{苦手|にがて}です。",
+      "en": "Emma isn't a fan of natto."
+    },
+    {
+      "jp": "でも、／トムは／しょうゆを／{入|い}れて、／よく／{混|ま}ぜて、／ご{飯|はん}と／いっしょに／{食|た}べました。",
+      "en": "But Tom added soy sauce, mixed it well, and ate it with rice."
+    },
+    {
+      "jp": "「……おいしい！」",
+      "en": "\"…It's good!\""
+    },
+    {
+      "jp": "「{本当|ほんとう}？」",
+      "en": "\"Really?\""
+    },
+    {
+      "jp": "{月曜日|げつようび}も、／{火曜日|かようび}も、／{水曜日|すいようび}も、／トムは／{納豆|なっとう}を／{食|た}べました。",
+      "en": "Tom had natto on Monday, Tuesday and Wednesday too."
+    },
+    {
+      "jp": "{木曜日|もくようび}の{朝|あさ}、／トムは／{冷蔵庫|れいぞうこ}を／{開|あ}けました。",
+      "en": "On Thursday morning, Tom opened the fridge."
+    },
+    {
+      "jp": "「エマ、／{納豆|なっとう}は／もう／ない？」",
+      "en": "\"Emma, is there no natto left?\""
+    },
+    {
+      "jp": "「もう／ないよ。／トムが／{全部|ぜんぶ}／{食|た}べたよ。」",
+      "en": "\"There's none left. You ate it all.\""
+    },
+    {
+      "jp": "{今|いま}、／トムは／{毎朝|まいあさ}／{納豆|なっとう}を／{食|た}べています。",
+      "en": "Now Tom eats natto every morning."
+    },
+    {
+      "jp": "エマは／まだ／{食|た}べていません。",
+      "en": "Emma still hasn't eaten any."
+    }
+  ],
+  "gist": {
+    "q": "Who eats natto every morning now?",
+    "options": [
+      "Emma",
+      "Mrs. Tanaka",
+      "Tom"
+    ],
+    "answer": 2
+  }
+}

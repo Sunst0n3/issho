@@ -10,17 +10,21 @@
     "sou-looks",
     "te-kureru"
   ],
-  "coreWordCeiling": 1280,
+  "coreWordCeiling": 1311,
   "canDos": [
     {
       "id": "u20-cd1",
       "text": "Shop for clothes: say what's too big, too long or too expensive, and ask for a different one (a smaller one, the blue one).",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "You're trying on clothes in a shop. The clerk (the AI or your partner) says the three lines below. Answer each politely: say what's wrong with 〜すぎる and ask for a different one with の.",
+        "material": "いかがですか。\nこちらのコートは{三万円|さんまんえん}です。\n{色|いろ}は{何色|なにいろ}がいいですか。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says what's wrong with 〜すぎる (ちょっと ながすぎます, たかすぎます)",
+          "Asks for a different one with の (もうすこし みじかいのは ありますか, くろいのを ください)",
+          "Stays polite with です/ます throughout"
+        ]
       }
     },
     {
@@ -28,10 +32,14 @@
       "text": "Comment on how things look (that looks warm, that looks expensive) and tell your partner what suits them.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (or the AI) tries things on and asks you the questions below. Comment on how each one looks with 〜そう, say whether it suits them with にあう, and pick one with の.",
+        "material": "ねえ、このセーター、どう？\nこっちの{黒|くろ}いのと、どっちがいい？\n{今日|きょう}のパーティー、この{靴|くつ}で{大丈夫|だいじょうぶ}かな。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Comments on how something looks with 〜そう (あたたかそう, たかそう)",
+          "Says whether it suits them with にあう / にあわない",
+          "Picks one with の (くろいのが いい)"
+        ]
       }
     },
     {
@@ -39,9 +47,37 @@
       "text": "Understand a clothes-shop clerk's suggestions and questions (would you like to try it on? we have a smaller one).",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Listen to a clerk in a clothes shop (you can play it twice), then answer the questions.",
+        "material": "いらっしゃいませ。{冬|ふゆ}のコートですか。\nこちらは{軽|かる}くて、とても{暖|あたた}かいですよ。\nどうぞ、{着|き}てみてください。\n…いかがですか。ちょっと{長|なが}すぎますね。{少|すこ}し{短|みじか}いのもありますよ。\n{色|いろ}は{黒|くろ}とグレーと{緑|みどり}があります。\n{今週|こんしゅう}はセールなので、{全部|ぜんぶ}{二割引|にわりびき}です。",
+        "questions": [
+          {
+            "q": "What does the clerk say about this coat?",
+            "options": [
+              "It's light and very warm",
+              "It's this year's most popular style",
+              "It's made of wool"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "What's the problem when you try it on?",
+            "options": [
+              "It's too expensive",
+              "It's a little too long",
+              "It's too tight"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "Why is it cheaper this week?",
+            "options": [
+              "It's the last one in stock",
+              "It's a members' discount",
+              "There's a sale: 20% off everything"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -49,10 +85,15 @@
       "text": "Write a message thanking someone for a favour they did for you (choosing clothes, carrying bags, sewing on a button).",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "Yesterday your friend helped you choose a coat and carried your bags. She sent the message below. Reply in 3–5 sentences: thank her for at least two things she did (〜てくれて ありがとう), say how you feel about the coat, and offer something in return.",
+        "material": "{昨日|きのう}はお{疲|つか}れさま！いいコートが{見|み}つかってよかったね。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Thanks the friend for a specific favour with 〜てくれて ありがとう",
+          "Mentions at least two things she did (えらんでくれた, もってくれた)",
+          "Says how they feel about the coat (きにいった, あたたかい)",
+          "Offers something in return (こんど ごはんを おごるね)"
+        ]
       }
     },
     {
@@ -60,9 +101,37 @@
       "text": "Read a size chart and a care label and choose the right size.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "You're 170 cm tall and usually wear a size M. Read the size chart and care label on a coat you like, then answer the questions.",
+        "material": "コートのサイズ\nS：{背|せ} 155〜165cm\nM：{背|せ} 165〜175cm\nL：{背|せ} 175〜185cm\n※このコートは{少|すこ}し{小|ちい}さいので、いつもより{一|ひと}つ{大|おお}きいサイズを{選|えら}んでください。\n【{洗|あら}うとき】\n{洗濯機|せんたくき}は{使|つか}わないでください。{水|みず}で、{手|て}で{洗|あら}ってください。\n{白|しろ}い{服|ふく}と{一緒|いっしょ}に{洗|あら}わないでください。",
+        "questions": [
+          {
+            "q": "Which size should you buy?",
+            "options": [
+              "S",
+              "M",
+              "L"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "How should you wash this coat?",
+            "options": [
+              "In the washing machine on a gentle setting",
+              "By hand, in water",
+              "Only at the dry cleaner's"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What should you not wash it with?",
+            "options": [
+              "White clothes",
+              "Dark clothes",
+              "Wool sweaters"
+            ],
+            "answer": 0
+          }
+        ]
       }
     }
   ],
@@ -71,17 +140,88 @@
     "id": "u20-task",
     "canDo": "u20-cd1",
     "goal": "Buy a winter coat for one of you for under 20,000 yen: try things on, talk to the clerk (played by the AI), take your partner's honest advice, and leave with one coat.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "Which coat did you buy (colour, size and price), and is it under ¥20,000?",
     "roles": {
       "a": "Is buying the coat; knows their size and the colour they want (card A)",
       "b": "Is the honest adviser; knows the budget and what goes with your other clothes (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "Card A: you're buying the coat. You're usually a size M, but M coats are often too short on you (みじかすぎる). You want a dark colour (くろ or グレー), something warm (あたたかい) with pockets (ポケット). You don't like heavy coats (おもい コート) or bright colours (あかるい いろ).",
+    "infoB": "Card B: you're the honest adviser. Budget: ¥20,000 at most (にまんえん まで). Coats you've spotted: ① black wool coat ¥28,000, 20% off in the sale (にわりびき) = ¥22,400; ② grey down coat ¥18,000, light and warm, sizes M and L; ③ long green coat ¥15,000, size L only, quite heavy. A's scarf and shoes are brown (ちゃいろ): black and grey both go with them, green doesn't. Be honest: say what looks good and what doesn't (にあう / にあわない, 〜そう, 〜すぎる).",
+    "targets": [
+      "grammar:sugiru",
+      "grammar:no-one",
+      "grammar:sou-looks",
+      "grammar:te-kureru",
+      "core:cw-0761",
+      "core:cw-0904",
+      "core:cw-0913",
+      "core:cw-1222"
+    ],
+    "register": "mixed",
+    "twist": "Now B is the buyer and you're shopping for shoes (くつ) with a ¥8,000 budget. The clerk says the size B wants is sold out (うりきれ), so ask for a different one; A gives the honest advice.",
+    "aiRole": "Clothes-shop clerk (てんいん): welcomes you, suggests coats, says きてみてください (please try it on), offers a bigger, smaller or different-coloured one, mentions the 20% sale, and answers questions about price and size in polite shop Japanese.",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "ねえ、この{黒|くろ}いコート、どう？{暖|あたた}かそうでしょ？",
+        "en": "Hey, what do you think of this black coat? Looks warm, doesn't it?"
+      },
+      {
+        "role": "b",
+        "jp": "うん、{似合|にあ}うよ。でも、{二万八千円|にまんはっせんえん}は{高|たか}すぎるよ。",
+        "en": "Yeah, it suits you. But ¥28,000 is too expensive."
+      },
+      {
+        "role": "a",
+        "jp": "セールで{二割引|にわりびき}だって。",
+        "en": "It's 20% off in the sale, apparently."
+      },
+      {
+        "role": "b",
+        "jp": "それでも{二万円|にまんえん}より{高|たか}いよ。こっちのグレーのは？{一万八千円|いちまんはっせんえん}だよ。",
+        "en": "That's still more than ¥20,000. What about this grey one? It's ¥18,000."
+      },
+      {
+        "role": "a",
+        "jp": "{軽|かる}そうだね。{着|き}てみる。…どう？",
+        "en": "It looks light. I'll try it on. …How is it?"
+      },
+      {
+        "role": "b",
+        "jp": "ちょっと{短|みじか}すぎるね。{大|おお}きいサイズを{頼|たの}んでみたら？",
+        "en": "It's a bit too short. Why don't you ask for a bigger size?"
+      },
+      {
+        "role": "a",
+        "jp": "{店員|てんいん}さんが{大|おお}きいのを{持|も}ってきてくれたよ。これはどう？",
+        "en": "The clerk brought me a bigger one. How about this?"
+      },
+      {
+        "role": "b",
+        "jp": "うん、ちょうどいい！{茶色|ちゃいろ}の{靴|くつ}にも{似合|にあ}うよ。",
+        "en": "Yes, that's just right! It goes with your brown shoes, too."
+      },
+      {
+        "role": "a",
+        "jp": "{緑|みどり}の{長|なが}いのもあったけど、どう{思|おも}う？",
+        "en": "There was a long green one too. What do you think?"
+      },
+      {
+        "role": "b",
+        "jp": "{緑|みどり}は{茶色|ちゃいろ}の{靴|くつ}には{似合|にあ}わないと{思|おも}う。それに、ちょっと{重|おも}そうだよ。",
+        "en": "I don't think green goes with your brown shoes. And it looks a bit heavy."
+      },
+      {
+        "role": "a",
+        "jp": "わかった。じゃあ、グレーのにする。ちゃんと{見|み}てくれてありがとう。",
+        "en": "Okay. I'll take the grey one, then. Thanks for giving it a proper look."
+      },
+      {
+        "role": "b",
+        "jp": "ううん。これで{冬|ふゆ}も{暖|あたた}かいね！",
+        "en": "No problem. Now you'll be warm all winter!"
+      }
+    ]
   },
   "capstone": {
     "title": "Getting ready to go out",

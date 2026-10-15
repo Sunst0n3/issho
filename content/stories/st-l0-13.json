@@ -1,0 +1,136 @@
+{
+  "id": "st-l0-13",
+  "level": "L0",
+  "unit": 10,
+  "title": "Dinner next door",
+  "titleJp": "{田中|たなか}さんの うち",
+  "topic": "family",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "mo-also",
+    "ne-yo",
+    "masu-forms",
+    "wo-object",
+    "ni-time-place",
+    "masu-past",
+    "de-place-means",
+    "tai-want",
+    "arimasu-imasu",
+    "adjective-past",
+    "he-direction",
+    "position-words",
+    "adverbs-degree",
+    "te-kudasai",
+    "ga-subject",
+    "wa-ga-description",
+    "temo-ii",
+    "to-omou",
+    "ni-target",
+    "ya-nado"
+  ],
+  "sentences": [
+    {
+      "jp": "どようびの／{夜|よる}、／ケンと／エマは／となりの／{田中|たなか}さんの／うちへ／{行|い}きました。",
+      "en": "On Saturday evening, Ken and Emma went to Ms Tanaka's house next door."
+    },
+    {
+      "jp": "「どうぞ、／{入|はい}ってください。」",
+      "en": "\"Please, come in.\""
+    },
+    {
+      "jp": "「しつれいします。」",
+      "en": "\"Thank you for having us.\""
+    },
+    {
+      "jp": "{田中|たなか}さんの／ごしゅじんも／いました。",
+      "en": "Ms Tanaka's husband was there too."
+    },
+    {
+      "jp": "ごしゅじんは／せが／たかいです。",
+      "en": "Her husband is tall."
+    },
+    {
+      "jp": "そして、／とても／やさしい／{人|ひと}です。",
+      "en": "And he's a very kind man."
+    },
+    {
+      "jp": "テーブルの／{上|うえ}に／すしや／てんぷらなどが／ありました。",
+      "en": "On the table there was sushi, tempura and more."
+    },
+    {
+      "jp": "「すごい！」",
+      "en": "\"Wow!\""
+    },
+    {
+      "jp": "「ぜんぶ、／{田中|たなか}さんが／つくりましたか。」",
+      "en": "\"Did you make all of this?\""
+    },
+    {
+      "jp": "「ええ。」",
+      "en": "\"I did.\""
+    },
+    {
+      "jp": "「どうぞ、／たくさん／{食|た}べてください。」",
+      "en": "\"Please, eat as much as you like.\""
+    },
+    {
+      "jp": "「りょうりの／{写真|しゃしん}を／{撮|と}っても／いいですか。」",
+      "en": "\"May I take a photo of the food?\""
+    },
+    {
+      "jp": "「もちろん！」",
+      "en": "\"Of course!\""
+    },
+    {
+      "jp": "てんぷらは／とても／おいしかったです。",
+      "en": "The tempura was delicious."
+    },
+    {
+      "jp": "「{田中|たなか}さんは／りょうりが／じょうずですね！」",
+      "en": "\"You're such a good cook, Ms Tanaka!\""
+    },
+    {
+      "jp": "{田中|たなか}さんは／わらいました。",
+      "en": "Ms Tanaka laughed."
+    },
+    {
+      "jp": "テレビの／よこに／{写真|しゃしん}が／ありました。",
+      "en": "There was a photo next to the TV."
+    },
+    {
+      "jp": "「むすめです。」",
+      "en": "\"That's my daughter.\""
+    },
+    {
+      "jp": "「{今|いま}、／アメリカに／います。」",
+      "en": "\"She's in America now.\""
+    },
+    {
+      "jp": "むすめさんは／かみが／ながいです。",
+      "en": "Her daughter has long hair."
+    },
+    {
+      "jp": "「{来年|らいねん}、／{日本|にほん}に／{帰|かえ}ると／{思|おも}います。」",
+      "en": "\"I think she'll come back to Japan next year.\""
+    },
+    {
+      "jp": "エマは／アメリカの／{母|はは}に／{会|あ}いたいと／{思|おも}いました。",
+      "en": "Emma thought of her own mom in America and wanted to see her."
+    },
+    {
+      "jp": "その／{夜|よる}、／エマは／{母|はは}に／でんわしました。",
+      "en": "That night, Emma called her mom."
+    }
+  ],
+  "gist": {
+    "q": "What did Ken and Emma do at Ms Tanaka's house?",
+    "options": [
+      "They had dinner and took photos of her cooking",
+      "They helped her clean the house",
+      "They watched TV with her daughter"
+    ],
+    "answer": 0
+  }
+}

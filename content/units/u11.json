@@ -11,17 +11,22 @@
     "kedo-but",
     "te-kara"
   ],
-  "coreWordCeiling": 765,
+  "coreWordCeiling": 817,
   "canDos": [
     {
       "id": "u11-cd1",
       "text": "Tell your partner what you like doing on your days off, and what you don't enjoy so much.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "The AI asks you the three questions below about your days off. Answer each one in one or two sentences, polite or casual. Say what you like doing with 〜のが好き, and name one thing you don't enjoy much, joined with けど.",
+        "material": "1. {休|やす}みの{日|ひ}は、{何|なに}をするのが{好|す}きですか。\n2. {家|いえ}にいるのが{好|す}きですか、{出|で}かけるのが{好|す}きですか。\n3. {休|やす}みの{日|ひ}に、あまりしたくないことは{何|なん}ですか。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Uses 〜のが好き with at least two activities (散歩するのが好きです)",
+          "Names one thing they don't enjoy much (あまり好きじゃない／苦手です)",
+          "Joins two ideas with けど (映画を見るのは好きだけど、映画館は高い)",
+          "Answers all three questions"
+        ]
       }
     },
     {
@@ -29,9 +34,37 @@
       "text": "Read the rules at a museum, pool or park and say what you mustn't do there.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "You're visiting an art museum together. Read the sign at the entrance and answer the questions.",
+        "material": "{東町|ひがしまち}{美術館|びじゅつかん}\n{午前|ごぜん}{十時|じゅうじ}〜{午後|ごご}{五時|ごじ}　{休|やす}み：{毎週|まいしゅう}{月曜日|げつようび}\n\n{美術館|びじゅつかん}の{中|なか}では\n・{写真|しゃしん}を{撮|と}ってはいけません。\n・{電話|でんわ}で{話|はな}してはいけません。\n・{食|た}べ{物|もの}や{飲|の}み{物|もの}を{持|も}って{入|はい}ってはいけません。\n・{走|はし}ってはいけません。\n・{大|おお}きい{荷物|にもつ}は{入口|いりぐち}の{横|よこ}に{置|お}いてください。",
+        "questions": [
+          {
+            "q": "Which of these is not allowed inside the museum?",
+            "options": [
+              "Talking on your phone",
+              "Carrying a small bag",
+              "Walking around slowly"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "What should you do with a big bag?",
+            "options": [
+              "Take it in with you",
+              "Leave it next to the entrance",
+              "Leave it at the exit"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "When can't you visit the museum?",
+            "options": [
+              "On Sunday afternoons",
+              "Before eleven in the morning",
+              "On Mondays"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -39,10 +72,14 @@
       "text": "Talk about a film, place or meal you've enjoyed, describing it with a clause ('the film we saw on Sunday').",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "The AI asks you about things you've enjoyed. Answer each question in two or three sentences. Describe the film, place or meal with a clause in front of the noun (先週見た映画, 駅の近くにある店), say what it was like, and add one 'but'.",
+        "material": "1. {最近|さいきん}{見|み}た{映画|えいが}は{何|なん}ですか。どうでしたか。\n2. {二人|ふたり}がよく{行|い}く{店|みせ}はどこですか。どんな{店|みせ}ですか。\n3. {最近|さいきん}、どこでおいしいものを{食|た}べましたか。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Describes a noun with a clause in front of it (日曜日に見た映画, 駅の近くにあるカフェ)",
+          "Says what it was like with a past adjective (面白かったです, おいしかったです)",
+          "Gives one good point and one weaker point joined with けど or が"
+        ]
       }
     },
     {
@@ -50,9 +87,37 @@
       "text": "Follow a friend's plan for a day out (what they'll do first and what after that) and note the order.",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Your friend Ms Sato has left you a voice message about Sunday. Listen and answer the questions. You can listen twice.",
+        "material": "{佐藤|さとう}です。{日曜日|にちようび}の{予定|よてい}です。{十時|じゅうじ}に{駅|えき}の{前|まえ}で{会|あ}いましょう。まず、{駅|えき}の{近|ちか}くにある{美術館|びじゅつかん}に{行|い}きます。{美術館|びじゅつかん}を{出|で}てから、{公園|こうえん}でお{弁当|べんとう}を{食|た}べましょう。お{弁当|べんとう}は{私|わたし}が{作|つく}ります！{食|た}べてから、{公園|こうえん}を{少|すこ}し{散歩|さんぽ}して、{三時|さんじ}ごろカフェに{行|い}きます。{雨|あめ}の{日|ひ}は、{公園|こうえん}じゃなくて、{映画館|えいがかん}に{行|い}きましょう。じゃあ、{日曜日|にちようび}に！",
+        "questions": [
+          {
+            "q": "Where will you go first?",
+            "options": [
+              "The park",
+              "The art museum",
+              "A café"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What will you do after lunch?",
+            "options": [
+              "Take a short walk in the park",
+              "Go to the cinema",
+              "Go back to the station"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "What's the plan if it rains?",
+            "options": [
+              "Stay at home",
+              "Have lunch in a café",
+              "Go to the cinema instead of the park"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -60,10 +125,15 @@
       "text": "Write a short review of a café, film or place you've been to, with one good point and one bad point.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "Write a short review (3–4 sentences) of a café, film or place you've been to, for a review app. Use the card below: say what it was, one good point, one bad point, and whether you'd go again.",
+        "material": "★★★☆☆\n{行|い}った{所|ところ}・{見|み}た{映画|えいが}：\nよかったこと：\nよくなかったこと：\nまた{行|い}きたいですか：",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Names the place or film with a describing clause (先週行ったカフェは…)",
+          "Gives one good point and one bad point joined with けど or が",
+          "Uses past forms correctly (おいしかったです, 高かったです, 静かでした)",
+          "Says whether they'd go again (また行きたいです／あまり行きたくないです)"
+        ]
       }
     }
   ],
@@ -72,17 +142,86 @@
     "id": "u11-task",
     "canDo": "u11-cd1",
     "goal": "Plan a free Sunday together: agree on two things to do, and in what order, that you'll both enjoy.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "Which two things did you choose, in what order, and roughly how much will the day cost the two of you?",
     "roles": {
       "a": "Has a page of local events with times and rules (card A)",
       "b": "Has a list of what you both like and don't like, and the budget (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "What's on near you this Sunday (card A):\n• Art museum (びじゅつかん): 10:00–17:00, ¥1,000 each. No photos inside (しゃしんを とっては いけません), no food or drinks.\n• Park (こうえん): bike hire (じてんしゃを かしている) 9:00–13:00, ¥300 each.\n• Cinema (えいがかん): a comedy at 14:00 and at 18:30, ¥1,800 each.\n• Pool (プール): 13:00–20:00, ¥500 each. You must shower first (シャワーを あびてから はいる).\nYou'd like to see the museum. Tell your partner what's on, check what they like (〜のが すき？) and pass on any rules that matter.",
+    "infoB": "What you know (card B):\n• You love cycling (じてんしゃに のるのが すき) and you want to take lots of photos (しゃしん) on Sunday.\n• Swimming pools aren't really your thing (プールは にがて).\n• Budget: ¥5,000 for the two of you, lunch included (lunch out ≈ ¥1,500 for two).\n• You need to be home by 18:00 (your parents are coming for dinner).\nYou don't know what's on: ask (なにが ある？), check times and prices, and agree on two things and their order (〜てから).",
+    "targets": [
+      "grammar:no-ga-suki",
+      "grammar:te-kara",
+      "grammar:tewa-ikenai",
+      "grammar:kedo-but",
+      "core:cw-0742",
+      "core:cw-0813",
+      "core:cw-0754"
+    ],
+    "register": "plain",
+    "twist": "Repeat: it's raining on Sunday, so the park is out. Find an indoor plan that you both enjoy and that still fits the budget and the 18:00 deadline.",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "{日曜日|にちようび}、{暇|ひま}だから{一緒|いっしょ}に{出|で}かけない？",
+        "en": "We're free on Sunday. Do you want to go out together?"
+      },
+      {
+        "role": "b",
+        "jp": "いいね。{何|なに}がある？",
+        "en": "Sounds good. What's on?"
+      },
+      {
+        "role": "a",
+        "jp": "{美術館|びじゅつかん}と{映画館|えいがかん}とプール。あと、{公園|こうえん}で{自転車|じてんしゃ}を{貸|か}しているよ。",
+        "en": "There's the art museum, the cinema and the pool. And the park is renting out bikes."
+      },
+      {
+        "role": "b",
+        "jp": "{自転車|じてんしゃ}に{乗|の}るのが{好|す}き！{公園|こうえん}で{写真|しゃしん}も{撮|と}りたい。",
+        "en": "I love cycling! I want to take photos in the park, too."
+      },
+      {
+        "role": "a",
+        "jp": "いいね。{私|わたし}は{美術館|びじゅつかん}にも{行|い}きたい。{一人|ひとり}{千円|せんえん}だよ。",
+        "en": "Nice. I'd like to go to the museum too. It's a thousand yen each."
+      },
+      {
+        "role": "b",
+        "jp": "いいけど、{美術館|びじゅつかん}の{中|なか}は{写真|しゃしん}を{撮|と}ってはいけないよね。",
+        "en": "Sure, but you can't take photos inside the museum, right?"
+      },
+      {
+        "role": "a",
+        "jp": "うん。だから、{写真|しゃしん}は{公園|こうえん}で{撮|と}ってね。",
+        "en": "Right. So take your photos in the park."
+      },
+      {
+        "role": "b",
+        "jp": "じゃあ、{朝|あさ}は{公園|こうえん}で{自転車|じてんしゃ}に{乗|の}って、{昼|ひる}ご{飯|はん}を{食|た}べてから{美術館|びじゅつかん}はどう？",
+        "en": "Then how about cycling in the park in the morning, and the museum after lunch?"
+      },
+      {
+        "role": "a",
+        "jp": "いいね。プールは？{安|やす}いよ。",
+        "en": "Good. What about the pool? It's cheap."
+      },
+      {
+        "role": "b",
+        "jp": "ごめん、プールはちょっと{苦手|にがて}。",
+        "en": "Sorry, pools aren't really my thing."
+      },
+      {
+        "role": "a",
+        "jp": "そうか。じゃあ、{公園|こうえん}に{行|い}ってから、{美術館|びじゅつかん}ね。",
+        "en": "Okay. So the park first, and then the museum."
+      },
+      {
+        "role": "b",
+        "jp": "うん。{六時|ろくじ}には{家|いえ}にいたいね。{楽|たの}しみ！",
+        "en": "Yeah. I want to be home by six. I'm looking forward to it!"
+      }
+    ]
   },
   "capstone": {
     "title": "Our perfect day off",

@@ -11,17 +11,22 @@
     "te-iru-state",
     "hoshii"
   ],
-  "coreWordCeiling": 825,
+  "coreWordCeiling": 877,
   "canDos": [
     {
       "id": "u12-cd1",
       "text": "Tell a new friend about your life together: where you live, how long you've been married, and whether you have children or pets.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "A Japanese person you've just met (the AI) asks about your life together. Answer each question in one or two sentences of polite Japanese, and talk about 'we', not just 'I'.",
+        "material": "1. {今|いま}、どこに{住|す}んでいますか。\n2. {結婚|けっこん}して{何年|なんねん}ですか。\n3. {子|こ}どもやペットはいますか。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says where they live with 〜に住んでいます",
+          "Says how long they've been married (結婚して〜年です)",
+          "Answers about children or pets with います／いません and adds one detail (a name, an age)",
+          "Talks about both of them (私たちは, 二人で)"
+        ]
       }
     },
     {
@@ -29,10 +34,15 @@
       "text": "Write a short wish list for your life together (a bigger kitchen, a dog, a car) with a reason for each.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner has sent you their wish list for your life together. Reply with your own three wishes (different from theirs), each with a reason.",
+        "material": "{私|わたし}の{欲|ほ}しいもの\n1. {犬|いぬ}。{犬|いぬ}が{大好|だいす}きだから！\n2. {広|ひろ}い{台所|だいどころ}。{二人|ふたり}で{料理|りょうり}をしたいから。\n3. {新|あたら}しいソファー。{今|いま}のソファーは{古|ふる}いから。\nあなたは？{三|みっ}つ{書|か}いてね！",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Names three things with 〜が欲しい",
+          "Gives a reason for each with 〜から",
+          "Describes at least one thing with an adjective or a clause (大きい車, 庭がある家)",
+          "Keeps a warm, casual tone for a message to a partner"
+        ]
       }
     },
     {
@@ -40,9 +50,37 @@
       "text": "Understand someone passing on what another person said ('Ken said he'll be late') and asking what something is called.",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Your partner has left you a voice message about your friend Ken. Listen and answer the questions.",
+        "material": "{私|わたし}だよ。さっき{健|けん}さんから{電話|でんわ}があったよ。{今日|きょう}は{仕事|しごと}が{忙|いそが}しいから、{遅|おく}れると{言|い}っていた。{七時|しちじ}{過|す}ぎに{駅|えき}に{着|つ}くと{言|い}っていたよ。それから、{駅|えき}の{前|まえ}の「{雨|あめ}の{日|ひ}」という{喫茶店|きっさてん}で{待|ま}っていてと{言|い}っていた。あ、そうだ。{健|けん}さんの{奥|おく}さん、{何|なん}という{名前|なまえ}だった？{忘|わす}れた…。",
+        "questions": [
+          {
+            "q": "Why will Ken be late?",
+            "options": [
+              "He's busy at work",
+              "His train is delayed",
+              "He's at the doctor's"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "Where does Ken want you to wait?",
+            "options": [
+              "At the station ticket gate",
+              "In a coffee shop called 'Rainy Day' in front of the station",
+              "At his home"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What does your partner ask you at the end?",
+            "options": [
+              "What time Ken will arrive",
+              "Where the coffee shop is",
+              "What Ken's wife is called"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -50,9 +88,37 @@
       "text": "Read a short profile of a couple (where they live, what they do, what they want) and answer questions about it.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Read this short profile from a magazine's 'Our home' page and answer the questions.",
+        "material": "{私|わたし}たちの{家|いえ}　{田中|たなか}さん{夫婦|ふうふ}\n{夫|おっと}の{雄太|ゆうた}さんと{妻|つま}の{真理|まり}さんは、{結婚|けっこん}して{三年|さんねん}です。{今|いま}、{駅|えき}の{近|ちか}くの{小|ちい}さい{家|いえ}に{住|す}んでいます。{雄太|ゆうた}さんは{銀行|ぎんこう}に{勤|つと}めています。{真理|まり}さんは{病院|びょういん}で{働|はたら}いています。{二人|ふたり}は{料理|りょうり}をするのが{大好|だいす}きです。{週末|しゅうまつ}は{二人|ふたり}で{晩|ばん}ご{飯|はん}を{作|つく}ります。でも、{台所|だいどころ}がとても{狭|せま}いです。だから、{今|いま}、{広|ひろ}い{台所|だいどころ}がある{家|いえ}が{欲|ほ}しいです。{真理|まり}さんは{犬|いぬ}も{欲|ほ}しいと{言|い}っています。{子|こ}どもはまだいません。",
+        "questions": [
+          {
+            "q": "How long have Yuta and Mari been married?",
+            "options": [
+              "One year",
+              "Three years",
+              "Five years"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What do they want now?",
+            "options": [
+              "A new car",
+              "A house nearer the station",
+              "A house with a big kitchen"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "Which of these is true?",
+            "options": [
+              "They have one child",
+              "They cook dinner together at weekends",
+              "Mari works at a bank"
+            ],
+            "answer": 1
+          }
+        ]
       }
     },
     {
@@ -60,10 +126,14 @@
       "text": "Before guests arrive, check what's already done and what's still left, and decide who does the rest, alone or together.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "It's five o'clock and friends are coming at six. Your partner (the AI) asks how the list below is going. Say what's already done and what isn't done yet, then decide who does each job that's left: one of you, or both of you together.",
+        "material": "{六時|ろくじ}に{友達|ともだち}が{来|く}る！\n✓ リビングの{掃除|そうじ}\n✓ ビールを{買|か}う\n□ トイレの{掃除|そうじ}\n□ スリッパを{出|だ}す\n□ ごみを{出|だ}す\n□ サラダを{作|つく}る",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says what's done with もう〜た (リビングはもう掃除した)",
+          "Says what's left with まだ〜ていない or まだです",
+          "Shares out the rest with 私が〜 or 二人で〜"
+        ]
       }
     }
   ],
@@ -72,17 +142,90 @@
     "id": "u12-task",
     "canDo": "u12-cd5",
     "goal": "Get the flat ready before friends arrive at six: find out what's already done and what's still left, and split the rest between you.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "Who's doing each job that's still left, and what did Ken say?",
     "roles": {
       "a": "Has the to-do list with their own ticks (card A)",
       "b": "Has the shopping list with their own ticks (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "It's 4 p.m. Your friends Ken and Yumi arrive at 6. Your to-do list (✓ = you've done it):\n✓ Clean the living room (リビングの そうじ)\n✓ Put out slippers for the guests (スリッパを だす)\n✗ Clean the toilet (トイレの そうじ)\n✗ Take out the rubbish (ごみを だす)\n✗ Make a salad (サラダを つくる): you need tomatoes. Has your partner bought them?\nAsk what's been bought (もう かった？), say what you've done (もう〜た) and haven't (まだ〜ていない), and split what's left: who does what, or both of you together (ふたりで).",
+    "infoB": "Your shopping list (✓ = you bought it this afternoon):\n✓ Beer and juice (ビール・ジュース)\n✓ Tomatoes (トマト)\n✗ Cake (ケーキ): the bakery (パンや) closes at 5\n✗ Ice (こおり)\nKen also called you: Yumi doesn't drink alcohol, and he'll be about ten minutes late. Pass it on with 〜と いっていた.\nYou don't know what's been done at home, so ask (もう〜た？).",
+    "targets": [
+      "grammar:mou-mada",
+      "grammar:to-iu",
+      "grammar:de-amount",
+      "core:cw-0838",
+      "core:cw-0583",
+      "core:cw-0582"
+    ],
+    "register": "plain",
+    "twist": "Repeat: Ken and Yumi text that they're coming an hour early, at 5. Check again what's done and cut the list down to what really matters before they arrive.",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "ねえ、もう{四時|よじ}だよ。{買|か}い{物|もの}、もう{行|い}った？",
+        "en": "Hey, it's already four. Have you been shopping yet?"
+      },
+      {
+        "role": "b",
+        "jp": "うん、{行|い}ったよ。ビールとジュースとトマトはもう{買|か}った。",
+        "en": "Yes, I have. I've already got the beer, the juice and the tomatoes."
+      },
+      {
+        "role": "a",
+        "jp": "よかった。ケーキは？",
+        "en": "Great. What about the cake?"
+      },
+      {
+        "role": "b",
+        "jp": "ケーキと{氷|こおり}はまだ{買|か}ってない。パン{屋|や}は{五時|ごじ}までだから、すぐ{行|い}くね。",
+        "en": "I haven't got the cake or the ice yet. The bakery's only open till five, so I'll go now."
+      },
+      {
+        "role": "a",
+        "jp": "ありがとう。リビングはもう{掃除|そうじ}したよ。スリッパも{出|だ}した。",
+        "en": "Thanks. I've already cleaned the living room. I've put the slippers out, too."
+      },
+      {
+        "role": "b",
+        "jp": "すごい！トイレは？",
+        "en": "Great! And the toilet?"
+      },
+      {
+        "role": "a",
+        "jp": "トイレはまだ。ごみもまだ{出|だ}していないけど、{私|わたし}がするね。",
+        "en": "Not yet. I haven't taken the rubbish out either, but I'll do both."
+      },
+      {
+        "role": "b",
+        "jp": "ありがとう。サラダは、{帰|かえ}ってから{二人|ふたり}で{作|つく}らない？",
+        "en": "Thanks. Shall we make the salad together when I'm back?"
+      },
+      {
+        "role": "a",
+        "jp": "うん、いいね。",
+        "en": "Yes, good idea."
+      },
+      {
+        "role": "b",
+        "jp": "あ、それから、{健|けん}さんが、ゆみさんはお{酒|さけ}を{飲|の}まないと{言|い}っていたよ。",
+        "en": "Oh, and Ken said Yumi doesn't drink alcohol."
+      },
+      {
+        "role": "a",
+        "jp": "そう？じゃあ、ジュースがあるから{大丈夫|だいじょうぶ}だね。",
+        "en": "Really? Well, we've got juice, so that's fine."
+      },
+      {
+        "role": "b",
+        "jp": "うん。{健|けん}さんは{十分|じゅっぷん}ぐらい{遅|おく}れると{言|い}っていた。",
+        "en": "Yes. And Ken said he'd be about ten minutes late."
+      },
+      {
+        "role": "a",
+        "jp": "わかった。じゃあ、いってらっしゃい！",
+        "en": "Got it. Off you go, then!"
+      }
+    ]
   },
   "capstone": {
     "title": "Our story",

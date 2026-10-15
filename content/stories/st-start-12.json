@@ -1,0 +1,93 @@
+{
+  "id": "st-start-12",
+  "level": "start",
+  "unit": 4,
+  "title": "Ice cream in the park",
+  "titleJp": "こうえんの アイス",
+  "topic": "hobbies",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "mo-also",
+    "ne-yo",
+    "masu-forms",
+    "wo-object",
+    "counting-tsu",
+    "ni-time-place",
+    "masu-past",
+    "i-adjectives",
+    "de-place-means"
+  ],
+  "sentences": [
+    {
+      "jp": "きのう、／わたしたちは／じてんしゃで／こうえんに／いきました。",
+      "en": "Yesterday we went to the park by bike."
+    },
+    {
+      "jp": "こうえんは／とても／おおきいです。",
+      "en": "The park is very big."
+    },
+    {
+      "jp": "こうえんで／さんぽを／しました。",
+      "en": "We took a walk in the park."
+    },
+    {
+      "jp": "ケンは／しゃしんを／たくさん／とりました。",
+      "en": "Ken took lots of photos."
+    },
+    {
+      "jp": "「あついですね。」",
+      "en": "\"It's hot, isn't it?\""
+    },
+    {
+      "jp": "「アイスを／かいますか。」",
+      "en": "\"Shall we get some ice cream?\""
+    },
+    {
+      "jp": "こうえんの／{店|みせ}で／アイスを／ふたつ／かいました。",
+      "en": "We bought two ice creams at the shop in the park."
+    },
+    {
+      "jp": "わたしは／チョコレートの／アイスを／たべました。",
+      "en": "I had chocolate ice cream."
+    },
+    {
+      "jp": "ケンは／バナナの／アイスを／たべました。",
+      "en": "Ken had banana ice cream."
+    },
+    {
+      "jp": "「つめたいですね！」",
+      "en": "\"Nice and cold!\""
+    },
+    {
+      "jp": "「おいしいですね！」",
+      "en": "\"So good!\""
+    },
+    {
+      "jp": "ケンは／アイスの／しゃしんも／とりました。",
+      "en": "Ken took a photo of his ice cream too."
+    },
+    {
+      "jp": "{夜|よる}、／うちで／しゃしんを／みました。",
+      "en": "In the evening, we looked at the photos at home."
+    },
+    {
+      "jp": "「また／こうえんに／いきますか。」",
+      "en": "\"Shall we go to the park again?\""
+    },
+    {
+      "jp": "「はい、／らいしゅうも／いきます！」",
+      "en": "\"Yes! We'll go next week too!\""
+    }
+  ],
+  "gist": {
+    "q": "What did they do at the park?",
+    "options": [
+      "Played games in the rain",
+      "Walked, took photos and ate ice cream",
+      "Had a picnic with friends"
+    ],
+    "answer": 1
+  }
+}

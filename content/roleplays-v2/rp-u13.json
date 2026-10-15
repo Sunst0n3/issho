@@ -1,0 +1,79 @@
+{
+  "id": "rp-u13",
+  "unit": 13,
+  "title": "What's in the fridge?",
+  "titleJp": "{何|なに}か{作|つく}ろう",
+  "setting": "A lazy Saturday lunchtime. You're both hungry, and you look in the fridge to see what you can make together.",
+  "level": 2,
+  "register": "plain",
+  "targets": [
+    "grammar:volitional",
+    "grammar:yori-hou",
+    "grammar:naide-kudasai",
+    "grammar:n-desu",
+    "grammar:nanika-nanimo",
+    "core:cw-0879"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "お{腹|なか}がすいたね。{何|なに}か{作|つく}ろう。",
+      "en": "I'm hungry. Let's make something.",
+      "hint": "作ろう is the casual \"let's make\", the partner version of 作りましょう.",
+      "cue": "hungry · something · let's cook"
+    },
+    {
+      "role": "b",
+      "jp": "うん。{冷蔵庫|れいぞうこ}に{何|なに}がある？",
+      "en": "Okay. What's in the fridge?",
+      "cue": "fridge · what's in"
+    },
+    {
+      "role": "a",
+      "jp": "{卵|たまご}と{玉|たま}ねぎと…。あ、{肉|にく}はないね。",
+      "en": "Eggs, onions… Oh, there's no meat.",
+      "cue": "eggs · onions · no meat"
+    },
+    {
+      "role": "b",
+      "jp": "じゃあ、{卵|たまご}のサンドイッチはどう？パンもあるよ。",
+      "en": "Then how about egg sandwiches? We've got bread.",
+      "cue": "egg sandwiches · bread"
+    },
+    {
+      "role": "a",
+      "jp": "パンより、ご{飯|はん}のほうがいいな。",
+      "en": "I'd rather have rice than bread.",
+      "cue": "rice · rather · than bread"
+    },
+    {
+      "role": "b",
+      "jp": "そっか。じゃあ、ご{飯|はん}と{卵|たまご}のみそ{汁|しる}にしよう。",
+      "en": "Fair enough. Let's have rice and egg miso soup, then.",
+      "cue": "rice · egg miso soup · let's"
+    },
+    {
+      "role": "a",
+      "jp": "いいね。あ、みそはまだ{入|い}れないで。{最後|さいご}に{入|い}れるんだよ。",
+      "en": "Good. Oh, don't put the miso in yet. It goes in at the end.",
+      "hint": "〜ないで on its own is a casual \"please don't\". 〜んだよ explains why.",
+      "cue": "miso · not yet · at the end"
+    },
+    {
+      "role": "b",
+      "jp": "わかった。じゃあ、{私|わたし}はご{飯|はん}を{温|あたた}めるね。",
+      "en": "Got it. I'll heat up the rice, then.",
+      "cue": "OK · I · heat rice"
+    }
+  ]
+}

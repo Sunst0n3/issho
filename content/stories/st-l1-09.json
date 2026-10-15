@@ -1,0 +1,137 @@
+{
+  "id": "st-l1-09",
+  "level": "L1",
+  "unit": 20,
+  "title": "A coat for Ken",
+  "titleJp": "ケンのコート",
+  "topic": "clothes",
+  "grammar": [
+    "sugiru",
+    "no-one",
+    "sou-looks",
+    "te-kureru",
+    "te-miru",
+    "ni-iku-purpose",
+    "ka-or-ni-suru",
+    "adj-naru"
+  ],
+  "sentences": [
+    {
+      "jp": "{寒|さむ}く／なりました。",
+      "en": "It has got cold."
+    },
+    {
+      "jp": "ケンの／コートは、／もう／{古|ふる}いです。",
+      "en": "Ken's coat is old now."
+    },
+    {
+      "jp": "{日曜日|にちようび}、／{二人|ふたり}は／デパートへ／コートを／{買|か}いに／{行|い}きました。",
+      "en": "On Sunday, the two of them went to a department store to buy a coat."
+    },
+    {
+      "jp": "{最初|さいしょ}に、／{黒|くろ}い／コートを／{見|み}ました。",
+      "en": "First, they looked at a black coat."
+    },
+    {
+      "jp": "とても／{暖|あたた}かそうです。",
+      "en": "It looked very warm."
+    },
+    {
+      "jp": "ケンは／{着|き}て／みました。",
+      "en": "Ken tried it on."
+    },
+    {
+      "jp": "「どう？」",
+      "en": "\"How is it?\""
+    },
+    {
+      "jp": "「うん…。／ちょっと／{大|おお}きすぎるね。」",
+      "en": "\"Hmm... It's a bit too big.\""
+    },
+    {
+      "jp": "{店員|てんいん}さんが／{小|ちい}さいのを／{持|も}ってきて／くれました。",
+      "en": "The shop assistant brought him a smaller one."
+    },
+    {
+      "jp": "{小|ちい}さいのは、／ちょうど／いい／サイズでした。",
+      "en": "The smaller one was just the right size."
+    },
+    {
+      "jp": "でも、／{値段|ねだん}を／{見|み}て、／ケンは／びっくりしました。",
+      "en": "But when he saw the price, Ken was shocked."
+    },
+    {
+      "jp": "「{五万円|ごまんえん}！／{高|たか}すぎるよ。」",
+      "en": "\"Fifty thousand yen! That's too expensive.\""
+    },
+    {
+      "jp": "それから、／{二人|ふたり}は／セールの／{店|みせ}に／{行|い}きました。",
+      "en": "Next, they went to a shop with a sale on."
+    },
+    {
+      "jp": "{青|あお}い／コートと／{茶色|ちゃいろ}の／コートが／ありました。",
+      "en": "There was a blue coat and a brown coat."
+    },
+    {
+      "jp": "「{青|あお}いのは／{軽|かる}そうだね。」",
+      "en": "\"The blue one looks light.\""
+    },
+    {
+      "jp": "「{茶色|ちゃいろ}のは／{暖|あたた}かそう。」",
+      "en": "\"The brown one looks warm.\""
+    },
+    {
+      "jp": "ケンは／{両方|りょうほう}／{着|き}て／みました。",
+      "en": "Ken tried on both."
+    },
+    {
+      "jp": "{青|あお}いのは／{少|すこ}し／{短|みじか}すぎました。",
+      "en": "The blue one was a little too short."
+    },
+    {
+      "jp": "{茶色|ちゃいろ}のは／ちょうど／よかったです。",
+      "en": "The brown one was just right."
+    },
+    {
+      "jp": "「すごく／{似合|にあ}うよ。／{優|やさ}しそうに／{見|み}える。」",
+      "en": "\"It really suits you. You look kind in it.\""
+    },
+    {
+      "jp": "{値段|ねだん}は、／セールで／{一万|いちまん}{二千円|にせんえん}でした。",
+      "en": "With the sale, the price was twelve thousand yen."
+    },
+    {
+      "jp": "「これに／します！」",
+      "en": "\"I'll take this one!\""
+    },
+    {
+      "jp": "{店員|てんいん}さんは／{古|ふる}い／コートを／{袋|ふくろ}に／{入|い}れて／くれました。",
+      "en": "The shop assistant put his old coat in a bag for him."
+    },
+    {
+      "jp": "ケンは／{新|あたら}しい／コートを／{着|き}て、／{店|みせ}を／{出|で}ました。",
+      "en": "Ken left the shop wearing his new coat."
+    },
+    {
+      "jp": "{外|そと}は／{雪|ゆき}でした。",
+      "en": "Outside, it was snowing."
+    },
+    {
+      "jp": "「{暖|あたた}かい！／ミキ、／{選|えら}んで／くれて／ありがとう。」",
+      "en": "\"It's warm! Thanks for choosing it for me, Miki.\""
+    },
+    {
+      "jp": "「どういたしまして。／じゃあ、／{次|つぎ}は／{私|わたし}の／コートね。」",
+      "en": "\"You're welcome. Okay — next, my coat!\""
+    }
+  ],
+  "gist": {
+    "q": "Which coat does Ken buy?",
+    "options": [
+      "The black one",
+      "The blue one",
+      "The brown one"
+    ],
+    "answer": 2
+  }
+}

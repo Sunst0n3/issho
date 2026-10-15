@@ -1,0 +1,82 @@
+{
+  "id": "rp-u19",
+  "unit": 19,
+  "title": "Anniversary presents",
+  "titleJp": "{記念日|きねんび}のプレゼント",
+  "setting": "It's your wedding anniversary. After dinner you swap presents, and one of them didn't turn out quite as planned.",
+  "level": 2,
+  "register": "plain",
+  "targets": [
+    "grammar:kureru",
+    "grammar:te-shimau",
+    "grammar:potential-form",
+    "grammar:tara-conditional",
+    "core:cw-0462",
+    "core:cw-1120",
+    "core:cw-1183"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "はい、これ。{記念日|きねんび}のプレゼント。",
+      "en": "Here, this is for you. An anniversary present.",
+      "cue": "here · anniversary · present"
+    },
+    {
+      "role": "b",
+      "jp": "ありがとう！{開|あ}けてもいい？…あ、{時計|とけい}だ！",
+      "en": "Thank you! Can I open it? …Oh, a watch!",
+      "cue": "thanks · open? · watch"
+    },
+    {
+      "role": "a",
+      "jp": "{前|まえ}の{時計|とけい}、{壊|こわ}れちゃったでしょ？",
+      "en": "Your old one broke, didn't it?",
+      "hint": "〜ちゃった is the casual 〜てしまった: it happened, and it's a pity.",
+      "cue": "old one · broke · right?"
+    },
+    {
+      "role": "b",
+      "jp": "うん、{父|ちち}がくれた{時計|とけい}だったんだ。うれしい！{私|わたし}からは、これ。",
+      "en": "Yeah, it was the one my dad gave me. I'm so happy! And this is from me.",
+      "hint": "くれた: someone gave it to me (or my side).",
+      "cue": "dad gave it · happy · from me"
+    },
+    {
+      "role": "a",
+      "jp": "ケーキ？{自分|じぶん}で{作|つく}ったの？すごい！…あれ、ちょっと{硬|かた}い？",
+      "en": "A cake? You made it yourself? Amazing! …Hm, is it a bit hard?",
+      "cue": "cake · homemade? · bit hard?"
+    },
+    {
+      "role": "b",
+      "jp": "ごめん、{硬|かた}くなっちゃった。",
+      "en": "Sorry, it went hard.",
+      "cue": "sorry · went hard"
+    },
+    {
+      "role": "a",
+      "jp": "{大丈夫|だいじょうぶ}、{食|た}べられるよ。…うん、おいしい！",
+      "en": "It's fine, I can eat it. …Mm, it's good!",
+      "hint": "たべられる = can eat (potential form).",
+      "cue": "fine · can eat · tasty"
+    },
+    {
+      "role": "b",
+      "jp": "よかった。{来年|らいねん}は、もっと{上手|じょうず}に{作|つく}れたらいいな。",
+      "en": "Phew. Next year I hope I can make it better.",
+      "hint": "〜たら いいな = \"it would be nice if …\".",
+      "cue": "next year · better · hope"
+    }
+  ]
+}

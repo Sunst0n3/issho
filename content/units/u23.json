@@ -10,17 +10,22 @@
     "koto-ni-suru",
     "temo-even-if"
   ],
-  "coreWordCeiling": 1450,
+  "coreWordCeiling": 1465,
   "canDos": [
     {
       "id": "u23-cd1",
       "text": "Talk through a big decision with your partner (moving, changing jobs) and say what you've decided and why.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner asks about a big decision (the audio plays the question). Talk for 45–60 seconds about a decision you two have made or are making (moving, changing jobs, a big trip): what you've decided, why, and one difficulty you'll accept.",
+        "material": "{最近|さいきん}、{二人|ふたり}で{何|なに}か{大|おお}きいことを{決|き}めた？ {例|たと}えば、{引|ひ}っ{越|こ}しとか、{仕事|しごと}のこととか。どうしてそう{決|き}めたの？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "States the decision with 〜ことにした (引っ越すことにした)",
+          "Gives at least two reasons (〜し、〜し or 〜から)",
+          "Mentions a difficulty and says you'll go ahead anyway with 〜ても (家賃が高くても…)",
+          "Keeps talking for about 45 seconds"
+        ]
       }
     },
     {
@@ -28,9 +33,37 @@
       "text": "Read flat listings (rent, rooms, minutes from the station) and pick the one that fits both your conditions.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "You're looking for a flat together. Read the three listings and the note you both wrote, then answer the questions.",
+        "material": "A　もりマンション\n{家賃|やちん}：{九万円|きゅうまんえん}　{部屋|へや}：{二|ふた}つ＋{台所|だいどころ}\n{駅|えき}から{歩|ある}いて{五分|ごふん}　ベランダあり　ペット：×\nB　かわアパート\n{家賃|やちん}：{七万円|ななまんえん}　{部屋|へや}：{一|ひと}つ＋{台所|だいどころ}\n{駅|えき}から{歩|ある}いて{十五分|じゅうごふん}　{庭|にわ}あり　ペット：○\nC　ほしマンション\n{家賃|やちん}：{十万五千円|じゅうまんごせんえん}　{部屋|へや}：{二|ふた}つ＋{台所|だいどころ}\n{駅|えき}から{歩|ある}いて{八分|はっぷん}　エレベーターあり　ペット：○\n\n{二人|ふたり}のメモ：{猫|ねこ}と{一緒|いっしょ}に{住|す}みたい。{部屋|へや}は{二|ふた}つ{必要|ひつよう}。{家賃|やちん}は、{高|たか}くても{十一万円|じゅういちまんえん}まで。",
+        "questions": [
+          {
+            "q": "Which flat fits all of your conditions?",
+            "options": [
+              "A: Mori Mansion",
+              "B: Kawa Apartment",
+              "C: Hoshi Mansion"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "Why doesn't A, Mori Mansion, work for you?",
+            "options": [
+              "It's too far from the station",
+              "Pets aren't allowed",
+              "The rent is over your limit"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What does your note say about the rent?",
+            "options": [
+              "Up to ¥110,000, even if that's expensive",
+              "It must be under ¥90,000",
+              "It doesn't matter if there's a garden"
+            ],
+            "answer": 0
+          }
+        ]
       }
     },
     {
@@ -38,10 +71,14 @@
       "text": "Give advice that builds on what someone has just told you ('If you're moving to Osaka, …').",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "A friend tells you three things. Reply to each with a piece of advice that picks up what they just said, using 〜なら (大阪に引っ越すなら、…).",
+        "material": "{友達|ともだち}の{話|はなし}\n1）「{来月|らいげつ}、{大阪|おおさか}に{引|ひ}っ{越|こ}すんだ。」\n2）「{週末|しゅうまつ}、{二人|ふたり}で{温泉|おんせん}に{行|い}きたいんだけど…。」\n3）「{新|あたら}しいソファーを{買|か}おうと{思|おも}ってるんだ。」",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Answers each of the three with 〜なら, picking up the friend's words (温泉に行くなら…)",
+          "Each piece of advice is a sensible suggestion (〜たほうがいい, 〜がいいよ, 〜てみて)",
+          "Gives a reason for at least one piece of advice"
+        ]
       }
     },
     {
@@ -49,9 +86,37 @@
       "text": "Understand a friend or neighbour talking about things that happened to them (they were told off, their bike was taken).",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "A friend is telling you about a bad day. Listen for what happened to him — you don't need to use these 'was done to me' forms yourself. Then answer the questions.",
+        "material": "{聞|き}いてよ。{昨日|きのう}は{本当|ほんとう}に{大変|たいへん}だったんだ。{朝|あさ}、{駅|えき}に{止|と}めておいた{自転車|じてんしゃ}を{盗|ぬす}まれて、{会社|かいしゃ}に{遅刻|ちこく}しちゃった。それで、{上司|じょうし}に{怒|おこ}られた。{帰|かえ}りは{雨|あめ}に{降|ふ}られて、{服|ふく}が{全部|ぜんぶ}{濡|ぬ}れちゃったし。でも、うちに{帰|かえ}ったら、{妻|つま}に「お{疲|つか}れ{様|さま}」って{言|い}われて、ちょっと{元気|げんき}が{出|で}たよ。",
+        "questions": [
+          {
+            "q": "What happened to his bicycle?",
+            "options": [
+              "It was stolen at the station",
+              "It got a flat tyre",
+              "His wife borrowed it"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "Why did his boss tell him off?",
+            "options": [
+              "He forgot about a meeting",
+              "He was late for work",
+              "He came in soaking wet"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What cheered him up in the end?",
+            "options": [
+              "The rain stopped",
+              "His boss apologised",
+              "His wife said 'thanks for your hard work' when he got home"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -59,10 +124,15 @@
       "text": "Write a message telling friends about your decision and that you'll go ahead even if it's difficult.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "An old friend sent you this message. Reply in 3–5 sentences: tell them about a decision you two have made (moving, a new job, a trip), why you decided, and that you'll go ahead even if it's hard (〜ても).",
+        "material": "{久|ひさ}しぶり！ {元気|げんき}？ {最近|さいきん}どう？ {何|なに}か{新|あたら}しいこと、あった？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "States the decision with 〜ことにした",
+          "Gives at least one reason",
+          "Uses 〜ても to say you'll go ahead despite a difficulty (家賃が高くても…)",
+          "Ends in a friendly way (また連絡するね / 遊びに来てね)"
+        ]
       }
     }
   ],
@@ -71,17 +141,87 @@
     "id": "u23-task",
     "canDo": "u23-cd1",
     "goal": "Choose your next home from three flats: share your information, weigh up the must-haves, and decide on one, even if it isn't perfect.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "Which flat did you choose, and what's the one thing you've decided to put up with?",
     "roles": {
       "a": "Has the rent and floor plans of the three flats (card A)",
       "b": "Has the travel times to work and notes on each neighbourhood (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "Card A — the three flats. ① さくらマンション: rent (家賃) ¥95,000, two rooms + kitchen, small balcony (ベランダ). ② みどりアパート: ¥78,000, one room + kitchen (狭い), small garden, pets OK. ③ そらマンション: ¥118,000, two rooms + a big living room, big balcony, new building. You both agreed on a budget of up to ¥100,000 a month. You'd love a big balcony, but you work from home twice a week and need a quiet room. Share what you know, listen to your partner, and decide together (〜ことにしよう) — even if the flat isn't perfect (〜ても).",
+    "infoB": "Card B — travel and neighbourhoods. ① さくらマンション: 30 min to work for both of you; next to a shopping street (商店街) — handy, but people say it's lively at night. ② みどりアパート: 15 min to your work but 50 min to your partner's; very quiet, but no supermarket nearby. ③ そらマンション: 20 min to both jobs, right by the station, big supermarket; a main road outside, and people say the traffic (渋滞) is noisy. You don't want either of you commuting (通勤) more than 40 minutes. Share what you know, react to your partner's information with 〜なら (家賃なら…, 静かなら…), and decide together.",
+    "targets": [
+      "grammar:koto-ni-suru",
+      "grammar:temo-even-if",
+      "grammar:nara",
+      "core:cw-1053",
+      "core:cw-1169",
+      "core:cw-1012",
+      "core:cw-1435"
+    ],
+    "register": "plain",
+    "twist": "A fourth flat comes up: ¥88,000, two rooms, next to a park, but 45 minutes to both jobs. Decide again — this time B argues for the cheapest flat and A for the closest one.",
+    "aiRole": "Estate agent (不動産屋) who answers your extra questions about the flats in polite Japanese",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "どの{部屋|へや}にする？ {家賃|やちん}なら、みどりアパートが{一番|いちばん}{安|やす}いよ。{七万八千円|ななまんはっせんえん}。",
+        "en": "Which flat shall we go for? If it's the rent we're looking at, Midori Apartment is the cheapest. ¥78,000."
+      },
+      {
+        "role": "b",
+        "jp": "でも、みどりアパートだと、{通勤|つうきん}が{五十分|ごじゅっぷん}になるよ。{毎日|まいにち}{五十分|ごじゅっぷん}は{長|なが}いよね。",
+        "en": "But from Midori your commute would be fifty minutes. Fifty minutes every day is a long time."
+      },
+      {
+        "role": "a",
+        "jp": "そうだね。じゃあ、そらマンションは？ {部屋|へや}も{広|ひろ}いし、ベランダも{大|おお}きいよ。",
+        "en": "True. What about Sora Mansion, then? The rooms are big, and so is the balcony."
+      },
+      {
+        "role": "b",
+        "jp": "{駅|えき}のすぐ{近|ちか}くで、{二人|ふたり}とも{二十分|にじゅっぷん}で{行|い}けるよ。{家賃|やちん}は？",
+        "en": "It's right by the station, and we could both get to work in twenty minutes. What's the rent?"
+      },
+      {
+        "role": "a",
+        "jp": "{十一万八千円|じゅういちまんはっせんえん}。{十万円|じゅうまんえん}までにしたかったけど…。",
+        "en": "¥118,000. We wanted to keep it under ¥100,000…"
+      },
+      {
+        "role": "b",
+        "jp": "{高|たか}くても、{毎日|まいにち}{楽|らく}なら、いいと{思|おも}うけど。でも、{前|まえ}の{道|みち}は{渋滞|じゅうたい}でうるさいそうだよ。",
+        "en": "Even if it's expensive, if every day is easier, I think it could be worth it. But apparently the road outside is noisy with traffic."
+      },
+      {
+        "role": "a",
+        "jp": "うるさいのは{困|こま}るな。うちで{仕事|しごと}する{日|ひ}もあるし。さくらマンションはどう？ {九万五千円|きゅうまんごせんえん}で、{部屋|へや}も{二|ふた}つあるよ。",
+        "en": "Noise would be a problem — I work from home some days. How about Sakura Mansion? It's ¥95,000, and it has two rooms too."
+      },
+      {
+        "role": "b",
+        "jp": "さくらなら、{二人|ふたり}とも{三十分|さんじゅっぷん}ぐらい。{商店街|しょうてんがい}の{近|ちか}くで{便利|べんり}だけど、{夜|よる}は{少|すこ}しにぎやかだって。",
+        "en": "From Sakura it's about thirty minutes for both of us. It's near a shopping street, so it's handy, but apparently it's a bit lively at night."
+      },
+      {
+        "role": "a",
+        "jp": "{夜|よる}だけなら、{窓|まど}を{閉|し}めれば{大丈夫|だいじょうぶ}だと{思|おも}う。{昼間|ひるま}が{静|しず}かなら、{仕事|しごと}もできるし。",
+        "en": "If it's only at night, I think we'll be fine with the windows shut. And if it's quiet in the daytime, I can work there too."
+      },
+      {
+        "role": "b",
+        "jp": "じゃあ、さくらマンションにする？",
+        "en": "So, shall we go with Sakura Mansion?"
+      },
+      {
+        "role": "a",
+        "jp": "うん。ベランダが{小|ちい}さくても、{十万円|じゅうまんえん}より{安|やす}いし。さくらに{引|ひ}っ{越|こ}すことにしよう。",
+        "en": "Yes. Even if the balcony is small, it's under ¥100,000. Let's move to Sakura."
+      },
+      {
+        "role": "b",
+        "jp": "{決|き}まりだね。{明日|あした}、{電話|でんわ}しておくよ。",
+        "en": "That's settled, then. I'll phone them tomorrow."
+      }
+    ]
   },
   "capstone": {
     "title": "We're moving!",

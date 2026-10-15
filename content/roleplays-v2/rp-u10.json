@@ -1,0 +1,84 @@
+{
+  "id": "rp-u10",
+  "unit": 10,
+  "title": "Who's this?",
+  "titleJp": "これ、{誰|だれ}？",
+  "setting": "Evening at home. You're looking through old photos on your partner's phone together.",
+  "level": 2,
+  "register": "plain",
+  "targets": [
+    "grammar:wa-ga-description",
+    "grammar:to-omou",
+    "grammar:ni-target",
+    "grammar:ya-nado",
+    "grammar:temo-ii",
+    "core:cw-0759",
+    "core:cw-0724"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "これ、{誰|だれ}？",
+      "en": "Who's this?",
+      "cue": "who's this?"
+    },
+    {
+      "role": "b",
+      "jp": "{弟|おとうと}だよ。{背|せ}がすごく{高|たか}いよ。",
+      "en": "That's my little brother. He's really tall.",
+      "hint": "は〜が describes a feature: 弟は背が高い = my brother is tall (は is dropped here).",
+      "cue": "little brother · really tall"
+    },
+    {
+      "role": "a",
+      "jp": "かっこいいね！ {優|やさ}しい{人|ひと}だと{思|おも}う。",
+      "en": "He looks great! I bet he’s a kind person.",
+      "hint": "A noun needs だ before と思う: 人だと思う.",
+      "cue": "looks great · kind · I think"
+    },
+    {
+      "role": "b",
+      "jp": "うん、{優|やさ}しいよ。{料理|りょうり}も{上手|じょうず}。{毎週|まいしゅう}、{母|はは}に{電話|でんわ}するよ。",
+      "en": "He is. He’s a good cook, too. He calls our mum every week.",
+      "hint": "に marks the person on the receiving end: 母に電話する.",
+      "cue": "kind · good cook · calls Mum weekly"
+    },
+    {
+      "role": "a",
+      "jp": "{今度|こんど}、{弟|おとうと}さんに{会|あ}いたい！",
+      "en": "I'd love to meet him sometime!",
+      "hint": "Your partner’s family gets さん: 弟さん, but your own brother is just 弟.",
+      "cue": "sometime · meet him"
+    },
+    {
+      "role": "b",
+      "jp": "じゃあ、{来月|らいげつ}うちに{呼|よ}ぶ？ {肉|にく}や{野菜|やさい}を{焼|や}いて、{一緒|いっしょ}に{食|た}べる？",
+      "en": "Then shall we invite him over next month? We could grill some meat and veg and eat together.",
+      "hint": "や gives examples from a longer list: meat, veg and so on.",
+      "cue": "invite · next month · grill meat & veg"
+    },
+    {
+      "role": "a",
+      "jp": "いいね！ {他|ほか}の{写真|しゃしん}も{見|み}てもいい？",
+      "en": "Great idea! Can I look at the other photos too?",
+      "hint": "〜てもいい？ asks permission casually; add ですか with people you don’t know well.",
+      "cue": "great · other photos · may I?"
+    },
+    {
+      "role": "b",
+      "jp": "もちろん。どうぞ。",
+      "en": "Of course. Go ahead.",
+      "cue": "of course · go ahead"
+    }
+  ]
+}

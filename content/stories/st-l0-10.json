@@ -1,0 +1,119 @@
+{
+  "id": "st-l0-10",
+  "level": "L0",
+  "unit": 9,
+  "title": "The wrong train",
+  "titleJp": "ちがう {電車|でんしゃ}",
+  "topic": "transport",
+  "grammar": [
+    "wa-desu",
+    "no-possession",
+    "mo-also",
+    "ne-yo",
+    "masu-forms",
+    "wo-object",
+    "ni-time-place",
+    "masu-past",
+    "de-place-means",
+    "arimasu-imasu",
+    "deshita",
+    "adverbs-frequency",
+    "na-adjectives",
+    "casual-speech",
+    "position-words",
+    "te-form",
+    "adverbs-degree",
+    "ga-subject",
+    "dates-days",
+    "ni-iku-purpose",
+    "casual-past",
+    "kara-because"
+  ],
+  "sentences": [
+    {
+      "jp": "どようびに、／ケンと／エマは／そばを／{食|た}べに／{行|い}きました。",
+      "en": "On Saturday, Ken and Emma went out to eat soba."
+    },
+    {
+      "jp": "となりの／まちに／ゆうめいな／そばの／{店|みせ}が／あります。",
+      "en": "There's a famous soba restaurant in the next town."
+    },
+    {
+      "jp": "ふたりは／{駅|えき}で／{電車|でんしゃ}に／のりました。",
+      "en": "They got on a train at the station."
+    },
+    {
+      "jp": "{電車|でんしゃ}の／{中|なか}で、／ふたりは／たくさん／はなして、／たくさん／わらいました。",
+      "en": "On the train, they talked a lot and laughed a lot."
+    },
+    {
+      "jp": "エマが／まどの／{外|そと}を／{見|み}ました。",
+      "en": "Emma looked out of the window."
+    },
+    {
+      "jp": "「あれ、／ここ、／どこ？」",
+      "en": "\"Huh, where are we?\""
+    },
+    {
+      "jp": "{駅|えき}の／{名前|なまえ}が／ちがいました。",
+      "en": "The station names were wrong."
+    },
+    {
+      "jp": "「この／{電車|でんしゃ}、／ちがう！」",
+      "en": "\"This is the wrong train!\""
+    },
+    {
+      "jp": "ふたりは／つぎの／{駅|えき}で／おりました。",
+      "en": "They got off at the next station."
+    },
+    {
+      "jp": "ちいさい／{駅|えき}でした。",
+      "en": "It was a small station."
+    },
+    {
+      "jp": "{人|ひと}も／あまり／いませんでした。",
+      "en": "There weren't many people around, either."
+    },
+    {
+      "jp": "「おなかが／すいた…」",
+      "en": "\"I'm hungry...\""
+    },
+    {
+      "jp": "{駅|えき}の／{前|まえ}に／ちいさい／{店|みせ}が／ありました。",
+      "en": "There was a little restaurant in front of the station."
+    },
+    {
+      "jp": "うどんの／{店|みせ}でした。",
+      "en": "It was an udon restaurant."
+    },
+    {
+      "jp": "ふたりは／うどんを／{食|た}べました。",
+      "en": "They ate udon."
+    },
+    {
+      "jp": "「この／うどん、／すごく／おいしいね！」",
+      "en": "\"This udon is really good!\""
+    },
+    {
+      "jp": "「うん、／ちがう／{電車|でんしゃ}に／のったから、／この／{店|みせ}に／{来|き}た。」",
+      "en": "\"Yeah, we got on the wrong train, so we found this place.\""
+    },
+    {
+      "jp": "「よかったね。」",
+      "en": "\"Lucky us.\""
+    },
+    {
+      "jp": "そばは／また／こんど。",
+      "en": "Soba will have to wait until next time."
+    }
+  ],
+  "gist": {
+    "q": "What happened to Ken and Emma's plan to eat soba?",
+    "options": [
+      "They ate soba at the famous restaurant",
+      "The soba restaurant was closed, so they went home",
+      "They took the wrong train and ate udon instead"
+    ],
+    "answer": 2
+  }
+}

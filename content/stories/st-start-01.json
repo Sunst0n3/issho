@@ -1,0 +1,101 @@
+{
+  "id": "st-start-01",
+  "level": "start",
+  "unit": 1,
+  "title": "The new neighbour",
+  "titleJp": "となりの ひと",
+  "topic": "people",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "kore-sore-are"
+  ],
+  "sentences": [
+    {
+      "jp": "わたしは／エマです。",
+      "en": "I'm Emma."
+    },
+    {
+      "jp": "おっとは／ケンです。",
+      "en": "My husband is Ken."
+    },
+    {
+      "jp": "わたしたちは／アメリカじんです。",
+      "en": "We're American."
+    },
+    {
+      "jp": "きょうは／やすみです。",
+      "en": "Today is our day off."
+    },
+    {
+      "jp": "「こんにちは！」",
+      "en": "\"Hello!\""
+    },
+    {
+      "jp": "となりの／ひとです。",
+      "en": "It's the woman from next door."
+    },
+    {
+      "jp": "「はじめまして。」",
+      "en": "\"Nice to meet you.\""
+    },
+    {
+      "jp": "「{田中|たなか}です。」",
+      "en": "\"I'm Tanaka.\""
+    },
+    {
+      "jp": "「はじめまして、／エマです。」",
+      "en": "\"Nice to meet you. I'm Emma.\""
+    },
+    {
+      "jp": "「おっとの／ケンです。」",
+      "en": "\"And this is my husband, Ken.\""
+    },
+    {
+      "jp": "「よろしく／おねがいします。」",
+      "en": "\"It's a pleasure to meet you.\""
+    },
+    {
+      "jp": "{田中|たなか}さんは／にほんじんです。",
+      "en": "Ms Tanaka is Japanese."
+    },
+    {
+      "jp": "「ケンさん、／それは／なんですか。」",
+      "en": "\"Ken, what's that?\""
+    },
+    {
+      "jp": "「にほんごの／ほんです。」",
+      "en": "\"It's a Japanese book.\""
+    },
+    {
+      "jp": "「わたしたちは／にほんごの／がくせいです。」",
+      "en": "\"We're students of Japanese.\""
+    },
+    {
+      "jp": "「へえ、／そうですか。」",
+      "en": "\"Oh, I see.\""
+    },
+    {
+      "jp": "「わたしは／にほんごの／せんせいです！」",
+      "en": "\"I'm a Japanese teacher!\""
+    },
+    {
+      "jp": "「ほんとうですか！」",
+      "en": "\"Really?\""
+    },
+    {
+      "jp": "「よろしく／おねがいします、／せんせい！」",
+      "en": "\"Please look after us, sensei!\""
+    }
+  ],
+  "gist": {
+    "q": "What is the new neighbour's job?",
+    "options": [
+      "She teaches Japanese.",
+      "She's a doctor.",
+      "She's a student of English."
+    ],
+    "answer": 0
+  }
+}

@@ -10,17 +10,22 @@
     "sou-hearsay",
     "te-oku"
   ],
-  "coreWordCeiling": 1335,
+  "coreWordCeiling": 1366,
   "canDos": [
     {
       "id": "u21-cd1",
       "text": "Tell your partner what your week at work is like, giving several reasons why you're busy or tired.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner asks about your week (the audio plays their question). Answer for 30–60 seconds: say what your week at work is like and give at least two reasons why you're busy or tired, joined with 〜し.",
+        "material": "おかえりなさい。{遅|おそ}かったね。{今週|こんしゅう}、{仕事|しごと}どう？ なんだか{疲|つか}れてるね。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says what the week is like (busy, tiring, so-so) and what is happening (meetings, overtime, a business trip)",
+          "Gives at least two reasons joined with 〜し (会議も多いし、残業もあるし…)",
+          "Uses at least one time word (月曜日, 毎晩, 来週…)",
+          "Keeps going for about 30 seconds without switching to English"
+        ]
       }
     },
     {
@@ -28,9 +33,37 @@
       "text": "Understand news someone passes on from work or the neighbourhood ('I heard the manager is leaving').",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Your partner has just come home with some news from work. Listen, then answer the questions.",
+        "material": "ただいま。ねえ、{聞|き}いて。{山田|やまだ}さん、{来月|らいげつ}{会社|かいしゃ}を{辞|や}めるそうだよ。{田舎|いなか}に{帰|かえ}って、お{父|とう}さんの{店|みせ}を{手伝|てつだ}うんだって。それで、{次|つぎ}の{上司|じょうし}は{大阪|おおさか}から{来|く}る{人|ひと}だそうだよ。ちょっと{厳|きび}しいそうだけど、{仕事|しごと}はすごくできるって。",
+        "questions": [
+          {
+            "q": "Why is Yamada-san leaving the company?",
+            "options": [
+              "To move to Osaka for a new job",
+              "To help at his father's shop back in his home town",
+              "Because the new boss is strict"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What has your partner heard about the next boss?",
+            "options": [
+              "They're a bit strict, but very good at the job",
+              "They're young and easy-going",
+              "They're Yamada-san's father"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "Where is the next boss coming from?",
+            "options": [
+              "Yamada-san's home town",
+              "Head office in Tokyo",
+              "Osaka"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -38,10 +71,14 @@
       "text": "Plan ahead for a busy week together: what to get ready in advance (cook, shop, set alarms) and who does it.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "This is your schedule for next week. Tell your partner at least three things you'll get ready in advance with 〜ておく (cooking, shopping, ironing…), say why, and suggest who does each one.",
+        "material": "{来週|らいしゅう}の{予定|よてい}\n{月曜日|げつようび}：{朝|あさ}{八時|はちじ}から{会議|かいぎ}\n{水曜日|すいようび}：{大阪|おおさか}に{出張|しゅっちょう}（{木曜日|もくようび}の{夜|よる}に{帰|かえ}る）\n{金曜日|きんようび}：{残業|ざんぎょう}\nメモ：{冷蔵庫|れいぞうこ}の{中|なか}、ほとんど{何|なに}もない！ シャツにアイロン！",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Names at least three jobs to do in advance with 〜ておく (カレーを作っておく, シャツにアイロンをかけておく)",
+          "Links each job to the schedule with a reason (水曜日は出張だから…)",
+          "Suggests who does each job and when (土曜日に私が…)"
+        ]
       }
     },
     {
@@ -49,9 +86,37 @@
       "text": "Read a notice at work or in your building (a meeting, a water shut-off) and work out what to do beforehand.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "This notice has gone up in the entrance of your building. Read it and answer the questions.",
+        "material": "お{知|し}らせ\n{十月|じゅうがつ}{二十日|はつか}（{火|か}）{午前|ごぜん}{九時|くじ}～{午後|ごご}{三時|さんじ}は、{水|みず}が{出|で}ません。トイレも{使|つか}えません。\n・{料理|りょうり}やトイレに{使|つか}う{水|みず}は、{前|まえ}の{日|ひ}の{夜|よる}に、ペットボトルや{鍋|なべ}に{入|い}れておいてください。\n・{洗濯|せんたく}は、{十九日|じゅうくにち}（{月|げつ}）にしておいてください。\n・{三時|さんじ}{過|す}ぎに{水|みず}が{出|で}なければ、{下|した}の{番号|ばんごう}に{電話|でんわ}してください。\n{電話番号|でんわばんごう}：03-1234-5678\nよろしくお{願|ねが}いします。",
+        "questions": [
+          {
+            "q": "When will the water be off?",
+            "options": [
+              "Monday the 19th, all evening",
+              "Tuesday the 20th, 9 a.m. to 3 p.m.",
+              "Tuesday the 20th, from 3 p.m."
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What does the notice ask you to do the night before?",
+            "options": [
+              "Put the water you'll need into bottles or pots",
+              "Phone the number at the bottom",
+              "Do the laundry in the morning"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "What should you do if the water still isn't running after 3 p.m.?",
+            "options": [
+              "Wait until the next morning",
+              "Use bottled water for the toilet",
+              "Call the phone number on the notice"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -59,10 +124,15 @@
       "text": "Write a message asking for advice, and suggest what to do if things go well ('If I finish early, shall we eat out?').",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner sent you this LINE message. Reply in 2–4 sentences: say what is going on at work, ask their advice about one problem (…どうすればいい？), and suggest a plan for if things go well, with 〜ば (早く終われば、外で食べない？).",
+        "material": "お{疲|つか}れ{様|さま}！ {今日|きょう}も{残業|ざんぎょう}？ {晩|ばん}ご{飯|はん}、どうする？ {何|なに}か{作|つく}っておこうか？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Explains what is happening at work in a sentence or two",
+          "Asks for advice with どうすればいい？ or 〜ばいい？",
+          "Suggests a plan with a 〜ば condition (早く終われば…)",
+          "Uses casual style suited to a partner"
+        ]
       }
     }
   ],
@@ -71,17 +141,91 @@
     "id": "u21-task",
     "canDo": "u21-cd3",
     "goal": "Get ready for a busy week: decide what to prepare in advance and who does which job on which day.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "What are you cooking in advance, and on which day? Who is ironing the shirts for the trip?",
     "roles": {
       "a": "Has their work schedule (late meetings on Tuesday and Thursday) and the shopping list (card A)",
       "b": "Has their schedule (a business trip on Wednesday) and the household jobs (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "Your week: late meetings (会議) on Tuesday and Thursday, so you're home after 9 p.m.; Monday and Wednesday you're home by 7. You have the shopping list: detergent (洗剤) and shampoo (シャンプー) are nearly out, and you need meat and vegetables for a big curry. On Tuesday you cycle to work, so you can't carry heavy shopping that day. Find out your partner's week first, then agree: what to buy in advance and when, what to cook on Sunday so there's food for the busy days (作っておけば…), and who takes the rubbish out.",
+    "infoB": "Your week: overtime (残業) on Monday; a business trip (出張) to Osaka on Wednesday — you leave on the 6 a.m. bullet train and are back on Thursday night. You have the list of household jobs: iron the shirts for the trip (アイロン), vacuum (掃除機), rubbish out on Tuesday and Friday mornings, and the laundry. You have no clean shirt for the trip yet, and you've heard your boss (上司) is coming too. Find out your partner's week first, then agree who does each job and on which day, so everything is ready before Wednesday.",
+    "targets": [
+      "grammar:te-oku",
+      "grammar:ba-conditional",
+      "grammar:shi-reasons",
+      "core:cw-1365",
+      "core:cw-1361",
+      "core:cw-1006",
+      "core:cw-1005"
+    ],
+    "register": "plain",
+    "twist": "Repeat it with a change: B's business trip moves to Tuesday and A now has to work on Saturday. Re-plan when the shopping and the cooking happen, and who takes the rubbish out on Tuesday.",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "{来週|らいしゅう}、{忙|いそが}しい？ {火曜日|かようび}と{木曜日|もくようび}は、{夜|よる}{遅|おそ}くまで{会議|かいぎ}なんだ。",
+        "en": "Are you busy next week? I've got meetings till late on Tuesday and Thursday."
+      },
+      {
+        "role": "b",
+        "jp": "こっちも{大変|たいへん}。{月曜日|げつようび}は{残業|ざんぎょう}だし、{水曜日|すいようび}は{大阪|おおさか}に{出張|しゅっちょう}だし。",
+        "en": "Mine's tough too. I've got overtime on Monday, and on Wednesday I'm off to Osaka on a business trip."
+      },
+      {
+        "role": "a",
+        "jp": "じゃあ、{日曜日|にちようび}にカレーを{作|つく}っておこうか。{作|つく}っておけば、{三日|みっか}ぐらい{食|た}べられるし。",
+        "en": "Then shall we make a curry on Sunday? If we make it ahead, it'll last us about three days."
+      },
+      {
+        "role": "b",
+        "jp": "いいね。{買|か}い{物|もの}は？",
+        "en": "Good idea. What about the shopping?"
+      },
+      {
+        "role": "a",
+        "jp": "{洗剤|せんざい}とシャンプーがもうすぐなくなるから、{土曜日|どようび}に{私|わたし}が{買|か}っておくよ。カレーの{肉|にく}と{野菜|やさい}も。",
+        "en": "The detergent and shampoo are nearly out, so I'll buy them on Saturday. And the meat and vegetables for the curry."
+      },
+      {
+        "role": "b",
+        "jp": "ありがとう。じゃあ、{掃除|そうじ}とアイロンは{私|わたし}がやっておくね。{出張|しゅっちょう}のシャツもあるし。",
+        "en": "Thanks. Then I'll do the cleaning and the ironing. I've got my shirts for the trip to do anyway."
+      },
+      {
+        "role": "a",
+        "jp": "{水曜日|すいようび}は{朝|あさ}{早|はや}いの？",
+        "en": "Are you leaving early on Wednesday?"
+      },
+      {
+        "role": "b",
+        "jp": "うん、{六時|ろくじ}の{新幹線|しんかんせん}。{上司|じょうし}も{一緒|いっしょ}に{行|い}くそうだよ。",
+        "en": "Yeah, the six o'clock bullet train. Apparently my boss is coming too."
+      },
+      {
+        "role": "a",
+        "jp": "{大変|たいへん}だね。{火曜日|かようび}の{夜|よる}にスーツケースに{荷物|にもつ}を{入|い}れておけば、{朝|あさ}は{楽|らく}だよ。",
+        "en": "That's rough. If you pack your suitcase on Tuesday night, the morning will be easy."
+      },
+      {
+        "role": "b",
+        "jp": "そうだね。ごみは？ {火曜日|かようび}と{金曜日|きんようび}の{朝|あさ}だよね。",
+        "en": "True. What about the rubbish? It's Tuesday and Friday mornings, right?"
+      },
+      {
+        "role": "a",
+        "jp": "{火曜日|かようび}は{私|わたし}が{出|だ}すよ。{金曜日|きんようび}はお{願|ねが}いしてもいい？",
+        "en": "I'll take it out on Tuesday. Can I leave Friday to you?"
+      },
+      {
+        "role": "b",
+        "jp": "うん、いいよ。{金曜日|きんようび}、{早|はや}く{帰|かえ}れれば、{外|そと}で{食|た}べない？",
+        "en": "Sure. And on Friday, if I can get home early, shall we eat out?"
+      },
+      {
+        "role": "a",
+        "jp": "いいね！ じゃあ、{土曜日|どようび}は{買|か}い{物|もの}、{日曜日|にちようび}はカレー。{決|き}まり！",
+        "en": "Sounds good! So: shopping on Saturday, curry on Sunday. Done!"
+      }
+    ]
   },
   "capstone": {
     "title": "Friday night catch-up",

@@ -11,17 +11,22 @@
     "casual-past",
     "kara-because"
   ],
-  "coreWordCeiling": 655,
+  "coreWordCeiling": 709,
   "canDos": [
     {
       "id": "u09-cd1",
       "text": "Tell each other your birthdays and other important dates, and find out what day of the week they fall on this year.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (or the AI) asks the three questions below. Answer with full dates — month, day and day of the week — using this year's calendar, and add one plan for the day. Then ask the first question back.",
+        "material": "{誕生日|たんじょうび}はいつ？\n{今年|ことし}の{誕生日|たんじょうび}は{何曜日|なんようび}？\n{二人|ふたり}の{記念日|きねんび}は{何月|なんがつ}{何日|なんにち}？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says a month and date with the right readings (四月八日 = しがつ ようか)",
+          "Names the day of the week correctly (〜曜日)",
+          "Adds a plan for the day with に (誕生日に〜を食べに行きたい)",
+          "Asks the partner when their birthday is (誕生日はいつ？)"
+        ]
       }
     },
     {
@@ -29,9 +34,37 @@
       "text": "Read a calendar or an invitation and find the date, the day of the week and what's happening.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "A friend sent you and your partner this message. Read it and answer the questions.",
+        "material": "こんにちは！ {来月|らいげつ}の{十四日|じゅうよっか}（{土曜日|どようび}）は{夫|おっと}の{誕生日|たんじょうび}です。\n{夜|よる}{七時|しちじ}から、うちで{晩|ばん}ご{飯|はん}を{食|た}べます。ケーキもありますよ。\n{二人|ふたり}も{来|き}ませんか。{駅|えき}から{歩|ある}いて{五分|ごふん}です。\n{来|く}る？ {来|こ}ない？ メッセージ{待|ま}ってるね！",
+        "questions": [
+          {
+            "q": "What day of the week is the dinner?",
+            "options": [
+              "Friday",
+              "Saturday",
+              "Sunday"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What is it for?",
+            "options": [
+              "Her husband's birthday",
+              "Their wedding anniversary",
+              "Their new house"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "What time does dinner start?",
+            "options": [
+              "6:00",
+              "8:00",
+              "7:00"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -39,10 +72,15 @@
       "text": "Text your partner what you're doing right now and what you're going out to do later.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner sent the message below. Reply in 3–4 casual sentences: what you're doing right now, where you're going later and what for, and why.",
+        "material": "{今|いま}、{何|なに}してる？ {私|わたし}は{電車|でんしゃ}に{乗|の}ってるよ。{七時|しちじ}ごろ{帰|かえ}るね。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says what they're doing now with 〜てる / 〜ている (仕事してる)",
+          "Says where they are going later and what for with 〜に行く (牛乳を買いに行く)",
+          "Gives a reason with から (お腹がすいたから)",
+          "Stays casual: plain forms, no です / ます"
+        ]
       }
     },
     {
@@ -50,9 +88,37 @@
       "text": "Follow your partner's casual account of their day (what they did and why) and answer questions about it.",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Your partner is telling you about their day. Listen (twice if you like) and answer the questions.",
+        "material": "{今日|きょう}は{大変|たいへん}だった！ {朝|あさ}、{雨|あめ}が{降|ふ}ってたから、バスで{会社|かいしゃ}に{行|い}った。でも、バスがすごく{遅|おそ}かった。{昼|ひる}は{忙|いそが}しかったから、{昼|ひる}ご{飯|はん}を{食|た}べなかった。{仕事|しごと}の{後|あと}、{駅|えき}のコンビニにおにぎりを{買|か}いに{行|い}った。{今|いま}はちょっと{元気|げんき}だよ！",
+        "questions": [
+          {
+            "q": "How did they get to work, and why?",
+            "options": [
+              "By bus, because it was raining",
+              "By train, because the bus was late",
+              "On foot, because it was sunny"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "Why didn't they have lunch?",
+            "options": [
+              "They forgot",
+              "They were busy",
+              "The shop was closed"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What did they do after work?",
+            "options": [
+              "Met a friend at the station",
+              "Took a taxi home",
+              "Went to buy a rice ball at the convenience store"
+            ],
+            "answer": 2
+          }
+        ]
       }
     }
   ],
@@ -61,17 +127,87 @@
     "id": "u09-task",
     "canDo": "u09-cd1",
     "goal": "Find a free evening next month for an anniversary dinner: compare your calendars, agree on the date, and decide what you will go out to eat.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "What date and day are you going out, and what are you going to eat?",
     "roles": {
       "a": "Has their calendar for next month (card A)",
       "b": "Has their calendar and the restaurant's closing days (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "Card A — your calendar for next month (来月). Busy evenings: the 3rd (Fri, work), the 10th (Fri, work) and the 11th (Sat, a friend's birthday). Free evenings: the 4th (Sat), the 17th (Fri) and the 18th (Sat). Your wedding anniversary (記念日) is the 17th (十七日), a Friday. You feel like sushi or tempura (寿司か天ぷらを食べに行きたい). Say which days you're free (〜日は暇だよ) and why you can't do the others (仕事があるから).",
+    "infoB": "Card B — your calendar and two restaurants near the station. You're free on the 11th (Sat), the 17th (Fri) and the 18th (Sat); on the 4th you're working. You can't remember whether the anniversary is the 17th or the 18th — ask! The sushi place (寿司の店) is closed on Fridays (定休日：金曜日). The tempura place (天ぷらの店) is closed on Saturdays and Sundays. Compare your free days, check the date, and decide where to go, giving reasons with から.",
+    "targets": [
+      "grammar:dates-days",
+      "grammar:ni-iku-purpose",
+      "grammar:kara-because",
+      "core:cw-0462",
+      "core:cw-0704",
+      "core:cw-0641",
+      "core:cw-0686",
+      "core:cw-0447"
+    ],
+    "register": "plain",
+    "twist": "Repeat it 2–7 days later for a birthday instead: card A's free days change (the 17th is now taken by work), card B's restaurant list adds a new closing day, and you also decide what present to go out and buy (プレゼントを買いに行く).",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "{来月|らいげつ}の{記念日|きねんび}、{一緒|いっしょ}にご{飯|はん}を{食|た}べに{行|い}かない？",
+        "en": "Shall we go out to eat for our anniversary next month?"
+      },
+      {
+        "role": "b",
+        "jp": "いいね！ {記念日|きねんび}は{十七日|じゅうしちにち}？ {十八日|じゅうはちにち}？",
+        "en": "Lovely! Is our anniversary the 17th or the 18th?"
+      },
+      {
+        "role": "a",
+        "jp": "{十七日|じゅうしちにち}だよ。{金曜日|きんようび}。",
+        "en": "It's the 17th. A Friday."
+      },
+      {
+        "role": "b",
+        "jp": "よかった。{十七日|じゅうしちにち}は{暇|ひま}だよ。{十八日|じゅうはちにち}も{大丈夫|だいじょうぶ}。",
+        "en": "Good. I'm free on the 17th. The 18th is fine too."
+      },
+      {
+        "role": "a",
+        "jp": "{私|わたし}も。{四日|よっか}は？",
+        "en": "Me too. What about the 4th?"
+      },
+      {
+        "role": "b",
+        "jp": "{四日|よっか}はだめ。{仕事|しごと}があるから。",
+        "en": "The 4th is no good. I've got work."
+      },
+      {
+        "role": "a",
+        "jp": "じゃあ、{十七日|じゅうしちにち}にする？ {寿司|すし}か{天|てん}ぷらを{食|た}べに{行|い}きたい。",
+        "en": "Then shall we make it the 17th? I'd love to go for sushi or tempura."
+      },
+      {
+        "role": "b",
+        "jp": "{駅|えき}の{近|ちか}くの{寿司|すし}の{店|みせ}は、{金曜日|きんようび}が{定休日|ていきゅうび}だよ。",
+        "en": "The sushi place near the station is closed on Fridays."
+      },
+      {
+        "role": "a",
+        "jp": "そうか。{天|てん}ぷらの{店|みせ}は？",
+        "en": "Oh, right. What about the tempura place?"
+      },
+      {
+        "role": "b",
+        "jp": "{天|てん}ぷらの{店|みせ}は{土曜日|どようび}と{日曜日|にちようび}が{休|やす}み。{金曜日|きんようび}は{大丈夫|だいじょうぶ}。",
+        "en": "The tempura place is closed on Saturdays and Sundays, so Friday's fine."
+      },
+      {
+        "role": "a",
+        "jp": "じゃあ、{十七日|じゅうしちにち}の{金曜日|きんようび}に{天|てん}ぷらを{食|た}べに{行|い}く？",
+        "en": "So shall we go for tempura on Friday the 17th?"
+      },
+      {
+        "role": "b",
+        "jp": "うん！ {楽|たの}しみ！",
+        "en": "Yes! I can't wait!"
+      }
+    ]
   },
   "capstone": {
     "title": "The night before our anniversary",

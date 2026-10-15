@@ -1,0 +1,108 @@
+{
+  "id": "st-start-09",
+  "level": "start",
+  "unit": 3,
+  "title": "One more rice ball",
+  "titleJp": "おにぎりを もう ひとつ",
+  "topic": "food",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "mo-also",
+    "numbers-prices",
+    "masu-forms",
+    "wo-object",
+    "counting-tsu",
+    "time-telling",
+    "wo-kudasai",
+    "ni-time-place"
+  ],
+  "sentences": [
+    {
+      "jp": "にちようびの／ひるです。",
+      "en": "It's Sunday lunchtime."
+    },
+    {
+      "jp": "わたしたちは／いちじに／ラーメンの／{店|みせ}に／いきます。",
+      "en": "At one, we go to a ramen shop."
+    },
+    {
+      "jp": "「すみません、／メニューを／ください。」",
+      "en": "\"Excuse me, could we have the menu?\""
+    },
+    {
+      "jp": "「はい、／どうぞ。」",
+      "en": "\"Here you are.\""
+    },
+    {
+      "jp": "ラーメンは／はっぴゃくえんです。",
+      "en": "Ramen is 800 yen."
+    },
+    {
+      "jp": "おにぎりは／ひゃくごじゅうえんです。",
+      "en": "Rice balls are 150 yen."
+    },
+    {
+      "jp": "「ラーメンを／ふたつ／ください。」",
+      "en": "\"Two ramen, please.\""
+    },
+    {
+      "jp": "「それから、／おにぎりを／ひとつ／ください。」",
+      "en": "\"And one rice ball, please.\""
+    },
+    {
+      "jp": "「ケン、／おにぎりも／たべますか。」",
+      "en": "\"Ken, you're having a rice ball too?\""
+    },
+    {
+      "jp": "「はい、／たべます！」",
+      "en": "\"Yes, I am!\""
+    },
+    {
+      "jp": "「いただきます！」",
+      "en": "\"Let's eat!\""
+    },
+    {
+      "jp": "ケンは／ラーメンを／たべます。",
+      "en": "Ken eats his ramen."
+    },
+    {
+      "jp": "おにぎりも／たべます。",
+      "en": "He eats the rice ball too."
+    },
+    {
+      "jp": "「すみません、／おにぎりを／もう／ひとつ／ください！」",
+      "en": "\"Excuse me, one more rice ball, please!\""
+    },
+    {
+      "jp": "「ケン…」",
+      "en": "\"Ken...\""
+    },
+    {
+      "jp": "「おかいけいを／おねがいします。」",
+      "en": "\"Could we have the bill, please?\""
+    },
+    {
+      "jp": "「せんきゅうひゃくえんです。」",
+      "en": "\"That's 1,900 yen.\""
+    },
+    {
+      "jp": "「ごちそうさまでした！」",
+      "en": "\"Thank you, that was great!\""
+    },
+    {
+      "jp": "「エマ、／ばんごはんは／なんですか。」",
+      "en": "\"Emma, what's for dinner?\""
+    }
+  ],
+  "gist": {
+    "q": "What does Ken order one more of?",
+    "options": [
+      "A rice ball",
+      "Ramen",
+      "Beer"
+    ],
+    "answer": 0
+  }
+}

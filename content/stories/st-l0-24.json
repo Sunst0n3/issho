@@ -1,0 +1,94 @@
+{
+  "id": "st-l0-24",
+  "level": "L0",
+  "unit": 14,
+  "title": "The Wrong Stop",
+  "titleJp": "{知|し}らない {駅|えき}",
+  "topic": "transport",
+  "grammar": [
+    "toki-when",
+    "adjectives-te",
+    "adj-naru",
+    "duration-kakaru",
+    "ichiban",
+    "relative-clauses",
+    "te-form",
+    "te-imasu",
+    "to-iu"
+  ],
+  "sentences": [
+    {
+      "jp": "{日曜日|にちようび}、／トムと／エマは／{温泉|おんせん}に／{行|い}きました。",
+      "en": "On Sunday, Tom and Emma went to a hot spring."
+    },
+    {
+      "jp": "{温泉|おんせん}まで／{電車|でんしゃ}で／{二時間|にじかん}／かかります。",
+      "en": "It takes two hours by train to get there."
+    },
+    {
+      "jp": "{大|おお}きい／{駅|えき}で／{乗|の}り{換|か}えました。",
+      "en": "They changed trains at a big station."
+    },
+    {
+      "jp": "{次|つぎ}の／{電車|でんしゃ}は／{静|しず}かで、／{暖|あたた}かかったです。",
+      "en": "The next train was quiet and warm."
+    },
+    {
+      "jp": "{二人|ふたり}は／{眠|ねむ}くなりました。",
+      "en": "They both got sleepy."
+    },
+    {
+      "jp": "{起|お}きた／とき、／{電車|でんしゃ}は／{知|し}らない／{駅|えき}に／{止|と}まっていました。",
+      "en": "When they woke up, the train was stopped at a station they didn't know."
+    },
+    {
+      "jp": "「あ！／{温泉|おんせん}の／{駅|えき}は／{二|ふた}つ／{前|まえ}だよ！」",
+      "en": "\"Oh no! Our stop was two stations back!\""
+    },
+    {
+      "jp": "{二人|ふたり}は／{急|いそ}いで／{降|お}りました。",
+      "en": "They hurried off the train."
+    },
+    {
+      "jp": "{小|ちい}さくて、／{古|ふる}い／{駅|えき}でした。",
+      "en": "It was a small, old station."
+    },
+    {
+      "jp": "{次|つぎ}の／{電車|でんしゃ}まで、／{一時間|いちじかん}／ありました。",
+      "en": "The next train was an hour away."
+    },
+    {
+      "jp": "{駅|えき}の{外|そと}に／{出|で}た／とき、／エマが／「すごい！」と／{言|い}いました。",
+      "en": "When they stepped outside the station, Emma said, \"Wow!\""
+    },
+    {
+      "jp": "{目|め}の{前|まえ}に／{大|おお}きい／{山|やま}と／{青|あお}い／{川|かわ}が／ありました。",
+      "en": "Right in front of them were a big mountain and a blue river."
+    },
+    {
+      "jp": "とても／きれいで、／{静|しず}かな／{所|ところ}でした。",
+      "en": "It was a beautiful, quiet place."
+    },
+    {
+      "jp": "{二人|ふたり}は／{川|かわ}の{近|ちか}くを／{散歩|さんぽ}して、／{写真|しゃしん}を／たくさん／{撮|と}りました。",
+      "en": "They strolled by the river and took lots of photos."
+    },
+    {
+      "jp": "{温泉|おんせん}に／{着|つ}いた／とき、／もう／{夕方|ゆうがた}でした。",
+      "en": "By the time they reached the hot spring, it was already evening."
+    },
+    {
+      "jp": "でも、／{今日|きょう}／いちばん／よかったのは、／あの／{小|ちい}さい／{駅|えき}でした。",
+      "en": "But the best part of the day was that little station."
+    }
+  ],
+  "gist": {
+    "q": "Why did they get off at a station they didn't know?",
+    "options": [
+      "They fell asleep and missed their stop",
+      "The train broke down",
+      "Emma wanted to take photos"
+    ],
+    "answer": 0
+  }
+}

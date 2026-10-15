@@ -1,0 +1,102 @@
+{
+  "id": "st-start-11",
+  "level": "start",
+  "unit": 4,
+  "title": "A rainy Sunday",
+  "titleJp": "あめの にちようび",
+  "topic": "weather",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "mo-also",
+    "ne-yo",
+    "masu-forms",
+    "wo-object",
+    "i-adjectives",
+    "de-place-means"
+  ],
+  "sentences": [
+    {
+      "jp": "きょうは／にちようびです。",
+      "en": "Today is Sunday."
+    },
+    {
+      "jp": "あめです。",
+      "en": "It's raining."
+    },
+    {
+      "jp": "ちょっと／さむいです。",
+      "en": "It's a little cold."
+    },
+    {
+      "jp": "「ケン、／きょうの／さんぽは？」",
+      "en": "\"Ken, what about our walk today?\""
+    },
+    {
+      "jp": "「あめですね…」",
+      "en": "\"It's raining, isn't it...\""
+    },
+    {
+      "jp": "「じゃあ、／うちで／えいがを／みますか。」",
+      "en": "\"Then shall we watch a movie at home?\""
+    },
+    {
+      "jp": "「いいですね！」",
+      "en": "\"Sounds good!\""
+    },
+    {
+      "jp": "わたしたちは／うちで／えいがを／みます。",
+      "en": "We watch a movie at home."
+    },
+    {
+      "jp": "えいがは／とても／おもしろいです。",
+      "en": "The movie is really good."
+    },
+    {
+      "jp": "ひるごはんは／あたたかい／スープです。",
+      "en": "Lunch is a warm soup."
+    },
+    {
+      "jp": "ケンの／スープは／とても／おいしいです。",
+      "en": "Ken's soup is really tasty."
+    },
+    {
+      "jp": "ごご、／ケンは／へやで／ゲームを／します。",
+      "en": "In the afternoon, Ken plays games in his room."
+    },
+    {
+      "jp": "わたしは／ほんを／よみます。",
+      "en": "I read a book."
+    },
+    {
+      "jp": "あめの／にちようびも／たのしいです。",
+      "en": "Rainy Sundays are fun too."
+    },
+    {
+      "jp": "{夜|よる}、／ケンは／スマホを／みます。",
+      "en": "In the evening, Ken looks at his phone."
+    },
+    {
+      "jp": "「あしたは／はれですよ！」",
+      "en": "\"It'll be sunny tomorrow!\""
+    },
+    {
+      "jp": "「でも、／あしたは／げつようびです…」",
+      "en": "\"But tomorrow is Monday...\""
+    },
+    {
+      "jp": "「あ…／しごとですね。」",
+      "en": "\"Oh... work, right.\""
+    }
+  ],
+  "gist": {
+    "q": "Why do they stay home?",
+    "options": [
+      "It's raining.",
+      "Ken is sick.",
+      "They have work."
+    ],
+    "answer": 0
+  }
+}

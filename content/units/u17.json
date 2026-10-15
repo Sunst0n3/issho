@@ -10,17 +10,22 @@
     "deshou",
     "nagara"
   ],
-  "coreWordCeiling": 1105,
+  "coreWordCeiling": 1148,
   "canDos": [
     {
       "id": "u17-cd1",
       "text": "Tell your partner how you feel and where it hurts, and ask how they are feeling.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (or the AI) asks you the questions below. Imagine one set of symptoms (a headache, a sore throat, a stomach ache…) and answer: how you feel, where it hurts and since when. Then ask your partner how they're feeling.",
+        "material": "どうしたの？{大丈夫|だいじょうぶ}？\nどこが{痛|いた}いの？\nいつから？{熱|ねつ}はある？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says how they feel (ちょうしが わるい, きもちわるい, さむい)",
+          "Says where it hurts with 〜が いたい (あたまが いたい)",
+          "Says since when with から (きのうから, けさから)",
+          "Asks the partner back how they are (〜は だいじょうぶ？ / げんき？)"
+        ]
       }
     },
     {
@@ -28,9 +33,37 @@
       "text": "Understand a doctor's or pharmacist's instructions: what you must do, how to take the medicine, and what to avoid.",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "You're picking up medicine at a pharmacy. Listen to the pharmacist (you can play it twice), then answer the questions.",
+        "material": "こちらが{風邪|かぜ}のお{薬|くすり}です。\n{一日|いちにち}{三回|さんかい}、ご{飯|はん}を{食|た}べたあとに{飲|の}んでください。{一回|いっかい}に{二|ふた}つです。\nこのお{薬|くすり}を{飲|の}んだあとは{眠|ねむ}くなるので、{車|くるま}を{運転|うんてん}しないでください。\nお{酒|さけ}も{飲|の}まないでくださいね。\nこちらの{白|しろ}い{袋|ふくろ}は{熱|ねつ}の{薬|くすり}です。{熱|ねつ}が{高|たか}いときだけ{飲|の}んでください。\n{風邪|かぜ}のお{薬|くすり}は、{最後|さいご}まで{全部|ぜんぶ}{飲|の}まなければなりません。\nお{大事|だいじ}に。",
+        "questions": [
+          {
+            "q": "How should you take the cold medicine?",
+            "options": [
+              "Two at a time, three times a day, after meals",
+              "One at a time, twice a day, before meals",
+              "Three at a time, only at night"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "Why shouldn't you drive?",
+            "options": [
+              "The roads are icy",
+              "The medicine makes you sleepy",
+              "You have a high fever"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "When should you take the medicine in the white bag?",
+            "options": [
+              "Every morning",
+              "Until it is all gone",
+              "Only when your fever is high"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -38,9 +71,37 @@
       "text": "Read a medicine label or clinic notice (times, how many, before or after meals) and answer questions.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "This is the label on the medicine your partner got from the clinic. Read it and answer the questions.",
+        "material": "{山本|やまもと}　あおい　{様|さま}\n【{黄色|きいろ}い{薬|くすり}】せきの{薬|くすり}\n{一日|いちにち}３{回|かい}　{朝|あさ}・{昼|ひる}・{晩|ばん}のご{飯|はん}のあと　{一回|いっかい}に{一|ひと}つ\n【{白|しろ}い{薬|くすり}】{熱|ねつ}・{頭|あたま}が{痛|いた}いとき\n{痛|いた}いときだけ{飲|の}んでください。{一回|いっかい}に{一|ひと}つ。\n{次|つぎ}の{薬|くすり}は、６{時間|じかん}{待|ま}ってから{飲|の}んでください。\n※お{酒|さけ}と{一緒|いっしょ}に{飲|の}まないでください。",
+        "questions": [
+          {
+            "q": "When should the yellow medicine be taken?",
+            "options": [
+              "Only when the cough is bad",
+              "Three times a day, after each meal",
+              "Once a day, before bed"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "Your partner took a white pill at 9:00 a.m. When is the earliest they can take another?",
+            "options": [
+              "10:00 a.m.",
+              "Noon",
+              "3:00 p.m."
+            ],
+            "answer": 2
+          },
+          {
+            "q": "What should your partner avoid?",
+            "options": [
+              "Taking the medicine with alcohol",
+              "Taking the medicine with water",
+              "Eating before taking the medicine"
+            ],
+            "answer": 0
+          }
+        ]
       }
     },
     {
@@ -48,10 +109,15 @@
       "text": "Look after your partner when they're unwell: guess what's wrong, give gentle advice and tell them to rest properly.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (or the AI) isn't well and says the lines below. Respond in casual Japanese: guess what's wrong with でしょう (or でしょ), give one piece of advice, and tell them to rest properly.",
+        "material": "なんか{頭|あたま}が{痛|いた}い…。{昨日|きのう}はあまり{寝|ね}なかったんだ。\n{喉|のど}もちょっと{痛|いた}くて、{寒|さむ}い。\nでも、{今日|きょう}は{会議|かいぎ}があるから、{会社|かいしゃ}に{行|い}かなきゃ。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Guesses the cause with でしょう / でしょ (かぜでしょう, つかれたんでしょう)",
+          "Gives advice with 〜ほうがいい or 〜ないで (きょうは やすんだ ほうが いい)",
+          "Tells them to rest properly with an adverb (ゆっくり やすんで, はやく ねて, あたたかく して)",
+          "Deals with the meeting problem (e.g. suggests calling the office: かいしゃに でんわ しよう)"
+        ]
       }
     },
     {
@@ -59,10 +125,15 @@
       "text": "Write a message cancelling plans because you're unwell, saying what you have to do instead.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your friend sent the message below about tomorrow, but you've come down with a fever. Reply in 3–5 sentences: apologise, explain why with ので, say what you have to do instead with 〜なければならない or 〜なきゃ, and suggest another day.",
+        "material": "{明日|あした}、{十時|じゅうじ}に{駅|えき}の{前|まえ}でね！{映画|えいが}、{楽|たの}しみ！",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Apologises and cancels (ごめんね、あしたは ちょっと…)",
+          "Explains the reason with ので (ねつが あるので…)",
+          "Says what they have to do with 〜なければならない or 〜なきゃ (びょういんに いかなきゃ)",
+          "Suggests another day (らいしゅうの どようびは どう？)"
+        ]
       }
     }
   ],
@@ -71,17 +142,91 @@
     "id": "u17-task",
     "canDo": "u17-cd4",
     "goal": "One of you feels unwell: work out what's wrong, decide whether to go to the clinic, and make a plan for the rest of the day.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "Is A going to the clinic, and when? Who's doing today's jobs, and what are you buying on the way back?",
     "roles": {
       "a": "Feels unwell (symptoms card A)",
       "b": "Has the clinic's opening hours and what's in the medicine box (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "Card A: you're the one who feels unwell. Since this morning (けさから): a headache (あたまが いたい), a sore throat (のどが いたい), and you feel cold (さむい). Your temperature is 38 degrees (さんじゅうはちど). You only slept four hours last night. Today you were going to clean the flat (そうじ), do the food shopping (かいもの) and call your mother at 7 p.m. You don't really want to go to the clinic (めんどうくさい) and you'd rather do your jobs anyway. Don't show this card: answer B's questions.",
+    "infoB": "Card B: you're looking after A. It's Saturday, 10:30 a.m. The clinic near home (さくらびょういん) is open 9:00–12:00 today, mornings only (ごぜん だけ), a 15-minute walk away. Medicine box: two headache pills (あたまの くすり), no cold medicine (かぜの くすりは ない). Fridge: eggs and rice, no fruit, nothing to drink. Ask A how they feel, guess what's wrong (〜でしょう), then agree: clinic or not, who does today's jobs, and what to buy on the way back.",
+    "targets": [
+      "grammar:nakereba-naranai",
+      "grammar:deshou",
+      "grammar:adverb-form",
+      "core:cw-0794",
+      "core:cw-0372",
+      "core:cw-0451",
+      "core:cw-0664"
+    ],
+    "register": "plain",
+    "twist": "Swap roles: now B is unwell, with a stomach ache (おなかが いたい) but no fever, and it's Sunday, so the clinic is closed (やすみ). Decide what to do at home today and whether to see a doctor on Monday before work.",
+    "scripted": [
+      {
+        "role": "b",
+        "jp": "どうしたの？{具合|ぐあい}が{悪|わる}いの？",
+        "en": "What's wrong? Are you feeling ill?"
+      },
+      {
+        "role": "a",
+        "jp": "うん、{朝|あさ}から{頭|あたま}と{喉|のど}が{痛|いた}いんだ。ちょっと{寒|さむ}い。",
+        "en": "Yeah, my head and throat have hurt since this morning. I feel a bit cold."
+      },
+      {
+        "role": "b",
+        "jp": "{熱|ねつ}は？",
+        "en": "Have you got a temperature?"
+      },
+      {
+        "role": "a",
+        "jp": "{三十八度|さんじゅうはちど}ある。",
+        "en": "It's 38."
+      },
+      {
+        "role": "b",
+        "jp": "{風邪|かぜ}でしょう。{病院|びょういん}に{行|い}ったほうがいいよ。",
+        "en": "It's probably a cold. You'd better go to the clinic."
+      },
+      {
+        "role": "a",
+        "jp": "え〜、めんどうくさい。{家|いえ}で{寝|ね}てるよ。",
+        "en": "Ugh, what a hassle. I'll just stay in bed."
+      },
+      {
+        "role": "b",
+        "jp": "だめ。{熱|ねつ}が{高|たか}いから、ちゃんと{医者|いしゃ}に{行|い}かなきゃ。{土曜日|どようび}は{十二時|じゅうにじ}までだよ。",
+        "en": "No way. Your temperature's high, so you need to see a doctor properly. On Saturdays they're only open till twelve."
+      },
+      {
+        "role": "a",
+        "jp": "わかった。でも、{今日|きょう}は{掃除|そうじ}と{買|か}い{物|もの}をしなきゃ。",
+        "en": "Okay. But I have to clean and do the shopping today."
+      },
+      {
+        "role": "b",
+        "jp": "それは{私|わたし}がやるよ。{無理|むり}しないで。",
+        "en": "I'll do that. Don't push yourself."
+      },
+      {
+        "role": "a",
+        "jp": "ありがとう。じゃあ、{今|いま}から{行|い}ってくる。",
+        "en": "Thanks. I'll go now, then."
+      },
+      {
+        "role": "b",
+        "jp": "{一緒|いっしょ}に{行|い}くよ。{帰|かえ}りに{薬|くすり}と{飲|の}み{物|もの}を{買|か}おう。",
+        "en": "I'll come with you. Let's buy medicine and something to drink on the way back."
+      },
+      {
+        "role": "a",
+        "jp": "うん。{帰|かえ}ってから、お{母|かあ}さんに{電話|でんわ}しなきゃ。",
+        "en": "Okay. When we get back, I have to call my mum."
+      },
+      {
+        "role": "b",
+        "jp": "{電話|でんわ}は{短|みじか}くね。{今日|きょう}はゆっくり{寝|ね}なきゃだめだよ。",
+        "en": "Keep the call short. Today you have to get plenty of rest."
+      }
+    ]
   },
   "capstone": {
     "title": "Under the weather",

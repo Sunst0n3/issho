@@ -1,0 +1,131 @@
+{
+  "id": "st-l1-13",
+  "level": "L1",
+  "unit": 22,
+  "title": "The cat that comes to visit",
+  "titleJp": "{遊|あそ}びに{来|く}る{猫|ねこ}",
+  "topic": "animals",
+  "grammar": [
+    "to-conditional",
+    "you-ni-naru",
+    "you-da",
+    "nakutemo-ii",
+    "te-shimau",
+    "sou-looks",
+    "shi-reasons",
+    "ageru-morau",
+    "te-imasu",
+    "ni-iku-purpose"
+  ],
+  "sentences": [
+    {
+      "jp": "{去年|きょねん}の／{春|はる}、／{一匹|いっぴき}の／{白|しろ}い／{猫|ねこ}が／{庭|にわ}に／{来|き}ました。",
+      "en": "Last spring, a white cat came into the garden."
+    },
+    {
+      "jp": "{少|すこ}し／{太|ふと}った／{猫|ねこ}です。／{近所|きんじょ}の／{猫|ねこ}の／ようです。",
+      "en": "It was a slightly chubby cat. It seemed to be a cat from the neighbourhood."
+    },
+    {
+      "jp": "{最初|さいしょ}、／{猫|ねこ}は／{庭|にわ}の／{木|き}の／{下|した}で／{寝|ね}る／だけでした。",
+      "en": "At first, the cat just slept under the tree in the garden."
+    },
+    {
+      "jp": "ケンが／{窓|まど}を／{開|あ}けると、／すぐ／どこかへ／{行|い}ってしまいました。",
+      "en": "Whenever Ken opened the window, it ran off somewhere right away."
+    },
+    {
+      "jp": "でも、／ミキは／{毎朝|まいあさ}、／{猫|ねこ}に／「おはよう」と／{言|い}いました。",
+      "en": "But every morning, Miki said \"Good morning\" to the cat."
+    },
+    {
+      "jp": "{夏|なつ}に／なると、／{猫|ねこ}は／{毎日|まいにち}／{来|く}るように／なりました。",
+      "en": "When summer came, the cat started coming every day."
+    },
+    {
+      "jp": "{秋|あき}には、／{窓|まど}の／{前|まえ}で／{待|ま}つように／なりました。",
+      "en": "By autumn, it had started waiting in front of the window."
+    },
+    {
+      "jp": "ミキが／{窓|まど}を／{開|あ}けると、／{嬉|うれ}しそうに／ミキの／{顔|かお}を／{見|み}ます。",
+      "en": "When Miki opens the window, it looks up at her face happily."
+    },
+    {
+      "jp": "そして、／{冬|ふゆ}の／{寒|さむ}い／{日|ひ}、／{猫|ねこ}は／{初|はじ}めて／{家|いえ}の／{中|なか}に／{入|はい}ってきました。",
+      "en": "Then, on a cold winter day, the cat came inside the house for the first time."
+    },
+    {
+      "jp": "{猫|ねこ}は／こたつが／{大好|だいす}きな／ようです。",
+      "en": "The cat seems to love the kotatsu."
+    },
+    {
+      "jp": "こたつに／{入|はい}ると、／すぐ／{寝|ね}てしまいます。",
+      "en": "As soon as it gets under the kotatsu, it falls asleep."
+    },
+    {
+      "jp": "{二人|ふたり}は／{猫|ねこ}を／「ユキ」と／{呼|よ}ぶように／なりました。",
+      "en": "The two of them started calling the cat \"Yuki\" (Snow)."
+    },
+    {
+      "jp": "{白|しろ}くて、／{雪|ゆき}の／ようだからです。",
+      "en": "Because it is white, like snow."
+    },
+    {
+      "jp": "ある／{晩|ばん}、／ケンが／{言|い}いました。／「ユキに／{何|なに}か／{食|た}べ{物|もの}を／あげようか。」",
+      "en": "One evening, Ken said, \"Shall we give Yuki something to eat?\""
+    },
+    {
+      "jp": "「あげなくても／いいよ。／ユキは／{近所|きんじょ}の／{家|いえ}で／ご{飯|はん}を／もらっている／みたい。」",
+      "en": "\"We don't need to. Yuki seems to get fed at a house in the neighbourhood.\""
+    },
+    {
+      "jp": "「そうだね。／{太|ふと}っているしね。」",
+      "en": "\"True. She is chubby, after all.\""
+    },
+    {
+      "jp": "{春|はる}に／なって、／ミキは／{近所|きんじょ}の／おばあさんの／{家|いえ}の／{前|まえ}を／{通|とお}りました。",
+      "en": "When spring came, Miki walked past an old lady's house in the neighbourhood."
+    },
+    {
+      "jp": "{家|いえ}の／{前|まえ}に、／ユキが／いました。",
+      "en": "Yuki was in front of the house."
+    },
+    {
+      "jp": "「あ、／その／{猫|ねこ}…。」",
+      "en": "\"Oh, that cat...\""
+    },
+    {
+      "jp": "「うちの／{猫|ねこ}の／シロです。／{毎晩|まいばん}、／どこかへ／{行|い}くんですよ。」と／おばあさんが／{言|い}いました。",
+      "en": "\"This is our cat, Shiro. She goes off somewhere every night,\" the old lady said."
+    },
+    {
+      "jp": "ミキは／{笑|わら}って、／「{毎晩|まいばん}、／うちの／こたつで／{寝|ね}ていますよ。」と／{言|い}いました。",
+      "en": "Miki laughed and said, \"Every night, she's asleep under our kotatsu.\""
+    },
+    {
+      "jp": "「まあ！／すみません。」",
+      "en": "\"Oh my! I'm so sorry.\""
+    },
+    {
+      "jp": "「いいえ。／シロが／{来|く}ると、／うちは／とても／{楽|たの}しいんです。」",
+      "en": "\"Not at all. When Shiro comes, our home is lots of fun.\""
+    },
+    {
+      "jp": "{今|いま}も、／シロは／{毎晩|まいばん}／{遊|あそ}びに／{来|き}ます。",
+      "en": "Even now, Shiro comes to visit every night."
+    },
+    {
+      "jp": "でも、／ケンと／ミキは／まだ／「ユキ」と／{呼|よ}んでいます。",
+      "en": "But Ken and Miki still call her \"Yuki\"."
+    }
+  ],
+  "gist": {
+    "q": "Who does the white cat really belong to?",
+    "options": [
+      "Ken and Miki",
+      "An old lady in the neighbourhood",
+      "Nobody — it is a stray cat"
+    ],
+    "answer": 1
+  }
+}

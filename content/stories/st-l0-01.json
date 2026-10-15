@@ -1,0 +1,119 @@
+{
+  "id": "st-l0-01",
+  "level": "L0",
+  "unit": 6,
+  "title": "Curry or ramen?",
+  "titleJp": "カレーか、ラーメンか",
+  "topic": "food",
+  "grammar": [
+    "wa-desu",
+    "no-possession",
+    "mo-also",
+    "masu-forms",
+    "wo-object",
+    "ni-time-place",
+    "tai-want",
+    "arimasu-imasu",
+    "to-with",
+    "deshita",
+    "adverbs-frequency",
+    "ka-or-ni-suru",
+    "dictionary-form",
+    "suki-kirai"
+  ],
+  "sentences": [
+    {
+      "jp": "きんようびの／よるです。",
+      "en": "It's Friday night."
+    },
+    {
+      "jp": "ケンと／エマは／うちに／います。",
+      "en": "Ken and Emma are at home."
+    },
+    {
+      "jp": "「ケン、／ばんごはん、／なに／{食|た}べる？」",
+      "en": "\"Ken, what do you want for dinner?\""
+    },
+    {
+      "jp": "「カレー！」",
+      "en": "\"Curry!\""
+    },
+    {
+      "jp": "ケンは／カレーが／だいすきです。",
+      "en": "Ken loves curry."
+    },
+    {
+      "jp": "いつも／カレーを／{食|た}べます。",
+      "en": "He always eats curry."
+    },
+    {
+      "jp": "げつようびも／カレーでした。",
+      "en": "Monday was curry too."
+    },
+    {
+      "jp": "すいようびも／カレーでした。",
+      "en": "Wednesday was curry too."
+    },
+    {
+      "jp": "「また／カレー？」",
+      "en": "\"Curry again?\""
+    },
+    {
+      "jp": "エマも／カレーが／すきです。",
+      "en": "Emma likes curry too."
+    },
+    {
+      "jp": "でも、／{今日|きょう}は／ラーメンを／{食|た}べたいです。",
+      "en": "But today she wants to eat ramen."
+    },
+    {
+      "jp": "「{今日|きょう}は／ラーメンに／する？」",
+      "en": "\"Shall we have ramen today?\""
+    },
+    {
+      "jp": "「カレーか／ラーメンか…」",
+      "en": "\"Curry or ramen...\""
+    },
+    {
+      "jp": "「うん、／いいね。」",
+      "en": "\"Okay, sounds good.\""
+    },
+    {
+      "jp": "ふたりは／ラーメンの／{店|みせ}に／{行|い}きます。",
+      "en": "The two of them go to a ramen shop."
+    },
+    {
+      "jp": "メニューを／{見|み}ます。",
+      "en": "They look at the menu."
+    },
+    {
+      "jp": "「あ、／カレーラーメンが／ある！」",
+      "en": "\"Oh, they have curry ramen!\""
+    },
+    {
+      "jp": "ケンは／カレーラーメンに／します。",
+      "en": "Ken goes for the curry ramen."
+    },
+    {
+      "jp": "エマも／カレーラーメンに／します。",
+      "en": "Emma goes for the curry ramen too."
+    },
+    {
+      "jp": "「おいしい！」",
+      "en": "\"Delicious!\""
+    },
+    {
+      "jp": "ふたりは／わらいます。",
+      "en": "The two of them laugh."
+    }
+  ],
+  "gist": {
+    "q": "What do Ken and Emma eat in the end?",
+    "options": [
+      "Curry at home",
+      "Curry ramen at a ramen shop",
+      "Plain ramen at a ramen shop"
+    ],
+    "answer": 1
+  }
+}

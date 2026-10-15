@@ -1,0 +1,83 @@
+{
+  "id": "rp-u16",
+  "unit": 16,
+  "title": "Where shall we go?",
+  "titleJp": "どこに{行|い}く？",
+  "setting": "One evening on the sofa, you two plan a short trip for your next days off.",
+  "level": 2,
+  "register": "plain",
+  "targets": [
+    "grammar:tsumori",
+    "grammar:tte-quote",
+    "grammar:dake-shika",
+    "grammar:node",
+    "grammar:wa-contrast",
+    "core:cw-0877",
+    "core:cw-1059",
+    "core:cw-1084"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "ねえ、{今度|こんど}の{休|やす}み、どこか{行|い}かない？",
+      "en": "Hey, want to go somewhere on our next days off?",
+      "cue": "days off · go somewhere?"
+    },
+    {
+      "role": "b",
+      "jp": "いいね！{温泉|おんせん}に{行|い}って、のんびりしたいな。",
+      "en": "Sounds good! I'd like to go to a hot spring and just relax.",
+      "cue": "hot spring · relax"
+    },
+    {
+      "role": "a",
+      "jp": "{友達|ともだち}が、{山|やま}の{上|うえ}の{旅館|りょかん}がとてもよかったって{言|い}ってたよ。",
+      "en": "A friend said a ryokan up in the mountains was really good.",
+      "hint": "〜って いってた = \"(they) said that …\": って is casual と.",
+      "cue": "friend said · mountain ryokan · great"
+    },
+    {
+      "role": "b",
+      "jp": "でも、{今月|こんげつ}は{三万円|さんまんえん}しかないよ。",
+      "en": "But we've only got ¥30,000 this month.",
+      "hint": "しか always takes a negative verb: しか ない = \"only (and that's not much)\".",
+      "cue": "only · 30,000 yen · this month"
+    },
+    {
+      "role": "a",
+      "jp": "{平日|へいじつ}は{安|やす}いので、{二人|ふたり}で{二万五千円|にまんごせんえん}だけだよ。",
+      "en": "Weekdays are cheaper, so it's only ¥25,000 for the two of us.",
+      "hint": "へいじつは: は for contrast (weekdays, unlike weekends). ので gives the reason softly.",
+      "cue": "weekdays · cheaper · just 25,000"
+    },
+    {
+      "role": "b",
+      "jp": "ほんと？じゃあ、{何日|なんにち}{行|い}くつもり？",
+      "en": "Really? So how many days are you thinking?",
+      "cue": "really? · how many days?"
+    },
+    {
+      "role": "a",
+      "jp": "{仕事|しごと}が{忙|いそが}しいから、{一晩|ひとばん}だけにするつもり。",
+      "en": "Work's busy, so I'm planning on just one night.",
+      "hint": "〜つもり = a plan you have already decided on.",
+      "cue": "work busy · just one night"
+    },
+    {
+      "role": "b",
+      "jp": "わかった。じゃあ、{今夜|こんや}{予約|よやく}しよう！",
+      "en": "Got it. Let's book it tonight, then!",
+      "cue": "okay · book tonight"
+    }
+  ]
+}

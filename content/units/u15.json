@@ -11,16 +11,44 @@
     "ta-koto-ga-aru",
     "hou-ga-ii"
   ],
-  "coreWordCeiling": 995,
+  "coreWordCeiling": 1044,
   "canDos": [
     {
       "id": "u15-cd1",
       "text": "Understand a short weather forecast (sunny, rain later, the temperature) and decide what to take with you.",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Listen to tomorrow's weather forecast and answer the questions.",
+        "material": "{明日|あした}の{天気|てんき}です。{朝|あさ}は{晴|は}れですが、{午後|ごご}から{曇|くも}って、{夕方|ゆうがた}から{雨|あめ}が{降|ふ}ります。{夜|よる}は{風|かぜ}も{強|つよ}くなります。{最高|さいこう}{気温|きおん}は{十八度|じゅうはちど}です。{朝|あさ}と{夜|よる}は{十度|じゅうど}ぐらいで、{寒|さむ}くなります。{出|で}かけるときは、{傘|かさ}を{忘|わす}れないでください。{夜|よる}{出|で}かける{人|ひと}は、{温|あたた}かい{服|ふく}を{着|き}たほうがいいですよ。",
+        "questions": [
+          {
+            "q": "When will it start raining?",
+            "options": [
+              "In the morning",
+              "In the afternoon",
+              "In the evening"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "What's the highest temperature tomorrow?",
+            "options": [
+              "10 degrees",
+              "18 degrees",
+              "28 degrees"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "You'll be out until late. What should you take?",
+            "options": [
+              "An umbrella and warm clothes",
+              "Water and a hat",
+              "Just an umbrella"
+            ],
+            "answer": 0
+          }
+        ]
       }
     },
     {
@@ -28,10 +56,14 @@
       "text": "Plan your day around the weather and give your partner advice (go before the rain, take an umbrella, don't forget water).",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Here is today's forecast and your partner's (the AI's) plan for the day. Give them advice: what to do before the rain, what to do after it, and what to take. Then listen to their reply and answer it.",
+        "material": "{今日|きょう}の{天気|てんき}\n{朝|あさ}　{晴|は}れ　28{度|ど}\n{午後|ごご}{三時|さんじ}から　{雨|あめ}・{雷|かみなり}\n\n{今日|きょう}は{自転車|じてんしゃ}で{図書館|としょかん}に{行|い}って、{午後|ごご}は{公園|こうえん}を{走|はし}りたいんだ。どう{思|おも}う？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Gives advice with 〜たほうがいい or 〜ないほうがいい",
+          "Orders the day with 〜前に or 〜あとで (雨が降る前に図書館に行ったほうがいい)",
+          "Mentions something to take (傘, 水)"
+        ]
       }
     },
     {
@@ -39,10 +71,15 @@
       "text": "Write a few lines about your favourite season: what the weather is like and the things you do then.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "A Japanese friend sent you this message. Reply in four or five sentences about your favourite season.",
+        "material": "{日本|にほん}では、{季節|きせつ}の{話|はなし}をよくします。{一番|いちばん}{好|す}きな{季節|きせつ}はいつですか。その{季節|きせつ}は、どんな{天気|てんき}ですか。{何|なに}をしますか。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Names their favourite season (一番好きな季節は〜です)",
+          "Describes the weather then (暑い, 涼しい, 雪がたくさん降る)",
+          "Lists things they do with 〜たり〜たりします",
+          "Connects at least two sentences with から or けど"
+        ]
       }
     },
     {
@@ -50,10 +87,14 @@
       "text": "Ask each other about weather experiences (snow, typhoons, cherry blossoms) and tell your own.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "The AI asks about your weather experiences. Answer with 〜たことがあります／ありません and add one detail (when, where, what it was like). Then ask the AI one question of your own with 〜たことがありますか.",
+        "material": "1. {雪|ゆき}の{中|なか}を{歩|ある}いたことがありますか。\n2. {台風|たいふう}の{日|ひ}に{外|そと}に{出|で}たことがありますか。\n3. {日本|にほん}で{桜|さくら}を{見|み}たことがありますか。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Answers with 〜たことがあります／ありません",
+          "Adds one detail (when, where, what it was like)",
+          "Asks the AI one question with 〜たことがありますか"
+        ]
       }
     },
     {
@@ -61,9 +102,37 @@
       "text": "Read a weekend weather chart and a shopping list, and work out what to do before and after the rain.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Read your weekend forecast and your shared shopping list, then answer the questions.",
+        "material": "{週末|しゅうまつ}の{天気|てんき}\n{土曜日|どようび}　{午前|ごぜん}：{晴|は}れ　{午後|ごご}：{雨|あめ}（{二時|にじ}ごろから）　{夜|よる}には{止|や}みます\n{日曜日|にちようび}　{一日|いちにち}{晴|は}れ　{暑|あつ}い（32{度|ど}）\n\n{買|か}うもの\n・{米|こめ}　10キロ\n・{牛乳|ぎゅうにゅう}　2{本|ほん}\n・キャンプの{肉|にく}と{飲|の}み{物|もの}（{日曜日|にちようび}）\n※ {洗濯|せんたく}は{雨|あめ}が{降|ふ}る{前|まえ}に！",
+        "questions": [
+          {
+            "q": "When should you do the laundry?",
+            "options": [
+              "Saturday morning",
+              "Saturday afternoon",
+              "Saturday night"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "How many bottles of milk do you need to buy?",
+            "options": [
+              "One",
+              "Three",
+              "Two"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "Which day suits the camping trip, and what should you take plenty of?",
+            "options": [
+              "Saturday, umbrellas",
+              "Sunday, water",
+              "Sunday, warm clothes"
+            ],
+            "answer": 1
+          }
+        ]
       }
     }
   ],
@@ -72,17 +141,86 @@
     "id": "u15-task",
     "canDo": "u15-cd2",
     "goal": "Plan Saturday around the weather: agree what to do before and after the rain and what to take with you.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "What will you do before the rain, what will you do while it's raining, and what will you take when you go out in the evening?",
     "roles": {
       "a": "Has Saturday's hourly forecast (card A)",
       "b": "Has the list of errands and the plan for a picnic (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "Saturday's forecast (てんきよほう), card A:\n• 9:00 sunny (はれ), 20°\n• 12:00 cloudy (くもり), 22°\n• 14:00–18:00 rain (あめ) with thunder (かみなり) and strong wind (つよい かぜ)\n• 18:00 the rain stops (やむ); 16° at night, so it gets cold (さむく なる)\nYou don't know the plans for the day. Ask what your partner has planned, then give advice with 〜たほうが いい and 〜まえに／〜あとで.",
+    "infoB": "Your plans for Saturday, card B:\n• 1 p.m.: lunch in the park with your partner (こうえんで おべんとう)\n• Post office (ゆうびんきょく): send a parcel to your mum; it closes at 5 p.m.\n• Laundry (せんたく): it dries outside\n• 7 p.m.: dinner with friends at an izakaya (いざかや), a fifteen-minute walk away\nYou don't know the weather, so ask. Then agree on the order of the day and what to take (かさ, コート, みず).",
+    "targets": [
+      "grammar:mae-ni-ato-de",
+      "grammar:hou-ga-ii",
+      "grammar:tari-tari",
+      "grammar:counters-objects",
+      "core:cw-0995",
+      "core:cw-1002",
+      "core:cw-0998"
+    ],
+    "register": "plain",
+    "twist": "Repeat: the forecast has changed. The rain now comes in the morning (9:00–12:00), and the afternoon is sunny and hot (30°). Plan the day again.",
+    "scripted": [
+      {
+        "role": "b",
+        "jp": "{土曜日|どようび}の{天気|てんき}、どう？",
+        "en": "What's the weather doing on Saturday?"
+      },
+      {
+        "role": "a",
+        "jp": "{朝|あさ}は{晴|は}れだけど、{二時|にじ}ごろから{雨|あめ}が{降|ふ}るよ。{雷|かみなり}と{強|つよ}い{風|かぜ}も。",
+        "en": "It's sunny in the morning, but it'll rain from about two. With thunder and strong wind."
+      },
+      {
+        "role": "b",
+        "jp": "え、{一時|いちじ}に{公園|こうえん}でお{弁当|べんとう}を{食|た}べる{予定|よてい}だよ。",
+        "en": "Oh no, we're planning a picnic lunch in the park at one."
+      },
+      {
+        "role": "a",
+        "jp": "{雨|あめ}が{降|ふ}る{前|まえ}に、{十一時|じゅういちじ}ごろ{食|た}べたほうがいいよ。",
+        "en": "We'd better eat before the rain, around eleven."
+      },
+      {
+        "role": "b",
+        "jp": "そうだね。じゃあ、{洗濯|せんたく}は{出|で}かける{前|まえ}にしよう。",
+        "en": "True. Then let's do the laundry before we go out."
+      },
+      {
+        "role": "a",
+        "jp": "うん。{郵便局|ゆうびんきょく}は？",
+        "en": "Okay. What about the post office?"
+      },
+      {
+        "role": "b",
+        "jp": "{五時|ごじ}までだから、{公園|こうえん}から{帰|かえ}る{前|まえ}に{行|い}かない？",
+        "en": "It's open till five, so shall we go there on the way back from the park?"
+      },
+      {
+        "role": "a",
+        "jp": "いいね。{雨|あめ}のときは、{家|いえ}で{映画|えいが}を{見|み}たり、{本|ほん}を{読|よ}んだりしよう。",
+        "en": "Good. While it's raining, let's watch a film or read at home."
+      },
+      {
+        "role": "b",
+        "jp": "{雨|あめ}は{何時|なんじ}に{止|や}む？",
+        "en": "What time does the rain stop?"
+      },
+      {
+        "role": "a",
+        "jp": "{六時|ろくじ}ごろ{止|や}むけど、{夜|よる}は{十六度|じゅうろくど}で、{寒|さむ}くなるよ。",
+        "en": "Around six, but it gets cold at night. Sixteen degrees."
+      },
+      {
+        "role": "b",
+        "jp": "じゃあ、{居酒屋|いざかや}に{行|い}くとき、コートを{着|き}たほうがいいね。",
+        "en": "Then we'd better wear our coats when we go to the izakaya."
+      },
+      {
+        "role": "a",
+        "jp": "うん。{雨|あめ}が{止|や}んだあとで{出|で}かけるけど、{傘|かさ}も{一本|いっぽん}{持|も}っていこう。",
+        "en": "Yes. We're going out after the rain stops, but let's take an umbrella too."
+      }
+    ]
   },
   "capstone": {
     "title": "Our four seasons",

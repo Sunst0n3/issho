@@ -1,0 +1,1747 @@
+[
+  {
+    "id": "rp-greetings",
+    "unit": 2,
+    "title": "Good morning, neighbor",
+    "titleJp": "おはよう ございます",
+    "setting": "Two neighbors who haven't seen each other in a while meet outside one morning.",
+    "level": 1,
+    "register": "polite",
+    "targets": [
+      "core:cw-0018",
+      "core:cw-0861",
+      "core:cw-0167",
+      "core:cw-0180",
+      "core:cw-0032",
+      "core:cw-0450",
+      "core:cw-0159",
+      "grammar:wa-desu",
+      "grammar:ka-question",
+      "grammar:ne-yo"
+    ],
+    "roles": {
+      "a": {
+        "name": "Tanaka",
+        "nameJp": "たなか"
+      },
+      "b": {
+        "name": "Mori",
+        "nameJp": "もり"
+      }
+    },
+    "lines": [
+      {
+        "role": "a",
+        "jp": "あ、もりさん。おはよう ございます。",
+        "en": "Oh, Mori-san. Good morning.",
+        "hint": "Add さん to other people's names, never to your own.",
+        "cue": "oh · Mori · good morning"
+      },
+      {
+        "role": "b",
+        "jp": "たなかさん、おはよう ございます。おひさしぶり です。",
+        "en": "Tanaka-san, good morning. It's been a while.",
+        "hint": "おひさしぶり = long time no see. Use it after weeks, not days.",
+        "cue": "Tanaka · good morning · long time"
+      },
+      {
+        "role": "a",
+        "jp": "ほんとうに。おげんき ですか。",
+        "en": "It really has. How have you been?",
+        "hint": "げんき = well, healthy. The お makes it polite when asking about someone else.",
+        "cue": "really · are you well?"
+      },
+      {
+        "role": "b",
+        "jp": "はい、げんき です。たなかさんは？",
+        "en": "I'm well, thanks. And you?",
+        "hint": "Name + は？ bounces the question back; no need for \"you\".",
+        "cue": "yes · well · and you?"
+      },
+      {
+        "role": "a",
+        "jp": "おかげさまで、げんき です。",
+        "en": "I'm well too, thank you.",
+        "hint": "おかげさまで (\"thanks to you\") is a polite set phrase, not meant literally.",
+        "cue": "thanks to you · well"
+      },
+      {
+        "role": "b",
+        "jp": "きょうは いい てんき ですね。",
+        "en": "Lovely weather today, isn't it?",
+        "hint": "ね at the end invites agreement, like \"isn't it?\"",
+        "cue": "today · nice weather · isn’t it"
+      },
+      {
+        "role": "a",
+        "jp": "そうですね。あたたかい ですね。",
+        "en": "It is. Nice and warm.",
+        "hint": "そうですね = \"that's right\". The easiest way to agree.",
+        "cue": "agree · warm"
+      },
+      {
+        "role": "b",
+        "jp": "おでかけ ですか。",
+        "en": "Heading out?",
+        "hint": "Friendly small talk, not nosy. A vague answer is fine.",
+        "cue": "you · heading out?"
+      },
+      {
+        "role": "a",
+        "jp": "はい、ちょっと かいものに。",
+        "en": "Yes, just doing a bit of shopping.",
+        "hint": "The verb is left off the end. That is normal in conversation.",
+        "cue": "yes · a bit · shopping"
+      },
+      {
+        "role": "b",
+        "jp": "そうですか。おきを つけて。",
+        "en": "I see. Take care.",
+        "hint": "おきを つけて = take care. The お keeps it polite; to a partner just say きを つけて.",
+        "cue": "I see · take care"
+      },
+      {
+        "role": "a",
+        "jp": "ありがとう ございます。じゃあ、また。",
+        "en": "Thank you. See you.",
+        "hint": "じゃあ、また = see you (around).",
+        "cue": "thank you · see you"
+      },
+      {
+        "role": "b",
+        "jp": "はい、また。",
+        "en": "Yes, see you.",
+        "cue": "yes · see you"
+      }
+    ]
+  },
+  {
+    "id": "rp-introductions",
+    "unit": 5,
+    "title": "Nice to meet you",
+    "titleJp": "はじめまして",
+    "setting": "Two people meet for the first time at a friend's party and introduce themselves.",
+    "level": 1,
+    "register": "polite",
+    "targets": [
+      "core:cw-0042",
+      "core:cw-0043",
+      "core:cw-0109",
+      "core:cw-0089",
+      "core:cw-0432",
+      "core:cw-0080",
+      "core:cw-0090",
+      "core:cw-0188",
+      "grammar:wa-desu",
+      "grammar:ka-question",
+      "grammar:masu-past",
+      "grammar:masenka-mashou"
+    ],
+    "roles": {
+      "a": {
+        "name": "Sato",
+        "nameJp": "さとう"
+      },
+      "b": {
+        "name": "Sam",
+        "nameJp": "サム"
+      }
+    },
+    "lines": [
+      {
+        "role": "a",
+        "jp": "はじめまして。さとう です。",
+        "en": "Nice to meet you. I'm Sato.",
+        "hint": "Japanese people introduce themselves by family name.",
+        "cue": "nice to meet you · Sato"
+      },
+      {
+        "role": "b",
+        "jp": "はじめまして。サム です。",
+        "en": "Nice to meet you. I'm Sam.",
+        "hint": "Swap in your own name. Foreign names are written in katakana.",
+        "cue": "nice to meet you · Sam"
+      },
+      {
+        "role": "a",
+        "jp": "サムさんは どこから きましたか。",
+        "en": "Where are you from, Sam?",
+        "hint": "どこから = from where.",
+        "cue": "Sam · from where?"
+      },
+      {
+        "role": "b",
+        "jp": "アメリカから きました。",
+        "en": "I'm from America.",
+        "hint": "Swap in your country: カナダ, イギリス, オーストラリア…",
+        "cue": "from · America"
+      },
+      {
+        "role": "a",
+        "jp": "そうですか。にほんごが じょうず ですね。",
+        "en": "Oh, really? Your Japanese is good.",
+        "hint": "People say this a lot, sometimes after just one word!",
+        "cue": "I see · Japanese · good at"
+      },
+      {
+        "role": "b",
+        "jp": "いえいえ、まだまだ です。",
+        "en": "Oh no, I still have a long way to go.",
+        "hint": "The modest reply to a compliment. A simple ありがとう ございます is fine too.",
+        "cue": "oh no · long way to go"
+      },
+      {
+        "role": "a",
+        "jp": "おしごとは なん ですか。",
+        "en": "What do you do for work?",
+        "hint": "なに becomes なん before です.",
+        "cue": "your job · what?"
+      },
+      {
+        "role": "b",
+        "jp": "エンジニア です。さとうさんは？",
+        "en": "I'm an engineer. And you?",
+        "hint": "Swap in your own job.",
+        "cue": "engineer · and you?"
+      },
+      {
+        "role": "a",
+        "jp": "わたしは きょうし です。こうこうで えいごを おしえて います。",
+        "en": "I'm a teacher. I teach English at a high school.",
+        "hint": "Call your own job きょうし. Other people call a teacher せんせい.",
+        "cue": "teacher · high school · teach English"
+      },
+      {
+        "role": "b",
+        "jp": "え、そうですか！ じゃあ、こんど えいごで はなしましょう。",
+        "en": "Oh, really! Then let's chat in English sometime.",
+        "hint": "こんど = sometime soon. 〜ましょう = let's…",
+        "cue": "really! · sometime · talk in English"
+      },
+      {
+        "role": "a",
+        "jp": "いえいえ、にほんごで はなしましょう！ よろしく おねがいします。",
+        "en": "No, no, let's speak Japanese! Nice to meet you.",
+        "hint": "よろしく おねがいします closes every introduction.",
+        "cue": "no, no · in Japanese · nice to meet you"
+      },
+      {
+        "role": "b",
+        "jp": "こちらこそ、よろしく おねがいします。",
+        "en": "Likewise, nice to meet you.",
+        "hint": "こちらこそ = \"likewise\", the standard reply.",
+        "cue": "likewise · nice to meet you"
+      }
+    ]
+  },
+  {
+    "id": "rp-cafe",
+    "unit": 4,
+    "title": "At the café",
+    "titleJp": "カフェで",
+    "setting": "You two sit down at a small café and order drinks and something sweet.",
+    "level": 1,
+    "register": "polite",
+    "targets": [
+      "core:cw-0397",
+      "core:cw-0069",
+      "core:cw-0105",
+      "core:cw-0137",
+      "core:cw-0215",
+      "core:cw-0216",
+      "core:cw-0404",
+      "core:cw-0865",
+      "grammar:keigo-set-phrases",
+      "grammar:counters-people",
+      "grammar:counting-tsu",
+      "grammar:wo-kudasai"
+    ],
+    "roles": {
+      "a": {
+        "name": "Server",
+        "nameJp": "てんいん"
+      },
+      "b": {
+        "name": "Customer",
+        "nameJp": "おきゃくさん"
+      }
+    },
+    "lines": [
+      {
+        "role": "a",
+        "jp": "いらっしゃいませ。なんめいさま ですか。",
+        "en": "Welcome! How many in your party?",
+        "hint": "Staff greet every customer this way. You don't need to reply to いらっしゃいませ.",
+        "cue": "welcome · how many?"
+      },
+      {
+        "role": "b",
+        "jp": "ふたり です。",
+        "en": "Two.",
+        "hint": "ひとり = one person, ふたり = two people. Or just hold up fingers.",
+        "cue": "two · people"
+      },
+      {
+        "role": "a",
+        "jp": "こちらへ どうぞ。",
+        "en": "This way, please.",
+        "cue": "this way · please"
+      },
+      {
+        "role": "b",
+        "jp": "すみません。コーヒーを ふたつ ください。",
+        "en": "Excuse me. Two coffees, please.",
+        "hint": "ひとつ, ふたつ, みっつ count drinks and cakes.",
+        "cue": "excuse me · coffee · two · please"
+      },
+      {
+        "role": "a",
+        "jp": "ホット ですか、アイス ですか。",
+        "en": "Hot or iced?",
+        "hint": "ホット and アイス come from English \"hot\" and \"ice\".",
+        "cue": "hot · or iced?"
+      },
+      {
+        "role": "b",
+        "jp": "ひとつは ホット、ひとつは アイスで おねがいします。",
+        "en": "One hot and one iced, please.",
+        "hint": "Xで おねがいします = I'll go with X.",
+        "cue": "one hot · one iced · please"
+      },
+      {
+        "role": "a",
+        "jp": "ごちゅうもんは いじょうで よろしい ですか。",
+        "en": "Will that be everything?",
+        "hint": "A stock staff question. Listen for いじょう (\"that's all\").",
+        "cue": "your order · is that all?"
+      },
+      {
+        "role": "b",
+        "jp": "あ、この ケーキも ひとつ ください。",
+        "en": "Oh, and one of this cake, please.",
+        "hint": "Point at the menu and say この… (this…). It works anywhere.",
+        "cue": "oh · this cake · one too"
+      },
+      {
+        "role": "a",
+        "jp": "かしこまりました。",
+        "en": "Certainly.",
+        "hint": "The formal staff version of わかりました.",
+        "cue": "certainly · (staff)"
+      },
+      {
+        "role": "a",
+        "jp": "おまたせしました。コーヒーと ケーキ です。",
+        "en": "Thank you for waiting. Here are your coffees and cake.",
+        "hint": "Staff say おまたせしました (\"sorry to keep you waiting\") even after a short wait.",
+        "cue": "sorry to keep you waiting · coffee · cake"
+      },
+      {
+        "role": "b",
+        "jp": "ありがとう ございます。おいしそう！",
+        "en": "Thank you. That looks delicious!",
+        "hint": "おいしそう = looks tasty. おいしい = tastes good.",
+        "cue": "thank you · looks delicious"
+      },
+      {
+        "role": "a",
+        "jp": "ごゆっくり どうぞ。",
+        "en": "Enjoy, take your time.",
+        "hint": "A warm send-off from staff. A small nod is the perfect reply.",
+        "cue": "enjoy · take your time"
+      }
+    ]
+  },
+  {
+    "id": "rp-fruit",
+    "unit": 3,
+    "title": "Buying fruit",
+    "titleJp": "くだものを かう",
+    "setting": "At a neighborhood fruit stand, you ask about prices and buy mandarins and apples.",
+    "level": 1,
+    "register": "polite",
+    "targets": [
+      "core:cw-0333",
+      "core:cw-0332",
+      "core:cw-0177",
+      "core:cw-0212",
+      "core:cw-0337",
+      "core:cw-0217",
+      "core:cw-0214",
+      "core:cw-0355",
+      "grammar:numbers-prices",
+      "grammar:counting-tsu",
+      "grammar:wo-kudasai",
+      "grammar:ne-yo"
+    ],
+    "roles": {
+      "a": {
+        "name": "Shopkeeper",
+        "nameJp": "おみせの ひと"
+      },
+      "b": {
+        "name": "Customer",
+        "nameJp": "おきゃくさん"
+      }
+    },
+    "lines": [
+      {
+        "role": "a",
+        "jp": "いらっしゃいませ！ きょうは みかんが やすい ですよ。",
+        "en": "Welcome! The mandarins are cheap today.",
+        "hint": "よ at the end adds \"I'm telling you\": friendly sales talk.",
+        "cue": "welcome · mandarins · cheap today"
+      },
+      {
+        "role": "b",
+        "jp": "そうですか。この みかんは いくら ですか。",
+        "en": "Oh, really? How much are these mandarins?",
+        "hint": "いくら ですか = how much is it?",
+        "cue": "I see · these mandarins · how much?"
+      },
+      {
+        "role": "a",
+        "jp": "ひとふくろ さんびゃく えん です。",
+        "en": "300 yen a bag.",
+        "hint": "300 is さんびゃく: ひゃく changes to びゃく after さん.",
+        "cue": "one bag · 300 yen"
+      },
+      {
+        "role": "b",
+        "jp": "じゃあ、ひとふくろ ください。",
+        "en": "Then one bag, please.",
+        "hint": "じゃあ = \"well then\". It buys you a second to decide.",
+        "cue": "then · one bag · please"
+      },
+      {
+        "role": "a",
+        "jp": "ありがとう ございます。ほかに なにか いかが ですか。",
+        "en": "Thank you. Anything else?",
+        "hint": "いかが ですか = how about…? (polite)",
+        "cue": "thank you · anything else?"
+      },
+      {
+        "role": "b",
+        "jp": "りんごは いくら ですか。",
+        "en": "How much are the apples?",
+        "cue": "apples · how much?"
+      },
+      {
+        "role": "a",
+        "jp": "ひとつ ひゃくごじゅう えん です。あまくて おいしい ですよ。",
+        "en": "150 yen each. They're sweet and delicious.",
+        "hint": "あまくて = sweet and… The て form joins describing words.",
+        "cue": "150 yen each · sweet · delicious"
+      },
+      {
+        "role": "b",
+        "jp": "じゃあ、りんごを みっつ ください。",
+        "en": "Then three apples, please.",
+        "hint": "ひとつ, ふたつ, みっつ count fruit too.",
+        "cue": "then · three apples · please"
+      },
+      {
+        "role": "a",
+        "jp": "みっつ ですね。ぜんぶで ななひゃく ごじゅう えん です。",
+        "en": "Three, right. That's 750 yen altogether.",
+        "hint": "ぜんぶで = in total.",
+        "cue": "three · 750 yen in total"
+      },
+      {
+        "role": "b",
+        "jp": "はい、せん えんで おねがいします。",
+        "en": "Here, out of 1,000 yen, please.",
+        "hint": "Say this as you hand over a bill bigger than the price.",
+        "cue": "here · out of 1,000 yen"
+      },
+      {
+        "role": "a",
+        "jp": "せん えん おあずかり します。にひゃく ごじゅう えんの おかえし です。",
+        "en": "Out of 1,000 yen. Here's 250 yen change.",
+        "hint": "おかえし = your change. Shops always say the amounts out loud.",
+        "cue": "out of 1,000 · 250 yen change"
+      },
+      {
+        "role": "b",
+        "jp": "ありがとう ございます。",
+        "en": "Thank you.",
+        "cue": "thank you · (polite)"
+      },
+      {
+        "role": "a",
+        "jp": "まいど ありがとう ございました！",
+        "en": "Thanks, come again!",
+        "hint": "まいど (\"every time\") is a warm shopkeeper's thank-you.",
+        "cue": "thanks · come again"
+      }
+    ]
+  },
+  {
+    "id": "rp-time",
+    "unit": 9,
+    "title": "What time is it?",
+    "titleJp": "いま なんじ？",
+    "setting": "You're getting ready to catch a train, and one of you keeps checking the time.",
+    "level": 1,
+    "register": "plain",
+    "targets": [
+      "core:cw-0303",
+      "core:cw-0302",
+      "core:cw-0301",
+      "core:cw-0157",
+      "core:cw-0392",
+      "core:cw-0587",
+      "core:cw-0581",
+      "core:cw-0665",
+      "core:cw-0418",
+      "grammar:time-telling",
+      "grammar:casual-speech",
+      "grammar:position-words",
+      "grammar:kara-because"
+    ],
+    "roles": {
+      "a": {
+        "name": "Hikaru",
+        "nameJp": "ひかる"
+      },
+      "b": {
+        "name": "Aoi",
+        "nameJp": "あおい"
+      }
+    },
+    "lines": [
+      {
+        "role": "a",
+        "jp": "ねえ、いま なんじ？",
+        "en": "Hey, what time is it?",
+        "hint": "Casual: drop ですか and let your voice rise at the end.",
+        "cue": "hey · now · what time?"
+      },
+      {
+        "role": "b",
+        "jp": "えっと… しちじ はん。",
+        "en": "Um… half past seven.",
+        "hint": "はん = half past. 7 o'clock is しちじ, not ななじ.",
+        "cue": "um · half past seven"
+      },
+      {
+        "role": "a",
+        "jp": "えっ、もう？ でんしゃは なんじ？",
+        "en": "What, already? What time is the train?",
+        "hint": "もう = already.",
+        "cue": "already? · train · what time?"
+      },
+      {
+        "role": "b",
+        "jp": "はちじ じゅっぷん。",
+        "en": "8:10.",
+        "hint": "Minutes change sound: いっぷん, さんぷん, じゅっぷん.",
+        "cue": "eight · ten past"
+      },
+      {
+        "role": "a",
+        "jp": "あと よんじゅっぷん… だいじょうぶ かな。",
+        "en": "Forty minutes left… will we make it?",
+        "hint": "かな = \"I wonder\", for thinking out loud.",
+        "cue": "forty minutes left · will we make it?"
+      },
+      {
+        "role": "b",
+        "jp": "だいじょうぶ、だいじょうぶ。えきまで じゅうごふん だから。",
+        "en": "It's fine, it's fine. The station is only fifteen minutes away.",
+        "hint": "Saying だいじょうぶ twice sounds reassuring. だから = so, because.",
+        "cue": "fine, fine · station · 15 minutes"
+      },
+      {
+        "role": "a",
+        "jp": "あ、さいふ！ さいふは どこ？",
+        "en": "Oh, my wallet! Where's my wallet?",
+        "hint": "どこ = where.",
+        "cue": "oh · wallet · where?"
+      },
+      {
+        "role": "b",
+        "jp": "テーブルの うえ だよ。",
+        "en": "It's on the table.",
+        "hint": "Xの うえ = on top of X. だよ is a casual \"it is, you know\".",
+        "cue": "on · the table"
+      },
+      {
+        "role": "a",
+        "jp": "あった！ ありがとう。",
+        "en": "Found it! Thanks.",
+        "hint": "あった (\"it was there\") is what you say when you find something.",
+        "cue": "found it! · thanks"
+      },
+      {
+        "role": "b",
+        "jp": "もう しちじ よんじゅうごふん だよ。そろそろ いこう。",
+        "en": "It's already 7:45. We'd better get going.",
+        "hint": "そろそろ = it's about time. いこう = let's go (casual).",
+        "cue": "already 7:45 · time to go"
+      },
+      {
+        "role": "a",
+        "jp": "うん、いこう！",
+        "en": "Yeah, let's go!",
+        "cue": "yeah · let’s go"
+      },
+      {
+        "role": "b",
+        "jp": "かぎは？",
+        "en": "What about the keys?",
+        "hint": "Just noun + は？ asks \"what about…?\"",
+        "cue": "what about · the keys?"
+      },
+      {
+        "role": "a",
+        "jp": "もってる よ。よし、しゅっぱつ！",
+        "en": "I've got them. Okay, let's head out!",
+        "hint": "しゅっぱつ = departure. An upbeat \"we're off!\"",
+        "cue": "got them · okay · off we go"
+      }
+    ]
+  },
+  {
+    "id": "rp-goodnight",
+    "unit": 13,
+    "title": "Saying good night",
+    "titleJp": "おやすみ",
+    "setting": "It's late, and the two of you wrap up the evening and get ready for bed.",
+    "level": 1,
+    "register": "plain",
+    "targets": [
+      "core:cw-0231",
+      "core:cw-0184",
+      "core:cw-0183",
+      "core:cw-0185",
+      "core:cw-0579",
+      "core:cw-0274",
+      "core:cw-0054",
+      "core:cw-0020",
+      "grammar:casual-speech",
+      "grammar:casual-past",
+      "grammar:volitional",
+      "grammar:n-desu"
+    ],
+    "roles": {
+      "a": {
+        "name": "Hikaru",
+        "nameJp": "ひかる"
+      },
+      "b": {
+        "name": "Aoi",
+        "nameJp": "あおい"
+      }
+    },
+    "lines": [
+      {
+        "role": "a",
+        "jp": "あ、もう じゅういちじ だ。",
+        "en": "Oh, it's already eleven.",
+        "hint": "だ is the casual です.",
+        "cue": "oh · already eleven"
+      },
+      {
+        "role": "b",
+        "jp": "ほんとうだ。ねむい…",
+        "en": "You're right. I'm sleepy…",
+        "hint": "ねむい = sleepy. Feel free to stretch it out.",
+        "cue": "you’re right · sleepy"
+      },
+      {
+        "role": "a",
+        "jp": "あしたは なんじに おきる？",
+        "en": "What time are you getting up tomorrow?",
+        "hint": "なんじに = at what time.",
+        "cue": "tomorrow · get up · what time?"
+      },
+      {
+        "role": "b",
+        "jp": "ろくじ。あしたは はやいんだ。",
+        "en": "Six. I've got an early day tomorrow.",
+        "hint": "〜んだ explains a reason. Casual and warm.",
+        "cue": "six · early day tomorrow"
+      },
+      {
+        "role": "a",
+        "jp": "そうか。じゃあ、もう ねよう。",
+        "en": "I see. Let's go to bed, then.",
+        "hint": "ねよう = let's sleep (casual \"let's\" form).",
+        "cue": "I see · then · let’s sleep"
+      },
+      {
+        "role": "b",
+        "jp": "うん。でんき けして くれる？",
+        "en": "Okay. Can you turn off the light?",
+        "hint": "〜て くれる？ = will you… for me? A soft casual request.",
+        "cue": "okay · light off · for me?"
+      },
+      {
+        "role": "a",
+        "jp": "いいよ。めざまし かけた？",
+        "en": "Sure. Did you set the alarm?",
+        "hint": "めざまし = alarm clock. You かける (set) an alarm.",
+        "cue": "sure · alarm · set it?"
+      },
+      {
+        "role": "b",
+        "jp": "うん、かけた。",
+        "en": "Yeah, I set it.",
+        "cue": "yeah · set it"
+      },
+      {
+        "role": "a",
+        "jp": "きょうも いちにち おつかれさま。",
+        "en": "You worked hard again today.",
+        "hint": "おつかれさま thanks someone for their effort. Partners say it at the end of the day.",
+        "cue": "today too · all day · good work"
+      },
+      {
+        "role": "b",
+        "jp": "ありがとう。ひかるも おつかれさま。",
+        "en": "Thanks. You too, Hikaru.",
+        "hint": "Use your partner's name instead of あなた (you).",
+        "cue": "thanks · Hikaru · you too"
+      },
+      {
+        "role": "a",
+        "jp": "おやすみ。",
+        "en": "Good night.",
+        "hint": "Casual. To someone you'd be polite with: おやすみなさい.",
+        "cue": "good night · (casual)"
+      },
+      {
+        "role": "b",
+        "jp": "おやすみ。また あした。",
+        "en": "Good night. See you tomorrow.",
+        "hint": "また あした = see you tomorrow.",
+        "cue": "good night · see you tomorrow"
+      }
+    ]
+  },
+  {
+    "id": "rp-restaurant",
+    "unit": 4,
+    "title": "At a restaurant",
+    "titleJp": "{食堂|しょくどう}で",
+    "setting": "You two have lunch at a casual diner: get a table, order the set meal and pay.",
+    "level": 2,
+    "register": "polite",
+    "targets": [
+      "core:cw-0069",
+      "core:cw-0335",
+      "core:cw-0402",
+      "core:cw-0731",
+      "core:cw-0140",
+      "core:cw-0336",
+      "core:cw-0373",
+      "core:cw-0638",
+      "core:cw-0049",
+      "grammar:keigo-set-phrases",
+      "grammar:counters-people",
+      "grammar:counting-tsu",
+      "grammar:wo-kudasai"
+    ],
+    "roles": {
+      "a": {
+        "name": "Server",
+        "nameJp": "{店員|てんいん}"
+      },
+      "b": {
+        "name": "Customer",
+        "nameJp": "{客|きゃく}"
+      }
+    },
+    "lines": [
+      {
+        "role": "a",
+        "jp": "いらっしゃいませ。{何名様|なんめいさま}ですか。",
+        "en": "Welcome. How many in your party?",
+        "hint": "様 (さま) is an extra-polite さん that staff use for customers.",
+        "cue": "welcome · how many?"
+      },
+      {
+        "role": "b",
+        "jp": "{二人|ふたり}です。{窓際|まどぎわ}の{席|せき}は{空|あ}いていますか。",
+        "en": "Two. Is there a table free by the window?",
+        "hint": "空いています = is free (seats, rooms, time slots).",
+        "cue": "two · window seat · free?"
+      },
+      {
+        "role": "a",
+        "jp": "はい、こちらへどうぞ。メニューです。",
+        "en": "Yes, this way, please. Here's the menu.",
+        "cue": "this way · menu"
+      },
+      {
+        "role": "b",
+        "jp": "すみません、おすすめは{何|なん}ですか。",
+        "en": "Excuse me, what do you recommend?",
+        "hint": "おすすめ = recommendation. A great question anywhere.",
+        "cue": "excuse me · recommendation?"
+      },
+      {
+        "role": "a",
+        "jp": "{今日|きょう}の{定食|ていしょく}です。{焼|や}き{魚|ざかな}とご{飯|はん}とみそ{汁|しる}がついています。",
+        "en": "Today's set meal. It comes with grilled fish, rice and miso soup.",
+        "hint": "定食 (ていしょく) = a set meal, usually the best value. ついています = comes with.",
+        "cue": "today’s set meal · grilled fish · rice · miso soup"
+      },
+      {
+        "role": "b",
+        "jp": "じゃあ、それを{二|ふた}つください。",
+        "en": "Then two of those, please.",
+        "hint": "ふたつ works for ordering dishes, too.",
+        "cue": "then · two of those"
+      },
+      {
+        "role": "a",
+        "jp": "お{飲|の}み{物|もの}はいかがですか。",
+        "en": "Would you like anything to drink?",
+        "cue": "drinks · how about?"
+      },
+      {
+        "role": "b",
+        "jp": "{温|あたた}かいお{茶|ちゃ}を{二|ふた}つお{願|ねが}いします。",
+        "en": "Two hot teas, please.",
+        "hint": "Water (お水, おみず) is free in most restaurants.",
+        "cue": "hot tea · two · please"
+      },
+      {
+        "role": "a",
+        "jp": "かしこまりました。{少々|しょうしょう}お{待|ま}ちください。",
+        "en": "Certainly. Just a moment, please.",
+        "hint": "少々 (しょうしょう) is a polite ちょっと.",
+        "cue": "certainly · one moment"
+      },
+      {
+        "role": "b",
+        "jp": "すみません、お{会計|かいけい}お{願|ねが}いします。",
+        "en": "Excuse me, could we have the check?",
+        "hint": "You usually pay at the register by the door. No tipping in Japan.",
+        "cue": "excuse me · the bill · please"
+      },
+      {
+        "role": "a",
+        "jp": "はい。{全部|ぜんぶ}で{二千四百円|にせんよんひゃくえん}です。",
+        "en": "Sure. That's 2,400 yen altogether.",
+        "hint": "せん = 1,000 and ひゃく = 100. Prices are usually written with numerals: 2,400円.",
+        "cue": "altogether · 2,400 yen"
+      },
+      {
+        "role": "b",
+        "jp": "カードで{払|はら}えますか。",
+        "en": "Can I pay by card?",
+        "hint": "払えますか = can I pay? Small places may be cash only.",
+        "cue": "by card · can I pay?"
+      },
+      {
+        "role": "a",
+        "jp": "はい、{大丈夫|だいじょうぶ}です。ありがとうございました。",
+        "en": "Yes, that's fine. Thank you very much.",
+        "cue": "yes · that’s fine · thank you"
+      },
+      {
+        "role": "b",
+        "jp": "ごちそうさまでした。",
+        "en": "Thank you for the meal.",
+        "hint": "Say this to the staff on your way out. They'll love it.",
+        "cue": "thanks · for the meal"
+      }
+    ]
+  },
+  {
+    "id": "rp-station",
+    "unit": 14,
+    "title": "Asking the way at the station",
+    "titleJp": "{駅|えき}で{道|みち}を{聞|き}く",
+    "setting": "You ask a station attendant how to get to Asakusa and how to find Sensō-ji temple.",
+    "level": 2,
+    "register": "polite",
+    "targets": [
+      "core:cw-0392",
+      "core:cw-0284",
+      "core:cw-0670",
+      "core:cw-0981",
+      "core:cw-0771",
+      "core:cw-0770",
+      "core:cw-0427",
+      "core:cw-0744",
+      "core:cw-0763",
+      "grammar:tai-want",
+      "grammar:n-desu",
+      "grammar:duration-kakaru",
+      "grammar:te-form"
+    ],
+    "roles": {
+      "a": {
+        "name": "Traveler",
+        "nameJp": "{旅行者|りょこうしゃ}"
+      },
+      "b": {
+        "name": "Station attendant",
+        "nameJp": "{駅員|えきいん}"
+      }
+    },
+    "lines": [
+      {
+        "role": "a",
+        "jp": "すみません、ちょっといいですか。",
+        "en": "Excuse me, do you have a moment?",
+        "hint": "A polite way to stop someone before asking a question.",
+        "cue": "excuse me · got a moment?"
+      },
+      {
+        "role": "b",
+        "jp": "はい、どうしましたか。",
+        "en": "Yes, how can I help?",
+        "hint": "Literally \"what happened?\", a common way to offer help.",
+        "cue": "yes · how can I help?"
+      },
+      {
+        "role": "a",
+        "jp": "{浅草|あさくさ}に{行|い}きたいんですが、どの{電車|でんしゃ}に{乗|の}ればいいですか。",
+        "en": "I'd like to go to Asakusa. Which train should I take?",
+        "hint": "〜たいんですが softens a request: \"I'd like to…, but…\"",
+        "cue": "want to go · Asakusa · which train?"
+      },
+      {
+        "role": "b",
+        "jp": "{三番線|さんばんせん}の{電車|でんしゃ}です。",
+        "en": "The train on track 3.",
+        "hint": "番線 (ばんせん) = track or platform number.",
+        "cue": "track 3 · train"
+      },
+      {
+        "role": "a",
+        "jp": "{三番線|さんばんせん}ですね。どのくらいかかりますか。",
+        "en": "Track 3. How long does it take?",
+        "hint": "かかります = it takes (time or money).",
+        "cue": "track 3 · how long?"
+      },
+      {
+        "role": "b",
+        "jp": "{二十分|にじゅっぷん}ぐらいです。{乗|の}り{換|か}えはありません。",
+        "en": "About twenty minutes. No transfers.",
+        "hint": "ぐらい = about. 乗り換え (のりかえ) = a transfer.",
+        "cue": "about 20 minutes · no transfers"
+      },
+      {
+        "role": "a",
+        "jp": "よかった。{切符|きっぷ}はどこで{買|か}えますか。",
+        "en": "Great. Where can I buy a ticket?",
+        "hint": "買えますか = can I buy?",
+        "cue": "great · ticket · where to buy?"
+      },
+      {
+        "role": "b",
+        "jp": "あちらの{券売機|けんばいき}で{買|か}えます。カードも{使|つか}えますよ。",
+        "en": "At the ticket machines over there. You can also use a transit card.",
+        "hint": "券売機 (けんばいき) = ticket machine. Transit cards like Suica just tap through the gate.",
+        "cue": "machines over there · cards OK too"
+      },
+      {
+        "role": "a",
+        "jp": "{浅草駅|あさくさえき}から{浅草寺|せんそうじ}は{近|ちか}いですか。",
+        "en": "Is Sensō-ji close to Asakusa Station?",
+        "hint": "浅草寺 is read せんそうじ, though 浅草 alone is あさくさ. Names are tricky!",
+        "cue": "Sensō-ji · close to · Asakusa Station?"
+      },
+      {
+        "role": "b",
+        "jp": "はい。{一番出口|いちばんでぐち}を{出|で}て、まっすぐ{五分|ごふん}ぐらいです。",
+        "en": "Yes. Take Exit 1, then it's about five minutes straight ahead.",
+        "hint": "まっすぐ = straight ahead. Right is 右 (みぎ), left is 左 (ひだり).",
+        "cue": "Exit 1 · straight · about 5 minutes"
+      },
+      {
+        "role": "a",
+        "jp": "{一番出口|いちばんでぐち}から、まっすぐ{五分|ごふん}。わかりました。",
+        "en": "Exit 1, five minutes straight. Got it.",
+        "hint": "Repeating directions back is natural and polite.",
+        "cue": "Exit 1 · straight · 5 minutes · got it"
+      },
+      {
+        "role": "b",
+        "jp": "お{気|き}をつけて。",
+        "en": "Have a safe trip.",
+        "hint": "お気をつけて = take care, have a safe trip.",
+        "cue": "take care · safe trip"
+      },
+      {
+        "role": "a",
+        "jp": "ありがとうございました。",
+        "en": "Thank you very much.",
+        "cue": "thank you · very much"
+      }
+    ]
+  },
+  {
+    "id": "rp-konbini",
+    "unit": 8,
+    "title": "At the convenience store",
+    "titleJp": "コンビニで",
+    "setting": "You buy a bento and a drink at the register, and the clerk asks the usual questions.",
+    "level": 2,
+    "register": "polite",
+    "targets": [
+      "core:cw-0344",
+      "core:cw-0725",
+      "core:cw-0338",
+      "core:cw-0337",
+      "core:cw-0024",
+      "core:cw-0203",
+      "core:cw-0638",
+      "core:cw-1042",
+      "grammar:keigo-set-phrases",
+      "grammar:wo-kudasai",
+      "grammar:te-kudasai"
+    ],
+    "roles": {
+      "a": {
+        "name": "Clerk",
+        "nameJp": "{店員|てんいん}"
+      },
+      "b": {
+        "name": "Customer",
+        "nameJp": "{客|きゃく}"
+      }
+    },
+    "lines": [
+      {
+        "role": "a",
+        "jp": "いらっしゃいませ。お{弁当|べんとう}は{温|あたた}めますか。",
+        "en": "Hello. Would you like your bento heated up?",
+        "hint": "Clerks will microwave a bento for you. Just say はい.",
+        "cue": "welcome · bento · heat it up?"
+      },
+      {
+        "role": "b",
+        "jp": "はい、お{願|ねが}いします。あと、このお{茶|ちゃ}も。",
+        "en": "Yes, please. And this tea too.",
+        "hint": "あと = and also, one more thing.",
+        "cue": "yes please · this tea too"
+      },
+      {
+        "role": "a",
+        "jp": "かしこまりました。お{箸|はし}はおつけしますか。",
+        "en": "Certainly. Would you like chopsticks?",
+        "hint": "Very polite clerk talk. Just answer はい or いいえ.",
+        "cue": "certainly · chopsticks?"
+      },
+      {
+        "role": "b",
+        "jp": "はい。それと、からあげも{一|ひと}つください。",
+        "en": "Yes. Oh, and one karaage, please.",
+        "hint": "からあげ (fried chicken) waits by the register in most stores.",
+        "cue": "yes · and · one karaage"
+      },
+      {
+        "role": "a",
+        "jp": "からあげですね。{袋|ふくろ}はご{利用|りよう}ですか。",
+        "en": "One karaage. Do you need a bag?",
+        "hint": "Bags cost a few yen, so clerks always ask.",
+        "cue": "karaage · need a bag?"
+      },
+      {
+        "role": "b",
+        "jp": "いいえ、{大丈夫|だいじょうぶ}です。",
+        "en": "No, I'm fine.",
+        "hint": "大丈夫です (だいじょうぶです) is a polite \"no thanks\".",
+        "cue": "no · I’m fine"
+      },
+      {
+        "role": "a",
+        "jp": "{合計|ごうけい}で{八百二十円|はっぴゃくにじゅうえん}です。",
+        "en": "That comes to 820 yen.",
+        "hint": "800 is はっぴゃく, another sound change.",
+        "cue": "total · 820 yen"
+      },
+      {
+        "role": "b",
+        "jp": "スマホで{払|はら}えますか。",
+        "en": "Can I pay with my phone?",
+        "hint": "スマホ = smartphone.",
+        "cue": "by phone · can I pay?"
+      },
+      {
+        "role": "a",
+        "jp": "はい。こちらにタッチしてください。",
+        "en": "Yes. Please tap here.",
+        "hint": "タッチ = tap, touch (from English).",
+        "cue": "yes · tap here"
+      },
+      {
+        "role": "b",
+        "jp": "はい…できました。",
+        "en": "Okay… done.",
+        "hint": "できました = it's done, it worked.",
+        "cue": "okay · done"
+      },
+      {
+        "role": "a",
+        "jp": "レシートはご{入用|いりよう}ですか。",
+        "en": "Do you need the receipt?",
+        "hint": "ご入用 (ごいりよう) = needed. A stock clerk phrase you'll hear daily.",
+        "cue": "receipt · need it?"
+      },
+      {
+        "role": "b",
+        "jp": "いいえ、けっこうです。",
+        "en": "No, thank you.",
+        "hint": "けっこうです = no thank you. A small wave of the hand makes it clear.",
+        "cue": "no · thank you (refusing)"
+      },
+      {
+        "role": "a",
+        "jp": "ありがとうございました。またお{越|こ}しくださいませ。",
+        "en": "Thank you very much. Please come again.",
+        "hint": "Formal shop talk. A nod is all you need.",
+        "cue": "thank you · come again"
+      }
+    ]
+  },
+  {
+    "id": "rp-weekend",
+    "unit": 21,
+    "title": "Weekend plans",
+    "titleJp": "{週末|しゅうまつ}の{予定|よてい}",
+    "setting": "Over dinner on Thursday, you two decide what to do this weekend.",
+    "level": 2,
+    "register": "plain",
+    "targets": [
+      "core:cw-0206",
+      "core:cw-0996",
+      "core:cw-0409",
+      "core:cw-0344",
+      "core:cw-0805",
+      "core:cw-0443",
+      "core:cw-0280",
+      "core:cw-0202",
+      "grammar:tara-conditional",
+      "grammar:tte-quote",
+      "grammar:volitional",
+      "grammar:nakereba-naranai",
+      "grammar:te-oku"
+    ],
+    "roles": {
+      "a": {
+        "name": "Hikaru",
+        "nameJp": "ひかる"
+      },
+      "b": {
+        "name": "Aoi",
+        "nameJp": "あおい"
+      }
+    },
+    "lines": [
+      {
+        "role": "a",
+        "jp": "ねえ、{週末|しゅうまつ}、{何|なに}かしたい？",
+        "en": "Hey, do you want to do anything this weekend?",
+        "hint": "Casual questions simply rise at the end; no か needed.",
+        "cue": "hey · weekend · want to do something?"
+      },
+      {
+        "role": "b",
+        "jp": "うん！{天気|てんき}がよかったら、{公園|こうえん}に{行|い}きたいな。",
+        "en": "Yeah! If the weather's nice, I'd like to go to the park.",
+        "hint": "〜たら = if, when. な at the end softens a wish.",
+        "cue": "yeah · if it’s nice · park"
+      },
+      {
+        "role": "a",
+        "jp": "いいね。{土曜日|どようび}は{晴|は}れるって。",
+        "en": "Sounds good. They say Saturday will be sunny.",
+        "hint": "〜って = \"they say\" (casual quoting).",
+        "cue": "sounds good · Saturday · sunny, they say"
+      },
+      {
+        "role": "b",
+        "jp": "じゃあ、{土曜日|どようび}はお{弁当|べんとう}を{持|も}って{行|い}こうか。",
+        "en": "Then shall we take a packed lunch on Saturday?",
+        "hint": "〜ようか = shall we…? A casual suggestion.",
+        "cue": "then · Saturday · take a packed lunch?"
+      },
+      {
+        "role": "a",
+        "jp": "ピクニック！{楽|たの}しそう。{何|なに}を{作|つく}る？",
+        "en": "A picnic! Sounds fun. What should we make?",
+        "hint": "楽しそう (たのしそう) = looks fun, sounds fun.",
+        "cue": "picnic! · sounds fun · make what?"
+      },
+      {
+        "role": "b",
+        "jp": "おにぎりと{卵|たまご}{焼|や}き。",
+        "en": "Rice balls and rolled omelet.",
+        "hint": "Both are classic bento food.",
+        "cue": "rice balls · rolled omelet"
+      },
+      {
+        "role": "a",
+        "jp": "いいね。{日曜日|にちようび}は？",
+        "en": "Nice. And Sunday?",
+        "cue": "nice · and Sunday?"
+      },
+      {
+        "role": "b",
+        "jp": "{日曜日|にちようび}はゆっくりしたい。{家|いえ}で{映画|えいが}でも{見|み}ない？",
+        "en": "On Sunday I want to take it easy. Want to watch a movie at home or something?",
+        "hint": "〜でも = \"…or something\". 見ない？ (\"won't we watch?\") is a casual invitation.",
+        "cue": "Sunday · take it easy · movie at home?"
+      },
+      {
+        "role": "a",
+        "jp": "{賛成|さんせい}！ポップコーンも{買|か}っておくね。",
+        "en": "Agreed! I'll pick up some popcorn.",
+        "hint": "〜ておく = do something ahead of time.",
+        "cue": "agreed! · popcorn · get it ahead"
+      },
+      {
+        "role": "b",
+        "jp": "ありがとう。あ、{日曜日|にちようび}の{夜|よる}はお{母|かあ}さんに{電話|でんわ}しなきゃ。",
+        "en": "Thanks. Oh, I have to call my mom on Sunday night.",
+        "hint": "〜なきゃ = I have to… (casual). To your partner, your mom is お母さん; 母 (はは) is for outsiders.",
+        "cue": "thanks · Sunday night · must call Mom"
+      },
+      {
+        "role": "a",
+        "jp": "そうだね。じゃあ、{映画|えいが}は{昼|ひる}にしよう。",
+        "en": "Right. Then let's watch the movie in the afternoon.",
+        "hint": "〜にしよう = let's go with…, let's make it…",
+        "cue": "right · then · movie in the daytime"
+      },
+      {
+        "role": "b",
+        "jp": "うん、{決|き}まりだね。",
+        "en": "Okay, it's settled.",
+        "hint": "決まり (きまり) = decided. A satisfying way to close plans.",
+        "cue": "yeah · it’s settled"
+      }
+    ]
+  },
+  {
+    "id": "rp-doctor",
+    "unit": 17,
+    "title": "At the doctor",
+    "titleJp": "{病院|びょういん}で",
+    "setting": "You've had a cold for a few days and describe your symptoms to a doctor.",
+    "level": 2,
+    "register": "polite",
+    "targets": [
+      "core:cw-0791",
+      "core:cw-0368",
+      "core:cw-0372",
+      "core:cw-0797",
+      "core:cw-1408",
+      "core:cw-0369",
+      "core:cw-0370",
+      "core:cw-0282",
+      "core:cw-0864",
+      "grammar:ga-subject",
+      "grammar:kara-made",
+      "grammar:te-kudasai",
+      "grammar:temo-ii"
+    ],
+    "roles": {
+      "a": {
+        "name": "Doctor",
+        "nameJp": "{医者|いしゃ}"
+      },
+      "b": {
+        "name": "Patient",
+        "nameJp": "{患者|かんじゃ}"
+      }
+    },
+    "lines": [
+      {
+        "role": "a",
+        "jp": "{今日|きょう}はどうしましたか。",
+        "en": "What brings you in today?",
+        "hint": "Doctors open with this. Literally \"what happened today?\"",
+        "cue": "today · what’s wrong?"
+      },
+      {
+        "role": "b",
+        "jp": "{三日|みっか}{前|まえ}から{喉|のど}が{痛|いた}いです。",
+        "en": "My throat has been sore for three days.",
+        "hint": "Xが痛いです = X hurts. 三日 is みっか (three days).",
+        "cue": "three days · sore throat"
+      },
+      {
+        "role": "a",
+        "jp": "{熱|ねつ}はありますか。",
+        "en": "Do you have a fever?",
+        "cue": "fever · do you have one?"
+      },
+      {
+        "role": "b",
+        "jp": "はい、{昨日|きのう}の{夜|よる}は{三十八度|さんじゅうはちど}ありました。",
+        "en": "Yes, last night it was 38 degrees.",
+        "hint": "Japan uses Celsius. 38°C is about 100°F.",
+        "cue": "yes · last night · 38 degrees"
+      },
+      {
+        "role": "a",
+        "jp": "せきは{出|で}ますか。",
+        "en": "Are you coughing?",
+        "hint": "せき = cough. You say a cough \"comes out\" (出ます, でます).",
+        "cue": "coughing · at all?"
+      },
+      {
+        "role": "b",
+        "jp": "{少|すこ}し{出|で}ます。{鼻水|はなみず}も{出|で}ます。",
+        "en": "A little. I have a runny nose too.",
+        "hint": "鼻水 (はなみず) = runny nose, literally \"nose water\".",
+        "cue": "a little · runny nose too"
+      },
+      {
+        "role": "a",
+        "jp": "ちょっと{口|くち}を{開|あ}けてください。…はい、いいですよ。",
+        "en": "Please open your mouth a little… Okay, that's fine.",
+        "hint": "〜てください = please do…",
+        "cue": "open your mouth · okay"
+      },
+      {
+        "role": "b",
+        "jp": "どうですか。",
+        "en": "How does it look?",
+        "cue": "how · does it look?"
+      },
+      {
+        "role": "a",
+        "jp": "{風邪|かぜ}ですね。お{薬|くすり}を{出|だ}しておきます。",
+        "en": "It's a cold. I'll give you some medicine.",
+        "hint": "風邪 is read かぜ as a whole word, a special reading.",
+        "cue": "a cold · I’ll give you medicine"
+      },
+      {
+        "role": "b",
+        "jp": "{仕事|しごと}に{行|い}ってもいいですか。",
+        "en": "Is it okay for me to go to work?",
+        "hint": "〜てもいいですか = may I…?",
+        "cue": "work · okay to go?"
+      },
+      {
+        "role": "a",
+        "jp": "{二|に}、{三日|さんにち}は{家|いえ}で{休|やす}んでください。",
+        "en": "Please rest at home for two or three days.",
+        "hint": "二、三日 (にさんにち) = two or three days.",
+        "cue": "two or three days · rest at home"
+      },
+      {
+        "role": "b",
+        "jp": "わかりました。ありがとうございます。",
+        "en": "Understood. Thank you.",
+        "cue": "understood · thank you"
+      },
+      {
+        "role": "a",
+        "jp": "お{大事|だいじ}に。",
+        "en": "Take care of yourself.",
+        "hint": "The standard \"get well soon\" for anyone who is sick.",
+        "cue": "take care · get well"
+      }
+    ]
+  },
+  {
+    "id": "rp-hotel",
+    "unit": 24,
+    "title": "Hotel check-in mix-up",
+    "titleJp": "ホテルのチェックイン",
+    "setting": "You check in, but the hotel has your booking as one night instead of two, and the clerk sorts it out.",
+    "level": 3,
+    "register": "polite",
+    "targets": [
+      "core:cw-0728",
+      "core:cw-0289",
+      "core:cw-0672",
+      "core:cw-1514",
+      "core:cw-0559",
+      "core:cw-1513",
+      "core:cw-1138",
+      "core:cw-1241",
+      "grammar:keigo-set-phrases",
+      "grammar:keigo-verbs",
+      "grammar:n-desu",
+      "grammar:ba-conditional"
+    ],
+    "roles": {
+      "a": {
+        "name": "Front desk",
+        "nameJp": "フロント{係|がかり}"
+      },
+      "b": {
+        "name": "Guest",
+        "nameJp": "{客|きゃく}"
+      }
+    },
+    "lines": [
+      {
+        "role": "a",
+        "jp": "いらっしゃいませ。チェックインでございますか。",
+        "en": "Good afternoon. Are you checking in?",
+        "hint": "でございます is the hotel-polite version of です.",
+        "cue": "welcome · checking in?"
+      },
+      {
+        "role": "b",
+        "jp": "はい。{予約|よやく}しているスミスです。",
+        "en": "Yes. I have a reservation under Smith.",
+        "hint": "Swap in your own family name. 予約している = who has a reservation.",
+        "cue": "yes · booking · Smith"
+      },
+      {
+        "role": "a",
+        "jp": "スミス{様|さま}ですね。{少々|しょうしょう}お{待|ま}ちください。…{本日|ほんじつ}から{一泊|いっぱく}、ダブルのお{部屋|へや}でございますね。",
+        "en": "Mr. or Ms. Smith. One moment, please… A double room for one night from today, correct?",
+        "hint": "本日 (ほんじつ) is the formal word for 今日. 一泊 (いっぱく) = one night's stay.",
+        "cue": "Smith · one moment · one night · double room"
+      },
+      {
+        "role": "b",
+        "jp": "え？{二泊|にはく}で{予約|よやく}したんですが…。",
+        "en": "Oh? I booked two nights…",
+        "hint": "〜んですが raises a problem gently, without sounding angry.",
+        "cue": "huh? · booked · two nights"
+      },
+      {
+        "role": "a",
+        "jp": "{大変|たいへん}{失礼|しつれい}いたしました。{確認|かくにん}いたします。",
+        "en": "I'm terribly sorry. Let me check.",
+        "hint": "いたします is the humble します. Hotel staff use it constantly.",
+        "cue": "terribly sorry · let me check"
+      },
+      {
+        "role": "b",
+        "jp": "これが{予約|よやく}の{確認|かくにん}メールです。",
+        "en": "Here's my booking confirmation email.",
+        "hint": "Hold out your phone and say これが…",
+        "cue": "this · booking confirmation email"
+      },
+      {
+        "role": "a",
+        "jp": "ありがとうございます。…{確|たし}かに{二泊|にはく}ですね。こちらのミスでございます。{申|もう}し{訳|わけ}ございません。",
+        "en": "Thank you… You're right, it's two nights. The mistake was ours. We sincerely apologize.",
+        "hint": "申し訳ございません (もうしわけございません) is the most formal apology you'll hear.",
+        "cue": "two nights indeed · our mistake · so sorry"
+      },
+      {
+        "role": "b",
+        "jp": "いえいえ。{部屋|へや}は{大丈夫|だいじょうぶ}ですか。",
+        "en": "That's all right. Is there still a room for us?",
+        "hint": "大丈夫ですか (\"is it okay?\") covers \"is it still available?\" too.",
+        "cue": "that’s okay · is the room okay?"
+      },
+      {
+        "role": "a",
+        "jp": "はい。ただ、{明日|みょうにち}の{夜|よる}は{同|おな}じお{部屋|へや}が{空|あ}いておりません。",
+        "en": "Yes. However, the same room isn't available tomorrow night.",
+        "hint": "Staff read 明日 as みょうにち, the formal reading of あした.",
+        "cue": "however · tomorrow night · same room not free"
+      },
+      {
+        "role": "b",
+        "jp": "そうですか…。じゃあ、どうすればいいですか。",
+        "en": "I see… So what should we do?",
+        "hint": "どうすればいいですか = what should I do?",
+        "cue": "I see · what should we do?"
+      },
+      {
+        "role": "a",
+        "jp": "よろしければ、{二泊|にはく}とも{上|うえ}の{階|かい}の{広|ひろ}いお{部屋|へや}をご{用意|ようい}できますが、いかがでしょうか。{料金|りょうきん}は{変|か}わりません。",
+        "en": "If you like, we can give you a larger room on a higher floor for both nights. How would that be? The price stays the same.",
+        "hint": "よろしければ = if it suits you, a polite offer.",
+        "cue": "if you like · bigger room upstairs · same price"
+      },
+      {
+        "role": "b",
+        "jp": "{本当|ほんとう}ですか。ありがとうございます、{助|たす}かります。",
+        "en": "Really? Thank you, that's a big help.",
+        "hint": "助かります (たすかります) = \"that really helps me\", a warm thank-you.",
+        "cue": "really? · thank you · big help"
+      },
+      {
+        "role": "a",
+        "jp": "こちらがカードキーです。{朝食|ちょうしょく}は{七時|しちじ}から、{二階|にかい}のレストランでございます。",
+        "en": "Here is your key card. Breakfast is from 7:00 in the restaurant on the second floor.",
+        "hint": "七時 is しちじ. Japan counts the ground floor as the first floor.",
+        "cue": "key card · breakfast from 7 · 2nd floor"
+      },
+      {
+        "role": "b",
+        "jp": "わかりました。お{世話|せわ}になります。",
+        "en": "Got it. Thank you for having us.",
+        "hint": "お世話になります (\"we'll be in your care\") is perfect when checking in.",
+        "cue": "got it · in your care"
+      }
+    ]
+  },
+  {
+    "id": "rp-trip",
+    "unit": 18,
+    "title": "Planning a trip together",
+    "titleJp": "{旅行|りょこう}の{計画|けいかく}",
+    "setting": "You two plan a long-weekend trip to Kyoto: how to get there and where to stay.",
+    "level": 3,
+    "register": "plain",
+    "targets": [
+      "core:cw-1306",
+      "core:cw-1397",
+      "core:cw-0644",
+      "core:cw-1060",
+      "core:cw-1059",
+      "core:cw-0877",
+      "core:cw-0728",
+      "core:cw-0447",
+      "grammar:kedo-but",
+      "grammar:volitional",
+      "grammar:dake-shika",
+      "grammar:te-miru",
+      "grammar:kamoshirenai"
+    ],
+    "roles": {
+      "a": {
+        "name": "Hikaru",
+        "nameJp": "ひかる"
+      },
+      "b": {
+        "name": "Aoi",
+        "nameJp": "あおい"
+      }
+    },
+    "lines": [
+      {
+        "role": "a",
+        "jp": "ねえ、{来月|らいげつ}の{連休|れんきゅう}、どこか{行|い}かない？",
+        "en": "Hey, want to go somewhere over the long weekend next month?",
+        "hint": "連休 (れんきゅう) = days off in a row, a long weekend.",
+        "cue": "hey · long weekend next month · go somewhere?"
+      },
+      {
+        "role": "b",
+        "jp": "いいね！{前|まえ}から{京都|きょうと}に{行|い}ってみたかったんだ。",
+        "en": "Sounds great! I've wanted to go to Kyoto for a while.",
+        "hint": "〜てみたかった = have wanted to try… んだ adds feeling.",
+        "cue": "great! · always wanted · try Kyoto"
+      },
+      {
+        "role": "a",
+        "jp": "{京都|きょうと}か。{紅葉|こうよう}の{季節|きせつ}だから、{混|こ}んでるかもしれないね。",
+        "en": "Kyoto, huh. It's autumn-leaves season, so it might be crowded.",
+        "hint": "かもしれない = might, maybe. 混んでる (こんでる) = crowded.",
+        "cue": "Kyoto · autumn leaves · might be crowded"
+      },
+      {
+        "role": "b",
+        "jp": "{朝|あさ}{早|はや}く{出|で}れば{大丈夫|だいじょうぶ}だよ。{新幹線|しんかんせん}で{行|い}こうよ。",
+        "en": "We'll be fine if we leave early. Let's take the shinkansen.",
+        "hint": "〜ば = if. で marks how you travel.",
+        "cue": "leave early · we’ll be fine · shinkansen"
+      },
+      {
+        "role": "a",
+        "jp": "{新幹線|しんかんせん}は{速|はや}いけど、{高|たか}いよね。{夜行|やこう}バスはどう？",
+        "en": "The shinkansen is fast, but it's expensive. What about a night bus?",
+        "hint": "けど = but (casual). 夜行バス (やこうバス) = overnight bus, cheap but tiring.",
+        "cue": "shinkansen fast · but expensive · night bus?"
+      },
+      {
+        "role": "b",
+        "jp": "え〜、バスは{疲|つか}れるから{嫌|いや}だな。",
+        "en": "Ugh, buses are so tiring. I'd rather not.",
+        "hint": "嫌だな (いやだな) = I'd rather not. Soft but clear.",
+        "cue": "ugh · buses tiring · rather not"
+      },
+      {
+        "role": "a",
+        "jp": "わかった。じゃあ、{新幹線|しんかんせん}にしよう。{泊|と}まるところは？",
+        "en": "Okay, shinkansen it is. Where should we stay?",
+        "hint": "泊まる (とまる) = stay overnight. ところ = place.",
+        "cue": "okay · shinkansen · where to stay?"
+      },
+      {
+        "role": "b",
+        "jp": "{旅館|りょかん}がいいな。{温泉|おんせん}があるところ。",
+        "en": "I'd love a ryokan. One with a hot spring.",
+        "hint": "旅館 (りょかん) = a traditional inn, often with dinner and a big bath.",
+        "cue": "ryokan · with a hot spring"
+      },
+      {
+        "role": "a",
+        "jp": "いいね。でも、{旅館|りょかん}はちょっと{高|たか}いよ。{一泊|いっぱく}だけにする？",
+        "en": "Nice. But ryokan are a bit pricey. Just one night there?",
+        "hint": "だけ = only.",
+        "cue": "nice · but pricey · just one night?"
+      },
+      {
+        "role": "b",
+        "jp": "うん。{一泊|いっぱく}は{旅館|りょかん}、もう{一泊|いっぱく}はホテルにしよう。",
+        "en": "Yeah. One night at a ryokan and the other at a hotel.",
+        "hint": "もう一泊 (もういっぱく) = one more night.",
+        "cue": "yeah · one night ryokan · one night hotel"
+      },
+      {
+        "role": "a",
+        "jp": "{賛成|さんせい}。じゃあ、{今夜|こんや}{予約|よやく}しておくね。",
+        "en": "Agreed. I'll make the booking tonight, then.",
+        "hint": "〜ておく = do something ahead of time.",
+        "cue": "agreed · tonight · I’ll book"
+      },
+      {
+        "role": "b",
+        "jp": "ありがとう！{京都|きょうと}で{何|なに}が{食|た}べたい？",
+        "en": "Thanks! What do you want to eat in Kyoto?",
+        "hint": "〜たい = want to…",
+        "cue": "thanks! · in Kyoto · eat what?"
+      },
+      {
+        "role": "a",
+        "jp": "{湯豆腐|ゆどうふ}！あと、{抹茶|まっちゃ}のアイスも。",
+        "en": "Simmered tofu! And matcha ice cream, too.",
+        "hint": "湯豆腐 (ゆどうふ) = tofu simmered in broth, a Kyoto classic.",
+        "cue": "simmered tofu · matcha ice cream too"
+      },
+      {
+        "role": "b",
+        "jp": "{楽|たの}しみだね！",
+        "en": "I can't wait!",
+        "hint": "楽しみ (たのしみ) = something to look forward to.",
+        "cue": "can’t wait · looking forward"
+      }
+    ]
+  },
+  {
+    "id": "rp-phone",
+    "unit": 24,
+    "title": "Rescheduling by phone",
+    "titleJp": "{電話|でんわ}で{予約|よやく}の{変更|へんこう}",
+    "setting": "Something came up at work, so you call a hair salon to move tomorrow's appointment.",
+    "level": 3,
+    "register": "polite",
+    "targets": [
+      "core:cw-0866",
+      "core:cw-0728",
+      "core:cw-1522",
+      "core:cw-0667",
+      "core:cw-1461",
+      "core:cw-0314",
+      "core:cw-0298",
+      "core:cw-0299",
+      "core:cw-0057",
+      "grammar:n-desu",
+      "grammar:te-shimau",
+      "grammar:keigo-verbs"
+    ],
+    "roles": {
+      "a": {
+        "name": "Receptionist",
+        "nameJp": "{受付|うけつけ}"
+      },
+      "b": {
+        "name": "Customer",
+        "nameJp": "{客|きゃく}"
+      }
+    },
+    "lines": [
+      {
+        "role": "a",
+        "jp": "はい、{美容院|びよういん}さくらでございます。",
+        "en": "Hello, Sakura Hair Salon.",
+        "hint": "Businesses answer with their name + でございます.",
+        "cue": "hello · Sakura salon"
+      },
+      {
+        "role": "b",
+        "jp": "もしもし、{予約|よやく}をしているブラウンと{申|もう}します。",
+        "en": "Hello, my name is Brown. I have an appointment.",
+        "hint": "もしもし is only for the phone. 〜と申します (ともうします) = humble \"my name is\".",
+        "cue": "hello · have a booking · I’m Brown"
+      },
+      {
+        "role": "a",
+        "jp": "ブラウン{様|さま}ですね。いつもありがとうございます。",
+        "en": "Yes, Mr. or Ms. Brown. Thank you for your continued business.",
+        "hint": "いつもありがとうございます (\"thanks as always\") greets regular customers.",
+        "cue": "Brown · thanks as always"
+      },
+      {
+        "role": "b",
+        "jp": "{実|じつ}は、{明日|あした}の{三時|さんじ}の{予約|よやく}なんですが、{急|きゅう}に{仕事|しごと}が{入|はい}ってしまって…。",
+        "en": "Actually, it's about my three o'clock appointment tomorrow. Something suddenly came up at work…",
+        "hint": "実は (じつは) = actually, the thing is. 〜てしまって signals something unfortunate.",
+        "cue": "actually · tomorrow at 3 · work came up"
+      },
+      {
+        "role": "a",
+        "jp": "そうでしたか。では、{日|ひ}にちを{変更|へんこう}なさいますか。",
+        "en": "I see. Would you like to change the date?",
+        "hint": "なさいます = honorific します, used for the customer's actions.",
+        "cue": "I see · change the date?"
+      },
+      {
+        "role": "b",
+        "jp": "はい、お{願|ねが}いします。{来週|らいしゅう}の{土曜日|どようび}は{空|あ}いていますか。",
+        "en": "Yes, please. Is anything open next Saturday?",
+        "hint": "空いていますか (あいていますか) = is it free?",
+        "cue": "yes please · next Saturday · free?"
+      },
+      {
+        "role": "a",
+        "jp": "{少々|しょうしょう}お{待|ま}ちください。…{土曜日|どようび}は{午前|ごぜん}{十時|じゅうじ}と{午後|ごご}{四時|よじ}が{空|あ}いております。",
+        "en": "One moment, please… On Saturday we have 10 a.m. and 4 p.m. open.",
+        "hint": "4 o'clock is よじ, not よんじ. 午前 (ごぜん) = a.m., 午後 (ごご) = p.m.",
+        "cue": "one moment · Saturday · 10 a.m. · 4 p.m."
+      },
+      {
+        "role": "b",
+        "jp": "じゃあ、{午後|ごご}{四時|よじ}でお{願|ねが}いできますか。",
+        "en": "Then could I have 4 p.m., please?",
+        "hint": "お願いできますか (おねがいできますか) is politer than ください.",
+        "cue": "then · 4 p.m. · could I?"
+      },
+      {
+        "role": "a",
+        "jp": "かしこまりました。{来週|らいしゅう}の{土曜日|どようび}、{午後|ごご}{四時|よじ}でお{取|と}りしました。",
+        "en": "Certainly. You're booked for next Saturday at 4 p.m.",
+        "hint": "Staff repeat the date and time to confirm. Listen for the numbers.",
+        "cue": "certainly · next Saturday · 4 p.m. booked"
+      },
+      {
+        "role": "b",
+        "jp": "{急|きゅう}な{変更|へんこう}で、すみません。",
+        "en": "Sorry for the last-minute change.",
+        "hint": "Apologizing for the trouble is expected, even for small changes.",
+        "cue": "sorry · sudden change"
+      },
+      {
+        "role": "a",
+        "jp": "とんでもございません。お{待|ま}ちしております。",
+        "en": "Not at all. We look forward to seeing you.",
+        "hint": "とんでもございません = \"not at all\", a gracious reply to an apology.",
+        "cue": "not at all · we look forward"
+      },
+      {
+        "role": "b",
+        "jp": "ありがとうございます。よろしくお{願|ねが}いします。",
+        "en": "Thank you. I appreciate it.",
+        "cue": "thank you · I appreciate it"
+      },
+      {
+        "role": "a",
+        "jp": "お{電話|でんわ}ありがとうございました。{失礼|しつれい}いたします。",
+        "en": "Thank you for calling. Goodbye.",
+        "hint": "失礼いたします (しつれいいたします) is how businesses end a call.",
+        "cue": "thanks for calling · goodbye"
+      },
+      {
+        "role": "b",
+        "jp": "{失礼|しつれい}します。",
+        "en": "Goodbye.",
+        "hint": "Say 失礼します (しつれいします) before hanging up, instead of さようなら.",
+        "cue": "goodbye · (before hanging up)"
+      }
+    ]
+  }
+]

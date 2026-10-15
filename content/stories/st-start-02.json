@@ -1,0 +1,107 @@
+{
+  "id": "st-start-02",
+  "level": "start",
+  "unit": 1,
+  "title": "Whose umbrella?",
+  "titleJp": "だれの かさ？",
+  "topic": "home",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "kore-sore-are",
+    "ja-nai-desu",
+    "mo-also"
+  ],
+  "sentences": [
+    {
+      "jp": "きょうは／やすみです。",
+      "en": "It's our day off today."
+    },
+    {
+      "jp": "「ケン、／これは／ケンの／かさですか。」",
+      "en": "\"Ken, is this your umbrella?\""
+    },
+    {
+      "jp": "「いいえ、／ぼくのじゃないです。」",
+      "en": "\"No, it isn't mine.\""
+    },
+    {
+      "jp": "「ぼくの／かさは／あれです。」",
+      "en": "\"Mine is that one over there.\""
+    },
+    {
+      "jp": "「エマのですか。」",
+      "en": "\"Is it yours, Emma?\""
+    },
+    {
+      "jp": "「いいえ、／わたしのじゃないです。」",
+      "en": "\"No, it isn't mine.\""
+    },
+    {
+      "jp": "「だれの／かさですか…」",
+      "en": "\"So whose umbrella is it...?\""
+    },
+    {
+      "jp": "「あ！」",
+      "en": "\"Oh!\""
+    },
+    {
+      "jp": "「サムさんの／かさです。」",
+      "en": "\"It's Sam's umbrella.\""
+    },
+    {
+      "jp": "「サムさんは／だれですか。」",
+      "en": "\"Who's Sam?\""
+    },
+    {
+      "jp": "「ぼくの／かいしゃの／ともだちです。」",
+      "en": "\"He's a friend from my office.\""
+    },
+    {
+      "jp": "「なるほど。」",
+      "en": "\"I see.\""
+    },
+    {
+      "jp": "「この／かばんも／サムさんのですか。」",
+      "en": "\"Is this bag Sam's too?\""
+    },
+    {
+      "jp": "「いいえ、／それは／ぼくのです。」",
+      "en": "\"No, that's mine.\""
+    },
+    {
+      "jp": "「この／ほんは？」",
+      "en": "\"And this book?\""
+    },
+    {
+      "jp": "「それも／ぼくのです。」",
+      "en": "\"That's mine too.\""
+    },
+    {
+      "jp": "「この／コーヒーは？」",
+      "en": "\"And this coffee?\""
+    },
+    {
+      "jp": "「それも／ぼくの…」",
+      "en": "\"That's mine t—\""
+    },
+    {
+      "jp": "「いいえ！」",
+      "en": "\"No!\""
+    },
+    {
+      "jp": "「これは／わたしの／コーヒーです！」",
+      "en": "\"This is MY coffee!\""
+    }
+  ],
+  "gist": {
+    "q": "Whose umbrella is it?",
+    "options": [
+      "Emma's",
+      "Ken's",
+      "Sam's, a friend from Ken's office"
+    ],
+    "answer": 2
+  }
+}

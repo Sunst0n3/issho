@@ -1,0 +1,138 @@
+{
+  "id": "st-l0-09",
+  "level": "L0",
+  "unit": 8,
+  "title": "A present for Mom",
+  "titleJp": "おかあさんの プレゼント",
+  "topic": "shopping",
+  "grammar": [
+    "wa-desu",
+    "ka-question",
+    "no-possession",
+    "kore-sore-are",
+    "numbers-prices",
+    "masu-forms",
+    "wo-object",
+    "wo-kudasai",
+    "ni-time-place",
+    "masu-past",
+    "i-adjectives",
+    "de-place-means",
+    "arimasu-imasu",
+    "ka-or-ni-suru",
+    "dictionary-form",
+    "he-direction",
+    "casual-speech",
+    "te-form",
+    "adverbs-degree",
+    "te-kudasai",
+    "ga-subject"
+  ],
+  "sentences": [
+    {
+      "jp": "らいしゅうは／エマの／おかあさんの／たんじょうびです。",
+      "en": "Next week is Emma's mom's birthday."
+    },
+    {
+      "jp": "エマの／おかあさんは／アメリカに／います。",
+      "en": "Emma's mom is in America."
+    },
+    {
+      "jp": "ケンと／エマは／まちの／おおきい／{店|みせ}へ／{行|い}きました。",
+      "en": "Ken and Emma went to a big store in town."
+    },
+    {
+      "jp": "「どれが／いい？」",
+      "en": "\"Which one would be good?\""
+    },
+    {
+      "jp": "「この／かばんは？」",
+      "en": "\"How about this bag?\""
+    },
+    {
+      "jp": "「かわいいね。」",
+      "en": "\"It's cute.\""
+    },
+    {
+      "jp": "「でも、／ちょっと／たかい。」",
+      "en": "\"But it's a bit expensive.\""
+    },
+    {
+      "jp": "「この／かさは？」",
+      "en": "\"How about this umbrella?\""
+    },
+    {
+      "jp": "「それは／あまり／かわいくない。」",
+      "en": "\"That one's not very cute.\""
+    },
+    {
+      "jp": "ケンは／ちいさい／とけいを／{取|と}りました。",
+      "en": "Ken picked up a small watch."
+    },
+    {
+      "jp": "「これは？」",
+      "en": "\"What about this?\""
+    },
+    {
+      "jp": "「きれい！」",
+      "en": "\"It's lovely!\""
+    },
+    {
+      "jp": "「いくら？」",
+      "en": "\"How much is it?\""
+    },
+    {
+      "jp": "「{三千円|さんぜんえん}。」",
+      "en": "\"Three thousand yen.\""
+    },
+    {
+      "jp": "「あまり／たかくないね。」",
+      "en": "\"That's not too expensive.\""
+    },
+    {
+      "jp": "「これに／する！」",
+      "en": "\"Let's get this one!\""
+    },
+    {
+      "jp": "「すみません、／これを／ください。」",
+      "en": "\"Excuse me, I'll take this, please.\""
+    },
+    {
+      "jp": "「プレゼントですか。」",
+      "en": "\"Is it a present?\""
+    },
+    {
+      "jp": "「はい、／はこに／{入|い}れてください。」",
+      "en": "\"Yes, please put it in a box.\""
+    },
+    {
+      "jp": "うちで、／エマは／えいごで／カードを／{書|か}きました。",
+      "en": "At home, Emma wrote a card in English."
+    },
+    {
+      "jp": "ケンは／{日本語|にほんご}で／{書|か}きました。",
+      "en": "Ken wrote in Japanese."
+    },
+    {
+      "jp": "「たんじょうび／おめでとう！」",
+      "en": "\"Happy birthday!\""
+    },
+    {
+      "jp": "でも、／おかあさんは／{日本語|にほんご}が／わかりません。",
+      "en": "But Emma's mom doesn't understand Japanese."
+    },
+    {
+      "jp": "「エマ、／でんわで／{読|よ}んで。」",
+      "en": "\"Emma, read it to her on the phone.\""
+    }
+  ],
+  "gist": {
+    "q": "What do Ken and Emma buy for Emma's mom?",
+    "options": [
+      "A bag",
+      "A small watch",
+      "An umbrella"
+    ],
+    "answer": 1
+  }
+}

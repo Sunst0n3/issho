@@ -1,0 +1,79 @@
+{
+  "id": "rp-u12",
+  "unit": 12,
+  "title": "Old photos",
+  "titleJp": "この{写真|しゃしん}、{見|み}て",
+  "setting": "A quiet evening at home. You find photos from five years ago and talk about how things have changed and what you'd still like.",
+  "level": 2,
+  "register": "plain",
+  "targets": [
+    "grammar:mou-mada",
+    "grammar:to-iu",
+    "grammar:de-amount",
+    "grammar:te-iru-state",
+    "grammar:hoshii",
+    "core:cw-0868"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "ほら、この{写真|しゃしん}。{五年|ごねん}{前|まえ}の{夏|なつ}だよ。",
+      "en": "Look at this photo. It's from five years ago, in the summer.",
+      "cue": "look · photo · five years ago"
+    },
+    {
+      "role": "b",
+      "jp": "すごい、{若|わか}いね！{結婚|けっこん}して、もう{五年|ごねん}か…。",
+      "en": "Wow, we look so young! We've been married five years already…",
+      "hint": "か… at the end of a sentence is musing to yourself: \"five years, huh…\"",
+      "cue": "young · married · five years already"
+    },
+    {
+      "role": "a",
+      "jp": "うん。この{時|とき}は{狭|せま}い{部屋|へや}に{住|す}んでいたね。",
+      "en": "Yeah. Back then we were living in a tiny flat.",
+      "cue": "back then · tiny flat · lived"
+    },
+    {
+      "role": "b",
+      "jp": "そうそう。でも、{今|いま}の{家|いえ}も{台所|だいどころ}が{狭|せま}いよね。{大|おお}きい{台所|だいどころ}が{欲|ほ}しいなあ。",
+      "en": "That's right. Mind you, the kitchen here is small too. I'd love a big kitchen.",
+      "cue": "kitchen · small too · want big"
+    },
+    {
+      "role": "a",
+      "jp": "{私|わたし}は{犬|いぬ}が{欲|ほ}しいな。{健|けん}さんの{家|いえ}の{犬|いぬ}、かわいかったね。",
+      "en": "And I'd love a dog. Ken's dog was so cute, wasn't it?",
+      "cue": "dog · want · Ken's · cute"
+    },
+    {
+      "role": "b",
+      "jp": "うん。あ、{健|けん}さんたち、{来月|らいげつ}{二人|ふたり}で{日本|にほん}に{行|い}くと{言|い}っていたよ。",
+      "en": "Yeah. Oh, Ken said he and his wife are going to Japan next month, just the two of them.",
+      "hint": "〜と言っていた passes on what someone told you.",
+      "cue": "Ken · next month · Japan · said"
+    },
+    {
+      "role": "a",
+      "jp": "いいなあ。{私|わたし}たちは、まだ{日本|にほん}に{行|い}っていないね。",
+      "en": "Lucky them. We still haven't been to Japan, have we?",
+      "cue": "lucky · we · not yet"
+    },
+    {
+      "role": "b",
+      "jp": "じゃあ、{来年|らいねん}は{二人|ふたり}で{行|い}きたいね！",
+      "en": "Then let's make next year the year we go, the two of us!",
+      "cue": "next year · two of us · want to go"
+    }
+  ]
+}

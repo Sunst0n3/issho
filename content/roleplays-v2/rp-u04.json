@@ -1,0 +1,76 @@
+{
+  "id": "rp-u04",
+  "unit": 4,
+  "title": "Is it spicy?",
+  "titleJp": "{辛|から}いですか",
+  "setting": "At a ramen shop near the station: your bowls arrive and you try each other's.",
+  "level": 1,
+  "register": "polite",
+  "targets": [
+    "core:cw-0048",
+    "core:cw-0356",
+    "core:cw-0407",
+    "core:cw-0201",
+    "grammar:i-adjectives",
+    "grammar:masu-past",
+    "grammar:de-place-means",
+    "grammar:wo-kudasai"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "いただきます。",
+      "en": "Let's eat.",
+      "cue": "before eating · thanks"
+    },
+    {
+      "role": "b",
+      "jp": "いただきます。…あ、{熱|あつ}い！ でも、おいしいです！",
+      "en": "Let's eat. … Ooh, hot! But it's delicious!",
+      "hint": "熱い is hot to the touch (food, drinks); 暑い is hot weather.",
+      "cue": "let's eat · hot · delicious"
+    },
+    {
+      "role": "a",
+      "jp": "この{店|みせ}、{先週|せんしゅう}テレビで{見|み}ました。",
+      "en": "I saw this place on TV last week.",
+      "hint": "で marks the means: テレビで = on TV.",
+      "cue": "this shop · last week · on TV"
+    },
+    {
+      "role": "b",
+      "jp": "へえ。そのラーメン、{辛|から}いですか。",
+      "en": "Oh, really? Is your ramen spicy?",
+      "cue": "oh · your ramen · spicy?"
+    },
+    {
+      "role": "a",
+      "jp": "ちょっと{辛|から}いです。{食|た}べますか。",
+      "en": "It's a bit spicy. Want to try?",
+      "cue": "a bit spicy · try?"
+    },
+    {
+      "role": "b",
+      "jp": "あ、{辛|から}い！ {水|みず}、{水|みず}！",
+      "en": "Whoa, spicy! Water, water!",
+      "cue": "spicy! · water"
+    },
+    {
+      "role": "a",
+      "jp": "はい、どうぞ。すみません、お{水|みず}をもうひとつください。",
+      "en": "Here you go. Excuse me, could we have another glass of water?",
+      "hint": "もうひとつ = one more.",
+      "cue": "here · excuse me · one more water"
+    }
+  ]
+}

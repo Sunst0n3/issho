@@ -1,0 +1,75 @@
+{
+  "id": "rp-u09",
+  "unit": 9,
+  "title": "How was your day?",
+  "titleJp": "{今日|きょう}、どうだった？",
+  "setting": "Late evening. One of you gets home after a long day; the other is on the sofa watching TV.",
+  "level": 2,
+  "register": "plain",
+  "targets": [
+    "grammar:te-imasu",
+    "grammar:casual-past",
+    "grammar:kara-because",
+    "grammar:ni-iku-purpose",
+    "core:cw-0358",
+    "core:cw-0555"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "ただいま。{何|なに}してる？",
+      "en": "I'm home. What are you up to?",
+      "hint": "In casual speech ている shrinks to てる.",
+      "cue": "home · doing what?"
+    },
+    {
+      "role": "b",
+      "jp": "お{帰|かえ}り。テレビ{見|み}てる。{今日|きょう}、どうだった？",
+      "en": "Welcome back. Just watching TV. How was your day?",
+      "hint": "どうだった？ is the everyday \"how was it?\"",
+      "cue": "watching TV · how was today?"
+    },
+    {
+      "role": "a",
+      "jp": "すごく{忙|いそが}しかった。{昼|ひる}ご{飯|はん}も{食|た}べなかった。",
+      "en": "Really busy. I didn't even have lunch.",
+      "hint": "Plain past negative: 食べない → 食べなかった.",
+      "cue": "really busy · no lunch"
+    },
+    {
+      "role": "b",
+      "jp": "どうして？ {大丈夫|だいじょうぶ}？",
+      "en": "Why not? Are you okay?",
+      "cue": "why? · okay?"
+    },
+    {
+      "role": "a",
+      "jp": "{仕事|しごと}が{多|おお}かったから。もうお{腹|なか}がすいた！",
+      "en": "There was so much work. I'm starving now!",
+      "hint": "The reason comes first, then から.",
+      "cue": "so much work · starving"
+    },
+    {
+      "role": "b",
+      "jp": "じゃあ、ラーメン{食|た}べに{行|い}く？ {駅|えき}の{前|まえ}の{店|みせ}、{十時|じゅうじ}までだよ。",
+      "en": "Then do you want to go out for ramen? The place by the station is open till ten.",
+      "cue": "ramen · go eat? · till ten"
+    },
+    {
+      "role": "a",
+      "jp": "{行|い}く！ ありがとう。",
+      "en": "Yes, let's go! Thanks.",
+      "cue": "let's go · thanks"
+    }
+  ]
+}

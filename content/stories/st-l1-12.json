@@ -1,0 +1,131 @@
+{
+  "id": "st-l1-12",
+  "level": "L1",
+  "unit": 21,
+  "title": "The day the water stops",
+  "titleJp": "{水|みず}が{止|と}まる{日|ひ}",
+  "topic": "home",
+  "grammar": [
+    "ba-conditional",
+    "shi-reasons",
+    "sou-hearsay",
+    "te-oku",
+    "potential-form",
+    "te-shimau",
+    "te-kureru",
+    "kara-made",
+    "ka-or-ni-suru",
+    "ageru-morau"
+  ],
+  "sentences": [
+    {
+      "jp": "{月曜日|げつようび}、／マンションの／{入口|いりぐち}に／お{知|し}らせが／ありました。",
+      "en": "On Monday, there was a notice at the entrance of their building."
+    },
+    {
+      "jp": "「{木曜日|もくようび}の／{午前|ごぜん}{十時|じゅうじ}から／{午後|ごご}{三時|さんじ}まで、／{水|みず}が／{止|と}まります。」",
+      "en": "\"On Thursday, from 10 a.m. to 3 p.m., the water will be off.\""
+    },
+    {
+      "jp": "ミキは／{隣|となり}の／おばあさんに／{会|あ}って、／{話|はなし}を／{聞|き}きました。",
+      "en": "Miki ran into the old lady next door and talked to her about it."
+    },
+    {
+      "jp": "「{去年|きょねん}も／{水|みず}が／{止|と}まったのよ。／トイレも／{使|つか}えなかったわ。」",
+      "en": "\"The water stopped last year too. We couldn't even use the toilet.\""
+    },
+    {
+      "jp": "その／{晩|ばん}、／ミキは／ケンに／{話|はな}しました。",
+      "en": "That evening, Miki told Ken."
+    },
+    {
+      "jp": "「{隣|となり}の／おばあさんの／{話|はなし}では、／{去年|きょねん}は／トイレも／{使|つか}えなかったそうだよ。」",
+      "en": "\"The lady next door says that last year they couldn't even use the toilet.\""
+    },
+    {
+      "jp": "「{木曜日|もくようび}は／{水|みず}も／{出|で}ないし、／トイレも／{使|つか}えないし、／{大変|たいへん}だね。」",
+      "en": "\"On Thursday there's no water and no toilet — that's going to be tough.\""
+    },
+    {
+      "jp": "「{僕|ぼく}は／{会社|かいしゃ}だから／{大丈夫|だいじょうぶ}だけど、／ミキは／うちで／{仕事|しごと}だよね。」",
+      "en": "\"I'll be at the office, so I'm fine, but you're working from home, right?\""
+    },
+    {
+      "jp": "「じゃあ、／ペットボトルに／{水|みず}を／{入|い}れておこう。」",
+      "en": "\"Then let's fill some plastic bottles with water beforehand.\""
+    },
+    {
+      "jp": "{水曜日|すいようび}の／{夜|よる}、／{二人|ふたり}は／{大|おお}きい／ペットボトルに／{水|みず}を／{入|い}れておきました。",
+      "en": "On Wednesday night, they filled big plastic bottles with water."
+    },
+    {
+      "jp": "お{風呂|ふろ}にも／{水|みず}を／{入|い}れておきました。",
+      "en": "They filled the bath with water too."
+    },
+    {
+      "jp": "{洗濯|せんたく}も／しておきました。／お{皿|さら}も／{洗|あら}っておきました。",
+      "en": "They did the laundry ahead of time. They washed the dishes too."
+    },
+    {
+      "jp": "「{水|みず}が／あれば、／{困|こま}らないね。」",
+      "en": "\"As long as we have water, we'll be fine.\""
+    },
+    {
+      "jp": "{木曜日|もくようび}の／{十時|じゅうじ}、／{水|みず}が／{止|と}まりました。",
+      "en": "At ten on Thursday, the water stopped."
+    },
+    {
+      "jp": "ミキは／うちで／{仕事|しごと}を／しました。",
+      "en": "Miki worked from home."
+    },
+    {
+      "jp": "{昼|ひる}ご{飯|はん}は、／コンビニの／お{弁当|べんとう}に／しました。",
+      "en": "For lunch, she had a convenience store bento."
+    },
+    {
+      "jp": "{二時|にじ}ごろ、／{隣|となり}の／おばあさんが／{来|き}ました。",
+      "en": "Around two, the old lady next door came over."
+    },
+    {
+      "jp": "「ごめんなさい。／{水|みず}を／{少|すこ}し／{分|わ}けて／くれない？」",
+      "en": "\"I'm sorry. Could you spare me a little water?\""
+    },
+    {
+      "jp": "「{水|みず}を／{入|い}れておくのを、／{忘|わす}れてしまったの。」",
+      "en": "\"I forgot to fill up any water beforehand.\""
+    },
+    {
+      "jp": "ミキは／{笑|わら}って、／ペットボトルを／{一本|いっぽん}／あげました。",
+      "en": "Miki laughed and gave her a bottle."
+    },
+    {
+      "jp": "「{去年|きょねん}の／{話|はなし}を／{教|おし}えて／くれたのは、／おばあさんですよ。」",
+      "en": "\"You were the one who told me about last year!\""
+    },
+    {
+      "jp": "「そうだったわね。」／おばあさんも／{笑|わら}いました。",
+      "en": "\"So I did.\" The old lady laughed too."
+    },
+    {
+      "jp": "{三時|さんじ}に、／{水|みず}が／また／{出|で}ました。",
+      "en": "At three, the water came back on."
+    },
+    {
+      "jp": "{夜|よる}、／{帰|かえ}ってきた／ケンが／{聞|き}きました。／「{大丈夫|だいじょうぶ}だった？」",
+      "en": "In the evening, Ken came home and asked, \"Was everything okay?\""
+    },
+    {
+      "jp": "「うん。／{水|みず}を／{入|い}れておいて、／よかった。／おばあさんも／{喜|よろこ}んでいたよ。」",
+      "en": "\"Yes. I'm glad we filled up the water. The lady next door was happy too.\""
+    }
+  ],
+  "gist": {
+    "q": "Why did the neighbour come to Miki's door?",
+    "options": [
+      "To ask for some water",
+      "To tell her the water would stop",
+      "To bring her a bento"
+    ],
+    "answer": 0
+  }
+}

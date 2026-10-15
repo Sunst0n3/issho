@@ -10,17 +10,21 @@
     "te-miru",
     "kamoshirenai"
   ],
-  "coreWordCeiling": 1165,
+  "coreWordCeiling": 1202,
   "canDos": [
     {
       "id": "u18-cd1",
       "text": "Ask what kind of music, films or sports your partner likes, and describe the kind you like.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (or the AI) asks you the three questions below. Answer each in one or two sentences, describing the kind of thing you like, then ask one どんな question back.",
+        "material": "どんな{音楽|おんがく}が{好|す}き？\nどんな{映画|えいが}をよく{見|み}る？\nスポーツは{何|なに}かできる？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Describes a kind of thing with an adjective or a describing phrase (しずかな おんがく, こわい えいが)",
+          "Says what they can do with ができる or ことができる (テニスが できる, およぐ ことが できる)",
+          "Asks a どんな question back (どんな えいがが すき？)"
+        ]
       }
     },
     {
@@ -28,9 +32,37 @@
       "text": "Understand a short introduction to a class or club (what you can do there, what it's like) and answer questions.",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Listen to a teacher introducing a weekend class (you can play it twice), then answer the questions.",
+        "material": "こんにちは。{土曜日|どようび}の{料理|りょうり}のクラスへようこそ。\nこのクラスでは、{日本|にほん}の{家|いえ}の{料理|りょうり}を{作|つく}ることができます。みそ{汁|しる}や{天|てん}ぷらなどを{作|つく}ります。\n{一回|いっかい}{二時間|にじかん}で、{作|つく}った{料理|りょうり}はみんなで{食|た}べます。\n{初|はじ}めての{人|ひと}も{大丈夫|だいじょうぶ}です。{包丁|ほうちょう}が{苦手|にがて}な{人|ひと}は、ゆっくり{練習|れんしゅう}しましょう。\nエプロンとタオルを{持|も}ってきてください。\n{最初|さいしょ}の{一回|いっかい}は{無料|むりょう}です。ぜひ{来|き}てみてください！",
+        "questions": [
+          {
+            "q": "What do you make in this class?",
+            "options": [
+              "Cakes and sweets",
+              "Japanese home cooking, like miso soup and tempura",
+              "Sushi for parties"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What happens to the food you make?",
+            "options": [
+              "Everyone eats it together",
+              "You take it home in a box",
+              "The teacher keeps it"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "What should you bring, and how much is your first class?",
+            "options": [
+              "A knife; ¥1,000",
+              "Nothing; ¥500",
+              "An apron and a towel; it is free"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -38,9 +70,37 @@
       "text": "Read a list of classes and find one you can both do (day, time, what you can learn).",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "You both work until 7 p.m. on weekdays and need 30 minutes to get anywhere after work. You don't own a guitar or a camera. Read the community centre's class list and answer the questions.",
+        "material": "{秋|あき}のクラス　ご{案内|あんない}\n・ヨガ　{月曜日|げつようび}　19:00〜20:00\n　{体|からだ}が{硬|かた}い{人|ひと}も{大丈夫|だいじょうぶ}！　１{回|かい}1,000{円|えん}\n・ギター　{水曜日|すいようび}　18:30〜20:00\n　ギターを{借|か}りることができます。　１{回|かい}1,500{円|えん}\n・{写真|しゃしん}　{土曜日|どようび}　10:00〜12:00\n　{町|まち}を{歩|ある}きながら{写真|しゃしん}を{撮|と}ります。スマホでもいいです。　１{回|かい}800{円|えん}\n・ダンス　{金曜日|きんようび}　20:00〜21:30\n　{二人|ふたり}で{踊|おど}るダンスです。カップルにおすすめ！　１{回|かい}2,000{円|えん}（{二人|ふたり}で）",
+        "questions": [
+          {
+            "q": "Which weekday class can you both get to in time?",
+            "options": [
+              "Yoga on Monday",
+              "Guitar on Wednesday",
+              "Dance on Friday"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "You don't have a camera. Can you still join the photo class?",
+            "options": [
+              "No, you must bring a camera",
+              "Yes, a smartphone is fine",
+              "Yes, but only on Sundays"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "How much is one dance lesson for the two of you?",
+            "options": [
+              "¥2,000",
+              "¥4,000",
+              "¥1,000"
+            ],
+            "answer": 0
+          }
+        ]
       }
     },
     {
@@ -48,10 +108,15 @@
       "text": "Suggest trying something new together, and talk about how it might go (it might be hard, we might love it).",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (or the AI) says the lines below. Suggest one new thing to try together with 〜てみない？ or 〜てみよう, and talk about how it might go, good and bad, with かもしれない (or かも).",
+        "material": "{最近|さいきん}、{週末|しゅうまつ}がちょっとつまらないね。\n{何|なに}か{新|あたら}しいこと、したいな。\nでも、{難|むずか}しいことは{嫌|いや}だよ。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Suggests an activity with 〜てみない？ or 〜てみよう (ヨガを やってみない？)",
+          "Says one possible problem with かもしれない (さいしょは むずかしいかもしれない)",
+          "Says one possible good result with かもしれない or かも (たのしいかも)",
+          "Answers the worry about difficulty (はじめての ひとも だいじょうぶだって)"
+        ]
       }
     },
     {
@@ -59,10 +124,15 @@
       "text": "Write a few lines about a hobby you'd like to try and what you can and can't do yet.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your friend sent the message below. Reply in 3–5 sentences: a hobby you'd like to try and why, something you can already do, and something you can't do yet.",
+        "material": "{今度|こんど}、{何|なに}か{一緒|いっしょ}に{始|はじ}めない？どんなことがしてみたい？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Names a hobby with 〜てみたい (ギターを ひいてみたい)",
+          "Says something they can do with ができる or ことができる",
+          "Says something they can't do yet (まだ〜できない / 〜ことが できない)",
+          "Gives a reason with から or ので"
+        ]
       }
     }
   ],
@@ -71,17 +141,86 @@
     "id": "u18-task",
     "canDo": "u18-cd4",
     "goal": "Choose one new hobby to try together this month: find out what each class involves, talk about what might be fun or hard, and pick one.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "Which class did you choose, on which day, and how much will it cost the two of you this month?",
     "roles": {
       "a": "Has listings for a cooking class and a dance class (card A)",
       "b": "Has listings for a yoga class and a guitar class, and your free evenings (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "Card A: two class listings. Cooking class (りょうりの クラス): Saturdays 10:00–12:00; ¥3,000 per person per lesson; Japanese home cooking, and you eat what you make; beginners welcome. Dance class (ダンス): Thursdays 20:00–21:00; ¥1,000 per person per lesson; dancing in couples (カップル), no experience needed (はじめての ひとも おどる ことが できる). About you: you love food but you're not good with knives (ほうちょうが にがて), and dancing in front of people feels a bit embarrassing (はずかしい).",
+    "infoB": "Card B: two class listings. Yoga (ヨガ): Tuesdays 19:00–20:00; ¥1,000 per person; you can borrow mats. Guitar (ギター): Sundays 14:00–16:00; ¥2,500 per person; you need your own guitar (about ¥15,000). Your free evenings this month: Thursdays and Fridays only (you always work late on Tuesdays: かようびは ざんぎょう). Saturdays you're both free. Budget for the new hobby: ¥10,000 a month for the two of you (ふたりで いちまんえん). About you: your body is stiff (からだが かたい) and you can't play any instrument.",
+    "targets": [
+      "grammar:te-miru",
+      "grammar:kamoshirenai",
+      "grammar:koto-ga-dekiru",
+      "grammar:konna-donna",
+      "core:cw-0566",
+      "core:cw-0944",
+      "core:cw-0945"
+    ],
+    "register": "plain",
+    "twist": "Same four classes, but one of you has hurt your back (こしが いたい), so nothing too active, and the budget drops to ¥6,000 a month. Choose again, and say what might be hard (〜かもしれない).",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "ねえ、{今月|こんげつ}、{何|なに}か{新|あたら}しいことをやってみない？",
+        "en": "Hey, shall we try something new this month?"
+      },
+      {
+        "role": "b",
+        "jp": "いいね。どんなこと？",
+        "en": "Sounds good. What kind of thing?"
+      },
+      {
+        "role": "a",
+        "jp": "{料理|りょうり}のクラスとダンスのクラスがあるよ。{料理|りょうり}は{土曜日|どようび}の{朝|あさ}で、{一人|ひとり}{三千円|さんぜんえん}。",
+        "en": "There's a cooking class and a dance class. Cooking is Saturday mornings, ¥3,000 each."
+      },
+      {
+        "role": "b",
+        "jp": "ちょっと{高|たか}いね。{私|わたし}はヨガとギターを{見|み}つけたよ。",
+        "en": "That's a bit pricey. I found yoga and guitar."
+      },
+      {
+        "role": "a",
+        "jp": "ヨガ、いいね！いつ？",
+        "en": "Yoga sounds nice! When is it?"
+      },
+      {
+        "role": "b",
+        "jp": "{火曜日|かようび}の{七時|しちじ}から。でも、{火曜日|かようび}はいつも{残業|ざんぎょう}だから、{行|い}くことができないかもしれない。",
+        "en": "Tuesdays from seven. But I always work late on Tuesdays, so I might not be able to go."
+      },
+      {
+        "role": "a",
+        "jp": "そっか。ダンスは{木曜日|もくようび}の{夜|よる}{八時|はちじ}からだよ。{一人|ひとり}{千円|せんえん}。",
+        "en": "I see. Dance is Thursday evenings from eight. ¥1,000 each."
+      },
+      {
+        "role": "b",
+        "jp": "{木曜日|もくようび}は{暇|ひま}だよ！でも、ダンスはちょっと{恥|は}ずかしいかもしれない。",
+        "en": "I'm free on Thursdays! But dancing might be a bit embarrassing."
+      },
+      {
+        "role": "a",
+        "jp": "{大丈夫|だいじょうぶ}。{初|はじ}めての{人|ひと}も{踊|おど}ることができるって。",
+        "en": "It's fine. They say even first-timers can do it."
+      },
+      {
+        "role": "b",
+        "jp": "{四回|よんかい}で、{二人|ふたり}で{八千円|はっせんえん}だね。いいよ。",
+        "en": "Four lessons is ¥8,000 for the two of us. Okay, I'm in."
+      },
+      {
+        "role": "a",
+        "jp": "じゃあ、{木曜日|もくようび}にダンスをやってみよう！",
+        "en": "Then let's try dancing on Thursdays!"
+      },
+      {
+        "role": "b",
+        "jp": "うん。{楽|たの}しいかもしれないね。",
+        "en": "Okay. It might actually be fun."
+      }
+    ]
   },
   "capstone": {
     "title": "Teach me something",

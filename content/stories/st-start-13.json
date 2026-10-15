@@ -1,0 +1,96 @@
+{
+  "id": "st-start-13",
+  "level": "start",
+  "unit": 5,
+  "title": "The cat at the window",
+  "titleJp": "まどの そとの ねこ",
+  "topic": "animals",
+  "grammar": [
+    "wa-desu",
+    "no-possession",
+    "ne-yo",
+    "masu-forms",
+    "masu-past",
+    "i-adjectives",
+    "de-place-means",
+    "masenka-mashou",
+    "arimasu-imasu",
+    "to-with",
+    "deshita"
+  ],
+  "sentences": [
+    {
+      "jp": "うちの／まどの／{外|そと}に／ねこが／います。",
+      "en": "There's a cat outside our window."
+    },
+    {
+      "jp": "ちいさい／ねこです。",
+      "en": "It's a small cat."
+    },
+    {
+      "jp": "「かわいいですね！」",
+      "en": "\"Isn't it cute!\""
+    },
+    {
+      "jp": "ねこは／まいにち／きます。",
+      "en": "The cat comes every day."
+    },
+    {
+      "jp": "あさは／まどの／したに／います。",
+      "en": "In the morning, it's under the window."
+    },
+    {
+      "jp": "ひるは／となりの／くるまの／うえに／います。",
+      "en": "At noon, it's on top of the neighbour's car."
+    },
+    {
+      "jp": "「ねこさん、／あそびませんか。」",
+      "en": "\"Hey, kitty, want to play?\""
+    },
+    {
+      "jp": "でも、／ねこは／ケンと／あそびません。",
+      "en": "But the cat won't play with Ken."
+    },
+    {
+      "jp": "きのうは／あめでした。",
+      "en": "Yesterday it rained."
+    },
+    {
+      "jp": "ねこは／きませんでした。",
+      "en": "The cat didn't come."
+    },
+    {
+      "jp": "「さびしいですね…」",
+      "en": "\"It's lonely without it...\""
+    },
+    {
+      "jp": "きょうは／はれです。",
+      "en": "Today it's sunny."
+    },
+    {
+      "jp": "ケンは／まどの／ちかくで／ほんを／よみます。",
+      "en": "Ken reads a book near the window."
+    },
+    {
+      "jp": "あれ？",
+      "en": "Huh?"
+    },
+    {
+      "jp": "ケンの／となりに／ねこが／います！",
+      "en": "There's the cat, right next to Ken!"
+    },
+    {
+      "jp": "「ねこさん、／きょうは／ともだちですね。」",
+      "en": "\"Kitty, today we're friends, aren't we?\""
+    }
+  ],
+  "gist": {
+    "q": "What happens at the end of the story?",
+    "options": [
+      "Ken takes the cat home.",
+      "The cat doesn't come back.",
+      "The cat is right next to Ken."
+    ],
+    "answer": 2
+  }
+}

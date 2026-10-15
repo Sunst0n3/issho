@@ -1,0 +1,143 @@
+{
+  "id": "st-l1-03",
+  "level": "L1",
+  "unit": 17,
+  "title": "Miki's cold",
+  "titleJp": "ミキの{風邪|かぜ}",
+  "topic": "health",
+  "grammar": [
+    "nakereba-naranai",
+    "adverb-form",
+    "deshou",
+    "nagara",
+    "hou-ga-ii",
+    "temo-ii",
+    "dake-shika",
+    "adj-naru",
+    "n-desu",
+    "ni-iku-purpose"
+  ],
+  "sentences": [
+    {
+      "jp": "{月曜日|げつようび}の／{朝|あさ}、／ミキは／なかなか／{起|お}きませんでした。",
+      "en": "On Monday morning, Miki just wouldn't get up."
+    },
+    {
+      "jp": "「ミキ、／{大丈夫|だいじょうぶ}？／{顔|かお}が／{赤|あか}いよ。」",
+      "en": "\"Miki, are you okay? Your face is red.\""
+    },
+    {
+      "jp": "「{頭|あたま}が／{痛|いた}い…。／{喉|のど}も／{痛|いた}い。」",
+      "en": "\"My head hurts... My throat hurts too.\""
+    },
+    {
+      "jp": "{熱|ねつ}も／ありました。／{三十八度|さんじゅうはちど}です。",
+      "en": "She had a fever too: thirty-eight degrees."
+    },
+    {
+      "jp": "「たぶん／{風邪|かぜ}だろうね。／{今日|きょう}は／{休|やす}んだほうが／いいよ。」",
+      "en": "\"It's probably a cold. You should rest today.\""
+    },
+    {
+      "jp": "ミキは／{会社|かいしゃ}に／{電話|でんわ}しなければなりませんでした。",
+      "en": "Miki had to phone her office."
+    },
+    {
+      "jp": "ケンは／{今日|きょう}、／うちで／{仕事|しごと}を／します。",
+      "en": "Ken is working from home today."
+    },
+    {
+      "jp": "ケンは／{静|しず}かに／{台所|だいどころ}へ／{行|い}って、／{温|あたた}かい／うどんを／{作|つく}りました。",
+      "en": "Ken went quietly to the kitchen and made some warm udon."
+    },
+    {
+      "jp": "「ゆっくり／{食|た}べてね。」",
+      "en": "\"Eat slowly, okay?\""
+    },
+    {
+      "jp": "ミキは／{少|すこ}し／{食|た}べて、／ベッドに／{戻|もど}りました。",
+      "en": "Miki ate a little and went back to bed."
+    },
+    {
+      "jp": "{午後|ごご}、／{二人|ふたり}は／{近|ちか}くの／{病院|びょういん}に／{行|い}きました。",
+      "en": "In the afternoon, they went to a clinic nearby."
+    },
+    {
+      "jp": "{先生|せんせい}は／「{風邪|かぜ}でしょう。／{三日|みっか}ぐらいで／{治|なお}りますよ。」と／{言|い}いました。",
+      "en": "The doctor said, \"It's probably a cold. It should get better in about three days.\""
+    },
+    {
+      "jp": "「この／{薬|くすり}を／{一日|いちにち}／{三回|さんかい}、／{食事|しょくじ}の／{後|あと}に／{飲|の}んで／ください。」",
+      "en": "\"Please take this medicine three times a day, after meals.\""
+    },
+    {
+      "jp": "「それから、／{暖|あたた}かく／して、／よく／{寝|ね}なければなりません。」",
+      "en": "\"Also, you must keep warm and get plenty of sleep.\""
+    },
+    {
+      "jp": "「お{風呂|ふろ}に／{入|はい}っても／いいですか。」と／ミキが／{聞|き}きました。",
+      "en": "\"Is it okay to have a bath?\" Miki asked."
+    },
+    {
+      "jp": "「{今日|きょう}は／{入|はい}らないほうが／いいでしょう。」",
+      "en": "\"It's probably better not to today.\""
+    },
+    {
+      "jp": "{家|いえ}に／{帰|かえ}って、／ミキは／{薬|くすり}を／{飲|の}んで、／すぐ／{寝|ね}ました。",
+      "en": "When they got home, Miki took her medicine and went straight to sleep."
+    },
+    {
+      "jp": "ケンは／パソコンで／{仕事|しごと}を／しながら、／ときどき／ミキの／{部屋|へや}を／{見|み}に／{行|い}きました。",
+      "en": "While Ken worked on his computer, he went to check on Miki's room now and then."
+    },
+    {
+      "jp": "{夜|よる}、／ミキが／{起|お}きてきました。",
+      "en": "In the evening, Miki got up."
+    },
+    {
+      "jp": "「お{腹|なか}が／すいた…。」",
+      "en": "\"I'm hungry...\""
+    },
+    {
+      "jp": "「よかった！／{少|すこ}し／{元気|げんき}に／なったね。」",
+      "en": "\"That's great! You're feeling a bit better.\""
+    },
+    {
+      "jp": "ケンは／また／うどんを／{作|つく}りました。",
+      "en": "Ken made udon again."
+    },
+    {
+      "jp": "「また／うどん？」",
+      "en": "\"Udon again?\""
+    },
+    {
+      "jp": "「ごめん。／{僕|ぼく}が／{得意|とくい}な／{料理|りょうり}は／うどんだけなんだ。」",
+      "en": "\"Sorry. Udon is the only dish I'm good at.\""
+    },
+    {
+      "jp": "ミキは／{笑|わら}って、／{全部|ぜんぶ}／{食|た}べました。",
+      "en": "Miki laughed and ate it all."
+    },
+    {
+      "jp": "{木曜日|もくようび}、／ミキの／{風邪|かぜ}は／{治|なお}りました。",
+      "en": "By Thursday, Miki's cold was better."
+    },
+    {
+      "jp": "でも、／{今度|こんど}は／ケンが／せきを／しています。",
+      "en": "But now Ken is coughing."
+    },
+    {
+      "jp": "「ケン、／{大丈夫|だいじょうぶ}？／{今日|きょう}は／{私|わたし}が／うどんを／{作|つく}るね。」",
+      "en": "\"Ken, are you okay? Today I'll make the udon.\""
+    }
+  ],
+  "gist": {
+    "q": "What happens at the end of the story?",
+    "options": [
+      "Miki has to go back to the doctor",
+      "Ken catches the cold, and Miki cooks for him",
+      "Ken learns to cook a new dish"
+    ],
+    "answer": 1
+  }
+}

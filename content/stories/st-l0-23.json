@@ -1,0 +1,97 @@
+{
+  "id": "st-l0-23",
+  "level": "L0",
+  "unit": 13,
+  "title": "Aren't You Eating?",
+  "titleJp": "{食|た}べないの？",
+  "topic": "food",
+  "grammar": [
+    "n-desu",
+    "nanika-nanimo",
+    "yori-hou",
+    "volitional",
+    "de-amount",
+    "casual-speech",
+    "casual-past",
+    "te-form"
+  ],
+  "sentences": [
+    {
+      "jp": "{今日|きょう}の／{晩|ばん}ご{飯|はん}は／{天|てん}ぷらです。",
+      "en": "Tonight's dinner is tempura."
+    },
+    {
+      "jp": "ケンが／{作|つく}りました。",
+      "en": "Ken made it."
+    },
+    {
+      "jp": "ミカは／{天|てん}ぷらが／{大好|だいす}きです。",
+      "en": "Mika loves tempura."
+    },
+    {
+      "jp": "でも、／{今夜|こんや}は／{何|なに}も／{食|た}べません。",
+      "en": "But tonight she isn't eating anything."
+    },
+    {
+      "jp": "「ミカ、／どうしたの？／{食|た}べないの？」",
+      "en": "\"Mika, what's wrong? Aren't you going to eat?\""
+    },
+    {
+      "jp": "「ごめん。／お{腹|なか}いっぱいなんだ。」",
+      "en": "\"Sorry. I'm full.\""
+    },
+    {
+      "jp": "「え？／{何|なに}か／{食|た}べたの？」",
+      "en": "\"Huh? Did you eat something?\""
+    },
+    {
+      "jp": "「{実|じつ}は、／{会社|かいしゃ}で／ケーキを／{食|た}べたんだ。」",
+      "en": "\"Actually, I had cake at work.\""
+    },
+    {
+      "jp": "「{会社|かいしゃ}の／{人|ひと}の／{誕生日|たんじょうび}だったの。」",
+      "en": "\"It was someone's birthday at work.\""
+    },
+    {
+      "jp": "「みんなで／{大|おお}きい／ケーキを／{食|た}べたんだ。」",
+      "en": "\"We all ate a big cake together.\""
+    },
+    {
+      "jp": "ケンは／{少|すこ}し／{笑|わら}いました。",
+      "en": "Ken smiled a little."
+    },
+    {
+      "jp": "「じゃあ、／{天|てん}ぷらは／{明日|あした}／{食|た}べよう。」",
+      "en": "\"Okay, then let's have the tempura tomorrow.\""
+    },
+    {
+      "jp": "それから、／ケンは／{冷蔵庫|れいぞうこ}から／{小|ちい}さい／{箱|はこ}を／{出|だ}しました。",
+      "en": "Then Ken took a small box out of the fridge."
+    },
+    {
+      "jp": "「{実|じつ}は、／{僕|ぼく}も／ケーキを／{買|か}ったんだ。」",
+      "en": "\"Actually, I bought a cake too.\""
+    },
+    {
+      "jp": "「ケーキと／{天|てん}ぷら、／どっちが／いい？」",
+      "en": "\"Cake or tempura — which would you rather have?\""
+    },
+    {
+      "jp": "ミカは／{笑|わら}って／{言|い}いました。",
+      "en": "Mika laughed and said:"
+    },
+    {
+      "jp": "「ケーキの{方|ほう}が／いい！／ケーキは／{大丈夫|だいじょうぶ}！」",
+      "en": "\"Cake! I can still manage cake!\""
+    }
+  ],
+  "gist": {
+    "q": "Why didn't Mika eat the tempura?",
+    "options": [
+      "She doesn't like tempura",
+      "She had already eaten cake at work",
+      "She felt sick"
+    ],
+    "answer": 1
+  }
+}

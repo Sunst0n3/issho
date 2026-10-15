@@ -11,17 +11,22 @@
     "n-desu",
     "nanika-nanimo"
   ],
-  "coreWordCeiling": 880,
+  "coreWordCeiling": 930,
   "canDos": [
     {
       "id": "u13-cd1",
       "text": "Suggest what to cook in casual Japanese and compare two options (which is quicker, which is better for you).",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (the AI) asks about dinner in casual Japanese. Answer in casual Japanese too: suggest something with the 〜よう form, compare the two dishes with より／のほうが, and give a reason.",
+        "material": "1. {今日|きょう}の{晩|ばん}ご{飯|はん}、{何|なに}にする？\n2. カレーとパスタ、どっちがいい？\n3. どっちのほうが{体|からだ}にいいと{思|おも}う？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Suggests a dish with the casual 〜よう form (カレーを作ろう, パスタにしよう)",
+          "Compares with 〜より〜のほうが (パスタのほうが簡単だよ)",
+          "Gives a reason with から",
+          "Stays in casual speech (no です/ます)"
+        ]
       }
     },
     {
@@ -29,9 +34,37 @@
       "text": "Read a simple recipe and put the steps in order.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "This recipe card got shuffled. Read steps A–D, work out the right order, and answer the questions.",
+        "material": "{親子丼|おやこどん}を{作|つく}ろう！（{二人|ふたり}・{二十分|にじゅっぷん}）\n{鶏肉|とりにく}200グラム・{玉|たま}ねぎ{一|ひと}つ・{卵|たまご}{三|みっ}つ・ご{飯|はん}・しょうゆ・{砂糖|さとう}\n\nA　{卵|たまご}を{混|ま}ぜてから、{鍋|なべ}に{入|い}れます。{入|い}れてから、あまり{混|ま}ぜないでください。\nB　{鍋|なべ}に{水|みず}としょうゆと{砂糖|さとう}を{入|い}れて、{温|あたた}めます。\nC　まず、{鶏肉|とりにく}と{玉|たま}ねぎを{切|き}ります。\nD　{鶏肉|とりにく}と{玉|たま}ねぎを{鍋|なべ}に{入|い}れて、{五分|ごふん}ぐらい{待|ま}ちます。\n{最後|さいご}に、ご{飯|はん}にかけて{食|た}べましょう！",
+        "questions": [
+          {
+            "q": "What is the right order of steps A–D?",
+            "options": [
+              "C → B → D → A",
+              "B → C → A → D",
+              "C → D → B → A"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "What does the recipe tell you not to do once the eggs are in?",
+            "options": [
+              "Wait five minutes",
+              "Stir it a lot",
+              "Add more sugar"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "How many eggs do you need?",
+            "options": [
+              "One",
+              "Two",
+              "Three"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -39,9 +72,37 @@
       "text": "Understand your partner's instructions and warnings in the kitchen (don't add the salt yet, don't touch that pan).",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "You're cooking together and your partner gives you instructions. Listen and answer the questions.",
+        "material": "じゃあ、{野菜|やさい}のスープを{作|つく}ろう。まず、にんじんとじゃがいもを{洗|あら}って、{切|き}って。{玉|たま}ねぎは{私|わたし}が{切|き}るね。あ、そのフライパン、{熱|あつ}いから{持|も}たないで！それから、{塩|しお}はまだ{入|い}れないでね。{塩|しお}は{最後|さいご}に{入|い}れるんだ。{冷蔵庫|れいぞうこ}からトマトを{出|だ}して。よし、{始|はじ}めよう！",
+        "questions": [
+          {
+            "q": "What does your partner ask you to do first?",
+            "options": [
+              "Wash and cut the carrots and potatoes",
+              "Cut the onions",
+              "Heat the frying pan"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "Which two things should you not do?",
+            "options": [
+              "Open the fridge, or cut the onions",
+              "Pick up the frying pan, or add the salt now",
+              "Wash the vegetables, or take out the tomatoes"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "Why shouldn't the salt go in yet?",
+            "options": [
+              "There isn't any",
+              "Your partner doesn't like salt",
+              "It goes in at the end"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -49,10 +110,15 @@
       "text": "Explain why you can't or don't want to eat something, and ask what's wrong when your partner isn't eating.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Part 1: the AI is your partner and notices you're not eating (questions 1–2). Explain why with 〜んです or 〜んだ. Part 2: now the AI isn't eating (line 3). Ask what's wrong and offer to make something else.",
+        "material": "1. どうしたの？あまり{食|た}べていないね。\n2. {何|なに}か{苦手|にがて}なものがあるの？\n3. ごめん、{今日|きょう}はちょっと…。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Explains with 〜んです／〜んだ (お腹が痛いんだ, もうお腹いっぱいなんです)",
+          "Gives a clear reason (an allergy, already full, doesn't like it)",
+          "Asks どうしたの？ or どうしたんですか when the AI isn't eating",
+          "Offers something else with 何か (何か他のものを作ろうか)"
+        ]
       }
     },
     {
@@ -60,10 +126,15 @@
       "text": "Leave your partner a note saying there's nothing in the fridge and asking them to buy something for dinner.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "You're going out and your partner will be home first. Look at what's in the fridge, then leave them a note: say there's nothing for dinner, ask them to buy two or three things on the way home, and suggest what to make.",
+        "material": "{冷蔵庫|れいぞうこ}の{中|なか}\n{牛乳|ぎゅうにゅう}（{少|すこ}し）・バター・みそ\n{肉|にく} ✗　{魚|さかな} ✗　{野菜|やさい} ✗　{卵|たまご} ✗",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says there's nothing for dinner with 何もない or 〜がない",
+          "Asks for two or three things with 〜を買ってきてね／買ってきてください",
+          "Suggests a dinner idea with 〜よう (カレーにしよう)",
+          "Signs off warmly (ありがとう, お願い)"
+        ]
       }
     }
   ],
@@ -72,17 +143,86 @@
     "id": "u13-task",
     "canDo": "u13-cd1",
     "goal": "Decide on tonight's dinner and who cooks what: agree on one main dish and one side using what you have.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "What are you having for dinner, who's cooking which part, and what does someone need to buy?",
     "roles": {
       "a": "Knows what's in the fridge and the cupboard (card A)",
       "b": "Knows what you both had for lunch and what's on special at the supermarket (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "What's at home (card A):\n• Fridge (れいぞうこ): six eggs (たまご), onions (たまねぎ), carrots (にんじん), cheese (チーズ), a little milk. No meat or fish (にくも さかなも ない).\n• Cupboard: rice (こめ), pasta (パスタ), curry roux (カレー), a tin of tomatoes.\nYou're tired, so you'd like something easy (かんたん). You can do the rice and a salad.\nSuggest with 〜よう, compare with 〜より〜のほうが, and ask if your partner needs anything (なにか いる？).",
+    "infoB": "What you know (card B):\n• You both had pasta for lunch at work today (ひるに パスタを たべた), so not pasta again.\n• The supermarket by the station: chicken (とりにく) is half price until 8 p.m., and potatoes (じゃがいも) are cheap. You can stop there on the way home.\n• It's cold today and you'd like something warm, like curry or soup.\nYou don't know what's at home, so ask (なにが ある？) and explain your reasons with 〜んだ.",
+    "targets": [
+      "grammar:volitional",
+      "grammar:yori-hou",
+      "grammar:nanika-nanimo",
+      "grammar:n-desu",
+      "core:cw-0677",
+      "core:cw-0927",
+      "core:cw-0879"
+    ],
+    "register": "plain",
+    "twist": "Repeat: the supermarket has sold out of chicken. Decide what you can make with only what's at home, and who cooks it.",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "{今日|きょう}の{晩|ばん}ご{飯|はん}、{何|なに}にする？",
+        "en": "What shall we have for dinner tonight?"
+      },
+      {
+        "role": "b",
+        "jp": "{寒|さむ}いから、カレーが{食|た}べたいな。",
+        "en": "It's cold, so I feel like curry."
+      },
+      {
+        "role": "a",
+        "jp": "カレー？でも、{肉|にく}がないよ。{冷蔵庫|れいぞうこ}、ほとんど{何|なに}もない。",
+        "en": "Curry? But we've got no meat. There's almost nothing in the fridge."
+      },
+      {
+        "role": "b",
+        "jp": "{大丈夫|だいじょうぶ}。{駅|えき}の{前|まえ}のスーパーで、{今日|きょう}は{鶏肉|とりにく}が{安|やす}いんだ。{買|か}って{帰|かえ}るよ。",
+        "en": "That's okay. Chicken's cheap today at the supermarket by the station. I'll pick some up on the way home."
+      },
+      {
+        "role": "a",
+        "jp": "パスタはどう？パスタのほうが{簡単|かんたん}だよ。",
+        "en": "What about pasta? Pasta's easier."
+      },
+      {
+        "role": "b",
+        "jp": "パスタは{昼|ひる}に{食|た}べたんだ。カレーのほうがいいな。",
+        "en": "I had pasta for lunch. I'd rather have curry."
+      },
+      {
+        "role": "a",
+        "jp": "そっか。じゃあ、カレーにしよう。{玉|たま}ねぎとにんじんはあるよ。",
+        "en": "Oh, right. Curry it is, then. We've got onions and carrots."
+      },
+      {
+        "role": "b",
+        "jp": "じゃがいもも{買|か}って{帰|かえ}るね。{他|ほか}に{何|なに}か{要|い}る？",
+        "en": "I'll get potatoes too. Do we need anything else?"
+      },
+      {
+        "role": "a",
+        "jp": "ううん、{何|なに}も{要|い}らない。ありがとう。",
+        "en": "No, nothing else. Thanks."
+      },
+      {
+        "role": "b",
+        "jp": "じゃあ、カレーは{私|わたし}が{作|つく}るよ。",
+        "en": "Then I'll make the curry."
+      },
+      {
+        "role": "a",
+        "jp": "お{願|ねが}い。ご{飯|はん}とサラダは{私|わたし}が{作|つく}るね。",
+        "en": "Yes, please. I'll do the rice and a salad."
+      },
+      {
+        "role": "b",
+        "jp": "いいね！{七時|しちじ}ごろ{帰|かえ}るね。",
+        "en": "Great! I'll be home around seven."
+      }
+    ]
   },
   "capstone": {
     "title": "Cooking show for two",

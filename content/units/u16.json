@@ -11,17 +11,22 @@
     "tte-quote",
     "wa-contrast"
   ],
-  "coreWordCeiling": 1050,
+  "coreWordCeiling": 1095,
   "canDos": [
     {
       "id": "u16-cd1",
       "text": "Plan a short trip: say where you plan to go, how long you'll stay and what you want to see.",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your partner (or the AI) asks you the three questions below about a trip you'd like to take. Answer each one in one or two sentences of casual Japanese, without notes.",
+        "material": "{今度|こんど}の{休|やす}み、どこに{行|い}くつもり？\n{何日|なんにち}ぐらい{行|い}くの？どこに{泊|と}まる？\n{何|なに}をするつもり？{何|なに}が{見|み}たい？",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Names a place and says it is the plan with 〜つもり (きょうとに いく つもり)",
+          "Says how long they will stay and where (ふたばん とまる, りょかんに とまる)",
+          "Gives at least two things to see or do (〜たり〜たり, or 〜と〜)",
+          "Gives a reason at least once with ので or から"
+        ]
       }
     },
     {
@@ -29,9 +34,37 @@
       "text": "Read a ryokan or hotel information sheet (check-in time, meals, bath hours) and answer questions about it.",
       "check": {
         "kind": "read",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "You're staying at this ryokan tonight. Read its information sheet, then answer the questions.",
+        "material": "{旅館|りょかん}「さくら」のご{案内|あんない}\nチェックイン　15:00〜19:00\nお{部屋|へや}を{出|で}る{時間|じかん}　〜10:00\n{晩|ばん}ご{飯|はん}　18:00〜20:00（お{部屋|へや}で）\n{朝|あさ}ご{飯|はん}　7:30〜9:00（{食堂|しょくどう}で）\n{温泉|おんせん}　15:00〜24:00／{朝|あさ} 6:00〜9:00\n※{夜|よる}12{時|じ}から{朝|あさ}6{時|じ}までは、{温泉|おんせん}に{入|はい}らないでください。\n※タオルはお{部屋|へや}にあります。{温泉|おんせん}に{持|も}っていってください。\n※{駅|えき}まで{無料|むりょう}のバスがあります（10:00・14:00・16:00）。",
+        "questions": [
+          {
+            "q": "What time can you check in?",
+            "options": [
+              "From 3:00 p.m. until 7:00 p.m.",
+              "From 10:00 a.m.",
+              "Any time after 6:00 p.m."
+            ],
+            "answer": 0
+          },
+          {
+            "q": "Where will you eat dinner?",
+            "options": [
+              "In the dining room",
+              "At a restaurant near the station",
+              "In your room"
+            ],
+            "answer": 2
+          },
+          {
+            "q": "You want a bath at 1:00 a.m. What does the sheet say?",
+            "options": [
+              "Fine: the bath is open all night",
+              "Don't use the hot spring between midnight and 6:00 a.m.",
+              "Ask for a towel at the front desk first"
+            ],
+            "answer": 1
+          }
+        ]
       }
     },
     {
@@ -39,9 +72,37 @@
       "text": "Understand a friend's travel tips and what they've heard about a place (the food's great, it's crowded in autumn).",
       "check": {
         "kind": "listen",
-        "instructions": "",
-        "material": "",
-        "questions": []
+        "instructions": "Your friend Yuki left you a voice message about Kyoto. Listen (you can play it twice), then answer the questions.",
+        "material": "もしもし、ゆきです。{京都|きょうと}に{行|い}くんだって？いいね！\n{私|わたし}は{去年|きょねん}の{秋|あき}に{行|い}ったけど、{人|ひと}が{多|おお}くて{大変|たいへん}だったよ。\n{冬|ふゆ}は{寒|さむ}いけど、{人|ひと}は{少|すく}ないよ。\n{友達|ともだち}は、{駅|えき}の{近|ちか}くの{豆腐|とうふ}の{店|みせ}がとてもおいしいって{言|い}ってた。\nあと、お{寺|てら}は{朝|あさ}{行|い}ったほうがいいって。{昼|ひる}は{人|ひと}が{多|おお}いので。\nじゃあ、{楽|たの}しんでね！お{土産|みやげ}、よろしく！",
+        "questions": [
+          {
+            "q": "What did Yuki find hard about Kyoto in autumn?",
+            "options": [
+              "It was very cold",
+              "There were lots of people",
+              "The temples were closed"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "What did Yuki's friend recommend?",
+            "options": [
+              "A tofu restaurant near the station",
+              "A hot spring outside the city",
+              "A ramen shop by a temple"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "When does Yuki say you should visit the temples, and why?",
+            "options": [
+              "In the evening, because they're lit up",
+              "At lunchtime, because the trains are empty",
+              "In the morning, because it's crowded during the day"
+            ],
+            "answer": 2
+          }
+        ]
       }
     },
     {
@@ -49,10 +110,15 @@
       "text": "Explain politely why you need something at a hotel or station, and make a request ('It's our first time here, so…').",
       "check": {
         "kind": "speak",
-        "instructions": "",
-        "material": "",
+        "instructions": "You've just arrived at a ryokan. The AI (or your partner) plays the clerk and says the three lines below. Answer each politely in です/ます: explain your situation with ので, then make a request. 1) You're early and want to leave your bags. 2) It's your first time in this town, so you'd like a map or some tips. 3) You'll be back late from sightseeing, so you'd like dinner later.",
+        "material": "いらっしゃいませ。すみません、お{部屋|へや}は{三時|さんじ}からなんです。\nはい。ほかに{何|なに}かありますか。\n{晩|ばん}ご{飯|はん}は{六時|ろくじ}からですが、{何時|なんじ}がいいですか。",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Gives a reason with ので in each answer (はやく ついたので…, はじめてなので…)",
+          "Makes a clear request: 〜てもいいですか, 〜てください or 〜を おねがいします",
+          "Keeps to です/ます throughout, with no casual forms",
+          "Names a specific time for dinner (しちじはんに おねがいします)"
+        ]
       }
     },
     {
@@ -60,10 +126,15 @@
       "text": "Write a postcard-style message about your trip: where you went, what was great and what wasn't.",
       "check": {
         "kind": "write",
-        "instructions": "",
-        "material": "",
+        "instructions": "Your friend sent the message below. Reply in 4–6 sentences about a trip you've taken (real or made up): where you went and for how long, one thing that was great and one that wasn't. Use は to contrast the two.",
+        "material": "お{帰|かえ}り！{旅行|りょこう}、どうだった？どこに{泊|と}まったの？{写真|しゃしん}{見|み}せて！",
         "questions": [],
-        "rubric": []
+        "rubric": [
+          "Says where they went and how long they stayed",
+          "Contrasts a good point and a bad point with は (りょかんは よかったけど、てんきは…)",
+          "Uses past forms correctly (〜た / 〜かった, or 〜ました / 〜かったです)",
+          "Uses だけ or しか〜ない at least once (いっぱく だけ, ふつか しか いなかった)"
+        ]
       }
     }
   ],
@@ -72,17 +143,87 @@
     "id": "u16-task",
     "canDo": "u16-cd1",
     "goal": "Plan a two-night trip: share what you each know about two places and agree where to go, how to get there and where to stay.",
-    "outcomeQuestion": "",
+    "outcomeQuestion": "Where are you going, how are you getting there, where are you staying, and what is the total for the two of you?",
     "roles": {
       "a": "Has the guide page for a hot-spring town (card A)",
       "b": "Has the guide page for a seaside town and your budget (card B)"
     },
-    "infoA": "",
-    "infoB": "",
-    "targets": [],
-    "register": "",
-    "twist": "",
-    "scripted": []
+    "infoA": "Card A: the hot-spring town (おんせんの まち). Shinkansen (しんかんせん) 2 hours, then a 30-minute bus. Train fare ¥14,000 per person, there and back. Ryokan (りょかん) with an outdoor bath, dinner and breakfast: ¥18,000 per person per night. Business hotel by the station: ¥7,000 per person per night, no meals. Famous for hot springs, mountain walks and soba (そば). A friend says it's a quiet, laid-back town (しずかで のんびりした まちだって), but there's nothing to do at night. You'd love at least one night in the ryokan.",
+    "infoB": "Card B: the seaside town (うみの まち). Local train (でんしゃ) 3 hours, no changes. Train fare ¥8,000 per person, there and back. Small hotel by the sea (うみの ちかくの ホテル): ¥9,000 per person per night, breakfast included. Famous for sashimi (さしみ) and boat trips (ふね). Your budget: ¥60,000 in total for the two of you, trains and rooms (ぜんぶで ろくまんえん しか ない). Two nights, leaving Friday. You'd love to eat fresh fish.",
+    "targets": [
+      "grammar:tsumori",
+      "grammar:node",
+      "grammar:dake-shika",
+      "grammar:tte-quote",
+      "grammar:wa-contrast",
+      "core:cw-1060",
+      "core:cw-1059",
+      "core:cw-1084"
+    ],
+    "register": "plain",
+    "twist": "Same two towns, but now one of you can only take one day off, so it is a one-night trip, and the budget drops to ¥35,000 (さんまん ごせんえん). Which town still works? Re-plan and agree again.",
+    "scripted": [
+      {
+        "role": "a",
+        "jp": "ねえ、{温泉|おんせん}の{町|まち}と{海|うみ}の{町|まち}、どっちに{行|い}きたい？",
+        "en": "Hey, the hot-spring town or the seaside town: which one do you want to go to?"
+      },
+      {
+        "role": "b",
+        "jp": "{海|うみ}かな。{刺身|さしみ}がとてもおいしいって。{温泉|おんせん}の{町|まち}は？",
+        "en": "The sea, I think. They say the sashimi's really good. What's the hot-spring town like?"
+      },
+      {
+        "role": "a",
+        "jp": "{静|しず}かで、のんびりした{町|まち}だって。{夜|よる}は{何|なに}もないけど。",
+        "en": "Apparently it's a quiet, laid-back town. There's nothing to do at night, though."
+      },
+      {
+        "role": "b",
+        "jp": "どうやって{行|い}くの？",
+        "en": "How do we get there?"
+      },
+      {
+        "role": "a",
+        "jp": "{新幹線|しんかんせん}で{二時間|にじかん}。でも、{電車|でんしゃ}だけで{二人|ふたり}で{二万八千円|にまんはっせんえん}かかるよ。",
+        "en": "Two hours on the shinkansen. But the trains alone come to ¥28,000 for the two of us."
+      },
+      {
+        "role": "b",
+        "jp": "{海|うみ}は{三時間|さんじかん}かかるけど、{二人|ふたり}で{一万六千円|いちまんろくせんえん}だよ。",
+        "en": "The sea takes three hours, but it's ¥16,000 for both of us."
+      },
+      {
+        "role": "a",
+        "jp": "{旅館|りょかん}に{泊|と}まりたいな。{一人|ひとり}{一万八千円|いちまんはっせんえん}だけど…。",
+        "en": "I'd love to stay at the ryokan. It's ¥18,000 each, though…"
+      },
+      {
+        "role": "b",
+        "jp": "お{金|かね}は{全部|ぜんぶ}で{六万円|ろくまんえん}しかないので、{旅館|りょかん}は{無理|むり}だね。",
+        "en": "We've only got ¥60,000 in total, so the ryokan's out."
+      },
+      {
+        "role": "a",
+        "jp": "そっか。じゃあ、{温泉|おんせん}はまた{今度|こんど}にしよう。{海|うみ}のホテルはいくら？",
+        "en": "I see. Then let's save the hot spring for another time. How much is the hotel by the sea?"
+      },
+      {
+        "role": "b",
+        "jp": "{一人|ひとり}{九千円|きゅうせんえん}で、{朝|あさ}ご{飯|はん}もあるよ。{二晩|ふたばん}{泊|と}まって、{全部|ぜんぶ}で{五万二千円|ごまんにせんえん}。",
+        "en": "¥9,000 each, with breakfast. Two nights, and it's ¥52,000 altogether."
+      },
+      {
+        "role": "a",
+        "jp": "いいね。じゃあ、{海|うみ}にしよう！{金曜日|きんようび}に{行|い}って、{日曜日|にちようび}に{帰|かえ}るつもり。",
+        "en": "Great. Let's go to the sea, then! I'm thinking we go on Friday and come back on Sunday."
+      },
+      {
+        "role": "b",
+        "jp": "うん。{八千円|はっせんえん}は、おいしい{魚|さかな}に{使|つか}おう！",
+        "en": "Okay. And let's spend the other ¥8,000 on good fish!"
+      }
+    ]
   },
   "capstone": {
     "title": "Our trip",

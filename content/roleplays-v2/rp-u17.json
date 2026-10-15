@@ -1,0 +1,75 @@
+{
+  "id": "rp-u17",
+  "unit": 17,
+  "title": "Are you okay?",
+  "titleJp": "{大丈夫|だいじょうぶ}？",
+  "setting": "One of you comes home flushed, with work still to finish; the other takes care of them.",
+  "level": 2,
+  "register": "plain",
+  "targets": [
+    "grammar:deshou",
+    "grammar:nakereba-naranai",
+    "grammar:nagara",
+    "grammar:adverb-form",
+    "core:cw-0369",
+    "core:cw-0451",
+    "core:cw-0864"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "{大丈夫|だいじょうぶ}？{顔|かお}が{赤|あか}いよ。",
+      "en": "Are you okay? Your face is red.",
+      "cue": "okay? · face · red"
+    },
+    {
+      "role": "b",
+      "jp": "うん…ちょっと{寒|さむ}いんだ。{頭|あたま}も{痛|いた}い。",
+      "en": "Mm… I feel a bit cold. My head hurts too.",
+      "cue": "feel cold · head hurts"
+    },
+    {
+      "role": "a",
+      "jp": "たぶん{風邪|かぜ}でしょう。{今日|きょう}は{早|はや}く{寝|ね}たほうがいいよ。",
+      "en": "It's probably a cold. You'd better go to bed early tonight.",
+      "hint": "でしょう = \"probably\": a fairly confident guess.",
+      "cue": "probably a cold · bed early"
+    },
+    {
+      "role": "b",
+      "jp": "でも、{今夜|こんや}このメールを{書|か}かなきゃ。",
+      "en": "But I have to write this email tonight.",
+      "hint": "〜なきゃ is the short, spoken form of 〜なければならない.",
+      "cue": "email · tonight · have to"
+    },
+    {
+      "role": "a",
+      "jp": "じゃあ、お{茶|ちゃ}を{飲|の}みながら{書|か}いて。{温|あたた}かいお{茶|ちゃ}、{入|い}れるね。",
+      "en": "Then drink some tea while you write it. I'll make you a hot cup.",
+      "hint": "〜ながら = while: one person doing two things at once.",
+      "cue": "tea · while writing · I’ll make"
+    },
+    {
+      "role": "b",
+      "jp": "ありがとう。{早|はや}く{書|か}いて、すぐ{寝|ね}るね。",
+      "en": "Thanks. I'll write it quickly and go straight to bed.",
+      "cue": "write quickly · straight to bed"
+    },
+    {
+      "role": "a",
+      "jp": "うん。{無理|むり}しないでね。お{大事|だいじ}に。",
+      "en": "Okay. Don't overdo it. Take care of yourself.",
+      "cue": "don't overdo it · take care"
+    }
+  ]
+}

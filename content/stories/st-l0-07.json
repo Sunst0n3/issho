@@ -1,0 +1,125 @@
+{
+  "id": "st-l0-07",
+  "level": "L0",
+  "unit": 8,
+  "title": "No snacks!",
+  "titleJp": "おかしは かわない！",
+  "topic": "shopping",
+  "grammar": [
+    "wa-desu",
+    "no-possession",
+    "mo-also",
+    "masu-forms",
+    "wo-object",
+    "masu-past",
+    "de-place-means",
+    "arimasu-imasu",
+    "to-with",
+    "suki-kirai",
+    "he-direction",
+    "casual-speech",
+    "position-words",
+    "te-form",
+    "nai-form",
+    "ga-subject"
+  ],
+  "sentences": [
+    {
+      "jp": "どようびの／ごごです。",
+      "en": "It's Saturday afternoon."
+    },
+    {
+      "jp": "ケンと／エマは／スーパーに／います。",
+      "en": "Ken and Emma are at the supermarket."
+    },
+    {
+      "jp": "{今日|きょう}は／たまごと／ぎゅうにゅうと／やさいを／{買|か}います。",
+      "en": "Today they're buying eggs, milk and vegetables."
+    },
+    {
+      "jp": "ケンは／おかしが／だいすきです。",
+      "en": "Ken loves snacks."
+    },
+    {
+      "jp": "「エマ、／これ、／{買|か}う？」",
+      "en": "\"Emma, shall we get this?\""
+    },
+    {
+      "jp": "「チョコレート？」",
+      "en": "\"Chocolate?\""
+    },
+    {
+      "jp": "「{買|か}わない。」",
+      "en": "\"We're not getting that.\""
+    },
+    {
+      "jp": "「じゃあ、／これは？」",
+      "en": "\"Then what about this?\""
+    },
+    {
+      "jp": "「アイスも／{買|か}わない！」",
+      "en": "\"We're not getting ice cream either!\""
+    },
+    {
+      "jp": "「おかしは／ひつようじゃないよ。」",
+      "en": "\"We don't need snacks.\""
+    },
+    {
+      "jp": "ふたりは／やさいと／ぎゅうにゅうを／{買|か}って、／うちへ／かえりました。",
+      "en": "They bought vegetables and milk and went home."
+    },
+    {
+      "jp": "うちで、／エマが／れいぞうこを／あけました。",
+      "en": "At home, Emma opened the fridge."
+    },
+    {
+      "jp": "「あ、／たまごが／ない！」",
+      "en": "\"Oh no, there are no eggs!\""
+    },
+    {
+      "jp": "ふたりは／たまごを／わすれました。",
+      "en": "They had forgotten the eggs."
+    },
+    {
+      "jp": "「だれが／{行|い}く？」",
+      "en": "\"Who's going to go?\""
+    },
+    {
+      "jp": "「ぼくが／{行|い}くよ。」",
+      "en": "\"I'll go.\""
+    },
+    {
+      "jp": "ケンは／ひとりで／スーパーへ／{行|い}って、／すぐ／かえりました。",
+      "en": "Ken went to the supermarket on his own and came straight back."
+    },
+    {
+      "jp": "ふくろの／{中|なか}に／たまごと／チョコレートと／アイスが／ありました。",
+      "en": "In the bag were eggs, chocolate and ice cream."
+    },
+    {
+      "jp": "「ケン！」",
+      "en": "\"Ken!\""
+    },
+    {
+      "jp": "「アイスは／エマの。」",
+      "en": "\"The ice cream is for you.\""
+    },
+    {
+      "jp": "「どうぞ。」",
+      "en": "\"Here.\""
+    },
+    {
+      "jp": "エマは／わらいました。",
+      "en": "Emma laughed."
+    }
+  ],
+  "gist": {
+    "q": "What did Ken bring back from his second trip to the supermarket?",
+    "options": [
+      "Only eggs",
+      "Vegetables and milk",
+      "Eggs, chocolate and ice cream"
+    ],
+    "answer": 2
+  }
+}

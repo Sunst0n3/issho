@@ -1,0 +1,75 @@
+{
+  "id": "rp-u18",
+  "unit": 18,
+  "title": "Want to give it a go?",
+  "titleJp": "やってみない？",
+  "setting": "One of you has an idea for something new to try together this autumn.",
+  "level": 2,
+  "register": "plain",
+  "targets": [
+    "grammar:te-miru",
+    "grammar:konna-donna",
+    "grammar:koto-ga-dekiru",
+    "grammar:kamoshirenai",
+    "core:cw-0948",
+    "core:cw-0813",
+    "core:cw-0965"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "ねえ、{今度|こんど}キャンプしてみない？",
+      "en": "Hey, want to try camping sometime?",
+      "hint": "〜てみない？ = \"want to try …?\": a soft suggestion.",
+      "cue": "camping · try?"
+    },
+    {
+      "role": "b",
+      "jp": "キャンプ？どんなキャンプ？",
+      "en": "Camping? What kind of camping?",
+      "cue": "what kind?"
+    },
+    {
+      "role": "a",
+      "jp": "{山|やま}で{一晩|ひとばん}{泊|と}まるんだ。{必要|ひつよう}な{物|もの}は{全部|ぜんぶ}{借|か}りることができるよ。",
+      "en": "We stay one night in the mountains. We can rent everything we need.",
+      "hint": "〜ことが できる = \"can\": dictionary form + ことが できる.",
+      "cue": "mountains · one night · rent everything"
+    },
+    {
+      "role": "b",
+      "jp": "でも、{虫|むし}が{多|おお}いかもしれないよ。{私|わたし}、{虫|むし}が{苦手|にがて}なんだ。",
+      "en": "But there might be lots of bugs. I'm not good with bugs.",
+      "hint": "かもしれない = \"might\": less sure than でしょう.",
+      "cue": "bugs · might · not my thing"
+    },
+    {
+      "role": "a",
+      "jp": "{秋|あき}は{少|すく}ないって。それに、{夜|よる}は{星|ほし}がすごくきれいに{見|み}えるよ。",
+      "en": "Apparently there aren't many in autumn. And at night you can see the stars really clearly.",
+      "cue": "autumn · fewer · stars"
+    },
+    {
+      "role": "b",
+      "jp": "{星|ほし}か…いいね。じゃあ、{一回|いっかい}やってみよう。",
+      "en": "Stars, huh… nice. Okay, let's give it a go once.",
+      "cue": "stars · let's try once"
+    },
+    {
+      "role": "a",
+      "jp": "やった！きっと{楽|たの}しいよ。",
+      "en": "Yay! I'm sure it'll be fun.",
+      "cue": "yay · sure · fun"
+    }
+  ]
+}

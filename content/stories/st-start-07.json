@@ -1,0 +1,105 @@
+{
+  "id": "st-start-07",
+  "level": "start",
+  "unit": 3,
+  "title": "Our weekdays",
+  "titleJp": "わたしたちの まいにち",
+  "topic": "time",
+  "grammar": [
+    "wa-desu",
+    "no-possession",
+    "ne-yo",
+    "masu-forms",
+    "wo-object",
+    "counting-tsu",
+    "time-telling",
+    "ni-time-place"
+  ],
+  "sentences": [
+    {
+      "jp": "わたしは／まいあさ／ろくじに／おきます。",
+      "en": "I get up at six every morning."
+    },
+    {
+      "jp": "ケンは／しちじに／おきます。",
+      "en": "Ken gets up at seven."
+    },
+    {
+      "jp": "わたしは／コーヒーを／のみます。",
+      "en": "I drink coffee."
+    },
+    {
+      "jp": "ケンは／おちゃを／のみます。",
+      "en": "Ken drinks green tea."
+    },
+    {
+      "jp": "ケンは／たまごを／ふたつ／たべます。",
+      "en": "Ken eats two eggs."
+    },
+    {
+      "jp": "ケンは／しちじはんに／かいしゃに／いきます。",
+      "en": "At half past seven, Ken goes to the office."
+    },
+    {
+      "jp": "「いってきます！」",
+      "en": "\"I'm off!\""
+    },
+    {
+      "jp": "「いってらっしゃい！」",
+      "en": "\"Have a good day!\""
+    },
+    {
+      "jp": "わたしは／はちじに／{学校|がっこう}に／いきます。",
+      "en": "I go to school at eight."
+    },
+    {
+      "jp": "わたしは／えいごの／せんせいです。",
+      "en": "I'm an English teacher."
+    },
+    {
+      "jp": "わたしは／ごご／よじに／かえります。",
+      "en": "I come home at four in the afternoon."
+    },
+    {
+      "jp": "ケンは／しちじに／かえります。",
+      "en": "Ken comes home at seven."
+    },
+    {
+      "jp": "ケンは／ばんごはんを／つくります。",
+      "en": "Ken makes dinner."
+    },
+    {
+      "jp": "わたしたちは／じゅういちじに／ねます。",
+      "en": "We go to bed at eleven."
+    },
+    {
+      "jp": "でも、／にちようびは／ちがいます。",
+      "en": "But Sundays are different."
+    },
+    {
+      "jp": "わたしは／じゅうじに／おきます。",
+      "en": "I get up at ten."
+    },
+    {
+      "jp": "ケンは／じゅうにじに／おきます！",
+      "en": "Ken gets up at twelve!"
+    },
+    {
+      "jp": "「おはよう、／ケン。」",
+      "en": "\"Morning, Ken.\""
+    },
+    {
+      "jp": "「もう／ひるですよ！」",
+      "en": "\"It's already noon!\""
+    }
+  ],
+  "gist": {
+    "q": "What is different on Sundays?",
+    "options": [
+      "Ken makes breakfast.",
+      "They get up much later.",
+      "Emma goes to school."
+    ],
+    "answer": 1
+  }
+}

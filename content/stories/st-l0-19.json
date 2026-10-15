@@ -1,0 +1,98 @@
+{
+  "id": "st-l0-19",
+  "level": "L0",
+  "unit": 12,
+  "title": "Our Wish List",
+  "titleJp": "わたしたちの ほしい もの",
+  "topic": "home",
+  "grammar": [
+    "hoshii",
+    "te-iru-state",
+    "to-iu",
+    "de-amount",
+    "mou-mada",
+    "kedo-but",
+    "kara-because",
+    "tai-want",
+    "te-form"
+  ],
+  "sentences": [
+    {
+      "jp": "{僕|ぼく}は／{妻|つま}と／{二人|ふたり}で／{住|す}んでいます。",
+      "en": "I live with my wife, just the two of us."
+    },
+    {
+      "jp": "{家|いえ}は／{駅|えき}から／ちょっと／{遠|とお}いです。",
+      "en": "Our house is a bit far from the station."
+    },
+    {
+      "jp": "{古|ふる}い／{家|いえ}ですけど、／{小|ちい}さい／{庭|にわ}が／あります。",
+      "en": "It's an old house, but it has a small garden."
+    },
+    {
+      "jp": "{猫|ねこ}も／います。",
+      "en": "We have a cat, too."
+    },
+    {
+      "jp": "{名前|なまえ}は／モモと／いいます。",
+      "en": "Her name is Momo."
+    },
+    {
+      "jp": "{妻|つま}は／{料理|りょうり}が／{大好|だいす}きです。",
+      "en": "My wife loves cooking."
+    },
+    {
+      "jp": "でも、／うちの／{台所|だいどころ}は／とても／{狭|せま}いです。",
+      "en": "But our kitchen is very small."
+    },
+    {
+      "jp": "{妻|つま}は／「{広|ひろ}い／{台所|だいどころ}が／ほしい」と／いつも／{言|い}っています。",
+      "en": "My wife is always saying, \"I want a big kitchen.\""
+    },
+    {
+      "jp": "{僕|ぼく}は／{車|くるま}が／ほしいです。",
+      "en": "I want a car."
+    },
+    {
+      "jp": "{今|いま}、／{車|くるま}を／{持|も}っていないから、／{買|か}い{物|もの}が／{大変|たいへん}です。",
+      "en": "We don't have a car right now, so shopping is hard work."
+    },
+    {
+      "jp": "それから、／{僕|ぼく}たちは／{犬|いぬ}も／ほしいです。",
+      "en": "And we'd like a dog, too."
+    },
+    {
+      "jp": "{犬|いぬ}と／いっしょに／{毎朝|まいあさ}／{公園|こうえん}を／{散歩|さんぽ}したいです。",
+      "en": "We'd love to walk in the park with a dog every morning."
+    },
+    {
+      "jp": "でも、／モモは／{犬|いぬ}が／{嫌|きら}いです。",
+      "en": "But Momo hates dogs."
+    },
+    {
+      "jp": "{先週|せんしゅう}、／{隣|となり}の／{犬|いぬ}が／うちの／{庭|にわ}に／{来|き}ました。",
+      "en": "Last week, the neighbors' dog came into our garden."
+    },
+    {
+      "jp": "モモは／とても／{怒|おこ}って、／{一日|いちにち}／ベッドの{下|した}に／いました。",
+      "en": "Momo got really angry and stayed under the bed all day."
+    },
+    {
+      "jp": "だから、／{犬|いぬ}は／まだ／いません。",
+      "en": "So we still don't have a dog."
+    },
+    {
+      "jp": "{犬|いぬ}が／ほしいけど、／モモも／{大切|たいせつ}な／{家族|かぞく}です。",
+      "en": "We want a dog, but Momo is an important part of our family too."
+    }
+  ],
+  "gist": {
+    "q": "Why don't they have a dog yet?",
+    "options": [
+      "They don't have a car",
+      "Their kitchen is too small",
+      "Their cat hates dogs"
+    ],
+    "answer": 2
+  }
+}

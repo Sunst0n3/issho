@@ -1,0 +1,76 @@
+{
+  "id": "rp-u20",
+  "unit": 20,
+  "title": "What shall I wear?",
+  "titleJp": "{何|なに}を{着|き}ていこう？",
+  "setting": "You're getting ready for a friend's wedding party, and one of you can't decide which shirt to wear.",
+  "level": 2,
+  "register": "plain",
+  "targets": [
+    "grammar:sugiru",
+    "grammar:no-one",
+    "grammar:sou-looks",
+    "grammar:te-kureru",
+    "core:cw-0761",
+    "core:cw-0561",
+    "core:cw-0840"
+  ],
+  "roles": {
+    "a": {
+      "name": "Hikaru",
+      "nameJp": "ひかる"
+    },
+    "b": {
+      "name": "Aoi",
+      "nameJp": "あおい"
+    }
+  },
+  "lines": [
+    {
+      "role": "a",
+      "jp": "ねえ、このシャツ、{明|あか}るすぎる？",
+      "en": "Hey, is this shirt too bright?",
+      "hint": "〜すぎる = too …: drop the い of an い-adjective and add すぎる.",
+      "cue": "shirt · too bright?"
+    },
+    {
+      "role": "b",
+      "jp": "そうだね…ちょっと{明|あか}るすぎるかも。{白|しろ}いのはどう？",
+      "en": "Mm… it might be a bit too bright. What about the white one?",
+      "hint": "しろいの = the white one: の stands in for a thing you both know.",
+      "cue": "bit bright · white one?"
+    },
+    {
+      "role": "a",
+      "jp": "{白|しろ}いのは、まだ{洗濯機|せんたくき}の{中|なか}なんだ。",
+      "en": "The white one's still in the washing machine.",
+      "cue": "white one · in the washer"
+    },
+    {
+      "role": "b",
+      "jp": "じゃあ、この{青|あお}いのは？{涼|すず}しそうで、よく{似合|にあ}うよ。",
+      "en": "Then how about this blue one? It looks cool and fresh, and it really suits you.",
+      "hint": "すずしそう = looks cool: drop the い and add そう.",
+      "cue": "blue one · looks cool · suits you"
+    },
+    {
+      "role": "a",
+      "jp": "ほんと？…あ、ボタンが{一|ひと}つない！",
+      "en": "Really? …Oh, there's a button missing!",
+      "cue": "really? · button missing"
+    },
+    {
+      "role": "b",
+      "jp": "{貸|か}して。すぐつけてあげる。",
+      "en": "Give it here. I'll sew it on for you right now.",
+      "cue": "give it here · sew it on"
+    },
+    {
+      "role": "a",
+      "jp": "ありがとう！いつも{手伝|てつだ}ってくれて、{本当|ほんとう}にうれしい。",
+      "en": "Thank you! You always help me out. I really appreciate it.",
+      "hint": "〜てくれて ありがとう = thanks for doing … for me.",
+      "cue": "thanks · always help"
+    }
+  ]
+}
