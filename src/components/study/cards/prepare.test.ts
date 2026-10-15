@@ -1,281 +1,196 @@
+import { createEmptyCard } from 'ts-fsrs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { cardId, db, updateSettings } from '../../../lib/db.ts';
-import type { CardRecord } from '../../../lib/types.ts';
-import { seededRandom } from '../../../srs/answers.ts';
-import { introduceItem } from '../../../srs/items.ts';
-import { grammarGloss, kanaToRomaji, longVowelsSpelledOut, shortInterval, untilText } from '../format.ts';
-import { KANA, KANJI, resetStudyDb, SURVIVAL, WORDS } from '../test-utils.tsx';
-import { prepareCard, writePromptReading } from './prepare.ts';
+import { cardId, db } from '../../../lib/db.ts';
+import { parseRuby } from '../../../lib/ruby.ts';
+import type { CardRecord, CardType, ItemKind } from '../../../lib/types.ts';
+import { seededRandom } from '../../../srs/random.ts';
+import type { KnownWords } from '../../../srs/readListen.ts';
+import { CURRICULUM, KANJI, resetStudyDb } from '../test-utils.tsx';
+import {
+  blankKana,
+  blankKanji,
+  CLOZE_GAP,
+  cueTexts,
+  prepareCard,
+  splitCue,
+  stripRubyOf,
+  TYPED_BUILD_FROM,
+  type PrepareContext,
+} from './prepare.ts';
+import type { PreparedCard } from './types.ts';
 
 vi.mock('../../../lib/data.ts', async () => (await import('../test-utils.tsx')).dataMock);
 
-async function cardOf(kind: CardRecord['kind'], key: string, type: CardRecord['type']): Promise<CardRecord> {
-  await introduceItem(kind, key);
-  return (await db.cards.get(cardId(`${kind}:${key}`, type)))!;
+const KNOWN = new Set(['word:w-mizu', 'word:w-hon', 'word:w-nihon', 'core:cw-0001']);
+const known: KnownWords = { isKnown: (ref) => KNOWN.has(ref), introducedDay: (ref) => (KNOWN.has(ref) ? '2026-10-01' : undefined) };
+
+function ctx(over: Partial<PrepareContext> = {}): PrepareContext {
+  return { courseDay: 20, inSprint: false, taught: new Set(), grammarIntroduced: 5, handsBusy: false, known, random: seededRandom(1), ...over };
+}
+
+function card(kind: ItemKind, key: string, type: CardType, reps = 0): CardRecord {
+  const itemId = `${kind}:${key}`;
+  return { ...createEmptyCard(new Date('2026-10-15T09:00:00')), reps, id: cardId(itemId, type), itemId, kind, type };
+}
+
+async function prep(kind: ItemKind, key: string, type: CardType, over: Partial<PrepareContext> = {}, reps = 0): Promise<PreparedCard> {
+  const p = await prepareCard(card(kind, key, type, reps), ctx(over));
+  if (!p) throw new Error(`no card for ${kind}:${key}|${type}`);
+  return p;
 }
 
 beforeEach(async () => {
   await resetStudyDb();
 });
 
-describe('prepareCard', () => {
-  it('kana read: four distinct romaji of the same script, including the answer', async () => {
-    const prepared = await prepareCard(await cardOf('kana', 'あ', 'read'), seededRandom(1));
-    expect(prepared?.view).toBe('kana-read');
-    if (prepared?.view !== 'kana-read') return;
-    expect(prepared.options).toHaveLength(4);
-    expect(new Set(prepared.options).size).toBe(4);
-    expect(prepared.options).toContain('a');
-    // Yōon and katakana never show up for a basic hiragana.
-    expect(prepared.options).not.toContain('kya');
+describe('blanks', () => {
+  it('blanks every occurrence of the kanji', () => {
+    expect(blankKanji('日本', '日')).toBe('□本');
+    expect(blankKanji('日々日', '日')).toBe('□々□');
+    expect(blankKanji('本', '日')).toBe('本');
   });
 
-  it('kana read: を is never offered "o" (from お), which is also right for it', async () => {
-    const wo = { char: 'を', script: 'hiragana' as const, romaji: 'wo', group: 'wa', kind: 'basic' as const, order: 44, altRomaji: ['o'] };
-    KANA.push(wo);
-    try {
-      for (let seed = 0; seed < 40; seed++) {
-        const prepared = await prepareCard(await cardOf('kana', 'を', 'read'), seededRandom(seed));
-        if (prepared?.view !== 'kana-read') throw new Error('wrong view');
-        expect(prepared.options).toContain('wo');
-        expect(prepared.options).not.toContain('o');
-        expect(prepared.options).toHaveLength(4);
-      }
-    } finally {
-      KANA.splice(KANA.indexOf(wo), 1);
-    }
+  it('blanks a kana only where it stands alone', () => {
+    expect(blankKana('かさ', 'か')).toBe('□さ');
+    expect(blankKana('きゃく', 'き')).toBe('きゃく');
+    expect(blankKana('ききゃ', 'き')).toBe('□きゃ');
   });
 
-  it('kana read: は and へ are never offered "wa" and "e", their sounds as particles', async () => {
-    const extra = [['は', 'ha'], ['へ', 'he'], ['わ', 'wa'], ['ひ', 'hi']].map(([char, romaji], i) =>
-      ({ char, script: 'hiragana' as const, romaji, group: romaji, kind: 'basic' as const, order: 60 + i }));
-    KANA.push(...extra);
-    try {
-      for (let seed = 0; seed < 30; seed++) {
-        const ha = await prepareCard(await cardOf('kana', 'は', 'read'), seededRandom(seed));
-        if (ha?.view !== 'kana-read') throw new Error('wrong view');
-        expect(ha.options).toContain('ha');
-        expect(ha.options).not.toContain('wa');
-        const he = await prepareCard(await cardOf('kana', 'へ', 'read'), seededRandom(seed));
-        if (he?.view !== 'kana-read') throw new Error('wrong view');
-        expect(he.options).not.toContain('e');
-      }
-    } finally {
-      KANA.splice(KANA.length - extra.length);
-    }
-  });
-
-  it('vocab recall: the wrong options use only kana the learner can read', async () => {
-    for (const k of ['あ', 'い', 'う', 'え']) await introduceItem('kana', k);
-    for (let seed = 0; seed < 20; seed++) {
-      const prepared = await prepareCard(await cardOf('vocab', 'sw-ie', 'recall'), seededRandom(seed));
-      if (prepared?.view !== 'vocab-recall') throw new Error('wrong view');
-      expect(prepared.options).toContain('いえ');
-      // かお has か and お, not learned yet; いいえ, あい and うえ use known kana only.
-      expect(prepared.options).not.toContain('かお');
-      expect([...prepared.options].sort()).toEqual(['あい', 'いいえ', 'いえ', 'うえ'].sort());
-    }
-    // Knowing the whole script makes every word fair again.
-    await updateSettings({ knowsHiragana: true });
-    const options = new Set<string>();
-    for (let seed = 0; seed < 20; seed++) {
-      const prepared = await prepareCard(await cardOf('vocab', 'sw-ie', 'recall'), seededRandom(seed));
-      if (prepared?.view === 'vocab-recall') prepared.options.forEach((o) => options.add(o));
-    }
-    expect(options.has('かお')).toBe(true);
-    expect(SURVIVAL.some((w) => w.kana === 'かお')).toBe(true);
-  });
-
-  it('vocab recall: with too few readable survival words, readable common words come before unreadable ones', async () => {
-    // A readable word that also means "no" would be a second right answer for いいえ.
-    const nay = { id: 'w-nay', written: '否', kana: 'えい', meanings: ['no'], pos: ['int'], freqRank: 10, kanji: ['否'] };
-    WORDS.push(nay);
-    try {
-      for (const k of ['い', 'え']) await introduceItem('kana', k);
-      for (let seed = 0; seed < 20; seed++) {
-        const prepared = await prepareCard(await cardOf('vocab', 'sw-iie', 'recall'), seededRandom(seed));
-        if (prepared?.view !== 'vocab-recall') throw new Error('wrong view');
-        expect(prepared.options).toContain('いいえ');
-        expect(prepared.options).toContain('いえ');
-        expect(prepared.options).toHaveLength(4);
-        // あ, う, か and お aren't learned: those survival words only come once nothing readable is left.
-        for (const unreadable of ['あい', 'うえ', 'かお']) expect(prepared.options).not.toContain(unreadable);
-        expect(prepared.options).not.toContain('えい');
-      }
-    } finally {
-      WORDS.splice(WORDS.indexOf(nay), 1);
-    }
-  });
-
-  it('word meaning: English options come from words already taught, then words at the same level', async () => {
-    const rare = { id: 'w-rare', written: '遠心力', kana: 'えんしんりょく', meanings: ['centrifugal force'], pos: ['n'], freqRank: 30, kanji: ['遠', '心', '力'] };
-    WORDS.push(rare);
-    try {
-      await introduceItem('word', 'w-hi');
-      for (let seed = 0; seed < 20; seed++) {
-        const prepared = await prepareCard(await cardOf('word', 'w-mizu', 'meaning'), seededRandom(seed));
-        if (prepared?.view !== 'word-meaning') throw new Error('wrong view');
-        expect(prepared.options).toContain('water');
-        expect(prepared.options).toContain('fire'); // taught
-        expect(prepared.options).not.toContain('centrifugal force');
-        expect(prepared.options).toHaveLength(4);
-      }
-    } finally {
-      WORDS.pop();
-    }
-  });
-
-  it("kanji reading: doesn't show a word whose own reading card is in the same block", async () => {
-    await introduceItem('word', 'w-mizu');
-    await introduceItem('word', 'w-sui');
-    const block = [cardId('word:w-mizu', 'reading'), cardId('kanji:水', 'reading')];
-    for (let seed = 0; seed < 10; seed++) {
-      const prepared = await prepareCard(await cardOf('kanji', '水', 'reading'), seededRandom(seed), { block });
-      if (prepared?.view !== 'kanji-reading') throw new Error('wrong view');
-      expect(prepared.word?.id).toBe('w-sui');
-    }
-    // Every taught word asked already: one of the kanji's own readings the words don't use.
-    const all = [...block, cardId('word:w-sui', 'reading')];
-    const own = await prepareCard(await cardOf('kanji', '水', 'reading'), seededRandom(1), { block: all });
-    if (own?.view !== 'kanji-reading') throw new Error('wrong view');
-    expect(own.word).toBeUndefined();
-    expect(own.answer).toBe('すい');
-  });
-
-  it('kana write: names the row when another kana has the same romaji', async () => {
-    const dakuten = (char: string, romaji: string, group: string, order: number) =>
-      ({ char, script: 'hiragana' as const, romaji, group, kind: 'dakuten' as const, order });
-    const added = [dakuten('ざ', 'za', 'za', 50), dakuten('じ', 'ji', 'za', 51), dakuten('だ', 'da', 'da', 55), dakuten('ぢ', 'ji', 'da', 56)];
-    KANA.push(...added);
-    try {
-      const di = await prepareCard(await cardOf('kana', 'ぢ', 'write'));
-      if (di?.view !== 'kana-write') throw new Error('wrong view');
-      expect(di.row).toBe('だ');
-      const zi = await prepareCard(await cardOf('kana', 'じ', 'write'));
-      if (zi?.view !== 'kana-write') throw new Error('wrong view');
-      expect(zi.row).toBe('ざ');
-      const a = await prepareCard(await cardOf('kana', 'あ', 'write'));
-      if (a?.view !== 'kana-write') throw new Error('wrong view');
-      expect(a.row).toBeUndefined();
-    } finally {
-      KANA.splice(KANA.length - added.length);
-    }
-  });
-
-  it('kanji meaning: similar-level distractors that share no meaning with the answer', async () => {
-    const prepared = await prepareCard(await cardOf('kanji', '日', 'meaning'), seededRandom(2));
-    if (prepared?.view !== 'kanji-meaning') throw new Error('wrong view');
-    expect(prepared.options).toContain('day');
-    expect(prepared.options).not.toContain('sun');
-    expect(prepared.notAccepted).not.toContain('day');
-    expect(prepared.notAccepted).not.toContain('sun');
-  });
-
-  it("kanji meaning: a typed answer is guarded against every other kanji's meaning, not only the options shown", async () => {
-    const prepared = await prepareCard(await cardOf('kanji', '日', 'meaning'), seededRandom(2));
-    if (prepared?.view !== 'kanji-meaning') throw new Error('wrong view');
-    const others = Object.values(KANJI).filter((k) => k.char !== '日').flatMap((k) => k.meanings);
-    expect([...prepared.notAccepted].sort()).toEqual([...new Set(others)].sort());
-  });
-
-  it('kanji reading: shows a taught word and offers word readings', async () => {
-    await introduceItem('word', 'w-sui');
-    const prepared = await prepareCard(await cardOf('kanji', '水', 'reading'), seededRandom(3));
-    if (prepared?.view !== 'kanji-reading') throw new Error('wrong view');
-    expect(prepared.word?.written).toBe('水曜日');
-    expect(prepared.answer).toBe('すいようび');
-    expect(prepared.options).toContain('すいようび');
-    expect(prepared.breakdown.map((b) => b.char)).toEqual(['水', '曜', '日']);
-  });
-
-  it('kanji reading without a taught word asks for one of its readings', async () => {
-    const prepared = await prepareCard(await cardOf('kanji', '水', 'reading'), seededRandom(4));
-    if (prepared?.view !== 'kanji-reading') throw new Error('wrong view');
-    expect(prepared.word).toBeUndefined();
-    expect(prepared.answer).toBe('みず');
-    expect(prepared.options).not.toContain('すい');
-  });
-
-  it('grammar drill: the drill options, shuffled', async () => {
-    const prepared = await prepareCard(await cardOf('grammar', 'wa-desu', 'drill'), seededRandom(5));
-    if (prepared?.view !== 'grammar-drill') throw new Error('wrong view');
-    expect([...prepared.options].sort()).toEqual([...prepared.drill.options].sort());
-  });
-
-  it('returns null when the item is not in the data', async () => {
-    expect(await prepareCard(await cardOf('kanji', '龍', 'meaning'))).toBeNull();
+  it('splits a sentence around a word, never leaving a reading on it', () => {
+    expect(splitCue('{水|みず}です。', '水')).toEqual({ before: '', target: '水', after: 'です。' });
+    // The first occurrence, or the one at a given offset (the word's own token).
+    expect(splitCue('{日本|にほん}の{本|ほん}です。', '本')).toEqual({ before: '日', target: '本', after: 'の本です。' });
+    expect(splitCue('{日本|にほん}の{本|ほん}です。', '本', 3)).toEqual({ before: '日本の', target: '本', after: 'です。' });
+    expect(splitCue('あ{水曜日|すいようび}', '水曜')).toEqual({ before: 'あ', target: '水曜', after: '日' });
+    expect(splitCue('{水|みず}です。', '火')).toBeNull();
+    expect(stripRubyOf('{水|みず}と{水|みず}と{木|き}', '水')).toBe('水と水と{木|き}');
   });
 });
 
-describe('helpers', () => {
-  it('writePromptReading prefers a one-kanji word, then a kun reading', () => {
-    const kanji = { char: '食', meanings: ['eat'], kun: ['た.べる'], on: ['ショク'], strokeCount: 9, components: [] };
-    expect(writePromptReading(kanji, [])).toBe('たべる');
-    expect(writePromptReading({ ...kanji, kun: [] }, [])).toBe('ショク');
+describe('prepareCard', () => {
+  it('writes the kanji write prompt with the anchor blanked and never the kanji itself', async () => {
+    for (const unit of CURRICULUM.units) {
+      const p = await prep('kanji', unit.char, 'write');
+      expect(p.view).toBe('kanji-write');
+      if (p.view !== 'kanji-write') continue;
+      const shown = [p.blanked ?? '', p.reading, ...cueTexts(p).texts].join('');
+      expect(shown, unit.char).not.toContain(unit.char);
+      expect(p.options).toEqual([]);
+    }
+    const nihon = await prep('kanji', '日', 'write');
+    expect(nihon).toMatchObject({ blanked: '□本', reading: 'にほん' });
+    // A zero-word kanji: its keyword and first reading.
+    expect(await prep('kanji', '曜', 'write')).toMatchObject({ reading: 'ヨウ' });
+    expect((await prep('kanji', '曜', 'write') as Extract<PreparedCard, { view: 'kanji-write' }>).blanked).toBeUndefined();
   });
 
-  it('kanaToRomaji handles yōon, small tsu and katakana', () => {
-    const kana = [...KANA, { char: 'て', script: 'hiragana' as const, romaji: 'te', group: 'ta', kind: 'basic' as const, order: 99 }];
-    expect(kanaToRomaji('みず', kana)).toBe('mizu');
-    expect(kanaToRomaji('きゃあ', kana)).toBe('kyaa');
-    expect(kanaToRomaji('いって', kana)).toBe('itte');
-    expect(kanaToRomaji('ア.イ', kana)).toBe('ai');
+  it('never gives the card’s own word a reading, for every view', async () => {
+    await db.items.put({ id: 'core:cw-0002', kind: 'core', key: 'cw-0002', introducedAt: new Date(), spelledAt: new Date() });
+    await db.savedSentences.put({ id: 's-nihon', jp: '{日本|にほん}の{本|ほん}です。', en: 'It is a Japanese book.', savedAt: new Date(), source: 'reading', blank: { surface: '本', reading: 'ほん', ref: 'word:w-hon' } });
+    const all = await Promise.all([
+      prep('kana', 'か', 'read', { inSprint: true }),
+      prep('kana', 'か', 'read'),
+      prep('kana', 'か', 'write', { inSprint: true }),
+      prep('kana', 'か', 'write'),
+      prep('kanaRule', 'hira-dakuten', 'read'),
+      prep('kanji', '水', 'write'),
+      prep('kanji', '曜', 'meaning'),
+      prep('word', 'w-nihon', 'read'),
+      prep('word', 'w-hon', 'read'),
+      prep('core', 'cw-0002', 'produce'),
+      prep('core', 'cw-0002', 'listen'),
+      prep('grammar', 'wa-desu', 'comprehend'),
+      prep('grammar', 'wa-desu', 'build'),
+      prep('sentence', 's-nihon', 'cloze'),
+    ]);
+    expect(new Set(all.map((p) => p.view))).toEqual(new Set([
+      'kana-read', 'kana-write', 'kana-rule', 'kanji-write', 'kanji-meaning', 'word-read', 'produce', 'listen',
+      'grammar-comprehend', 'grammar-build', 'cloze',
+    ]));
+    for (const p of all) {
+      const { texts, target } = cueTexts(p);
+      if (!target) continue;
+      for (const text of texts) {
+        for (const seg of parseRuby(text)) {
+          if (seg.reading === undefined) continue;
+          // No reading over the word wherever it appears (another word that only shares a kanji may keep its own).
+          expect(seg.text.includes(target), `${p.view}: ${text}`).toBe(false);
+        }
+      }
+      // Writing cards never show what is to be written.
+      if (p.view === 'kanji-write' || p.view === 'kana-write') expect(texts.join(''), p.view).not.toContain(target);
+    }
   });
 
-  it('kanaToRomaji keeps a final small tsu, and reads ヴ and loanword sounds', () => {
-    const kana = [...KANA, { char: 'じ', script: 'hiragana' as const, romaji: 'ji', group: 'za', kind: 'dakuten' as const, order: 98 }];
-    expect(kanaToRomaji('ジッ', kana)).toBe('jit');
-    expect(kanaToRomaji('じっ', kana)).not.toBe(kanaToRomaji('じ', kana));
-    expect(kanaToRomaji('ヴ', kana)).toBe('vu');
-    expect(kanaToRomaji('ヴァイオリン', kana)).toMatch(/^va/);
+  it('reads a word inside a known carrier sentence, underlined and without its reading', async () => {
+    const p = await prep('word', 'w-nihon', 'read');
+    expect(p.view).toBe('word-read');
+    if (p.view !== 'word-read') return;
+    expect(p.carrier?.id).toBe('s-nihon');
+    expect(p.cue).toEqual({ before: '', target: '日本', after: 'の{本|ほん}です。' });
+    expect(p.options).toHaveLength(4);
+    expect(p.options).toContain('にほん');
+    // A word with no known carrier stands alone.
+    const alone = await prep('word', 'w-ike', 'read');
+    expect(alone).toMatchObject({ view: 'word-read', cue: { before: '', target: '池', after: '' } });
+    // The word's own token is underlined, not an earlier word that contains it.
+    expect(await prep('word', 'w-hon', 'read')).toMatchObject({ cue: { before: '日本の', target: '本', after: 'です。' } });
+    expect((alone as Extract<PreparedCard, { view: 'word-read' }>).carrier).toBeUndefined();
   });
 
-  it('kanaToRomaji reads は, へ and を as particles in words and phrases, not in readings', () => {
-    const kana = [
-      ...KANA,
-      ...[['こ', 'ko'], ['ん', 'n'], ['に', 'ni'], ['ち', 'chi'], ['は', 'ha'], ['ば', 'ba'], ['ど', 'do'], ['と', 'to'], ['れ', 're'], ['を', 'wo'], ['へ', 'he']]
-        .map(([char, romaji], i) => ({ char, script: 'hiragana' as const, romaji, group: romaji, kind: 'basic' as const, order: 100 + i })),
-    ];
-    expect(kanaToRomaji('こんにちは', kana, { particles: true })).toBe('konnichiwa');
-    expect(kanaToRomaji('こんばんは', kana, { particles: true })).toBe('konbanwa');
-    expect(kanaToRomaji('トイレは どこ', kana, { particles: true })).toBe('toire wa doko');
-    expect(kanaToRomaji('みずを', kana, { particles: true })).toBe('mizuo');
-    // は that starts a word, or a reading, stays "ha".
-    expect(kanaToRomaji('はは', kana, { particles: true })).toBe('haha');
-    expect(kanaToRomaji('こんにちは', kana)).toBe('konnichiha');
+  it('shows a core word in kana until it is spelled', async () => {
+    await db.items.put({ id: 'core:cw-0002', kind: 'core', key: 'cw-0002', introducedAt: new Date() });
+    expect(await prep('core', 'cw-0002', 'listen')).toMatchObject({ view: 'listen', display: 'たべる' });
+    await db.items.update('core:cw-0002', { spelledAt: new Date() });
+    expect(await prep('core', 'cw-0002', 'listen')).toMatchObject({ display: '{食べる|たべる}' });
   });
 
-  it('shortInterval moves up a unit once the rounded number reaches it', () => {
-    const now = new Date(2026, 9, 14, 12);
-    const later = (ms: number) => new Date(now.getTime() + ms);
-    expect(shortInterval(later(10 * 60_000), now)).toBe('10m');
-    expect(shortInterval(later(59.6 * 60_000), now)).toBe('1h');
-    expect(shortInterval(later(6 * 3_600_000), now)).toBe('6h');
-    expect(shortInterval(later(23.6 * 3_600_000), now)).toBe('1d');
-    expect(shortInterval(later(24 * 3_600_000), now)).toBe('1d');
-    expect(shortInterval(later(8 * 86_400_000), now)).toBe('8d');
+  it('takes romaji on kana read cards only during the sprint, and makes write cards sound-only then', async () => {
+    expect(await prep('kana', 'か', 'read', { inSprint: true })).toMatchObject({ view: 'kana-read', mode: 'romaji', answer: 'ka' });
+    expect(await prep('kana', 'か', 'read')).toMatchObject({ view: 'kana-read', mode: 'word', answer: 'かさ' });
+    const sprintWrite = await prep('kana', 'か', 'write', { inSprint: true });
+    expect(sprintWrite).toMatchObject({ view: 'kana-write', prompt: 'sound' });
+    expect(JSON.stringify({ ...sprintWrite, kana: undefined, card: undefined })).not.toMatch(/"ka"/);
+    expect(await prep('kana', 'か', 'write')).toMatchObject({ prompt: 'word', blanked: '□さ' });
+    // お and を sound alike: a sound-only prompt names the row.
+    expect(await prep('kana', 'を', 'write', { inSprint: true })).toMatchObject({ row: 'わ' });
+    // The romaji choices never offer a second right answer (を is also "o").
+    const wo = await prep('kana', 'を', 'read', { inSprint: true });
+    expect(wo.options).not.toContain('o');
   });
 
-  it('grammarGloss drops a Japanese name the pattern already shows, keeps an English one', () => {
-    expect(grammarGloss({ title: '〜は〜です — "X is Y"', pattern: '〜は〜です' })).toBe('"X is Y"');
-    expect(grammarGloss({ title: '〜まえに・〜あとで — "before", "after"', pattern: '〜る{前|まえ}に・〜た{後|あと}で' })).toBe('"before", "after"');
-    expect(grammarGloss({ title: 'あります・います — "there is", "I have"', pattern: '〜に〜があります・〜がいます' })).toBe('"there is", "I have"');
-    expect(grammarGloss({ title: 'い-adjectives — "it\'s tasty"', pattern: '〜いです' })).toBe('い-adjectives — "it\'s tasty"');
+  it('rotates comprehend examples: never one of the last two shown, and never 0–2 within the first n − 3 reviews', async () => {
+    const n = 9;
+    const shown: number[] = [];
+    for (let reps = 0; reps <= 20; reps++) {
+      const p = await prep('grammar', 'wa-desu', 'comprehend', {}, reps);
+      if (p.view !== 'grammar-comprehend') throw new Error(p.view);
+      expect(shown.slice(-2)).not.toContain(p.exampleIndex);
+      if (reps < n - 3) expect(p.exampleIndex).toBeGreaterThanOrEqual(3);
+      shown.push(p.exampleIndex);
+    }
   });
 
-  it('longVowelsSpelledOut writes a long-vowel mark as the vowel it stretches', () => {
-    expect(longVowelsSpelledOut('コーヒー')).toBe('こおひい');
-    expect(longVowelsSpelledOut('ビーだま')).toBe('びいだま');
-    expect(longVowelsSpelledOut('ウォールがい')).toBe('うぉおるがい');
-    expect(longVowelsSpelledOut('すいようび')).toBe('すいようび');
+  it('builds with tiles until 60 grammar points are introduced, then typed with choices behind "Show options"', async () => {
+    const tiles = await prep('grammar', 'wa-desu', 'build', { grammarIntroduced: TYPED_BUILD_FROM - 1 });
+    expect(tiles).toMatchObject({ view: 'grammar-build', tiles: true, itemIndex: 1, options: [] });
+    if (tiles.view === 'grammar-build') expect(tiles.shuffledTiles).not.toEqual(tiles.item.tiles);
+    const typed = await prep('grammar', 'wa-desu', 'build', { grammarIntroduced: TYPED_BUILD_FROM });
+    expect(typed).toMatchObject({ tiles: false });
+    expect(typed.options.length).toBeGreaterThan(1);
+    expect(typed.options).toContain(typed.answer);
   });
 
-  it('untilText reads naturally', () => {
-    const now = new Date(2026, 9, 14, 12);
-    const later = (ms: number) => new Date(now.getTime() + ms);
-    expect(untilText(later(10 * 60_000), now)).toBe('in 10 minutes');
-    expect(untilText(later(26 * 3_600_000), now)).toBe('tomorrow');
-    expect(untilText(later(4 * 86_400_000), now)).toBe('in 4 days');
-    expect(untilText(later(90 * 86_400_000), now)).toBe('in 3 months');
+  it('blanks the cloze word and asks for its reading', async () => {
+    await db.savedSentences.put({ id: 's-mizu', jp: '{水|みず}です。', en: 'It is water.', savedAt: new Date(), source: 'reading', blank: { surface: '水', reading: 'みず', ref: 'word:w-mizu' } });
+    const p = await prep('sentence', 's-mizu', 'cloze');
+    expect(p).toMatchObject({ view: 'cloze', cue: { before: '', target: CLOZE_GAP, after: 'です。' }, answer: 'みず' });
+  });
+
+  it('carries the learner’s own hook, and nothing for a card whose data is missing', async () => {
+    await db.items.put({ id: 'kanji:水', kind: 'kanji', key: '水', introducedAt: new Date(), customMnemonic: 'My hook' });
+    expect((await prep('kanji', '水', 'write')).customMnemonic).toBe('My hook');
+    expect(await prepareCard(card('kanji', '火', 'write'), ctx())).toBeNull();
+    expect(Object.keys(KANJI)).not.toContain('火');
   });
 });

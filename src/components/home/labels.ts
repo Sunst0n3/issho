@@ -1,54 +1,31 @@
-// Wording shared by the home screens: phases, dates, greetings, daily pace.
-import type { CourseProgress, Phase } from '../../srs/course.ts';
-import type { Curriculum } from '../../lib/types.ts';
+// Wording shared by the home screens: daily minutes, dates, greetings, counts.
+import type { DailyMinutes, TogetherSlot } from '../../lib/types.ts';
 
-export const PHASE_NAMES: Record<Phase, string> = {
-  1: 'Kana & first words',
-  2: 'Foundation',
-  3: 'Reading for real',
-  4: 'Real Japanese',
+/** What each daily budget gives in a year, from the final-plan simulation (simF5, 2 seeds). */
+export const MINUTES_NOTES: Record<DailyMinutes, string> = {
+  20: 'about 165–175 kanji, 1,300 words in a year',
+  25: 'about 270–310 kanji, 1,550 words in a year',
+  30: 'about 350 kanji, 1,800 words in a year',
+  40: 'about 530 kanji, 2,400 words in a year',
 };
 
-export type KanjiTargets = Record<2 | 3 | 4, number>;
+export const MINUTES_TITLES: Record<DailyMinutes, string> = {
+  20: 'Light',
+  25: 'Steady',
+  30: 'Keen',
+  40: 'Intensive',
+};
 
-export function phaseDetail(phase: Phase, targets: KanjiTargets): string {
-  switch (phase) {
-    case 1: return 'Hiragana, katakana and everyday words';
-    // Each phase is counted in its own kanji, like the progress under it and the library.
-    case 2: return `Your first ${targets[2].toLocaleString()} kanji, inside real words`;
-    case 3: return `${(targets[3] - targets[2]).toLocaleString()} more kanji (${targets[3].toLocaleString()} in all), reading real sentences`;
-    case 4: return `The last ${(targets[4] - targets[3]).toLocaleString()} of all ${targets[4].toLocaleString()} everyday kanji`;
-  }
-}
+export const DEFAULT_MINUTES: DailyMinutes = 25;
 
-/** Kanji introduced by the end of each phase: { 2: 300, 3: 800, 4: 2136 }. */
-export function phaseKanjiTargets(curriculum: Curriculum): KanjiTargets {
-  const kanjiBefore = (end: number) => curriculum.units.filter((u) => u.type === 'kanji' && u.index < end).length;
-  const total = kanjiBefore(Infinity);
-  return {
-    2: kanjiBefore(curriculum.phaseEnds['2'] ?? Infinity),
-    3: kanjiBefore(curriculum.phaseEnds['3'] ?? Infinity),
-    4: total,
-  };
-}
-
-/**
- * "84 of 300 kanji" — progress in the current phase, counted in that phase's own
- * kanji as the kanji library's phase groups are ("Phase 3 · 0 of 500 kanji").
- * Phase 1 counts the basic kana ("49 of 92 basic kana"), which is what unlocks phase 2.
- */
-export function phaseProgressText(p: CourseProgress): string {
-  if (p.phase === 1) return `${p.phaseDone} of ${p.phaseTarget} basic kana`;
-  return `${p.phaseDone.toLocaleString()} of ${p.phaseTarget.toLocaleString()} kanji`;
-}
-
-/** 0..1 through the current phase. */
-export function phaseFraction(p: CourseProgress): number {
-  return p.phaseTarget ? Math.min(1, p.phaseDone / p.phaseTarget) : 0;
-}
-
+/** Indexed by Date.getDay() (0 = Sunday). */
 export const WEEKDAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 export const WEEKDAYS_JA = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'];
+
+/** ISO weekday (1 = Monday … 7 = Sunday) → English name. */
+export function isoWeekdayName(weekday: TogetherSlot['weekday']): string {
+  return WEEKDAYS_EN[weekday % 7];
+}
 
 /** 'YYYY-MM-DD' → local Date at noon (safe from DST edges). */
 export function dateOfKey(key: string): Date {
@@ -56,19 +33,62 @@ export function dateOfKey(key: string): Date {
   return new Date(y, m - 1, d, 12);
 }
 
+/** Local date → 'YYYY-MM-DD' (calendar date, no 4 a.m. rollover). */
+export function keyOfDate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/** Calendar days after `key` ('YYYY-MM-DD'); negative goes back. */
+export function shiftDay(key: string, days: number): string {
+  const d = dateOfKey(key);
+  d.setDate(d.getDate() + days);
+  return keyOfDate(d);
+}
+
+/** Monday of the ISO week that holds `key`. */
+export function mondayOf(key: string): string {
+  const day = dateOfKey(key).getDay();
+  return shiftDay(key, -((day + 6) % 7));
+}
+
+const SHORT_DATE = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
+const DAY_MONTH = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short' });
+const LONG_DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+/** 'Monday 20 Oct' */
+export function dayLabel(key: string): string {
+  return SHORT_DATE.format(dateOfKey(key)).replace(',', '');
+}
+
+/** '20 Oct' */
+export function dayMonth(key: string): string {
+  return DAY_MONTH.format(dateOfKey(key));
+}
+
+/** '20 October 2026' */
+export function longDate(key: string): string {
+  return LONG_DATE.format(dateOfKey(key));
+}
+
+/** 'Tuesday' for a day key. */
+export function weekdayOf(key: string): string {
+  return WEEKDAYS_EN[dateOfKey(key).getDay()];
+}
+
+/** 'Thursday 4 a.m.', 'Friday 7:30 p.m.' */
+export function deadlineText(d: Date): string {
+  const h = d.getHours();
+  const m = d.getMinutes();
+  const hour = h % 12 === 0 ? 12 : h % 12;
+  const time = m ? `${hour}:${String(m).padStart(2, '0')}` : String(hour);
+  return `${WEEKDAYS_EN[d.getDay()]} ${time} ${h < 12 ? 'a.m.' : 'p.m.'}`;
+}
+
 export function greeting(now: Date): string {
   const h = now.getHours();
   if (h >= 4 && h < 12) return 'Good morning';
   if (h >= 12 && h < 18) return 'Good afternoon';
   return 'Good evening';
-}
-
-/**
- * Honest daily time for a pace of new items, once reviews have built up:
- * 3 → ~10 min, 5 → ~15, 8 → ~25 (rounded to 5).
- */
-export function minutesForPace(newPerDay: number): number {
-  return Math.max(5, Math.round((newPerDay * 3) / 5) * 5);
 }
 
 /** "just now", "5 min ago", "3 h ago", "2 days ago" */
@@ -88,4 +108,16 @@ export function streakText(days: number): string {
 
 export function plural(n: number, one: string, many = `${one}s`): string {
   return `${n.toLocaleString()} ${n === 1 ? one : many}`;
+}
+
+/** 0.834 → '83 %' (with a no-break space, so the sign never wraps alone). */
+export function percent(share: number): string {
+  return `${Math.round(share * 100)} %`;
+}
+
+/** 'HH:MM' that a time input accepts, or null. */
+export function cleanTime(value: string): string | null {
+  const m = /^(\d{1,2}):(\d{2})$/.exec(value.trim());
+  if (!m || Number(m[1]) > 23 || Number(m[2]) > 59) return null;
+  return `${m[1].padStart(2, '0')}:${m[2]}`;
 }

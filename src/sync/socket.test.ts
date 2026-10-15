@@ -260,6 +260,9 @@ describe('presence', () => {
     expect(result.current).toBe(false);
     act(() => sock.receive({ type: 'roleplay', memberId: 'ken', state: { sessionId: 's', scriptId: 'rp', role: 'a', lineIndex: 0, status: 'waiting' } }));
     expect(result.current).toBe(true);
+    act(() => sock.receive({ type: 'presence', memberId: 'ken', online: false }));
+    act(() => sock.receive({ type: 'live', memberId: 'ken', state: { sessionId: 's', session: 'A', opener: 'ken', step: 'quiz', status: 'active' } }));
+    expect(result.current).toBe(true);
   });
 
   it('treats everyone as offline once a new connection has had time to list them', () => {

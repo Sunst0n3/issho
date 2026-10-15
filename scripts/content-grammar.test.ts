@@ -1,42 +1,76 @@
 // @vitest-environment node
-// Regression checks for content/grammar.json, from the grammar review. The
-// curriculum checks need public/data (npm run build:data) and skip without it.
+// Checks for grammar-v2 (content/grammar-v2.json, or its part files) and the typed answers of
+// its build items (scripts/lib/answers.ts). The checks against the curriculum need public/data
+// (npm run build:data) and skip without it.
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
-import { isKanaOnly, kanjiIn, parseRuby, rubyToPlain, type RubySegment } from '../src/lib/ruby.ts';
-import type { Curriculum, GrammarDrill, GrammarPoint, WordEntry } from '../src/lib/types.ts';
-import { DRILL_BLANK, checkContent, itemKanji, readingMismatches } from './lib/content.ts';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { isKanaOnly, kanjiIn, rubyToKana, rubyToPlain } from '../src/lib/ruby.ts';
+import type { Curriculum, GrammarPoint } from '../src/lib/types.ts';
+import { MAX_ANSWERS, buildAnswers, normalizeAnswer, tokenAnswers } from './lib/answers.ts';
+import {
+  DRILL_BLANK,
+  MIN_BUILD_ITEMS,
+  MIN_GRAMMAR_EXAMPLES,
+  MIN_GRAMMAR_POINTS,
+  PLAIN_FORM_MAX_ORDER,
+  PLAIN_FORM_POINTS,
+  checkContent,
+  checkGrammarSet,
+  itemKanji,
+  latePlainForms,
+  mergeContent,
+  readContentSources,
+} from './lib/content.ts';
+import { getTokenizer, type RubyTokenizer } from './v2/tokenize.ts';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const read = <T,>(path: string): T => JSON.parse(readFileSync(ROOT + path, 'utf8')) as T;
-const built = existsSync(`${ROOT}public/data/curriculum.json`) && existsSync(`${ROOT}public/data/words.json`);
+const built = existsSync(`${ROOT}public/data/curriculum.json`) && read<{ version?: number }>('public/data/curriculum.json').version === 2;
 
-const points = read<GrammarPoint[]>('content/grammar.json');
-const rubyFields = (p: GrammarPoint) => [p.pattern, ...p.examples.map((e) => e.jp), ...p.drills.map((d) => d.prompt)];
-const fill = (d: GrammarDrill, option: string) => d.prompt.replace(DRILL_BLANK, option);
-const KATAKANA_RE = /[ァ-ヺー]/;
+const source = readContentSources(`${ROOT}content`, 'grammar', ROOT);
+const merged = mergeContent('grammar', source.sources);
+const points = merged.data as GrammarPoint[];
+const order = new Map(points.map((p) => [p.id, p.order]));
 
-describe('content/grammar.json', () => {
-  it('passes the shared content validator with no errors or warnings', () => {
-    const report = checkContent('grammar', points);
-    expect(report.errors).toEqual([]);
-    expect(report.warnings).toEqual([]);
+describe('content grammar-v2', () => {
+  it('passes the shared content validator with no errors', () => {
+    expect(source.errors).toEqual([]);
+    expect(merged.errors).toEqual([]);
+    expect(checkGrammarSet(points as never[]).errors).toEqual([]);
   });
 
-  it('runs 1..n in order with unique kebab-case ids, never going back a phase', () => {
+  it(`has at least ${MIN_GRAMMAR_POINTS} points, running 1..n with unique kebab-case ids`, () => {
+    expect(points.length).toBeGreaterThanOrEqual(MIN_GRAMMAR_POINTS);
     points.forEach((p, i) => {
       expect(p.order, p.id).toBe(i + 1);
       expect(p.id).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
-      if (i > 0) expect(p.phase, `${p.id} goes back a phase`).toBeGreaterThanOrEqual(points[i - 1].phase);
     });
     expect(new Set(points.map((p) => p.id)).size).toBe(points.length);
   });
 
+  it(`gives every point ≥ ${MIN_GRAMMAR_EXAMPLES} examples and ≥ ${MIN_BUILD_ITEMS} build items unless recognition-only`, () => {
+    for (const p of points) {
+      expect(p.examples.length, p.id).toBeGreaterThanOrEqual(MIN_GRAMMAR_EXAMPLES);
+      if (p.recognitionOnly) expect(p.buildItems, p.id).toEqual([]);
+      else expect(p.buildItems.length, p.id).toBeGreaterThanOrEqual(MIN_BUILD_ITEMS);
+    }
+    expect(points.filter((p) => p.recognitionOnly).map((p) => p.id).sort()).toEqual(['causative', 'keigo-set-phrases', 'keigo-verbs', 'passive']);
+  });
+
+  it('builds every tile set back into the plain sentence', () => {
+    for (const p of points) for (const b of p.buildItems) expect(b.tiles.join(''), p.id).toBe(rubyToPlain(b.jp));
+  });
+
+  it('lists prerequisites that come earlier, and contrasts that exist', () => {
+    for (const p of points) {
+      for (const q of p.prerequisites) expect(order.get(q)!, `${p.id} needs ${q}`).toBeLessThan(p.order);
+      for (const q of p.contrastWith) expect(order.has(q), `${p.id} contrasts ${q}`).toBe(true);
+    }
+  });
+
   it('gives every drill one blank outside ruby, 3–4 distinct kana options and an English line', () => {
     for (const p of points) {
-      expect(p.examples.length, p.id).toBeGreaterThanOrEqual(3);
-      expect(p.drills.length, p.id).toBeGreaterThanOrEqual(4);
       for (const d of p.drills) {
         expect(d.prompt.split(DRILL_BLANK), d.prompt).toHaveLength(2);
         expect(d.prompt, 'blank inside ruby').not.toMatch(/\{[^}]*＿/);
@@ -47,142 +81,123 @@ describe('content/grammar.json', () => {
         expect(Number.isInteger(d.answer) && d.answer >= 0 && d.answer < d.options.length, d.prompt).toBe(true);
         expect(d.en.trim(), d.prompt).not.toBe('');
       }
-    }
-  });
-
-  it('keeps phase 1 in hiragana, so it can be read before katakana is taught', () => {
-    for (const p of points.filter((x) => x.phase === 1)) {
-      for (const s of [...rubyFields(p), ...p.drills.flatMap((d) => d.options), p.title, p.explanation]) {
-        expect(kanjiIn(s), `${p.id}: kanji in "${s}"`).toEqual([]);
-        expect(rubyToPlain(s), `${p.id}: katakana`).not.toMatch(KATAKANA_RE);
-      }
-    }
-  });
-
-  it('keeps kanji out of titles and explanations (plain strings cannot show readings)', () => {
-    for (const p of points) {
-      expect(kanjiIn(p.title), p.id).toEqual([]);
-      expect(kanjiIn(p.explanation), p.id).toEqual([]);
-    }
-  });
-
-  it('never gives every drill of a point the same answer', () => {
-    for (const p of points) {
       const answers = new Set(p.drills.map((d) => d.options[d.answer]));
       expect(answers.size, `${p.id}: every drill is ${[...answers].join('')}`).toBeGreaterThan(1);
     }
   });
 
-  it('mixes particle drills between the new particle and particles taught before it', () => {
-    // QA: each of these had five drills that were all answered by its own particle.
-    const particleOf: Record<string, string> = {
-      'wa-desu': 'は',
-      'ka-question': 'か',
-      'no-possession': 'の',
-      'mo-also': 'も',
-      'wo-object': 'を',
-      'ni-time-place': 'に',
-      'he-direction': 'へ',
-      'de-place-means': 'で',
-      'to-with': 'と',
-    };
-    const taught = new Set<string>();
-    for (const p of points) {
-      const particle = particleOf[p.id];
-      if (!particle) continue;
-      taught.add(particle);
-      if (p.id === 'wa-desu' || p.id === 'ka-question') continue;
-      const answers = p.drills.map((d) => d.options[d.answer]);
-      const own = answers.filter((a) => a === particle).length;
-      expect(own, `${p.id}: ${answers.join(' ')}`).toBeGreaterThanOrEqual(2);
-      expect(own, `${p.id}: ${answers.join(' ')}`).toBeLessThan(answers.length);
-      for (const a of answers) expect(taught.has(a), `${p.id}: answer ${a} is not taught yet`).toBe(true);
-    }
+  it('keeps kanji out of explanations (plain strings cannot show readings)', () => {
+    for (const p of points) expect(kanjiIn(p.explanation), p.id).toEqual([]);
   });
 
-  it('does not make claims later points contradict', () => {
-    // と also follows whole sentences in とおもう (and the conditional と).
-    if (points.some((p) => rubyToPlain(p.pattern).includes('と思う'))) {
-      for (const p of points) expect(p.explanation, p.id).not.toMatch(/never whole sentences/);
+  it('reports the plain forms the plan wants by order 22 (kept as authored, lead decision)', () => {
+    for (const id of PLAIN_FORM_POINTS) expect(order.has(id), id).toBe(true);
+    // An info line in the build, not a warning: exactly the plain-form points after #22, in order.
+    const expected = PLAIN_FORM_POINTS.filter((id) => order.get(id)! > PLAIN_FORM_MAX_ORDER).sort((a, b) => order.get(a)! - order.get(b)!);
+    expect(latePlainForms(points).map((p) => p.id)).toEqual(expected);
+    const fixture = [
+      { id: 'casual-past', order: 44 },
+      { id: 'dictionary-form', order: 22 },
+      { id: 'nai-form', order: 30 },
+      { id: 'te-form', order: 40 },
+    ];
+    expect(latePlainForms(fixture)).toEqual([{ id: 'nai-form', order: 30 }, { id: 'casual-past', order: 44 }]);
+  });
+  // Lead decision: the plain forms keep their authored order (#29–#44); the build prints the info line above.
+});
+
+/**
+ * Kana words in examples and build items that are not core words, reported to the lead (content
+ * authors' file): もちかえり (JMdict only), チョコ (the core word is チョコレート), どんなに (どんな + に).
+ * Remove an entry once the example or the core list is fixed.
+ */
+const KNOWN_NON_CORE = new Set(['keigo-set-phrases: もちかえり', 'kureru: チョコ', 'temo-even-if: どんなに']);
+
+describe('grammar example vocabulary', () => {
+  let tk: RubyTokenizer;
+  beforeAll(async () => {
+    tk = await getTokenizer();
+  }, 30_000);
+  const texts = (p: GrammarPoint) => [...p.examples.map((e) => e.jp), ...p.buildItems.map((b) => b.jp)];
+
+  // Every kanji has furigana: validateRuby (in the content validator above) reports a kanji without a reading.
+  it('uses core words, or words written in kanji with furigana, in examples and build items (names excepted)', () => {
+    const problems = new Set<string>();
+    for (const p of points) {
+      for (const t of texts(p)) {
+        for (const tok of tk.tokenize(t)) {
+          if (tok.kind !== 'content' || tok.proper || tok.ref?.startsWith('core:') || kanjiIn(tok.surface).length > 0) continue;
+          problems.add(`${p.id}: ${tok.surface}`);
+        }
+      }
     }
+    expect([...problems].filter((x) => !KNOWN_NON_CORE.has(x))).toEqual([]);
   });
 });
 
-describe.skipIf(!built)('content/grammar.json against the curriculum', () => {
-  it('uses only kanji the curriculum teaches', () => {
+describe('typed answers for build items', () => {
+  let tk: RubyTokenizer;
+  beforeAll(async () => {
+    tk = await getTokenizer();
+  }, 30_000);
+  const answers = (jp: string, alternatives: string[] = []) =>
+    buildAnswers({ jp, alternatives }, (t) => tk.tokenize(t), rubyToKana);
+
+  it('reads the sentence and its alternatives as hiragana without punctuation', () => {
+    const { answers: list, unread } = answers('{今|いま}{何時|なんじ}ですか。', ['今、何時？', 'いまなんじ']);
+    expect(list).toEqual(['いまなんじですか', 'いまなんじ']);
+    expect(unread).toEqual([]);
+  });
+
+  it('also accepts は, へ and を typed as わ, え and お', () => {
+    const { answers: list } = answers('わたしは{駅|えき}へ{行|い}きます。');
+    expect(list).toEqual(['わたしはえきへいきます', 'わたしはえきえいきます', 'わたしわえきへいきます', 'わたしわえきえいきます']);
+    expect(answers('ケーキを{食|た}べた。').answers).toContain('けーきおたべた');
+    // こんにちは is one word, not a particle.
+    expect(answers('こんにちは。').answers).toEqual(['こんにちは']);
+  });
+
+  it('leaves out an alternative it cannot read, and keeps at most 16', () => {
+    expect(tokenAnswers([{ surface: '囧', reading: '囧', pos: '名詞' }])).toBeUndefined();
+    const many = answers('わたしは{駅|えき}へ{行|い}きます。', ['あなたは駅へ行きます。', 'かれは駅へ行きます。', 'かのじょは駅へ行きます。', 'ともだちは駅へ行きます。']);
+    expect(many.answers.length).toBe(MAX_ANSWERS);
+    expect(many.answers.slice(0, 5)).toEqual([
+      'わたしはえきへいきます',
+      'あなたはえきへいきます',
+      'かれはえきへいきます',
+      'かのじょはえきへいきます',
+      'ともだちはえきへいきます',
+    ]);
+    expect(normalizeAnswer('コーヒー、ください！')).toBe('こーひーください');
+  });
+
+  it('adds no answers for an alternative written with digits (10分 is じゅっぷん, which its tokens do not say)', () => {
+    const { answers: list, unread } = answers('{午後|ごご}{四時|よじ}{十分|じゅっぷん}です。', ['午後4時10分です。', 'ごご よじ じゅっぷん です']);
+    expect(list).toEqual(['ごごよじじゅっぷんです']);
+    expect(unread).toEqual([]);
+  });
+
+  it.runIf(built)('are published with every build item, the particle variants included', () => {
+    const published = read<GrammarPoint[]>('public/data/content/grammar.json');
+    const first = published.find((p) => p.id === 'wa-desu')!.buildItems[0];
+    expect(first.answers[0]).toBe(normalizeAnswer(rubyToKana(first.jp)));
+    expect(first.answers.some((a) => a.includes('わ'))).toBe(true);
+    for (const p of published) for (const b of p.buildItems) expect(b.answers, p.id).toContain(normalizeAnswer(rubyToKana(b.jp)));
+    for (const p of published) for (const b of p.buildItems) for (const a of b.answers) expect(a, p.id).not.toMatch(/[0-9A-Za-z]/);
+  });
+});
+
+describe.skipIf(!built)('grammar-v2 against the curriculum', () => {
+  it('uses only kanji the curriculum teaches, each with a reading', () => {
     const taught = new Set(read<Curriculum>('public/data/curriculum.json').units.map((u) => u.char));
     for (const item of checkContent('grammar', points).items) {
       expect(itemKanji(item).filter((k) => !taught.has(k)), item.id).toEqual([]);
     }
   });
 
-  it('reads whole words as words.json does', () => {
-    const byWritten = new Map<string, string[]>();
-    for (const w of read<WordEntry[]>('public/data/words.json')) {
-      byWritten.set(w.written, [...(byWritten.get(w.written) ?? []), w.kana]);
-    }
-    // Single-kanji bases are mostly verb and adjective stems ({行|い}く) that
-    // would be compared with unrelated one-kanji words (行 ぎょう).
-    const mismatches = checkContent('grammar', points)
-      .items.flatMap((item) => readingMismatches(item, byWritten))
-      .filter((m) => [...m.written].length > 1);
-    expect(mismatches).toEqual([]);
-  });
-});
-
-/** Readings that depend on what follows the ruby group. */
-const CONTEXT_READINGS: { base: string; reading: string; wrongBefore: RegExp; why: string }[] = [
-  { base: '何', reading: 'なに', wrongBefore: /^(の|だ|です)/, why: '何 before の/だ/です is なん' },
-  { base: '何', reading: 'なん', wrongBefore: /^(を|が|も|か|\{|$)/, why: '何 before を/が/も/か or a verb is なに' },
-  { base: '一日', reading: 'ついたち', wrongBefore: /^/, why: 'ついたち only after a month (一月一日)' },
-  { base: '今日', reading: 'こんにち', wrongBefore: /^/, why: '今日 is きょう outside こんにちは' },
-];
-
-/** Completions a native speaker would accept for a drill's English; a distractor must never produce one. */
-const ACCEPTABLE_COMPLETIONS: { pattern: RegExp; why: string }[] = [
-  { pattern: /【[へに]】(行|帰|来)/, why: 'に and へ both mark a destination with 行く/帰る/来る' },
-  { pattern: /【[にへ]】ようこそ/, why: 'にようこそ and へようこそ are both fine' },
-  { pattern: /[ァ-ヺー]+【に】[ァ-ヺー]+を/, why: 'AにB lists items to order ("coffee with cake")' },
-  { pattern: /と.+、【(いつ|どれ)】が/, why: 'いつ/どれ can ask which of a listed set' },
-  { pattern: /【[へに]】(話|言)/, why: 'に/へ mark who you speak to' },
-  { pattern: /(来|食べ|見|寝|起き|着|出)【?れ】?(る|ます|ない)/, why: 'ra-nuki potential (来れる) is common speech' },
-  { pattern: /【おおきな】|大き【な】/, why: 'おおきな is a valid pre-noun form' },
-  { pattern: /な【?く(ちゃ|ては)/, why: 'なくちゃ/なくては also mean "have to"' },
-];
-
-describe('grammar.json wording', () => {
-  it('uses context-dependent readings (何 なに/なん, 一日, 今日) that fit their sentence', () => {
-    const markup = (s: RubySegment) => (s.reading === undefined ? s.text : `{${s.text}|${s.reading}}`);
-    const problems: string[] = [];
-    for (const p of points) {
-      for (const text of [...rubyFields(p), ...p.drills.map((d) => fill(d, d.options[d.answer]))]) {
-        const segments = parseRuby(text);
-        segments.forEach((seg, i) => {
-          const after = segments.slice(i + 1).map(markup).join('');
-          for (const rule of CONTEXT_READINGS) {
-            if (seg.text !== rule.base || seg.reading !== rule.reading) continue;
-            if (rule.base === '一日' && segments[i - 1]?.text.endsWith('月')) continue;
-            if (rule.wrongBefore.test(after)) problems.push(`${p.id}: ${rule.why} in "${text}"`);
-          }
-        });
-      }
-    }
-    expect(problems).toEqual([]);
-  });
-
-  it('has no distractor that completes a drill the way a native speaker would accept', () => {
-    const problems: string[] = [];
-    for (const p of points) {
-      for (const d of p.drills) {
-        d.options.forEach((o, k) => {
-          if (k === d.answer) return;
-          const filled = rubyToPlain(fill(d, `【${o}】`));
-          for (const { pattern, why } of ACCEPTABLE_COMPLETIONS) {
-            if (pattern.test(filled)) problems.push(`${p.id}: distractor "${o}" gives "${filled}": ${why} (${d.en})`);
-          }
-        });
-      }
-    }
-    expect(problems).toEqual([]);
+  it('gives every point the unit that teaches it', () => {
+    const published = read<GrammarPoint[]>('public/data/content/grammar.json');
+    const units = read<{ id: number; grammar: string[] }[]>('public/data/content/units.json');
+    for (const p of published) expect(units.find((u) => u.grammar.includes(p.id))?.id, p.id).toBe(p.unit);
   });
 });

@@ -1,0 +1,150 @@
+{
+  "id": "st-l1-20",
+  "level": "L1",
+  "unit": 25,
+  "title": "Sharing the housework",
+  "titleJp": "{家|いえ}のことは{二人|ふたり}で",
+  "topic": "home",
+  "grammar": [
+    "te-hoshii",
+    "noni",
+    "causative",
+    "embedded-questions",
+    "koto-ni-suru",
+    "you-ni-naru",
+    "nagara",
+    "te-imasu",
+    "te-miru",
+    "te-kureru",
+    "n-desu",
+    "kedo-but",
+    "ba-conditional"
+  ],
+  "sentences": [
+    {
+      "jp": "{最近|さいきん}、／ミキは／{仕事|しごと}が／とても／{忙|いそが}しいです。",
+      "en": "Lately, Miki has been very busy at work."
+    },
+    {
+      "jp": "{毎晩|まいばん}、／{遅|おそ}くまで／パソコンで／{仕事|しごと}を／しています。",
+      "en": "Every night she works on her computer until late."
+    },
+    {
+      "jp": "でも、／{掃除|そうじ}も／{洗濯|せんたく}も／{料理|りょうり}も、／ほとんど／ミキが／しています。",
+      "en": "But the cleaning, the laundry and the cooking are almost all done by Miki."
+    },
+    {
+      "jp": "ある／{土曜日|どようび}の／{朝|あさ}、／ミキは／{洗濯|せんたく}を／しながら、／{疲|つか}れた／{顔|かお}を／していました。",
+      "en": "One Saturday morning, Miki looked tired as she did the laundry."
+    },
+    {
+      "jp": "ケンは／ソファーで／テレビを／{見|み}ていました。",
+      "en": "Ken was watching TV on the sofa."
+    },
+    {
+      "jp": "「ねえ、／{少|すこ}し／{手伝|てつだ}ってほしいんだけど。」",
+      "en": "\"Hey, I'd like you to help a bit.\""
+    },
+    {
+      "jp": "「え？／{昨日|きのう}、／お{皿|さら}を／{洗|あら}ったのに。」",
+      "en": "\"Huh? But I washed the dishes yesterday.\""
+    },
+    {
+      "jp": "「{一回|いっかい}だけでしょう？／{私|わたし}も／{働|はたら}いているのに、／{家|いえ}の／ことは／{全部|ぜんぶ}／{私|わたし}が／しているよ。」",
+      "en": "\"That was just once, wasn't it? I work too, but I'm the one doing everything at home.\""
+    },
+    {
+      "jp": "ケンは／{何|なに}も／{言|い}えませんでした。",
+      "en": "Ken couldn't say a thing."
+    },
+    {
+      "jp": "{実|じつ}は、／ケンは／{子|こ}どもの／とき、／{家|いえ}の／ことを／{何|なに}も／しませんでした。",
+      "en": "The truth is, Ken never did any housework as a child."
+    },
+    {
+      "jp": "お{母|かあ}さんが／「{勉強|べんきょう}だけ／しなさい」と／{言|い}って、／{掃除|そうじ}も／{料理|りょうり}も／させなかったのです。",
+      "en": "His mother told him to \"just study\", and never let him clean or cook."
+    },
+    {
+      "jp": "だから、／ケンは／{何|なに}を／したらいいか、／よく／{分|わ}からなかったんです。",
+      "en": "So Ken didn't really know what he should do."
+    },
+    {
+      "jp": "ケンは／{言|い}いました。／「ごめん。／{何|なに}を／してほしいか、／{教|おし}えてくれる？」",
+      "en": "Ken said, \"Sorry. Can you tell me what you'd like me to do?\""
+    },
+    {
+      "jp": "{二人|ふたり}は／{紙|かみ}に、／{家|いえ}の／ことを／{全部|ぜんぶ}／{書|か}いてみました。",
+      "en": "The two of them tried writing down all the housework on a sheet of paper."
+    },
+    {
+      "jp": "{料理|りょうり}、／{洗濯|せんたく}、／{掃除|そうじ}、／{買|か}い{物|もの}、／ごみを／{出|だ}すこと…。",
+      "en": "Cooking, laundry, cleaning, shopping, taking out the rubbish..."
+    },
+    {
+      "jp": "「{多|おお}いね。／{全然|ぜんぜん}／{知|し}らなかった。」",
+      "en": "\"There's so much. I had no idea.\""
+    },
+    {
+      "jp": "ケンは、／{掃除|そうじ}と、／ごみを／{出|だ}すことと、／{週末|しゅうまつ}の／{料理|りょうり}を／することに／しました。",
+      "en": "Ken decided to take on the cleaning, the rubbish and the cooking at weekends."
+    },
+    {
+      "jp": "「{料理|りょうり}は／{苦手|にがて}だけど、／やってみるよ。」",
+      "en": "\"I'm not good at cooking, but I'll give it a go.\""
+    },
+    {
+      "jp": "{次|つぎ}の／{日曜日|にちようび}、／ケンは／{初|はじ}めて／{一人|ひとり}で／{晩|ばん}ご{飯|はん}を／{作|つく}りました。",
+      "en": "The next Sunday, Ken made dinner on his own for the first time."
+    },
+    {
+      "jp": "{味|あじ}は／{少|すこ}し／{薄|うす}かったけど、／ミキは／「おいしい！」と／{言|い}いました。",
+      "en": "It was a little bland, but Miki said, \"It's delicious!\""
+    },
+    {
+      "jp": "「ケンが／{作|つく}ってくれた／ご{飯|はん}、／うれしいな。」",
+      "en": "\"I'm so happy you cooked for me.\""
+    },
+    {
+      "jp": "「{来週|らいしゅう}は、／もっと／{上手|じょうず}に／{作|つく}るよ。」",
+      "en": "\"Next week I'll make it even better.\""
+    },
+    {
+      "jp": "それから、／ケンは／{毎週|まいしゅう}、／{料理|りょうり}を／するように／なりました。",
+      "en": "From then on, Ken started cooking every week."
+    },
+    {
+      "jp": "ある／{日|ひ}、／ケンの／お{母|かあ}さんが／{遊|あそ}びに／{来|き}ました。",
+      "en": "One day, Ken's mother came to visit."
+    },
+    {
+      "jp": "ケンが／{台所|だいどころ}に／{立|た}っているのを／{見|み}て、／お{母|かあ}さんは／びっくりしました。",
+      "en": "When she saw Ken standing in the kitchen, his mother was astonished."
+    },
+    {
+      "jp": "ミキは／{笑|わら}って／{言|い}いました。／「{毎週|まいしゅう}、／ケンに／{作|つく}らせているんです。」",
+      "en": "Miki laughed and said, \"I make him cook every week.\""
+    },
+    {
+      "jp": "「{違|ちが}うよ。／{僕|ぼく}が／{作|つく}りたいから、／{作|つく}っているんだよ。」",
+      "en": "\"That's not true. I cook because I want to.\""
+    },
+    {
+      "jp": "お{母|かあ}さんは／「{子|こ}どもの／ときに、／もっと／{手伝|てつだ}わせれば／よかったね。」と／{笑|わら}いました。",
+      "en": "His mother laughed. \"I should have made you help more when you were little.\""
+    },
+    {
+      "jp": "その／{夜|よる}、／{三人|さんにん}は／ケンの／{料理|りょうり}を／{食|た}べながら、／{遅|おそ}くまで／{話|はな}しました。",
+      "en": "That night, the three of them ate Ken's cooking and talked until late."
+    }
+  ],
+  "gist": {
+    "q": "What did Miki want Ken to do?",
+    "options": [
+      "Help more with the housework",
+      "Go back to his mother's house",
+      "Find a job that is less busy"
+    ],
+    "answer": 0
+  }
+}

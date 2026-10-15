@@ -153,3 +153,13 @@ export function toKana(input: string, { katakana = false, partial = false }: ToK
   }
   return katakana ? toKatakana(out) : out;
 }
+
+/**
+ * The in-field IME: live conversion while the learner types. Complete syllables
+ * become kana and an unfinished tail stays as letters ('kit' → 'きt'); "n'" and
+ * "nn" → ん; a doubled consonant → っ ('kitte' → 'きって'). Kana already in the
+ * field pass through, so converting the field's whole value again is safe.
+ */
+export function imeConvert(raw: string, opts: { katakana?: boolean } = {}): string {
+  return toKana(raw, { katakana: opts.katakana ?? false, partial: true });
+}

@@ -1,87 +1,173 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import { MemoryRouter, Route, Routes, useNavigate, type NavigateFunction } from 'react-router-dom';
-import { State } from 'ts-fsrs';
+import { StrictMode } from 'react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { createEmptyCard, Rating, State, type Grade } from 'ts-fsrs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cardId, db } from '../../lib/db.ts';
+import type { CardRecord, CardType, ItemKind, ItemRecord } from '../../lib/types.ts';
+import type { IntroduceResult } from '../../srs/items.ts';
 import Session from '../../screens/Session.tsx';
-import { introduceItem, markKnown } from '../../srs/items.ts';
+import { introducePlanItem, type NewItemPlan } from '../../srs/course.ts';
+import { completeDay, completeMakeup, streak, type StreakV2 } from '../../srs/habits.ts';
+import { finishStep, planMakeup, planToday, startSitting, type DayPlan } from '../../srs/planner.ts';
+import { gradeCard, type GradeOptions } from '../../srs/scheduler.ts';
 import { pushStats } from '../../sync/stats.ts';
-import { GRAMMAR, resetStudyDb, SENTENCES } from './test-utils.tsx';
+import { KANA, resetStudyDb, WORDS } from './test-utils.tsx';
 
 vi.mock('../../lib/data.ts', async () => (await import('./test-utils.tsx')).dataMock);
 vi.mock('../../writing/WritingPad.tsx', async () => (await import('./test-utils.tsx')).writingPadMock);
-vi.mock('../../sync/stats.ts', () => ({ pushStats: vi.fn(async () => true) }));
+vi.mock('../../speech/audio.ts', async () => (await import('./test-utils.tsx')).audioMock);
+vi.mock('../../speech/recognition.ts', () => ({ recognitionAvailable: () => false, listen: vi.fn() }));
+vi.mock('../../speech/recorder.ts', () => ({ micAvailable: () => false }));
+vi.mock('../../sync/stats.ts', () => ({ pushStats: vi.fn(async () => true), useHousehold: () => ({ loading: false, refresh: async () => {} }) }));
+vi.mock('../../sync/outbox.ts', () => ({ queueChatMessage: vi.fn(async () => 'client-1') }));
+vi.mock('../../sync/client.ts', async (original) => {
+  const real = await original<typeof import('../../sync/client.ts')>();
+  return { ...real, aiCheck: vi.fn(async () => { throw new real.ApiError(503, 'ai_disabled'); }), aiReport: vi.fn() };
+});
+vi.mock('../../srs/output.ts', () => ({
+  learnerAiContext: vi.fn(async () => ({})),
+  saveOutput: vi.fn(async (rec: object) => ({ ...rec, id: 'out-1', createdAt: new Date() })),
+  completeOutputCheck: vi.fn(async () => ({})),
+}));
+vi.mock('../../srs/planner.ts', () => ({
+  planToday: vi.fn(),
+  planMicro: vi.fn(),
+  planMakeup: vi.fn(),
+  startSitting: vi.fn(async () => {}),
+  finishStep: vi.fn(async () => {}),
+  leakMask: vi.fn(async () => ({ readings: new Set(), meanings: new Set(), kanji: new Set() })),
+}));
+vi.mock('../../srs/habits.ts', () => ({
+  completeDay: vi.fn(),
+  completeMicro: vi.fn(async () => {}),
+  completeMakeup: vi.fn(async () => false),
+  streak: vi.fn(),
+  noteReviewProgress: vi.fn(async () => true),
+}));
+vi.mock('../../srs/course.ts', async (original) => ({
+  ...(await original<typeof import('../../srs/course.ts')>()),
+  introducePlanItem: vi.fn(),
+  currentUnit: vi.fn(async () => 1),
+  taughtKana: vi.fn(async () => new Set<string>()),
+  loadCourseSnapshot: vi.fn(async () => ({ courseDay: 20, inSprint: false, kana: KANA })),
+}));
+vi.mock('../../srs/progress.ts', async (original) => ({
+  ...(await original<typeof import('../../srs/progress.ts')>()),
+  learnedToday: vi.fn(async () => []),
+  retention: vi.fn(async () => []),
+  addStudyTime: vi.fn(async () => {}),
+}));
+vi.mock('../../srs/scheduler.ts', async (original) => ({
+  ...(await original<typeof import('../../srs/scheduler.ts')>()),
+  gradeCard: vi.fn(async (id: string) => ({ id, due: new Date(Date.now() + 86_400_000) })),
+}));
 
-const HOUR = 60 * 60 * 1000;
-const KANA_READ = cardId('kana:あ', 'read');
+const DAY = 86_400_000;
+const STREAK: StreakV2 = {
+  current: 3, alive: true, longest: 5, daysThisMonth: 6, todayMinimum: true, todayGoal: true, tokensLeftThisWeek: 2,
+  makeupOffer: false, week: [],
+};
 
-/** A learner who knows both kana scripts, with one kana card due and the kanji 水 next in the course. */
-async function seed({ newPerDay = 1 } = {}) {
-  await resetStudyDb({ knowsHiragana: true, knowsKatakana: true, newPerDay });
-  await introduceItem('kana', 'あ', new Date(Date.now() - 48 * HOUR));
-  await db.cards.update(KANA_READ, { due: new Date(Date.now() - HOUR) });
-  await db.cards.update(cardId('kana:あ', 'write'), { due: new Date(Date.now() + 30 * 24 * HOUR) });
+function newCard(itemId: string, kind: ItemKind, type: CardType): CardRecord {
+  return { ...createEmptyCard(new Date()), id: cardId(itemId, type), itemId, kind, type };
 }
 
-let navigateTo: NavigateFunction;
-/** Gives the test the router's navigate, to press the browser's back button. */
-function NavProbe() {
-  navigateTo = useNavigate();
-  return null;
+/** A Review-state card due an hour ago. */
+function dueCard(itemId: string, kind: ItemKind, type: CardType): CardRecord {
+  const past = new Date(Date.now() - 3 * DAY);
+  return { ...createEmptyCard(past), state: State.Review, reps: 3, stability: 8, last_review: past, due: new Date(Date.now() - 3600_000),
+    id: cardId(itemId, type), itemId, kind, type };
 }
 
-function renderSession() {
-  return render(
-    <MemoryRouter initialEntries={['/', '/session']} initialIndex={1} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <NavProbe />
+async function seedWords(...ids: string[]) {
+  const items: ItemRecord[] = ids.map((id) => ({ id: `word:${id}`, kind: 'word', key: id, introducedAt: new Date(Date.now() - 10 * DAY) }));
+  await db.items.bulkPut(items);
+  await db.cards.bulkPut(ids.map((id) => dueCard(`word:${id}`, 'word', 'read')));
+}
+
+const kanjiPlan = (char: string, anchor: string): NewItemPlan =>
+  ({ itemId: `kanji:${char}`, kind: 'kanji', key: char, anchor: `word:${anchor}`, priceSec: 188, stream: 'kanji' });
+
+function plan(over: Partial<DayPlan> = {}): DayPlan {
+  return {
+    day: '2026-10-15', courseDay: 20, mode: 'normal', sitting: 'any', budgetMin: 25, estimateMin: 20, partOfDayDone: false,
+    tomorrowMin: 18, strandMin: 4, warmup: [], bury: [], teach: [], pendingCheck: [], read: null, output: null, fluency: null,
+    doneSteps: [], counts: { reviews: 0, newItems: 0 }, brake: false, offerExtraKanji: false, paperAllowed: true, courseComplete: false,
+    ...over,
+  };
+}
+
+/** introducePlanItem: the item, its anchor and their New cards, stored. */
+async function fakeIntroduce(p: NewItemPlan) {
+  const now = new Date();
+  const results: IntroduceResult[] = [];
+  const add = async (id: string, kind: ItemKind, types: CardType[]) => {
+    const item: ItemRecord = { id, kind, key: id.slice(kind.length + 1), introducedAt: now };
+    const cards = types.map((t) => newCard(id, kind, t));
+    await db.items.put(item);
+    await db.cards.bulkPut(cards);
+    results.push({ item, cards, created: true });
+  };
+  if (p.kind === 'kanji') {
+    await add(p.itemId, 'kanji', ['write']);
+    if (p.anchor) await add(p.anchor, 'word', ['read']);
+  } else if (p.kind === 'core') {
+    await add(p.itemId, 'core', ['listen']);
+  }
+  return results;
+}
+
+function renderSession(path = '/session', strict = false) {
+  const tree = (
+    <MemoryRouter initialEntries={['/', path]} initialIndex={1} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route path="/" element={<p>Home screen</p>} />
         <Route path="/session" element={<Session />} />
       </Routes>
-    </MemoryRouter>,
+    </MemoryRouter>
   );
+  return render(strict ? <StrictMode>{tree}</StrictMode> : tree);
 }
 
-/** The browser's back button (or Android's back gesture), once the screen has settled. */
-async function pressBack() {
-  await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
-  await act(async () => {
-    navigateTo(-1);
-  });
-}
+const counter = () => document.querySelector('.st-count')?.textContent ?? '';
+const reading = (written: string) => WORDS.find((w) => w.written === written)!.kana;
 
-const choices = () => within(screen.getByRole('group', { name: 'Answer choices' }));
-const choice = (name: string) => choices().getByRole('button', { name });
-/** Any option but the right one (options are shuffled). */
-const wrongChoice = (right: string) => choices().getAllByRole('button').find((b) => b.textContent?.replace(/^\d/, '') !== right)!;
-const counter = () => document.querySelector('.st-count')?.textContent;
-
-async function continueOn() {
-  fireEvent.click(await screen.findByRole('button', { name: 'Continue' }));
-}
-
-/** Answers whichever card of the first check is showing, correctly. */
-async function answerCheckCard() {
-  const ask = await screen.findByRole('heading', { level: 2 });
-  switch (ask.textContent) {
-    case 'What does this kanji mean?':
-    case 'What does this word mean?':
-      fireEvent.click(choice('water'));
-      break;
-    case 'How do you read this word?':
-      fireEvent.click(choice('みず'));
-      break;
-    case 'Write the kanji for':
-      fireEvent.click(screen.getByRole('button', { name: 'Finish writing' }));
-      break;
-    default:
-      throw new Error(`Unexpected card: ${ask.textContent}`);
+/** Answers the word-read card on screen: right (Good), or wrong twice and "No" (Again, with its feedback). */
+async function answerWordRead(right: boolean): Promise<string> {
+  const target = await screen.findByText((_, el) => Boolean(el?.matches('.st-target, .st-big.st-fit')));
+  const written = target.textContent ?? '';
+  const input = screen.getByLabelText('Reading');
+  if (right) {
+    fireEvent.change(input, { target: { value: reading(written) } });
+    fireEvent.submit(input.closest('form')!);
+    fireEvent.click(await screen.findByRole('button', { name: 'Yes' }));
+  } else {
+    fireEvent.change(input, { target: { value: 'zz' } });
+    fireEvent.submit(input.closest('form')!);
+    fireEvent.change(input, { target: { value: 'zzz' } });
+    fireEvent.submit(input.closest('form')!);
+    fireEvent.click(await screen.findByRole('button', { name: 'No' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Continue' }));
   }
-  await continueOn();
+  await waitFor(() => expect(screen.queryByText(written, { selector: '.st-target, .st-big.st-fit' })).toBeNull());
+  return written;
 }
 
-beforeEach(() => {
+const gradeCalls = () => vi.mocked(gradeCard).mock.calls.map(([id, grade, opts]) => ({ id, grade: grade as Grade, context: (opts as GradeOptions).context }));
+
+beforeEach(async () => {
+  await resetStudyDb();
+  vi.mocked(planToday).mockReset();
+  vi.mocked(planMakeup).mockReset();
+  vi.mocked(completeMakeup).mockClear();
+  vi.mocked(startSitting).mockClear();
+  vi.mocked(finishStep).mockClear();
+  vi.mocked(gradeCard).mockClear();
   vi.mocked(pushStats).mockClear();
+  vi.mocked(completeDay).mockReset().mockResolvedValue(STREAK);
+  vi.mocked(streak).mockReset().mockResolvedValue(STREAK);
+  vi.mocked(introducePlanItem).mockReset().mockImplementation(fakeIntroduce);
 });
 
 afterEach(() => {
@@ -89,235 +175,232 @@ afterEach(() => {
 });
 
 describe('Session', () => {
-  it('runs reviews, a new kanji with writing, its first check, reading and the summary', async () => {
-    await seed();
+  it('runs warm-up → teach → memory → read → check → output → fluency → summary, recording only the once-a-day steps', async () => {
+    await seedWords('w-ike');
+    vi.mocked(planToday).mockResolvedValue(plan({
+      warmup: ['word:w-ike|read'],
+      teach: [{ items: [kanjiPlan('水', 'w-mizu')] }],
+      read: { kind: 'sentences', kanaWords: [], sentences: [{ id: 's-mizu', target: 'word:w-mizu' }], minutes: 3 },
+      output: { target: { ref: 'core:cw-0003', label: 'もう', en: 'already' } },
+      fluency: { kind: 'speed', cardIds: ['nope|read'] },
+      counts: { reviews: 1, newItems: 1 },
+    }));
     renderSession();
+    fireEvent.click(await screen.findByRole('button', { name: /All of it/ }));
 
-    // 1. Review: a wrong answer is graded Again and comes back once, ungraded.
-    expect(await screen.findByRole('heading', { name: 'What sound is this hiragana?' })).toBeTruthy();
-    expect(counter()).toBe('Review 1 / 1');
-    fireEvent.click(wrongChoice('a'));
-    expect(await screen.findByText(/Not quite/)).toBeTruthy();
-    await waitFor(async () => expect(await db.reviewLogs.where('cardId').equals(KANA_READ).count()).toBe(1));
-    expect((await db.reviewLogs.toArray())[0].grade).toBe(1);
-    expect(await screen.findByText(/Reviewing again in/)).toBeTruthy();
-    await continueOn();
+    // Warm-up.
+    await screen.findByLabelText('Reading');
+    expect(counter()).toBe('Warm-up 1 / 1');
+    await answerWordRead(true);
 
-    expect(await screen.findByText('Once more, for practice')).toBeTruthy();
-    expect(counter()).toBe('Once more 1 / 1');
-    fireEvent.click(choice('a'));
-    expect(await screen.findByText('Extra practice: no new grade this time.')).toBeTruthy();
-    await continueOn();
-
-    // 2. New kanji: lesson, then trace → guided → memory.
+    // Teach: the kanji lesson, then a guided copy.
     expect(await screen.findByRole('heading', { name: 'water' })).toBeTruthy();
-    expect(counter()).toBe('New 1 / 1');
-    expect(screen.getByText('A stream splashing drops to both sides: water.')).toBeTruthy();
-    expect(screen.getByText('みず', { selector: '.st-word-kana [lang="ja"]' })).toBeTruthy();
-    // With romaji on (the default), the lesson's words show it too.
-    expect(screen.getByText('mizu', { selector: '.st-word-kana .st-romaji' })).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Practice writing it' }));
+    expect(counter()).toBe('New');
+    fireEvent.click(screen.getByRole('button', { name: 'Copy it' }));
+    expect(screen.getByRole('img', { name: /guided/ })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Finish writing' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
-    // The pad is named by its character while it is traced, then by what to write.
-    for (const [mode, name] of [['trace', '水'], ['guided', 'the kanji for "water" (みず)'], ['memory', 'the kanji for "water" (みず)']]) {
-      const pad = await screen.findByRole('img', { name: `Writing pad for ${name} (${mode})` }, { timeout: 3000 });
-      fireEvent.click(within(pad).getByRole('button', { name: 'Finish writing' }));
+    // Memory pass.
+    expect(await screen.findByText('From memory 1 / 1')).toBeTruthy();
+    expect(counter()).toBe('Memory');
+    expect(screen.getByText('Spaced recalls feel harder — that is why they stick.')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Write it right' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+
+    // Read & listen.
+    expect(await screen.findByRole('heading', { name: 'Read it aloud first' })).toBeTruthy();
+    expect(counter()).toBe('Read');
+    fireEvent.click(screen.getByRole('button', { name: 'Listen' }));
+    await waitFor(() => expect((screen.getByRole('button', { name: 'What does it mean?' }) as HTMLButtonElement).disabled).toBe(false));
+    fireEvent.click(screen.getByRole('button', { name: 'What does it mean?' }));
+    fireEvent.click(within(await screen.findByRole('group', { name: 'Answer choices' })).getAllByRole('button')[0]);
+    fireEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+
+    // First check: production first (the write card), then the anchor's read card.
+    expect(await screen.findByRole('heading', { name: 'Write the kanji' })).toBeTruthy();
+    expect(counter()).toBe('Check 1 / 2');
+    expect(screen.getByText('Spaced recalls feel harder — that is why they stick.')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Write it right' }));
+    fireEvent.click(await screen.findByText('Correct'));
+    await answerWordRead(true);
+
+    // Today's sentence (no AI here: it is sent as it is).
+    fireEvent.change(await screen.findByLabelText('Your sentence'), { target: { value: 'もうたべました' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Check it' }));
+    fireEvent.click(await screen.findByRole('button', { name: /Send to your partner/ }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+
+    // Fluency, then the summary.
+    expect(await screen.findByText('No speed round today.')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByRole('heading', { name: 'Done for now' })).toBeTruthy();
+    expect(await screen.findByText('about 18 min')).toBeTruthy();
+
+    await waitFor(() => expect(completeDay).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(pushStats).toHaveBeenCalledWith({ immediate: true }));
+    expect(vi.mocked(finishStep).mock.calls.map(([s]) => s)).toEqual(['read', 'output', 'fluency']);
+    expect(gradeCalls()).toEqual([
+      { id: 'word:w-ike|read', grade: Rating.Good, context: 'review' },
+      { id: 'kanji:水|write', grade: Rating.Good, context: 'first-check' },
+      { id: 'word:w-mizu|read', grade: Rating.Good, context: 'first-check' },
+    ]);
+  });
+
+  it('runs the memory pass for a batch only after its last item’s guided copy', async () => {
+    vi.mocked(planToday).mockResolvedValue(plan({
+      teach: [{ items: [kanjiPlan('水', 'w-mizu'), kanjiPlan('日', 'w-nihon'), kanjiPlan('木', 'w-ki'), kanjiPlan('人', 'w-hito')] }],
+    }));
+    renderSession();
+    fireEvent.click(await screen.findByRole('button', { name: /All of it/ }));
+    for (const meaning of ['water', 'day', 'tree', 'person']) {
+      expect(await screen.findByRole('heading', { name: meaning })).toBeTruthy();
+      expect(screen.queryByText(/From memory/)).toBeNull();
+      fireEvent.click(screen.getByRole('button', { name: 'Copy it' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Finish writing' }));
+      expect(screen.queryByText(/From memory/)).toBeNull();
+      fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
     }
-    expect(await screen.findByText('Nice. You wrote it from memory.')).toBeTruthy();
-    expect(await db.items.get('kanji:水')).toBeUndefined();
-    await continueOn();
+    expect(await screen.findByText('From memory 1 / 4')).toBeTruthy();
+    expect(introducePlanItem).toHaveBeenCalledTimes(4);
+  });
 
-    // 3. A quick first check: the kanji's meaning and writing, and its word's reading. The kanji's
-    // reading (the word asks it) and the word's meaning (its feedback shows it) wait for tomorrow.
-    await waitFor(() => expect(counter()).toBe('Check 1 / 3'));
-    expect(await db.items.get('word:w-mizu')).toBeDefined();
-    for (let i = 0; i < 3; i++) await answerCheckCard();
+  it('re-asks a missed warm-up card after at least 5 others, graded again as a re-ask', async () => {
+    const ids = ['w-mizu', 'w-sui', 'w-nihon', 'w-hon', 'w-ki', 'w-hito', 'w-ike'];
+    await seedWords(...ids);
+    vi.mocked(planToday).mockResolvedValue(plan({ warmup: ids.map((id) => `word:${id}|read`), counts: { reviews: 7, newItems: 0 } }));
+    renderSession();
+    fireEvent.click(await screen.findByRole('button', { name: /All of it/ }));
+    await screen.findByLabelText('Reading');
+    const order = [await answerWordRead(false)];
+    for (let i = 0; i < 7; i++) order.push(await answerWordRead(true));
+    // The missed word comes back as the 7th card: 5 others in between.
+    expect(order.indexOf(order[0], 1)).toBe(6);
+    await screen.findByRole('heading', { name: 'Done for now' });
+    const calls = gradeCalls().filter((c) => c.id === `word:${ids[0]}|read`);
+    expect(calls).toEqual([
+      { id: 'word:w-mizu|read', grade: Rating.Again, context: 'review' },
+      { id: 'word:w-mizu|read', grade: Rating.Good, context: 're-ask' },
+    ]);
+    expect(gradeCalls()).toHaveLength(8);
+  });
 
-    // 4. Reading the i+1 sentence, picked after the lesson so it uses 水. Saving sentences starts in phase 3; this is phase 2.
-    expect(await screen.findByRole('heading', { name: /^How do you read the underlined word\?/ })).toBeTruthy();
-    expect(counter()).toBe('Read 1 / 1');
-    fireEvent.click(choice('みず'));
-    expect(await screen.findByText('I drink water.')).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Save sentence' })).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Finish' }));
+  it('re-asks a first-check miss once, graded in the first check, and never retrieves a new card more than 4 times', async () => {
+    await db.items.put({ id: 'word:w-ike', kind: 'word', key: 'w-ike', introducedAt: new Date() });
+    await db.cards.put(newCard('word:w-ike', 'word', 'read'));
+    vi.mocked(planToday).mockResolvedValue(plan({ pendingCheck: ['word:w-ike|read'] }));
+    renderSession();
+    fireEvent.click(await screen.findByRole('button', { name: /All of it/ }));
+    await screen.findByLabelText('Reading');
+    await answerWordRead(false);
+    // The re-ask, missed again: not asked a third time.
+    await screen.findByText('Once more, from earlier');
+    await answerWordRead(false);
+    await screen.findByRole('heading', { name: 'Done for now' });
+    expect(gradeCalls()).toEqual([
+      { id: 'word:w-ike|read', grade: Rating.Again, context: 'first-check' },
+      { id: 'word:w-ike|read', grade: Rating.Again, context: 'first-check' },
+    ]);
+  });
 
-    // 5. Summary, with focus on its title (the Finish button is gone).
-    expect(await screen.findByRole('heading', { name: 'Session complete' })).toBeTruthy();
-    expect(document.activeElement).toBe(screen.getByRole('heading', { name: 'Session complete' }));
-    const stats = screen.getByText('Reviews').parentElement!;
-    expect(within(stats).getByText('4')).toBeTruthy();
-    expect(screen.getByText('75%')).toBeTruthy();
-    expect(await screen.findByText('1-day streak')).toBeTruthy();
-    expect(await screen.findByText('water', { selector: '.st-learned-meaning' })).toBeTruthy();
+  it('plans again every time it opens', async () => {
+    vi.mocked(planToday).mockResolvedValue(plan({ teach: [{ items: [kanjiPlan('水', 'w-mizu')] }] }));
+    renderSession();
+    fireEvent.click(await screen.findByRole('button', { name: /At my desk/ }));
+    await screen.findByRole('heading', { name: 'water' });
+    expect(planToday).toHaveBeenCalledWith(expect.any(Date), { sitting: 'desk' });
+    cleanup();
+    renderSession();
+    fireEvent.click(await screen.findByRole('button', { name: /All of it/ }));
+    await screen.findByRole('heading', { name: 'water' });
+    expect(planToday).toHaveBeenCalledTimes(2);
+  });
 
-    // Grades: one review, three first checks; the practice repeat added none.
-    expect(await db.reviewLogs.where('cardId').equals(KANA_READ).count()).toBe(1);
-    expect(await db.reviewLogs.count()).toBe(4);
-    const fresh = await db.cards.where('itemId').anyOf('kanji:水', 'word:w-mizu').toArray();
-    expect(fresh).toHaveLength(5);
-    const waiting = fresh.filter((c) => c.state === State.New);
-    expect(waiting.map((c) => c.id).sort()).toEqual([cardId('kanji:水', 'reading'), cardId('word:w-mizu', 'meaning')]);
-    // They come with the next study day's reviews, not as due right away.
-    expect(waiting.every((c) => c.due.getTime() > Date.now() && c.due.getHours() === 4)).toBe(true);
-    expect(JSON.parse(localStorage.getItem('issho.srs.sentencesShown') ?? '{}')).toHaveProperty('s-mizu');
-    expect((await db.days.toArray()).some((d) => d.sessionComplete)).toBe(true);
+  it('runs start-up and introduction side effects once under StrictMode and double taps', async () => {
+    vi.mocked(planToday).mockResolvedValue(plan({
+      teach: [{ items: [{ itemId: 'core:cw-0003', kind: 'core', key: 'cw-0003', priceSec: 35, stream: 'core' }] }],
+    }));
+    renderSession('/session', true);
+    const choice = await screen.findByRole('button', { name: /All of it/ });
+    fireEvent.click(choice);
+    fireEvent.click(choice);
+    fireEvent.click(await screen.findByRole('button', { name: 'Show the word' }));
+    const gotIt = screen.getByRole('button', { name: 'Got it' });
+    await act(async () => {
+      fireEvent.click(gotIt);
+      fireEvent.click(gotIt);
+    });
+    expect(await screen.findByText('From memory 1 / 1')).toBeTruthy();
+    expect(planToday).toHaveBeenCalledTimes(1);
+    expect(startSitting).toHaveBeenCalledTimes(1);
+    expect(introducePlanItem).toHaveBeenCalledTimes(1);
+  });
 
+  it('never shows a card count while catching up', async () => {
+    await seedWords('w-mizu', 'w-ike');
+    vi.mocked(planToday).mockResolvedValue(plan({ mode: 'catch-up', warmup: ['word:w-mizu|read', 'word:w-ike|read'], counts: undefined }));
+    renderSession();
+    fireEvent.click(await screen.findByRole('button', { name: /All of it/ }));
+    await screen.findByLabelText('Reading');
+    expect(counter()).toBe('Catching up');
+    await answerWordRead(true);
+    expect(counter()).toBe('Catching up');
+    expect(document.body.textContent).not.toMatch(/\d+ \/ \d+/);
+  });
+
+  it('an anywhere sitting runs the warm-up without paper, and does not complete the day', async () => {
+    await seedWords('w-ike');
+    await db.items.put({ id: 'kanji:水', kind: 'kanji', key: '水', introducedAt: new Date(Date.now() - 9 * DAY) });
+    await db.cards.put(dueCard('kanji:水', 'kanji', 'write'));
+    vi.mocked(planToday).mockResolvedValue(plan({ sitting: 'anywhere', paperAllowed: false, warmup: ['kanji:水|write'] }));
+    renderSession();
+    fireEvent.click(await screen.findByRole('button', { name: /Anywhere/ }));
+    expect(await screen.findByRole('heading', { name: 'Write the kanji' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Write on paper' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Write it right' }));
+    fireEvent.click(await screen.findByText('Correct'));
+    await screen.findByRole('heading', { name: 'Done for now' });
+    await waitFor(() => expect(streak).toHaveBeenCalled());
+    expect(completeDay).not.toHaveBeenCalled();
+    expect(finishStep).not.toHaveBeenCalled();
+  });
+
+  it('offers the make-up in the summary when the streak can be repaired', async () => {
+    vi.mocked(completeDay).mockResolvedValue({ ...STREAK, makeupOffer: true, repairable: { date: '2026-10-13', deadline: new Date() } });
+    vi.mocked(planToday).mockResolvedValue(plan({ teach: [{ items: [{ itemId: 'core:cw-0003', kind: 'core', key: 'cw-0003', priceSec: 35, stream: 'core' }] }] }));
+    renderSession();
+    fireEvent.click(await screen.findByRole('button', { name: /All of it/ }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Show the word' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Got it' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Show the meaning' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+    // The check: the listen card.
+    fireEvent.click(await screen.findByRole('button', { name: 'Show the answer' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Got it' }));
+    const offer = await screen.findByRole('link', { name: /Make up Tuesday: 10 more minutes/ });
+    expect(offer.getAttribute('href')).toBe('/session?mode=makeup');
+    expect(await screen.findByText(/You can now/)).toBeTruthy();
+  });
+
+  it('starts the make-up from the summary’s offer as a fresh session, and Done goes back to Today', async () => {
+    await seedWords('w-ike');
+    vi.mocked(completeDay).mockResolvedValue({ ...STREAK, makeupOffer: true, repairable: { date: '2026-10-13', deadline: new Date() } });
+    vi.mocked(planToday).mockResolvedValue(plan({ warmup: ['word:w-ike|read'] }));
+    vi.mocked(planMakeup).mockResolvedValue(plan({ mode: 'makeup', warmup: ['word:w-ike|read'], counts: undefined }));
+    renderSession();
+    fireEvent.click(await screen.findByRole('button', { name: /All of it/ }));
+    await answerWordRead(true);
+    fireEvent.click(await screen.findByRole('link', { name: /Make up Tuesday/ }));
+
+    // The make-up plans for itself and runs; the finished session is gone.
+    await waitFor(() => expect(planMakeup).toHaveBeenCalledTimes(1));
+    await screen.findByLabelText('Reading');
+    expect(planToday).toHaveBeenCalledTimes(1);
+    await answerWordRead(true);
+    expect(await screen.findByRole('heading', { name: 'Done for now' })).toBeTruthy();
+    await waitFor(() => expect(completeMakeup).toHaveBeenCalledTimes(1));
+    expect(vi.mocked(gradeCard).mock.calls.at(-1)?.[2]).toMatchObject({ makeup: true });
     fireEvent.click(screen.getByRole('button', { name: 'Done' }));
     expect(await screen.findByText('Home screen')).toBeTruthy();
-    await waitFor(() => expect(pushStats).toHaveBeenCalledWith({ immediate: true }));
-    // Back from Today doesn't land in the finished session.
-    await pressBack();
-    await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
-    expect(screen.getByText('Home screen')).toBeTruthy();
-    expect(screen.queryByLabelText("Planning today's session")).toBeNull();
-  }, 20_000);
-
-  it('asks before stopping, and keeps going when asked to', async () => {
-    await seed();
-    renderSession();
-    await screen.findByRole('heading', { name: 'What sound is this hiragana?' });
-
-    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
-    const dialog = screen.getByRole('alertdialog');
-    expect(dialog.textContent).toContain('Stop for now?');
-    expect(dialog.textContent).toContain('Your progress is saved.');
-    const [keep, stop] = within(dialog).getAllByRole('button');
-    expect(document.activeElement).toBe(keep);
-    fireEvent.keyDown(document.activeElement!, { key: 'Tab' });
-    expect(document.activeElement).toBe(stop);
-    fireEvent.keyDown(document.activeElement!, { key: 'Tab' });
-    expect(document.activeElement).toBe(keep);
-    fireEvent.keyDown(document.activeElement!, { key: 'Tab', shiftKey: true });
-    expect(document.activeElement).toBe(stop);
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Keep going' }));
-    expect(screen.queryByRole('alertdialog')).toBeNull();
-    expect(screen.getByRole('heading', { name: 'What sound is this hiragana?' })).toBeTruthy();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
-    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Stop' }));
-    expect(await screen.findByText('Home screen')).toBeTruthy();
-    await waitFor(() => expect(pushStats).toHaveBeenCalled());
-    expect((await db.days.toArray()).some((d) => d.sessionComplete)).toBe(false);
-
-    // The session's history entry went with it (and its back guard): back from Today doesn't reopen it.
-    await pressBack();
-    await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
-    expect(screen.getByText('Home screen')).toBeTruthy();
-    expect(screen.queryByRole('heading', { name: 'What sound is this hiragana?' })).toBeNull();
-  });
-
-  it('completes the day when stopped during reading, the optional last part', async () => {
-    await seed({ newPerDay: 0 });
-    renderSession();
-    await screen.findByRole('heading', { name: 'What sound is this hiragana?' });
-    fireEvent.click(choice('a'));
-    await continueOn();
-
-    expect(await screen.findByRole('heading', { name: 'What does this mean?' })).toBeTruthy();
-    expect(counter()).toBe('Read 1 / 1');
-    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
-    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Stop' }));
-    expect(await screen.findByText('Home screen')).toBeTruthy();
-    await waitFor(() => expect(pushStats).toHaveBeenCalledWith({ immediate: true }));
-    expect((await db.days.toArray()).some((d) => d.sessionComplete)).toBe(true);
-  });
-
-  it('skips writing but still introduces the item', async () => {
-    await seed();
-    await db.cards.update(KANA_READ, { due: new Date(Date.now() + 24 * HOUR) });
-    renderSession();
-
-    expect(await screen.findByRole('heading', { name: 'water' })).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Practice writing it' }));
-    fireEvent.click(await screen.findByRole('button', { name: 'Skip writing' }));
-    await waitFor(() => expect(counter()).toBe('Check 1 / 3'));
-    expect(await db.items.get('kanji:水')).toBeDefined();
-  });
-
-  it("picks the reading after the new items, so it can use the kanji just learned", async () => {
-    await seed();
-    await db.cards.update(KANA_READ, { due: new Date(Date.now() + 24 * HOUR) });
-    // Two kanji not learned yet when the session opens: too many for i+1 until 水 is learned.
-    const fresh = { id: 's-mizu-ki', jp: '{水|みず}と{木|き}。', en: 'Water and trees.' };
-    SENTENCES.unshift(fresh);
-    try {
-      renderSession();
-      expect(await screen.findByRole('heading', { name: 'water' })).toBeTruthy();
-      fireEvent.click(screen.getByRole('button', { name: 'Practice writing it' }));
-      fireEvent.click(await screen.findByRole('button', { name: 'Skip writing' }));
-      await waitFor(() => expect(counter()).toBe('Check 1 / 3'));
-      for (let i = 0; i < 3; i++) await answerCheckCard();
-
-      expect(await screen.findByRole('heading', { name: /^How do you read the underlined word\?/ })).toBeTruthy();
-      // 木 is still new, so its furigana shows.
-      expect(document.querySelector('.st-sentence')?.textContent).toBe('水と木き。');
-      expect(document.querySelector('.st-target')?.textContent).toBe('水');
-    } finally {
-      SENTENCES.splice(SENTENCES.indexOf(fresh), 1);
-    }
-  });
-
-  it('asks before stopping when the back gesture is used, like the close button', async () => {
-    await seed();
-    renderSession();
-    await screen.findByRole('heading', { name: 'What sound is this hiragana?' });
-
-    await pressBack();
-    const dialog = await screen.findByRole('alertdialog');
-    expect(dialog.textContent).toContain('Stop for now?');
-    expect(screen.queryByText('Home screen')).toBeNull();
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Keep going' }));
-    expect(screen.queryByRole('alertdialog')).toBeNull();
-    expect(screen.getByRole('heading', { name: 'What sound is this hiragana?' })).toBeTruthy();
-
-    // Kept going: back asks again, and Stop leaves.
-    await pressBack();
-    fireEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Stop' }));
-    expect(await screen.findByText('Home screen')).toBeTruthy();
-    await waitFor(() => expect(pushStats).toHaveBeenCalled());
-  });
-
-  it('lists everything learned today in the summary, also from an earlier sitting', async () => {
-    await seed({ newPerDay: 2 });
-    await db.cards.update(KANA_READ, { due: new Date(Date.now() + 24 * HOUR) });
-    // Learned earlier today, in a sitting that was stopped before its first check (which then waits).
-    await introduceItem('kana', 'い');
-    await db.cards.where('itemId').equals('kana:い').modify({ due: new Date(Date.now() + 24 * HOUR) });
-    renderSession();
-
-    // This sitting: the grammar point, its practice and its first check.
-    fireEvent.click(await screen.findByRole('button', { name: 'Try it' }));
-    for (const next of ['Next', 'Done']) {
-      fireEvent.click(choices().getAllByRole('button')[0]);
-      fireEvent.click(screen.getByRole('button', { name: next }));
-    }
-    expect(await screen.findByRole('heading', { name: 'Fill the gap' })).toBeTruthy();
-    const drill = GRAMMAR[0].drills.find((d) => d.en === document.querySelector('.st-drill-en')?.textContent)!;
-    fireEvent.click(choice(drill.options[drill.answer]));
-    await continueOn();
-    if (await screen.findByRole('heading', { name: 'What does this mean?' }).catch(() => null)) {
-      fireEvent.click(choices().getAllByRole('button')[0]);
-      fireEvent.click(await screen.findByRole('button', { name: 'Finish' }));
-    }
-
-    expect(await screen.findByRole('heading', { name: 'Session complete' })).toBeTruthy();
-    await waitFor(() => expect([...document.querySelectorAll('.st-learned-meaning')].map((e) => e.textContent)).toEqual(['i', 'grammar']));
-  });
-
-  it('says when the daily review limit, not an empty queue, is why there is nothing to do', async () => {
-    await resetStudyDb({ knowsHiragana: true, knowsKatakana: true, newPerDay: 1, maxReviewsPerDay: 0 });
-    await markKnown('kana', 'あ');
-    await db.cards.update(KANA_READ, { due: new Date(Date.now() - HOUR) });
-    renderSession();
-    expect(await screen.findByRole('heading', { name: "Today's reviews are done" })).toBeTruthy();
-    expect(screen.getByText(/New items are taking a break/)).toBeTruthy();
-  });
-
-  it('shows a friendly state when nothing is due and nothing is new', async () => {
-    await resetStudyDb({ knowsHiragana: true, knowsKatakana: true, newPerDay: 0 });
-    renderSession();
-    expect(await screen.findByRole('heading', { name: "You're all caught up" })).toBeTruthy();
-    expect(screen.getByRole('link', { name: /Practice writing/ }).getAttribute('href')).toBe('/write');
-    expect(screen.getByRole('link', { name: /Read and shadow/ }).getAttribute('href')).toBe('/read');
   });
 });

@@ -4,8 +4,8 @@ import { Fragment, useMemo, useState } from 'react';
 import { useRubyShow } from '../../lib/hooks.ts';
 import type { GrammarDrill } from '../../lib/types.ts';
 import { shuffle } from '../../srs/answers.ts';
-import { SpeakButton } from '../SpeakButton.tsx';
 import { Ruby } from '../ui.tsx';
+import { AudioButton } from './AudioButton.tsx';
 import { ChoiceGrid } from './cards/parts.tsx';
 
 export const GAP = '＿＿';
@@ -75,7 +75,7 @@ export function DrillPractice({ drills, onDone, doneLabel = 'Done' }: {
             </p>
           </div>
           <div className="st-row">
-            <SpeakButton text={filledDrill(drill)} compact />
+            <AudioButton source={{ text: filledDrill(drill) }} compact />
             {(onDone || !last) && (
               <button type="button" className="btn ink st-grow" onClick={next}>{last ? doneLabel : 'Next'}</button>
             )}

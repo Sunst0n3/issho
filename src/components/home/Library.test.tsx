@@ -1,106 +1,212 @@
-import { cleanup, fireEvent, screen } from '@testing-library/react';
+import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { State } from 'ts-fsrs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { WordInfo } from '../../lib/data.ts';
+import { dayKey, db } from '../../lib/db.ts';
+import type { ItemKind, StoryEntry, WordRef } from '../../lib/types.ts';
 import Library from '../../screens/Library.tsx';
-import { addLearned, renderAt, resetDb } from './test-fixtures.tsx';
+import { matchesWord, storyShelves } from './library.ts';
+import { addLearned, renderAt, resetDb, STORIES } from './test-fixtures.tsx';
 
-vi.mock('../../lib/data.ts', async () => (await import('./test-fixtures.tsx')).dataMock);
+const mocks = vi.hoisted(() => ({ play: vi.fn(async () => ({ via: 'clip', ms: 300, interrupted: false })) }));
+
+/** A story of 20 content words: the first `known` of them are the fixture words learned below. */
+function storyOf(id: string, refs: WordRef[]): StoryEntry {
+  return {
+    id, level: 'L0', unit: 1, title: `Story ${id}`, titleJp: id, topic: 'daily', grammar: [], chars: 300, refs,
+    gist: { q: '', options: [], answer: 0 },
+    sentences: [{ jp: id, en: id, phrases: [id], tokens: refs.map((ref) => ({ s: ref, ref, k: 'c' as const })) }],
+  };
+}
+const filler = (n: number): WordRef[] => Array.from({ length: n }, (_, i) => `word:filler-${i}` as WordRef);
+
+vi.mock('../../lib/data.ts', async () => {
+  const fixtures = await import('./test-fixtures.tsx');
+  return {
+    ...fixtures.dataMock,
+    loadStories: async () => [
+      ...fixtures.STORIES,
+      // 19 of 20 known: 95 %, a stretch story.
+      { ...fixtures.STORIES[1], id: 'st-stretch', title: 'Stretch story',
+        sentences: [{ jp: 'x', en: 'x', phrases: ['x'], tokens: [...Array.from({ length: 19 }, (_, i) => ({ s: 'w', ref: `word:filler-${i}`, k: 'c' as const })), { s: 'u', ref: 'word:unknown', k: 'c' as const }] }] },
+    ],
+  };
+});
+vi.mock('../../speech/audio.ts', () => ({
+  usePlayback: () => ({ play: mocks.play, stop: () => {}, playing: false }),
+}));
+vi.mock('../study/PitchLine.tsx', () => ({
+  PitchLine: ({ accent }: { accent: { type: string } }) => <span data-testid="pitch">{accent.type}</span>,
+}));
+
+const DAY = 86_400_000;
+const daysAgo = (n: number) => new Date(Date.now() - n * DAY);
+
+async function addWord(kind: ItemKind, key: string, introducedAt: Date, known = false) {
+  const id = `${kind}:${key}`;
+  await db.items.add({ id, kind, key, introducedAt });
+  if (known) {
+    await db.reviewLogs.add({
+      cardId: `${id}|read`, itemId: id, kind, type: kind === 'core' ? 'listen' : 'read', grade: 3, reviewedAt: new Date(),
+      durationMs: 3000, mode: 'typed', prevState: State.Review, elapsedDays: 3, context: 'review',
+    });
+  }
+}
+
+async function writeLog(char: string, at: Date) {
+  await db.reviewLogs.add({
+    cardId: `kanji:${char}|write`, itemId: `kanji:${char}`, kind: 'kanji', type: 'write', grade: 3, reviewedAt: at,
+    durationMs: 9000, mode: 'written', prevState: State.Review, elapsedDays: 2, context: 'review',
+  });
+}
 
 beforeEach(async () => {
   await resetDb();
-  await addLearned('kanji', '日');
-  await addLearned('kanji', '一', { lapses: 3 });
-  // Freshly learned and never forgotten: low stability alone is not "needs work".
-  await addLearned('radical', '氵', { stability: 1, state: State.Learning, reps: 1 });
+  // 日: written well on three later days → can write. 一: learning, pinned. 水: retired → reading only.
+  await addLearned('日', {}, { introducedAt: daysAgo(10) });
+  for (const n of [8, 5, 1]) await writeLog('日', daysAgo(n));
+  await addLearned('一', {}, { pinned: true });
+  await addLearned('水', { suspended: 'retired' });
 });
 
 afterEach(() => {
   cleanup();
   sessionStorage.clear();
   document.documentElement.scrollTop = 0;
+  vi.clearAllMocks();
 });
 
-const tileNames = () => screen.queryAllByRole('link').map((a) => a.getAttribute('aria-label')).filter((n) => n !== 'Back');
+const tileNames = (root: HTMLElement = document.body) =>
+  within(root).queryAllByRole('link').map((a) => a.getAttribute('aria-label')).filter((n): n is string => Boolean(n?.includes(',')));
 
-describe('Library', () => {
-  it('opens the current phase and marks learned, next-up and later tiles', async () => {
-    renderAt('/kanji', '/kanji', <Library />);
-    const phase2 = await screen.findByRole('button', { name: /Phase 2 · Foundation/ });
-    expect(phase2.getAttribute('aria-expanded')).toBe('true');
-    const phase3 = screen.getByRole('button', { name: /Phase 3/ });
-    expect(phase3.getAttribute('aria-expanded')).toBe('false');
-    // A closed group's panel stays in the page (empty and hidden) so aria-controls always points somewhere.
-    expect((document.getElementById(phase3.getAttribute('aria-controls')!) as HTMLElement).hidden).toBe(true);
-
+describe('Library: kanji', () => {
+  it('groups kanji by chapter, opens the current one, and marks each tile', async () => {
+    renderAt('/library', '/library', <Library />);
+    const chapter1 = await screen.findByRole('button', { name: 'Chapter 1, 3 of 8 kanji learned' });
+    expect(chapter1.getAttribute('aria-expanded')).toBe('true');
+    const chapter2 = screen.getByRole('button', { name: /^Chapter 2/ });
+    expect(chapter2.getAttribute('aria-expanded')).toBe('false');
     expect(tileNames()).toEqual([
-      '日, day, learned',
-      '一, one, learned, needs work',
-      '氵, water, learned',
-      '水, water, next up',
+      '日, day, can write',
+      '一, one, learning, pinned',
+      '水, water, reading only',
       '火, fire, next up',
       '木, tree, next up',
+      '休, rest, next up',
+      '金, gold, next up',
+      '土, soil, next up',
     ]);
-    expect(screen.getByRole('link', { name: '水, water, next up' }).getAttribute('href')).toBe(`/kanji/${encodeURIComponent('水')}`);
-
-    // Closed phases render no tiles until opened.
-    fireEvent.click(screen.getByRole('button', { name: /Phase 3/ }));
-    expect(tileNames()).toContain('金, gold, next up');
-    expect(tileNames()).toContain('土, soil, next up');
-    fireEvent.click(screen.getByRole('button', { name: /Phase 4/ }));
+    expect(screen.getByRole('link', { name: '火, fire, next up' }).getAttribute('href')).toBe(`/kanji/${encodeURIComponent('火')}`);
+    fireEvent.click(chapter2);
     expect(tileNames()).toContain('山, mountain, not learned yet');
   });
 
-  it('filters to learned kanji and to the ones that need work', async () => {
-    renderAt('/kanji', '/kanji', <Library />);
-    await screen.findByRole('button', { name: /Phase 2/ });
-
+  it('filters to the kanji learned so far', async () => {
+    renderAt('/library/kanji', '/library/:tab', <Library />);
+    await screen.findByRole('button', { name: /^Chapter 1/ });
     fireEvent.click(screen.getByRole('radio', { name: 'Learned' }));
-    expect(tileNames()).toEqual(['日, day, learned', '一, one, learned, needs work', '氵, water, learned']);
-
-    fireEvent.click(screen.getByRole('radio', { name: 'Needs work' }));
-    expect(tileNames()).toEqual(['一, one, learned, needs work']);
-
-    fireEvent.click(screen.getByRole('radio', { name: 'All' }));
-    expect(tileNames()).toHaveLength(6);
+    expect(tileNames()).toEqual(['日, day, can write', '一, one, learning, pinned', '水, water, reading only']);
   });
 
-  it('counts each phase in kanji, like Today and Learn, with a spaced accessible name', async () => {
-    renderAt('/kanji', '/kanji', <Library />);
-    const phase2 = await screen.findByRole('button', { name: 'Phase 2 · Foundation, 2 of 5 kanji learned' });
-    // 氵 is a part, not a kanji: it shows as a tile but isn't counted.
-    expect(phase2.textContent).toContain('2 of 5 kanji');
-    expect(screen.getByRole('heading', { level: 1, name: 'Kanji library' })).toBeTruthy();
-  });
-
-  it('comes back with the filter, open groups, pages and scroll it was left with', async () => {
-    const first = renderAt('/kanji', '/kanji', <Library />);
-    await screen.findByRole('button', { name: /Phase 2/ });
-    fireEvent.click(screen.getByRole('button', { name: /Phase 4/ }));
-    fireEvent.click(screen.getByRole('radio', { name: 'Needs work' }));
+  it('comes back with the filter and the chapters it was left with', async () => {
+    const first = renderAt('/library', '/library', <Library />);
+    await screen.findByRole('button', { name: /^Chapter 1/ });
+    fireEvent.click(screen.getByRole('button', { name: /^Chapter 2/ }));
     first.unmount();
-
-    renderAt('/kanji', '/kanji', <Library />);
-    await screen.findByRole('link', { name: '一, one, learned, needs work' });
-    expect(screen.getByRole('radio', { name: 'Needs work' }).getAttribute('aria-checked')).toBe('true');
-    expect(tileNames()).toEqual(['一, one, learned, needs work']);
-    fireEvent.click(screen.getByRole('radio', { name: 'All' }));
-    expect(screen.getByRole('button', { name: /Phase 4/ }).getAttribute('aria-expanded')).toBe('true');
+    renderAt('/library', '/library', <Library />);
+    expect((await screen.findByRole('button', { name: /^Chapter 2/ })).getAttribute('aria-expanded')).toBe('true');
   });
 
   it('restores the scroll position when coming back', async () => {
     sessionStorage.setItem('issho.library.view', JSON.stringify({ filter: 'all', open: {}, limits: {}, scrollY: 640 }));
-    // A MemoryRouter's first entry counts as a back/forward (POP) visit.
-    renderAt('/kanji', '/kanji', <Library />);
-    await screen.findByRole('button', { name: /Phase 2/ });
+    renderAt('/library', '/library', <Library />);
+    await screen.findByRole('button', { name: /^Chapter 1/ });
     expect(document.documentElement.scrollTop).toBe(640);
   });
 
-  it('says so when nothing needs work', async () => {
-    await resetDb();
-    renderAt('/kanji', '/kanji', <Library />);
-    await screen.findByRole('button', { name: /Phase 2/ });
-    fireEvent.click(screen.getByRole('radio', { name: 'Needs work' }));
-    expect(screen.getByText(/Nothing needs work right now/)).toBeTruthy();
-    expect(tileNames()).toEqual([]);
+  it('has its sections as links, with grammar on its own page', async () => {
+    renderAt('/library/kanji', '/library/:tab', <Library />);
+    const nav = await screen.findByRole('navigation', { name: 'Library sections' });
+    expect(within(nav).getByRole('link', { name: 'Kanji' }).getAttribute('aria-current')).toBe('page');
+    expect(within(nav).getByRole('link', { name: 'Words' }).getAttribute('href')).toBe('/library/words');
+    expect(within(nav).getByRole('link', { name: 'Grammar' }).getAttribute('href')).toBe('/grammar');
+    expect(screen.getByRole('heading', { level: 1, name: 'Library' })).toBeTruthy();
   });
+});
+
+describe('Library: words', () => {
+  beforeEach(async () => {
+    await addWord('core', 'cw-0005', daysAgo(1));
+    await addWord('word', 'w-hi', daysAgo(3));
+    await addWord('core', 'cw-0004', daysAgo(5));
+  });
+
+  it('lists core and kanji words met so far, newest first, with audio and pitch lines', async () => {
+    renderAt('/library/words', '/library/:tab', <Library />);
+    expect(await screen.findByText('3 words met so far, newest first')).toBeTruthy();
+    const list = screen.getByRole('list');
+    const written = within(list).getAllByRole('listitem').map((li) => li.querySelector('.kd-word-written')?.textContent);
+    expect(written).toEqual(['水', '日', 'コーヒー']);
+    expect(within(list).getAllByTestId('pitch').map((p) => p.textContent)).toEqual(['heiban', 'atamadaka']);
+    fireEvent.click(within(list).getByRole('button', { name: 'Listen to 水' }));
+    // A word without a clip of its own still plays, from its text with the right reading.
+    expect(mocks.play).toHaveBeenCalledWith({ ref: 'core:cw-0005' }, expect.objectContaining({ fallbackText: '{水|みず}' }));
+  });
+
+  it('searches in English and in kana', async () => {
+    renderAt('/library/words', '/library/:tab', <Library />);
+    const search = await screen.findByLabelText('Search your words');
+    fireEvent.change(search, { target: { value: 'coffee' } });
+    expect(await screen.findByText('1 word found')).toBeTruthy();
+    fireEvent.change(search, { target: { value: 'ひ' } });
+    expect(await screen.findByText('1 word found')).toBeTruthy();
+    fireEvent.change(search, { target: { value: 'zzz' } });
+    expect(await screen.findByText('No word you know matches that.')).toBeTruthy();
+  });
+});
+
+describe('Library: stories', () => {
+  it('shelves stories as Easy, Stretch (with tap glosses) and Read, each linking to the reader', async () => {
+    await addWord('core', 'cw-0004', daysAgo(20), true);
+    for (let i = 0; i < 19; i++) await addWord('word', `filler-${i}`, daysAgo(20), true);
+    await db.stories.put({ storyId: 'st-l1-03', stage: 1, firstDay: dayKey(daysAgo(2)), gist: [true], cpm: [] });
+    renderAt('/library/stories', '/library/:tab', <Library />);
+
+    const easy = await screen.findByRole('region', { name: 'Easy' });
+    expect(within(easy).getByRole('link', { name: /Morning coffee/ }).getAttribute('href')).toBe('/read/st-start-01');
+    const stretch = screen.getByRole('region', { name: 'Stretch' });
+    expect(stretch.textContent).toContain('tap words for English');
+    expect(within(stretch).getByRole('link', { name: /Stretch story/ }).getAttribute('href')).toBe('/read/st-stretch');
+    const read = screen.getByRole('region', { name: 'Read' });
+    expect(within(read).getByRole('link', { name: /The station/ }).textContent).toContain('in progress');
+    expect(screen.getByText('1 more story opens up as you learn words.')).toBeTruthy();
+  });
+
+  it('says when stories open up before any can be read', async () => {
+    renderAt('/library/stories', '/library/:tab', <Library />);
+    expect(await screen.findByText(/Stories open up once you know enough of their words/)).toBeTruthy();
+  });
+});
+
+describe('library helpers', () => {
+  it('shelves a started story as read, whatever its coverage', () => {
+    const progress = new Map([['st-start-01', { storyId: 'st-start-01', stage: 2 as const, gist: [], cpm: [] }]]);
+    const shelves = storyShelves(STORIES, () => true, progress);
+    expect(shelves.read.map((v) => v.story.id)).toEqual(['st-start-01']);
+    expect(shelves.easy.map((v) => v.story.id)).toEqual(['st-l0-02', 'st-l1-03']);
+    expect(storyShelves([storyOf('x', filler(3))], () => false, new Map()).later).toBe(1);
+  });
+
+  it('matches words in either width and case', () => {
+    const w: WordInfo = { ref: 'core:cw-0004', written: 'コーヒー', kana: 'コーヒー', en: 'Coffee', kanji: [], use: true, readings: ['コーヒー'] };
+    expect(matchesWord(w, 'COFFEE')).toBe(true);
+    expect(matchesWord(w, 'ｺｰﾋｰ')).toBe(true);
+    expect(matchesWord(w, '')).toBe(true);
+    expect(matchesWord(w, 'tea')).toBe(false);
+  });
+});
+
+it('sends an unknown section back to the library', async () => {
+  renderAt('/library/nope', '/library/:tab', <Library />);
+  await waitFor(() => expect(screen.getByText('Other screen')).toBeTruthy());
 });

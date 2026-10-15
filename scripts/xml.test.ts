@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { readJMdict, type JmEntry } from './lib/jmdict.ts';
-import { componentsOf, elementStrokes, ignoredElements, readKanjiVG, type KvgChar } from './lib/kanjivg.ts';
+import { componentCount, componentsOf, elementStrokes, ignoredElements, readKanjiVG, type KvgChar } from './lib/kanjivg.ts';
 import { EntityRewriter, parseXmlGz, rewriteEntities } from './lib/xml.ts';
 
 const dir = mkdtempSync(join(tmpdir(), 'issho-xml-'));
@@ -119,6 +119,16 @@ describe('KanjiVG', () => {
     expect(componentsOf(go, (el) => teachable.has(el))).toEqual(['言', '五', '口']);
     expect(componentsOf(go, (el) => el === '口' || el === '二')).toEqual(['口', '二']);
     expect(componentsOf(go, () => false)).toEqual([]);
+  });
+
+  it('counts a repeated component each time and a split one once (inferable kanji such as 林)', () => {
+    expect(componentCount(go, (el) => ['言', '五', '口'].includes(el))).toBe(3);
+    // 口 is drawn twice (inside 言 and inside 吾), but componentsOf lists it once.
+    expect(componentsOf(go, (el) => el === '口')).toEqual(['口']);
+    expect(componentCount(go, (el) => el === '口')).toBe(2);
+    // 二 is one element split over two groups (part 1, part 2).
+    expect(componentCount(go, (el) => el === '二')).toBe(1);
+    expect(componentCount(go, () => false)).toBe(0);
   });
 
   it('lists the elements it looks through, with their strokes', () => {

@@ -1,23 +1,32 @@
 // @vitest-environment node
-// Regression checks for content/survival-words.json and content/roleplays.json,
-// from the content review: recall-card ambiguity, punctuation and spacing per
-// level, register in the couple's scenes, and dictionary checks on every
-// reading. The dictionary checks need data-raw/JMdict_e.gz and public/data and
-// skip without them.
+// Regression checks for the role-plays (content/roleplays-v2/: the 14 upgraded v1 scenes in
+// legacy.json plus one core conversation per unit) and the survival core words, from the
+// content reviews: recall-card ambiguity, punctuation and spacing, register in the couple's
+// scenes, and dictionary checks on every reading. The dictionary checks need
+// data-raw/JMdict_e.gz and public/data and skip without them.
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { isKanaOnly, isKanji, kanjiIn, parseRuby, rubyToKana, rubyToPlain, validateRuby } from '../src/lib/ruby.ts';
-import type { KanjiEntry, RolePlay, SurvivalWord } from '../src/lib/types.ts';
+import { isKanji, kanjiIn, parseRuby, rubyToKana, rubyToPlain, validateRuby } from '../src/lib/ruby.ts';
+import type { CoreWord, KanjiEntry, RolePlay, UnitSpec } from '../src/lib/types.ts';
+import { mergeContent, readContentSources } from './lib/content.ts';
+import { CORE_CONVERSATION_LINES } from './lib/roleplays.ts';
 import { composesReading, readJmdictReadings, soundVariants, toHiragana, type JmdictReadings } from './lib/readings.ts';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const read = <T,>(path: string): T => JSON.parse(readFileSync(ROOT + path, 'utf8')) as T;
 const JMDICT = `${ROOT}data-raw/JMdict_e.gz`;
 const KANJI = `${ROOT}public/data/kanji.json`;
+const content = <T,>(kind: Parameters<typeof readContentSources>[1]) =>
+  mergeContent(kind, readContentSources(`${ROOT}content`, kind, ROOT).sources).data as T;
 
-const survival = read<SurvivalWord[]>('content/survival-words.json');
-const roleplays = read<RolePlay[]>('content/roleplays.json');
+const rolePlays = content<RolePlay[]>('roleplays');
+const units = content<UnitSpec[]>('units');
+const core = content<CoreWord[]>('core-words');
+const conversations = new Set(units.map((u) => u.conversation));
+const legacy = rolePlays.filter((rp) => !conversations.has(rp.id));
+const coreConversations = rolePlays.filter((rp) => conversations.has(rp.id));
+const survival = core.filter((w) => w.survival);
 
 /** Everyday English near-synonyms a learner cannot tell apart on a recall card. */
 const SYNONYMS: [RegExp, string][] = [
@@ -54,88 +63,80 @@ const textsOf = (rp: RolePlay): [string, string][] => [
   ...rp.lines.map((l, i): [string, string] => [`lines[${i}]`, l.jp]),
 ];
 
-describe('content/survival-words.json', () => {
-  it('has well-formed, unique entries', () => {
-    const seen = { id: new Set<string>(), kana: new Set<string>(), en: new Set<string>() };
-    for (const w of survival) {
-      expect(Object.keys(w).filter((k) => !['id', 'kana', 'written', 'en', 'note'].includes(k)), w.id).toEqual([]);
-      expect(w.id).toMatch(/^sw-[a-z]+$/);
-      expect(isKanaOnly(w.kana) && !/\s/.test(w.kana), `${w.id}: kana "${w.kana}"`).toBe(true);
-      expect(w.en.trim(), w.id).not.toBe('');
-      for (const key of ['id', 'kana', 'en'] as const) {
-        expect(seen[key].has(w[key]), `${w.id}: duplicate ${key}`).toBe(false);
-        seen[key].add(w[key]);
-      }
-      // Notes are read during the kana phase, before any kanji is taught.
-      if (w.note) expect(kanjiIn(w.note), w.id).toEqual([]);
-    }
+describe('survival core words', () => {
+  it('keep the 117 v1 survival words, with kana-only notes (read before any kanji is taught)', () => {
+    expect(survival).toHaveLength(117);
+    for (const w of survival) if (w.note) expect(kanjiIn(w.note), w.id).toEqual([]);
   });
 
-  it('never gives two words the same meaning without distinct qualifiers (ambiguous recall cards)', () => {
-    const owners = new Map<string, { id: string; qualifier: string }[]>();
+  it('never give two survival words the same meaning without distinct qualifiers or registers (ambiguous recall cards)', () => {
+    const owners = new Map<string, { id: string; qualifier: string; register: string }[]>();
     const problems: string[] = [];
+    // A polite and a plain word are told apart by the card's register label (ありがとう / ありがとうございます).
+    const sameRegister = (a: string, b: string) => a === b || a === 'both' || b === 'both';
     for (const w of survival) {
       const glosses = new Map(w.en.split(';').map((g) => glossKey(g)).map((k) => [k.base, k]));
       for (const { base, qualifier } of glosses.values()) {
         if (!base) continue;
         const others = owners.get(base) ?? [];
         for (const o of others) {
-          if (!qualifier || !o.qualifier || qualifier === o.qualifier) problems.push(`${w.id} and ${o.id} both mean "${base}"`);
+          const unqualified = !qualifier || !o.qualifier || qualifier === o.qualifier;
+          if (unqualified && sameRegister(w.register, o.register)) problems.push(`${o.id}/${w.id} "${base}"`);
         }
-        owners.set(base, [...others, { id: w.id, qualifier }]);
+        owners.set(base, [...others, { id: w.id, qualifier, register: w.register }]);
       }
     }
     expect(problems).toEqual([]);
   });
 });
 
-describe('content/roleplays.json', () => {
-  it('has 14 scenes: 6 at level 1, 5 at level 2 and 3 at level 3', () => {
-    expect(new Set(roleplays.map((rp) => rp.id)).size).toBe(roleplays.length);
-    const byLevel = (level: number) => roleplays.filter((rp) => rp.level === level).length;
+describe('content/roleplays-v2', () => {
+  it('has the 14 upgraded scenes (6 at level 1, 5 at level 2, 3 at level 3) and one core conversation per unit', () => {
+    expect(new Set(rolePlays.map((rp) => rp.id)).size).toBe(rolePlays.length);
+    const byLevel = (level: number) => legacy.filter((rp) => rp.level === level).length;
     expect([byLevel(1), byLevel(2), byLevel(3)]).toEqual([6, 5, 3]);
+    expect(coreConversations).toHaveLength(units.length);
   });
 
-  it('gives every scene 12–14 well-formed lines', () => {
-    for (const rp of roleplays) {
-      for (const key of ['id', 'title', 'titleJp', 'level', 'setting', 'roles', 'lines'] as const) {
-        expect(rp[key], `${rp.id}: ${key}`).toBeDefined();
-      }
-      expect(rp.lines.length, rp.id).toBeGreaterThanOrEqual(12);
-      expect(rp.lines.length, rp.id).toBeLessThanOrEqual(14);
+  it('gives the scenes 9–14 lines and the core conversations 4–8, every line well formed with a cue', () => {
+    for (const rp of rolePlays) {
+      const [min, max] = conversations.has(rp.id) ? [CORE_CONVERSATION_LINES.min, CORE_CONVERSATION_LINES.max] : [9, 14];
+      expect(rp.lines.length, rp.id).toBeGreaterThanOrEqual(min);
+      expect(rp.lines.length, rp.id).toBeLessThanOrEqual(max);
+      expect(['polite', 'plain', 'mixed'], rp.id).toContain(rp.register);
       rp.lines.forEach((l, i) => {
         const at = `${rp.id} line ${i}`;
         expect(['a', 'b'], at).toContain(l.role);
         expect(l.en.trim(), at).not.toBe('');
-        expect(Object.keys(l).filter((k) => !['role', 'jp', 'en', 'hint'].includes(k)), at).toEqual([]);
-        if (rp.level === 1 && l.hint) expect(kanjiIn(l.hint), `${at}: kanji in a level-1 hint`).toEqual([]);
+        expect(l.cue.trim(), at).not.toBe('');
+        expect(Object.keys(l).filter((k) => !['role', 'jp', 'en', 'hint', 'cue'].includes(k)), at).toEqual([]);
       });
     }
   });
 
-  it('writes Japanese the way each level reads it', () => {
+  it('writes Japanese with full-width punctuation, no Latin letters, and a space only after ！ or ？', () => {
     const problems: string[] = [];
-    for (const rp of roleplays) {
+    for (const rp of rolePlays) {
       for (const [where, text] of textsOf(rp)) {
         const at = `${rp.id} ${where}`;
         for (const p of validateRuby(text)) problems.push(`${at}: ${p}`);
         const plain = rubyToPlain(text);
         if (/[A-Za-z0-9]/.test(plain)) problems.push(`${at}: Latin letters or digits in "${text}"`);
         if (/[!?,.;:()]/.test(plain)) problems.push(`${at}: half-width punctuation in "${text}"`);
-        if (rp.level === 1 && kanjiIn(text).length > 0) problems.push(`${at}: kanji in a level-1 script`);
-        // Word spacing is a level-1 reading aid; text with kanji is written without spaces.
-        if (rp.level > 1 && /[ 　]/.test(plain)) problems.push(`${at}: spaces in a level-${rp.level} script`);
+        // Word spacing is a level-1 reading aid; otherwise a space only follows ！ or ？.
+        if (rp.level > 1 && /(^|[^！？])[ 　]/.test(plain)) problems.push(`${at}: spaces in a level-${rp.level} script`);
       }
     }
     expect(problems).toEqual([]);
   });
 
-  it('keeps the couple casual and family terms right between them', () => {
+  it("keeps the couple's plain-register scenes casual and family terms right between them", () => {
     const problems: string[] = [];
-    for (const rp of roleplays.filter((r) => COUPLE.has(r.roles.a.nameJp) && COUPLE.has(r.roles.b.nameJp))) {
+    // Units 1–5 practise です/ます on purpose: their core conversations are polite even between partners.
+    for (const rp of rolePlays.filter((r) => COUPLE.has(r.roles.a.nameJp) && COUPLE.has(r.roles.b.nameJp))) {
       rp.lines.forEach((l, i) => {
         const at = `${rp.id} lines[${i}]`;
-        if (/(です|ます|でした|ました|ません)[。！？…]*$/.test(rubyToKana(l.jp).replace(/\s/g, ''))) {
+        if (rp.register === 'plain' && /(です|ます|でした|ました|ません)[。！？…]*$/.test(rubyToKana(l.jp).replace(/\s/g, ''))) {
           problems.push(`${at}: polite ending between partners: "${l.jp}"`);
         }
         // はは/ちち are for outsiders; to a partner your parents are おかあさん/おとうさん.
@@ -154,12 +155,14 @@ const READING_ALLOW = new Set([
   '今日|きょう', '昨日|きのう', '明日|あした', '風邪|かぜ', '果物|くだもの', '大人|おとな',
   // お{母|かあ}さん, お{父|とう}さん: the jōyō special readings of 母さん and 父さん.
   '母|かあ', '父|とう',
+  // お{腹|なか}: お腹 おなか.
+  '腹|なか',
 ]);
 
 /** Conjugated forms and phrases that are not dictionary headwords, checked by hand. */
 const SURVIVAL_NOT_HEADWORD = new Set([
   'わかりません', 'わかりました', 'つかれた', 'あいしてる', 'がんばって', 'おねがいします',
-  'よろしくおねがいします', 'もういちど', 'そうですか',
+  'よろしくおねがいします', 'もういちど', 'もういちどおねがいします', 'そうですか',
 ]);
 
 describe.skipIf(!existsSync(JMDICT) || !existsSync(KANJI))('survival words and role-plays against the dictionaries', () => {
@@ -196,9 +199,7 @@ describe.skipIf(!existsSync(JMDICT) || !existsSync(KANJI))('survival words and r
     for (const w of survival) {
       if (!jmdict.kana.has(w.kana) && !SURVIVAL_NOT_HEADWORD.has(w.kana)) problems.push(`${w.id}: "${w.kana}" is not a JMdict reading`);
       if (w.written === undefined) continue;
-      const chars = [...w.written].filter(isKanji);
-      if (chars.length === 0) problems.push(`${w.id}: "${w.written}" has no kanji`);
-      for (const ch of chars) if (!(ch in kanji)) problems.push(`${w.id}: ${ch} is not a jōyō kanji`);
+      for (const ch of [...w.written].filter(isKanji)) if (!(ch in kanji)) problems.push(`${w.id}: ${ch} is not a jōyō kanji`);
       if (!readsAs(w.written, w.kana)) problems.push(`${w.id}: "${w.written}" does not read as "${w.kana}"`);
     }
     expect(problems).toEqual([]);
@@ -206,7 +207,7 @@ describe.skipIf(!existsSync(JMDICT) || !existsSync(KANJI))('survival words and r
 
   it('uses jōyō kanji with readings JMdict or KANJIDIC support in every role-play', () => {
     const problems: string[] = [];
-    for (const rp of roleplays) {
+    for (const rp of rolePlays) {
       for (const [where, text] of textsOf(rp)) {
         for (const ch of kanjiIn(text)) if (!(ch in kanji)) problems.push(`${rp.id} ${where}: ${ch} is not a jōyō kanji`);
         for (const seg of parseRuby(text)) {

@@ -1,9 +1,11 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { AiCheckResponse } from '../../../shared/api.ts';
-import { db, updateSettings } from '../../lib/db.ts';
+import type { AiCheckResponse, AiIssue, HouseholdResponse, MemberStats } from '../../../shared/api.ts';
+import type { WordInfo } from '../../lib/data.ts';
+import { dayKey, db, updateSettings } from '../../lib/db.ts';
 import type { WordEntry } from '../../lib/types.ts';
+import { emptyDay } from '../../srs/days.ts';
 import Chat from '../../screens/Chat.tsx';
 import type { PendingMessage } from '../../sync/outbox.ts';
 import { resetAiAvailability, TIMED_OUT } from './ai.ts';
@@ -19,6 +21,12 @@ const mocks = vi.hoisted(() => ({
   discardMessage: vi.fn(async () => {}),
   syncMessages: vi.fn(async () => 0),
   withTimeout: vi.fn(),
+  aiReport: vi.fn(async () => {}),
+  saveOutput: vi.fn(async (rec: object) => ({ ...rec, id: 'out-1', createdAt: new Date() })),
+  completeOutputCheck: vi.fn(async () => ({})),
+  learnerAiContext: vi.fn(async () => ({ knownKanji: ['水'], knownGrammar: ['ta-form'], knownWords: ['すし'], register: 'plain' })),
+  logEncounters: vi.fn(async () => 1),
+  finishStep: vi.fn(async () => {}),
 }));
 
 vi.mock('./ai.ts', async (importOriginal) => {
@@ -32,7 +40,16 @@ vi.mock('../../sync/client.ts', async (importOriginal) => ({
   health: mocks.health,
   aiCheck: mocks.aiCheck,
   aiTranslate: mocks.aiTranslate,
+  aiReport: mocks.aiReport,
 }));
+vi.mock('../../srs/output.ts', () => ({
+  saveOutput: mocks.saveOutput,
+  completeOutputCheck: mocks.completeOutputCheck,
+  learnerAiContext: mocks.learnerAiContext,
+}));
+vi.mock('../../srs/encounters.ts', () => ({ logEncounters: mocks.logEncounters }));
+vi.mock('../../srs/planner.ts', () => ({ finishStep: mocks.finishStep }));
+vi.mock('../../srs/course.ts', () => ({ loadCourseSnapshot: async () => ({ inSprint: false }) }));
 vi.mock('../../sync/outbox.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../sync/outbox.ts')>()),
   queueChatMessage: mocks.queueChatMessage,
@@ -49,35 +66,47 @@ vi.mock('../../sync/socket.ts', () => ({
   onStatusChange: () => () => {},
   connectFromSettings: async () => {},
 }));
-vi.mock('../../sync/stats.ts', () => ({
-  useHousehold: () => ({
-    loading: false,
-    refresh: async () => {},
-    data: {
-      householdName: 'Home',
-      me: 'me',
-      sharedStreak: 0,
-      members: [
-        { member: { id: 'me', name: 'Aiko', joinedAt: '', lastSeenAt: null }, days: [], streak: 0, kanjiKnown: 0, knownKanji: [], phase: 2, updatedAt: null },
-        { member: { id: 'ken', name: 'Ken', joinedAt: '', lastSeenAt: null }, days: [], streak: 0, kanjiKnown: 0, knownKanji: [], phase: 2, updatedAt: null },
-      ],
-    },
-  }),
-  pushStats: async () => true,
-}));
+vi.mock('../../sync/stats.ts', () => {
+  const stats = (id: string, name: string): MemberStats => ({
+    member: { id, name, joinedAt: '', lastSeenAt: null }, days: [], streak: 0, kanjiKnown: 0, knownKanji: [], phase: 1, progress: null, updatedAt: null,
+  });
+  const data: HouseholdResponse = {
+    householdName: 'Home',
+    me: 'me',
+    sharedStreak: 0,
+    quest: { week: '2026-10-12', minimumDays: {}, togetherSessions: 0, shortfall: 13, met: false, reserveUsed: false, reserveLeft: true, daysLeft: 4 },
+    questStreakWeeks: 0,
+    members: [stats('me', 'Aiko'), stats('ken', 'Ken')],
+  };
+  return { useHousehold: () => ({ loading: false, refresh: async () => {}, data }), pushStats: async () => true };
+});
 vi.mock('../../lib/data.ts', () => ({
   loadWords: async (): Promise<WordEntry[]> => [
     { id: '1', written: '水', kana: 'みず', meanings: ['water'], pos: ['n'], freqRank: 1, kanji: ['水'] },
     { id: '2', written: '飲む', kana: 'のむ', meanings: ['drink'], pos: ['v5m'], freqRank: 1, kanji: ['飲'] },
   ],
+  loadWordInfo: async () => (ref: string): WordInfo | undefined => (ref === 'core:cw-0100'
+    ? { ref: 'core:cw-0100', written: 'すし', kana: 'すし', en: 'sushi', kanji: [], use: true, readings: ['すし'] }
+    : undefined),
 }));
 
+const ISSUE: AiIssue = { quote: '食べます', start: 8, end: 12, type: 'conjugation', uncertain: false, hint: 'Yesterday: look at the verb ending.' };
+const NOTHING = { corrected: '', correctedRuby: '', diff: [], rule: '', grammarUsed: [], words: [], tips: [] };
+/** Step 1: where the problem is, never the fix. */
+const PROMPT: AiCheckResponse = { ok: false, issues: [ISSUE], ...NOTHING };
+/** Step 2, after an edit: the fix as a diff, and the rule. */
 const TIP: AiCheckResponse = {
   ok: false,
+  issues: [{ ...ISSUE, hint: 'Yesterday needs the past tense.' }],
   corrected: 'きのう すしを 食べました',
   correctedRuby: 'きのう すしを {食|た}べました',
-  tips: [{ original: '食べます', suggestion: '食べました', explanation: 'Yesterday needs the past tense.' }],
+  diff: [{ op: 'same', text: 'きのう すしを 食べ' }, { op: 'del', text: 'ます' }, { op: 'ins', text: 'ました' }],
+  rule: 'Yesterday needs the past tense.',
+  grammarUsed: ['ta-form'],
+  words: [],
+  tips: [{ original: '食べます', suggestion: '', explanation: 'Yesterday needs the past tense.' }],
 };
+const OK = (text: string): AiCheckResponse => ({ ok: true, issues: [], ...NOTHING, corrected: text, correctedRuby: text, diff: [{ op: 'same', text }] });
 
 function renderChat() {
   return render(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><Chat /></MemoryRouter>);
@@ -105,6 +134,8 @@ beforeEach(async () => {
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  // Answers queued for a test that stopped early must not leak into the next one.
+  mocks.aiCheck.mockReset();
 });
 
 describe('Chat', () => {
@@ -177,42 +208,171 @@ describe('Chat', () => {
     expect(await screen.findByText('Waiting for connection')).toBeTruthy();
   });
 
-  it('shows a private tip and sends the fix without checking again', async () => {
-    mocks.aiCheck.mockResolvedValue(TIP);
+  it('shows a private two-step tip: where the problem is first, the fix only after an edit', async () => {
+    mocks.aiCheck.mockResolvedValueOnce(PROMPT).mockResolvedValueOnce(TIP);
     renderChat();
     await screen.findByText('いいね');
     await waitFor(() => expect(mocks.health).toHaveBeenCalled());
     await screen.findByRole('button', { name: /Stuck\?/ });
 
     await typeAndSend('きのう すしを 食べます');
-    expect(await screen.findByText('Yesterday needs the past tense.')).toBeTruthy();
+    expect(await screen.findByText('Yesterday: look at the verb ending.')).toBeTruthy();
+    expect(screen.getByText('Conjugation')).toBeTruthy();
     expect(screen.getByText(/Only you can see this tip/)).toBeTruthy();
+    // The marked span, and nothing of the fix.
+    expect(document.querySelector('mark.tg-issue-span')?.textContent).toContain('食べます');
+    expect(document.body.textContent).not.toContain('食べました');
     expect(mocks.aiCheck).toHaveBeenCalledWith(expect.objectContaining({
       text: 'きのう すしを 食べます',
+      mode: 'prompt',
+      knownGrammar: ['ta-form'],
       context: ['Ken: 水を飲みます', 'Me: いいね'],
     }));
     expect(mocks.queueChatMessage).not.toHaveBeenCalled();
+
+    // One edit of their own, then the answer.
+    fireEvent.change(screen.getByLabelText('Message in Japanese'), { target: { value: 'きのう すしを 食べるでした' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Check again' }));
+    expect(await screen.findByText('Yesterday needs the past tense.')).toBeTruthy();
+    expect(mocks.aiCheck).toHaveBeenLastCalledWith(expect.objectContaining({
+      text: 'きのう すしを 食べるでした',
+      mode: 'reveal',
+      firstAttempt: 'きのう すしを 食べます',
+    }));
+    expect(document.querySelector('.tg-diff-ins')?.textContent).toBe('ました');
 
     fireEvent.click(screen.getByRole('button', { name: 'Use the fix' }));
     expect((screen.getByLabelText('Message in Japanese') as HTMLInputElement).value).toBe(TIP.corrected);
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
 
     await waitFor(() => expect(mocks.queueChatMessage).toHaveBeenCalledWith({ kind: 'text', text: TIP.corrected }));
-    expect(mocks.aiCheck).toHaveBeenCalledTimes(1);
+    expect(mocks.aiCheck).toHaveBeenCalledTimes(2);
   });
 
-  it('can send the original anyway', async () => {
-    mocks.aiCheck.mockResolvedValue(TIP);
+  it('shows at most two issues', async () => {
+    const three: AiCheckResponse = {
+      ...PROMPT,
+      issues: [ISSUE, { ...ISSUE, quote: 'すし', start: 4, end: 6, type: 'particle', hint: 'Particle one' }, { ...ISSUE, hint: 'Third' }],
+    };
+    mocks.aiCheck.mockResolvedValueOnce(three);
     renderChat();
     await screen.findByRole('button', { name: /Stuck\?/ });
     await typeAndSend('きのう すしを 食べます');
-    fireEvent.click(await screen.findByRole('button', { name: 'Send mine anyway' }));
+    await screen.findByText('Particle one');
+    expect(document.querySelectorAll('.tg-issue-list li')).toHaveLength(2);
+    expect(screen.queryByText('Third')).toBeNull();
+  });
+
+  it('can send it as it is, and never blocks sending', async () => {
+    mocks.aiCheck.mockResolvedValue(PROMPT);
+    renderChat();
+    await screen.findByRole('button', { name: /Stuck\?/ });
+    await typeAndSend('きのう すしを 食べます');
+    fireEvent.click(await screen.findByRole('button', { name: 'Send as it is' }));
     await waitFor(() => expect(mocks.queueChatMessage).toHaveBeenCalledWith({ kind: 'text', text: 'きのう すしを 食べます' }));
     expect(screen.queryByText(/Only you can see this tip/)).toBeNull();
   });
 
+  it('sends offline without a check', async () => {
+    mocks.status = 'offline';
+    renderChat();
+    await screen.findByText('いいね');
+    await typeAndSend('おやすみ');
+    await waitFor(() => expect(mocks.queueChatMessage).toHaveBeenCalledWith({ kind: 'text', text: 'おやすみ' }));
+    expect(mocks.aiCheck).not.toHaveBeenCalled();
+  });
+
+  it('reports a tip that seems wrong', async () => {
+    mocks.aiCheck.mockResolvedValueOnce(PROMPT);
+    renderChat();
+    await screen.findByRole('button', { name: /Stuck\?/ });
+    await typeAndSend('きのう すしを 食べます');
+    fireEvent.click(await screen.findByRole('button', { name: 'This tip seems wrong' }));
+    expect(mocks.aiReport).toHaveBeenCalledWith({ kind: 'check', text: 'きのう すしを 食べます', issue: ISSUE });
+    expect(screen.getByRole('button', { name: 'Thanks, noted' })).toHaveProperty('disabled', true);
+  });
+
+  describe("today's sentence", () => {
+    const now = new Date().toISOString();
+    beforeEach(async () => {
+      await db.messages.put({ id: 3, clientId: 'c3', memberId: 'ken', createdAt: now, kind: 'text', text: '今日はラーメンを食べた', tag: 'daily' });
+      await db.items.put({ id: 'core:cw-0100', kind: 'core', key: 'cw-0100', introducedAt: new Date() });
+    });
+
+    it('labels the daily sentence', async () => {
+      renderChat();
+      expect(await screen.findByText("Today's sentence")).toBeTruthy();
+    });
+
+    it("counts a reply to the partner's daily sentence as today's output while that step is open", async () => {
+      mocks.aiCheck.mockResolvedValueOnce(OK('すしがいい'));
+      renderChat();
+      fireEvent.click(await screen.findByRole('button', { name: 'Reply' }));
+      expect(screen.getByText("Replying to today's sentence · counts as yours")).toBeTruthy();
+      await screen.findByRole('button', { name: /Stuck\?/ });
+      await typeAndSend('すしがいい');
+
+      await waitFor(() => expect(mocks.finishStep).toHaveBeenCalledWith('output'));
+      expect(mocks.aiCheck).toHaveBeenCalledWith(expect.objectContaining({ text: 'すしがいい', mode: 'prompt' }));
+      expect(mocks.queueChatMessage).toHaveBeenCalledWith({ kind: 'text', text: 'すしがいい', tag: 'daily' });
+      expect(mocks.saveOutput).toHaveBeenCalledWith(expect.objectContaining({
+        day: dayKey(),
+        text: 'すしがいい',
+        draft: 'すしがいい',
+        chatClientId: 'client-id',
+        check: 'pending',
+        target: { ref: 'core:cw-0100', label: 'すし', en: 'sushi' },
+      }));
+      expect(mocks.saveOutput.mock.calls[0][0]).not.toHaveProperty('resultSeen');
+      expect(mocks.logEncounters).toHaveBeenCalledWith(['core:cw-0100'], 'output');
+      expect(await screen.findByText("That counts as today's sentence.")).toBeTruthy();
+    });
+
+    it('runs the reveal and the card guard when the reply needed a fix', async () => {
+      mocks.aiCheck.mockResolvedValueOnce(PROMPT).mockResolvedValueOnce(TIP);
+      renderChat();
+      fireEvent.click(await screen.findByRole('button', { name: 'Reply' }));
+      await screen.findByRole('button', { name: /Stuck\?/ });
+      await typeAndSend('きのう すしを 食べます');
+      await screen.findByText('Yesterday: look at the verb ending.');
+      fireEvent.click(screen.getByRole('button', { name: 'Check again' }));
+      fireEvent.click(await screen.findByRole('button', { name: 'Use the fix' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Send' }));
+
+      await waitFor(() => expect(mocks.completeOutputCheck).toHaveBeenCalledWith('out-1', TIP));
+      expect(mocks.queueChatMessage).toHaveBeenCalledWith({ kind: 'text', text: TIP.corrected, tag: 'daily' });
+      // The reveal was shown here, so the next study session does not repeat it as "From earlier today".
+      expect(mocks.saveOutput).toHaveBeenCalledWith(expect.objectContaining({ draft: 'きのう すしを 食べます', text: TIP.corrected, resultSeen: true }));
+      expect(mocks.finishStep).toHaveBeenCalledWith('output');
+    });
+
+    it('sends a reply after the output step is done as a normal message', async () => {
+      await db.days.put({ ...emptyDay(dayKey()), steps: ['output'] });
+      mocks.aiCheck.mockResolvedValueOnce(OK('いいね'));
+      renderChat();
+      fireEvent.click(await screen.findByRole('button', { name: 'Reply' }));
+      expect(screen.getByText('Replying')).toBeTruthy();
+      await screen.findByRole('button', { name: /Stuck\?/ });
+      await typeAndSend('いいね');
+      await waitFor(() => expect(mocks.queueChatMessage).toHaveBeenCalledWith({ kind: 'text', text: 'いいね' }));
+      expect(mocks.saveOutput).not.toHaveBeenCalled();
+      expect(mocks.finishStep).not.toHaveBeenCalled();
+    });
+
+    it('records the output offline too, with the check pending', async () => {
+      mocks.status = 'offline';
+      renderChat();
+      fireEvent.click(await screen.findByRole('button', { name: 'Reply' }));
+      await typeAndSend('すしがいい');
+      await waitFor(() => expect(mocks.finishStep).toHaveBeenCalledWith('output'));
+      expect(mocks.aiCheck).not.toHaveBeenCalled();
+      expect(mocks.saveOutput).toHaveBeenCalledWith(expect.objectContaining({ check: 'pending' }));
+      expect(mocks.completeOutputCheck).not.toHaveBeenCalled();
+    });
+  });
+
   it('sends straight away when the helper finds nothing', async () => {
-    mocks.aiCheck.mockResolvedValue({ ok: true, corrected: 'おはよう', correctedRuby: 'おはよう', tips: [] });
+    mocks.aiCheck.mockResolvedValue(OK('おはよう'));
     renderChat();
     await screen.findByRole('button', { name: /Stuck\?/ });
     await typeAndSend('おはよう');
@@ -272,7 +432,7 @@ describe('Chat', () => {
 
   it('keeps long earlier messages from breaking the check', async () => {
     await db.messages.put({ id: 3, clientId: 'c3', memberId: 'ken', createdAt: '2026-10-14T09:02:00.000Z', kind: 'text', text: 'あ'.repeat(1500) });
-    mocks.aiCheck.mockResolvedValue({ ok: true, corrected: 'うん', correctedRuby: 'うん', tips: [] });
+    mocks.aiCheck.mockResolvedValue(OK('うん'));
     renderChat();
     await screen.findByRole('button', { name: /Stuck\?/ });
     await typeAndSend('うん');

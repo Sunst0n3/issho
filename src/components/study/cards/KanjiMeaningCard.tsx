@@ -1,7 +1,8 @@
-import { gradeFor, meaningMatches } from '../../../srs/answers.ts';
+import { useState } from 'react';
+import { selfGrade } from '../../../srs/answers.ts';
 import { Glyph } from '../../Glyph.tsx';
 import { cleanReading } from '../format.ts';
-import { AnswerArea, Question } from './parts.tsx';
+import { Question, SelfGrade } from './parts.tsx';
 import type { CardProps } from './types.ts';
 
 /**
@@ -13,38 +14,27 @@ export function readingSample(kun: readonly string[], on: readonly string[], max
   return [...kun.slice(0, kunShown).map(cleanReading), ...on.slice(0, max - kunShown)];
 }
 
-/** kanji → English meaning */
+/** A kanji with no taught word: recall its meaning, reveal, then Missed / Got it. */
 export function KanjiMeaningCard({ prepared, onAnswer }: CardProps<'kanji-meaning'>) {
-  const { kanji, options, notAccepted } = prepared;
+  const { kanji } = prepared;
+  const [revealed, setRevealed] = useState(false);
   const readings = readingSample(kanji.kun, kanji.on);
   return (
     <>
       <Question ask="What does this kanji mean?">
         <div className="st-big-glyph"><Glyph char={kanji.char} size={96} /></div>
+        {revealed && (
+          <div className="st-reveal">
+            <p className="st-english">{kanji.meanings.join(', ')}</p>
+            {readings.length > 0 && <p className="st-reveal-kana" lang="ja">{readings.join('・')}</p>}
+          </div>
+        )}
       </Question>
-      <AnswerArea options={options} answer={kanji.meanings[0]}
-        typed={{
-          view: 'kanji-meaning',
-          kind: 'meaning',
-          label: 'Meaning',
-          check: (s) => meaningMatches(s, kanji.meanings, { notAccepted }),
-        }}
-        onResult={(r) => onAnswer({
-          grade: gradeFor(r),
-          mode: r.mode,
-          correct: r.correct,
-          feedback: {
-            expected: kanji.meanings[0],
-            note: (
-              <>
-                {/* Always spelled out: a typed answer may have been accepted with a typo. */}
-                <span>{kanji.meanings.join(', ')}</span>
-                {readings.length > 0 && <span lang="ja">{readings.join('・')}</span>}
-              </>
-            ),
-            speak: readings[0],
-          },
-        })} />
+      {revealed ? (
+        <SelfGrade onGrade={(gotIt) => onAnswer({ grade: selfGrade(gotIt), mode: 'self', revealed: true })} />
+      ) : (
+        <button type="button" className="btn ink block" onClick={() => setRevealed(true)}>Show the meaning</button>
+      )}
     </>
   );
 }

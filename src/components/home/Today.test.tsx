@@ -1,36 +1,115 @@
-import { cleanup, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { dayKey, db, updateSettings } from '../../lib/db.ts';
 import type { HouseholdResponse, MemberStats } from '../../../shared/api.ts';
-import type { SessionPlan } from '../../srs/planner.ts';
+import { dayKey, db, updateSettings } from '../../lib/db.ts';
+import type { CourseProgressV2 } from '../../srs/course.ts';
+import type { ComebackOffer, StreakV2 } from '../../srs/habits.ts';
+import type { DayPlan } from '../../srs/planner.ts';
 import Today from '../../screens/Today.tsx';
-import { addLearned, CURRICULUM, renderAt, resetDb } from './test-fixtures.tsx';
+import { mondayOf, shiftDay } from './labels.ts';
+import { renderAt, resetDb } from './test-fixtures.tsx';
+import { choosePrompt, type PromptInputs } from './TodayPrompts.tsx';
 
 vi.mock('../../lib/data.ts', async () => (await import('./test-fixtures.tsx')).dataMock);
 
-const planner = vi.hoisted(() => ({ plan: undefined as SessionPlan | undefined }));
-vi.mock('../../srs/planner.ts', () => ({
-  planToday: async () => planner.plan,
+const state = vi.hoisted(() => ({
+  plan: undefined as DayPlan | undefined,
+  progress: undefined as CourseProgressV2 | undefined,
+  streak: undefined as StreakV2 | undefined,
+  comeback: { kind: 'none', missedDays: 0 } as ComebackOffer,
+  household: undefined as HouseholdResponse | undefined,
 }));
 
-const household = vi.hoisted(() => ({ data: undefined as HouseholdResponse | undefined }));
+const mocks = vi.hoisted(() => ({
+  spendRestToken: vi.fn(async (_date: string) => 'ok' as const),
+  chooseFreshStart: vi.fn(async (_date: string) => {}),
+  setTravel: vi.fn(async (_until: string | null) => {}),
+  setDefaultAudioRate: vi.fn(),
+}));
+
+vi.mock('../../srs/planner.ts', () => ({ planToday: async () => state.plan }));
+vi.mock('../../srs/course.ts', () => ({ courseProgress: async () => state.progress }));
+vi.mock('../../srs/habits.ts', () => ({
+  streak: async () => state.streak,
+  comeback: async () => state.comeback,
+  spendRestToken: mocks.spendRestToken,
+  chooseFreshStart: mocks.chooseFreshStart,
+  setTravel: mocks.setTravel,
+}));
+vi.mock('../../speech/audio.ts', () => ({ setDefaultAudioRate: mocks.setDefaultAudioRate }));
+vi.mock('../together/TogetherTodayCard.tsx', () => ({
+  TogetherTodayCard: () => <p>Together card: Session A tonight</p>,
+}));
 vi.mock('../../sync/stats.ts', () => ({
-  useHousehold: () => ({ data: household.data, fetchedAt: Date.now(), loading: false, refresh: async () => {} }),
+  useHousehold: () => ({ data: state.household, fetchedAt: Date.now(), loading: false, refresh: async () => {} }),
 }));
 
-const EMPTY_PLAN: SessionPlan = { reviews: [], newItems: [], reading: [], backlog: 0, estimateMinutes: 0 };
+const BASE_PLAN: DayPlan = {
+  day: dayKey(),
+  courseDay: 20,
+  mode: 'normal',
+  sitting: 'any',
+  budgetMin: 25,
+  estimateMin: 25,
+  partOfDayDone: false,
+  tomorrowMin: 24,
+  strandMin: 4,
+  warmup: ['kanji:日|write', 'word:w-hi|read'],
+  bury: [],
+  teach: [{ items: [{ itemId: 'kanji:水', kind: 'kanji', key: '水', anchor: 'core:cw-0005', priceSec: 188, stream: 'kanji' }] }],
+  pendingCheck: [],
+  read: { kind: 'sentences', kanaWords: [], sentences: [], minutes: 3 },
+  output: null,
+  fluency: null,
+  doneSteps: [],
+  counts: { reviews: 31, newItems: 4 },
+  brake: false,
+  offerExtraKanji: false,
+  paperAllowed: true,
+  courseComplete: false,
+};
 
-function setPlan(patch: Partial<SessionPlan>) {
-  planner.plan = { ...EMPTY_PLAN, ...patch };
+const BASE_STREAK: StreakV2 = {
+  current: 5,
+  alive: true,
+  longest: 21,
+  daysThisMonth: 12,
+  todayMinimum: false,
+  todayGoal: false,
+  tokensLeftThisWeek: 2,
+  makeupOffer: false,
+  week: [],
+};
+
+const PROGRESS: CourseProgressV2 = {
+  courseDay: 20, sprintDone: true, kanaIntroduced: 92, kanaTotal: 92, kanjiIntroduced: 20, kanjiTotal: 2136,
+  coreIntroduced: 80, grammarIntroduced: 6, unit: 2, courseComplete: false,
+};
+
+function setPlan(patch: Partial<DayPlan>) {
+  state.plan = { ...BASE_PLAN, ...patch };
 }
+function setStreak(patch: Partial<StreakV2>) {
+  state.streak = { ...BASE_STREAK, ...patch };
+}
+
+const panel = async () => (await screen.findByRole('heading', { name: "Today's plan" })).closest('section')!;
 
 beforeEach(async () => {
   await resetDb();
+  localStorage.clear();
   await updateSettings({ onboarded: true, name: 'Sam' });
   setPlan({});
+  setStreak({});
+  state.progress = PROGRESS;
+  state.comeback = { kind: 'none', missedDays: 0 };
+  state.household = undefined;
 });
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+});
 
 describe('Today', () => {
   it('sends a new learner to the welcome screen', async () => {
@@ -39,240 +118,295 @@ describe('Today', () => {
     expect(await screen.findByText('Welcome screen')).toBeTruthy();
   });
 
-  it('greets an onboarded learner without redirecting', async () => {
+  it('greets an onboarded learner and links to Settings', async () => {
     renderAt('/', '/', <Today />);
     expect(await screen.findByRole('heading', { level: 1, name: /Good (morning|afternoon|evening), Sam/ })).toBeTruthy();
-    expect(screen.queryByText('Welcome screen')).toBeNull();
     expect(screen.getByRole('link', { name: 'Settings' }).getAttribute('href')).toBe('/settings');
   });
 
-  it("shows today's session with what's due, what's new and a start button", async () => {
-    setPlan({
-      reviews: ['kanji:日|meaning', 'kanji:日|reading'],
-      newItems: [{ itemId: 'kanji:水', kind: 'kanji', key: '水', words: ['w-mizu'] }],
-      reading: ['s-1', 's-2', 's-3'],
-      backlog: 2,
-      estimateMinutes: 9,
-    });
+  it('shows "About N min today · tomorrow about M" with the plan tiles and the ways in', async () => {
     renderAt('/', '/', <Today />);
-    const panel = (await screen.findByRole('heading', { name: "Today's session" })).closest('section')!;
-    expect(panel.textContent).toContain('about 9 min');
-    expect(panel.textContent).toContain('2reviews due');
-    expect(panel.textContent).toContain('1new kanji');
-    expect(panel.textContent).toContain('3sentences');
-    expect(within(panel).getByRole('link', { name: /Start session/ }).getAttribute('href')).toBe('/session');
+    const plan = await panel();
+    expect(plan.textContent).toContain('About 25 min today · tomorrow about 24');
+    expect(plan.textContent).toContain('31reviews');
+    expect(plan.textContent).toContain('4new items');
+    expect(plan.textContent).toContain('3min read & listen');
+    expect(within(plan).getByRole('link', { name: /Start session/ }).getAttribute('href')).toBe('/session');
+    expect(within(plan).getByRole('link', { name: /3-minute session/ }).getAttribute('href')).toBe('/session?mode=micro');
+    expect(mocks.setDefaultAudioRate).toHaveBeenCalledWith(20, undefined);
+  });
 
+  it('says "About N min left today" after an earlier sitting', async () => {
+    setPlan({ estimateMin: 12, partOfDayDone: true });
+    renderAt('/', '/', <Today />);
+    expect((await panel()).textContent).toContain('About 12 min left today · tomorrow about 24');
+  });
+
+  it('shows no card counts in catch-up', async () => {
+    setPlan({ mode: 'catch-up', counts: undefined, warmup: Array.from({ length: 140 }, (_, i) => `kanji:k${i}|write`), teach: [] });
+    renderAt('/', '/', <Today />);
+    const plan = await panel();
+    expect(plan.textContent).toContain('About 25 min today');
+    expect(plan.textContent).toContain('Reviews first today');
+    expect(within(plan).queryByRole('list')).toBeNull();
+    expect(plan.textContent).not.toMatch(/140|reviews due/);
+  });
+
+  it('notes the brake and offers one more kanji when the plan allows it', async () => {
+    setPlan({ brake: true, offerExtraKanji: true });
+    renderAt('/', '/', <Today />);
+    const plan = await panel();
+    expect(within(plan).getByText('New items are lighter today while reviews settle.')).toBeTruthy();
+    expect(within(plan).getByRole('link', { name: /Add one more kanji today\?/ }).getAttribute('href')).toBe('/session?extra=1');
+  });
+
+  it('previews the new items: kanji with keyword', async () => {
+    renderAt('/', '/', <Today />);
     const preview = (await screen.findByRole('heading', { name: 'New today' })).closest('section')!;
-    expect(preview.textContent).toContain('水');
+    await waitFor(() => expect(preview.textContent).toContain('水'));
     expect(preview.textContent).toContain('water');
   });
 
-  it('explains when new items are paused for a backlog', async () => {
-    setPlan({
-      reviews: Array.from({ length: 120 }, (_, i) => `kanji:k${i}|meaning`),
-      backlog: 180,
-      newBlocked: { reason: 'New items are taking a break while you catch up on 180 reviews.' },
-      estimateMinutes: 24,
-    });
+  it('asks to use a rest token for yesterday, and spends it on a tap', async () => {
+    const yesterday = shiftDay(dayKey(), -1);
+    setStreak({ offerTokenFor: yesterday, tokensLeftThisWeek: 1 });
     renderAt('/', '/', <Today />);
-    expect(await screen.findByText('New items are taking a break while you catch up on 180 reviews.')).toBeTruthy();
-    expect(screen.getByText('new paused')).toBeTruthy();
-    expect(screen.getByText('60 more reviews will wait for tomorrow.')).toBeTruthy();
-    expect(screen.queryByRole('heading', { name: 'New today' })).toBeNull();
+    const prompt = (await screen.findByRole('heading', { name: /Use a rest token for yesterday\?/ })).closest('section')!;
+    fireEvent.click(within(prompt).getByRole('button', { name: 'Use a rest token' }));
+    await waitFor(() => expect(mocks.spendRestToken).toHaveBeenCalledWith(yesterday));
   });
 
-  it('says all caught up when nothing is due and nothing is new', async () => {
+  it('puts a prompt away for the day with "Not now"', async () => {
+    setStreak({ offerTokenFor: shiftDay(dayKey(), -1) });
     renderAt('/', '/', <Today />);
-    expect(await screen.findByRole('heading', { name: 'All caught up' })).toBeTruthy();
-    expect(screen.queryByRole('link', { name: /Start session/ })).toBeNull();
-    expect(screen.getByRole('link', { name: /Practice writing/ }).getAttribute('href')).toBe('/write');
-  });
-
-  it("doesn't claim nothing is due once today's review limit is used up", async () => {
-    // Every due card is a Review-state card past the daily cap: the plan has none left for today.
-    setPlan({ backlog: 30 });
-    renderAt('/', '/', <Today />);
-    expect(await screen.findByRole('heading', { name: "Today's reviews are done" })).toBeTruthy();
-    expect(screen.getByText(/30 more reviews will wait for tomorrow/)).toBeTruthy();
-    expect(screen.queryByText(/Nothing is due right now/)).toBeNull();
-  });
-
-  it('sends a first-time visitor (no settings saved yet) to the welcome screen', async () => {
-    await db.settings.clear();
-    renderAt('/', '/', <Today />);
-    expect(await screen.findByText('Welcome screen')).toBeTruthy();
-  });
-
-  it('celebrates a finished course', async () => {
-    for (const u of CURRICULUM.units) await addLearned(u.type, u.char);
-    setPlan({ courseComplete: true });
-    renderAt('/', '/', <Today />);
-    expect(await screen.findByRole('heading', { name: "You've met every kanji" })).toBeTruthy();
-  });
-
-  it("doesn't call the course finished while new words or grammar are still to come", async () => {
-    for (const u of CURRICULUM.units) await addLearned(u.type, u.char);
-    setPlan({ courseComplete: false });
-    renderAt('/', '/', <Today />);
-    expect(await screen.findByRole('heading', { name: 'All caught up' })).toBeTruthy();
-    expect(screen.queryByRole('heading', { name: "You've met every kanji" })).toBeNull();
-  });
-
-  it('shows "Done for today" with extra practice once the session is complete', async () => {
-    await db.days.put({ date: dayKey(), studyMs: 600_000, reviews: 20, correct: 18, newItems: 5, sessionComplete: true });
-    setPlan({ newItems: [{ itemId: 'kanji:火', kind: 'kanji', key: '火' }], estimateMinutes: 2 });
-    renderAt('/', '/', <Today />);
-    expect(await screen.findByRole('heading', { name: 'Done for today' })).toBeTruthy();
-    expect(screen.getByRole('link', { name: /Practice writing/ }).getAttribute('href')).toBe('/write');
-    expect(screen.getByRole('link', { name: /Read & shadow/ }).getAttribute('href')).toBe('/read');
-    expect(screen.getByRole('heading', { name: '1-day streak' })).toBeTruthy();
-    expect(screen.queryByRole('heading', { name: 'New today' })).toBeNull();
-    expect(screen.getByText('Nice work. Your next reviews will be waiting tomorrow.')).toBeTruthy();
-  });
-
-  it("doesn't promise tomorrow's reviews while extra reviews are ready", async () => {
-    await db.days.put({ date: dayKey(), studyMs: 600_000, reviews: 20, correct: 18, newItems: 5, sessionComplete: true });
-    setPlan({ reviews: ['kanji:日|meaning', 'kanji:日|reading'], estimateMinutes: 2 });
-    renderAt('/', '/', <Today />);
-    const panel = (await screen.findByRole('heading', { name: 'Done for today' })).closest('section')!;
-    expect(panel.textContent).not.toContain('waiting tomorrow');
-    expect(within(panel).getByRole('link', { name: /2 more reviews ready/ }).getAttribute('href')).toBe('/session');
-  });
-
-  it("doesn't call the course over while reviews wait for tomorrow", async () => {
-    for (const u of CURRICULUM.units) await addLearned(u.type, u.char);
-    setPlan({ backlog: 200, courseComplete: true });
-    renderAt('/', '/', <Today />);
-    const panel = (await screen.findByRole('heading', { name: "You've met every kanji" })).closest('section')!;
-    expect(panel.textContent).not.toContain("That's the whole course");
-    expect(panel.textContent).toContain('200 more reviews will wait for tomorrow.');
-  });
-
-  it('keeps the break note away from a finished course: held-back new items mean it is not finished', async () => {
-    for (const u of CURRICULUM.units) await addLearned(u.type, u.char);
-    const reason = 'New items are taking a break while you catch up on 200 reviews.';
-    setPlan({ backlog: 200, newBlocked: { reason }, courseComplete: false });
-    renderAt('/', '/', <Today />);
-    const panel = (await screen.findByRole('heading', { name: "Today's reviews are done" })).closest('section')!;
-    expect(panel.textContent).toContain(reason);
-    expect(screen.queryByRole('heading', { name: "You've met every kanji" })).toBeNull();
-  });
-
-  it('shows the days before the learner started as not started, not missed', async () => {
-    // A Wednesday evening, onboarded today with both kana marked known.
-    vi.useFakeTimers({ toFake: ['Date'] });
-    vi.setSystemTime(new Date(2026, 9, 14, 20, 0));
-    try {
-      await db.items.add({ id: 'kana:あ', kind: 'kana', key: 'あ', introducedAt: new Date() });
-      renderAt('/', '/', <Today />);
-      const week = await screen.findByRole('list', { name: 'This week' });
-      expect(week.textContent).toContain('Monday: before you started');
-      expect(week.textContent).toContain('Tuesday: before you started');
-      expect(week.textContent).toContain('Wednesday: today, not done yet');
-      expect(week.textContent).not.toContain('missed');
-    } finally {
-      vi.useRealTimers();
-    }
-  });
-
-  it('invites an unpaired phone to connect, and shows the phase progress', async () => {
-    await updateSettings({ knowsHiragana: true, knowsKatakana: true });
-    await addLearned('kanji', '日');
-    renderAt('/', '/', <Today />);
-    expect((await screen.findByRole('link', { name: /Study together: connect your home server/ })).getAttribute('href')).toBe('/together');
-    expect((await screen.findByRole('link', { name: /Phase 2 · 1 of 5 kanji/ })).getAttribute('href')).toBe('/learn');
-    expect(screen.getByText('Works offline · progress saved on this phone')).toBeTruthy();
-  });
-
-  it("warns on an insecure (http://) address and doesn't promise offline use there", async () => {
-    Object.defineProperty(window, 'isSecureContext', { value: false, configurable: true });
-    try {
-      renderAt('/', '/', <Today />);
-      expect(await screen.findByRole('heading', { name: "Issho can't work offline from this address" })).toBeTruthy();
-      expect(screen.getByText('Progress saved on this phone')).toBeTruthy();
-      expect(screen.queryByText(/Works offline/)).toBeNull();
-    } finally {
-      Object.defineProperty(window, 'isSecureContext', { value: true, configurable: true });
-    }
+    fireEvent.click(await screen.findByRole('button', { name: 'Not now' }));
+    await waitFor(() => expect(screen.queryByRole('heading', { name: /Use a rest token/ })).toBeNull());
     cleanup();
     renderAt('/', '/', <Today />);
-    expect(await screen.findByText('Works offline · progress saved on this phone')).toBeTruthy();
-    expect(screen.queryByRole('heading', { name: /can't work offline/ })).toBeNull();
+    await panel();
+    expect(screen.queryByRole('heading', { name: /Use a rest token/ })).toBeNull();
   });
 
-  it('says so when the home server removed this phone', async () => {
-    localStorage.setItem('issho.sync.removed', '1');
-    try {
-      renderAt('/', '/', <Today />);
-      expect((await screen.findByRole('link', { name: /This phone was disconnected: connect again/ })).getAttribute('href')).toBe('/together');
-    } finally {
-      localStorage.removeItem('issho.sync.removed');
-    }
+  it('offers a welcome-back warm-up while the plan panel still shows the normal plan', async () => {
+    state.comeback = { kind: 'welcome-back', missedDays: 2 };
+    renderAt('/', '/', <Today />);
+    const card = (await screen.findByRole('heading', { name: /Welcome back — a 3-minute warm-up\?/ })).closest('section')!;
+    expect(within(card).getByRole('link', { name: /Start the warm-up/ }).getAttribute('href')).toBe('/session?mode=welcome');
+    expect((await panel()).textContent).toContain('About 25 min today');
+    // Warm copy only: never how long the gap was.
+    expect(document.body.textContent).not.toMatch(/missed|(^|\D)2 days/i);
   });
 
-  it("shows how the partner's day went on a paired phone", async () => {
-    await updateSettings({ deviceToken: 'token', memberId: 'm-sam', householdName: 'Our home' });
-    const member = (id: string, name: string, today: Partial<MemberStats['days'][number]>): MemberStats => ({
+  it('offers a fresh start after a longer gap and saves the chosen date', async () => {
+    state.comeback = { kind: 'fresh-start', missedDays: 4, freshStart: '2026-10-19' };
+    renderAt('/', '/', <Today />);
+    const button = await screen.findByRole('button', { name: /Start fresh on Monday 19 Oct/ });
+    expect(screen.getByText(/catch-up first, new items after/)).toBeTruthy();
+    fireEvent.click(button);
+    await waitFor(() => expect(mocks.chooseFreshStart).toHaveBeenCalledWith('2026-10-19'));
+  });
+
+  it('keeps the chosen fresh start instead of offering a later one the next day', async () => {
+    await updateSettings({ freshStart: '2026-10-19' });
+    state.comeback = { kind: 'fresh-start', missedDays: 5, freshStart: '2026-10-26' };
+    renderAt('/', '/', <Today />);
+    expect(await screen.findByText('Fresh start on Monday 19 Oct: catch-up first, new items after.')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /Start fresh/ })).toBeNull();
+  });
+
+  it('shows the fresh-start header from Settings.freshStart, and the week dots start on that day', async () => {
+    const today = dayKey();
+    const before = shiftDay(today, -1);
+    await updateSettings({ freshStart: today });
+    setStreak({ week: [{ date: before, status: 'missed' }, { date: today, status: 'today' }] });
+    renderAt('/', '/', <Today />);
+    expect(await screen.findByText('A fresh start — this week begins today')).toBeTruthy();
+    const week = screen.getByRole('list', { name: 'This week' });
+    expect(week.textContent).toContain('before this week began');
+    expect(week.textContent).not.toContain('no study');
+  });
+
+  it('shows the make-up offer only with makeupOffer, and a quiet line before the goal is met', async () => {
+    const missed = shiftDay(dayKey(), -2);
+    const deadline = new Date(2026, 9, 22, 4, 0);
+    setStreak({ repairable: { date: missed, deadline }, makeupOffer: false });
+    renderAt('/', '/', <Today />);
+    expect(await screen.findByText(/make-up for .* opens after today's session/)).toBeTruthy();
+    expect(screen.queryByRole('link', { name: /Start the make-up/ })).toBeNull();
+    cleanup();
+
+    setStreak({ repairable: { date: missed, deadline }, makeupOffer: true, todayGoal: true, todayMinimum: true });
+    renderAt('/', '/', <Today />);
+    const offer = (await screen.findByRole('heading', { name: /Make up .*: 10 more minutes before Thursday 4 a\.m\. keeps your streak/ })).closest('section')!;
+    expect(within(offer).getByRole('link', { name: /Start the make-up/ }).getAttribute('href')).toBe('/session?mode=makeup');
+  });
+
+  it('never renders a broken streak', async () => {
+    setStreak({ current: 0, alive: false, longest: 9, daysThisMonth: 3 });
+    renderAt('/', '/', <Today />);
+    const card = (await screen.findByRole('heading', { name: '3 days studied this month' })).closest('section')!;
+    expect(card.textContent).toContain('longest 9 days');
+    expect(card.textContent).not.toMatch(/0-day|-day streak|broken|missed/);
+  });
+
+  it('shows the current streak only while it is alive', async () => {
+    renderAt('/', '/', <Today />);
+    const card = (await screen.findByRole('heading', { name: '12 days studied this month' })).closest('section')!;
+    expect(card.textContent).toContain('longest 21 days · 5-day streak now');
+  });
+
+  it('shows the travel banner and ends travel mode', async () => {
+    const until = shiftDay(dayKey(), 3);
+    await updateSettings({ travelUntil: until });
+    setPlan({ mode: 'travel', counts: undefined });
+    renderAt('/', '/', <Today />);
+    const banner = (await screen.findByRole('heading', { name: /Away until/ })).closest('section')!;
+    fireEvent.click(within(banner).getByRole('button', { name: "I'm back" }));
+    await waitFor(() => expect(mocks.setTravel).toHaveBeenCalledWith(null));
+    expect(screen.getByRole('heading', { name: 'Travel mode' })).toBeTruthy();
+  });
+
+  it('prompts a plan review on its day and takes the day off the list when done', async () => {
+    await updateSettings({ planReviewDays: [dayKey(), shiftDay(dayKey(), 28)] });
+    renderAt('/', '/', <Today />);
+    fireEvent.click(await screen.findByRole('button', { name: 'It still fits' }));
+    await waitFor(async () => expect((await db.settings.get('me'))?.planReviewDays).toEqual([shiftDay(dayKey(), 28)]));
+  });
+
+  it('shows "Done for today" once the goal is met', async () => {
+    setStreak({ todayGoal: true, todayMinimum: true });
+    setPlan({ warmup: [], teach: [] });
+    renderAt('/', '/', <Today />);
+    expect(await screen.findByRole('heading', { name: 'Done for today' })).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: 'New today' })).toBeNull();
+  });
+
+  it('says all caught up when nothing is left', async () => {
+    setPlan({ estimateMin: 0, warmup: [], teach: [], read: null, counts: { reviews: 0, newItems: 0 } });
+    renderAt('/', '/', <Today />);
+    expect(await screen.findByRole('heading', { name: 'All caught up' })).toBeTruthy();
+  });
+
+  it('shows the chapter line, linking to Learn, and never a "/ 2,136" count', async () => {
+    renderAt('/', '/', <Today />);
+    const line = await screen.findByRole('link', { name: /Chapter 2 · 5 of 15 done/ });
+    expect(line.getAttribute('href')).toBe('/learn');
+    expect(document.body.textContent).not.toMatch(/2,136|2136/);
+  });
+
+  it('shows the kana chapter during the sprint', async () => {
+    state.progress = { ...PROGRESS, kanjiIntroduced: 0, kanaIntroduced: 46, sprintDone: false };
+    renderAt('/', '/', <Today />);
+    expect(await screen.findByRole('link', { name: /Chapter 0 · Kana · 46 of 92/ })).toBeTruthy();
+  });
+
+  it("shows the together card (it decides itself when there's a session)", async () => {
+    renderAt('/', '/', <Today />);
+    expect(await screen.findByText('Together card: Session A tonight')).toBeTruthy();
+  });
+
+  it('invites an unpaired phone to connect', async () => {
+    renderAt('/', '/', <Today />);
+    expect((await screen.findByRole('link', { name: /Study together: connect your home server/ })).getAttribute('href')).toBe('/together');
+  });
+
+  describe('partner card', () => {
+    const member = (id: string, name: string, today: Partial<MemberStats['days'][number]>, progress?: Partial<NonNullable<MemberStats['progress']>>): MemberStats => ({
       member: { id, name, joinedAt: '2026-09-01T00:00:00Z', lastSeenAt: null },
-      days: [{ date: dayKey(), studyMinutes: 12, reviews: 0, correct: 0, newItems: 0, sessionComplete: false, ...today }],
+      days: [{ date: dayKey(), studyMinutes: 0, reviews: 0, correct: 0, newItems: 0, sessionComplete: false, ...today }],
       streak: 4,
       kanjiKnown: 80,
       knownKanji: [],
-      phase: 2,
+      phase: 1,
+      progress: progress ? { unit: 2, chapter: 2, kanjiCanWrite: 0, kanjiCanRead: 0, wordsKnown: 0, grammarKnown: 0, hoursTotal: 0,
+        daysThisMonth: 0, longestStreak: 0, readyStories: [], recentKanji: [], recentItems: [], settledUnit: 0, coreReached: 0,
+        grammarReached: 0, ...progress } : null,
       updatedAt: null,
     });
-    household.data = {
+    const household = (partner: MemberStats): HouseholdResponse => ({
       householdName: 'Our home',
       me: 'm-sam',
-      members: [member('m-sam', 'Sam', {}), member('m-anna', 'Anna', { reviews: 31, correct: 29, newItems: 5, sessionComplete: true })],
-      sharedStreak: 3,
-    };
-    renderAt('/', '/', <Today />);
-    const card = await screen.findByRole('link', { name: /Anna finished today/ });
-    expect(card.getAttribute('href')).toBe('/together');
-    expect(card.textContent).toContain('5 new · 31 reviews · 94% correct');
-    // The lines of the card are separated in its accessible name.
-    expect(card.getAttribute('aria-label')).toBe('Anna finished today. 5 new · 31 reviews · 94% correct');
-    expect(screen.queryByText(/connect your home server/)).toBeNull();
-    household.data = undefined;
-  });
-
-  it('shows the partner seen most recently, not a leftover member who joined first', async () => {
-    await updateSettings({ deviceToken: 'token', memberId: 'm-sam', householdName: 'Our home' });
-    const member = (id: string, name: string, updatedAt: string | null): MemberStats => ({
-      member: { id, name, joinedAt: '2026-09-01T00:00:00Z', lastSeenAt: null },
-      days: [], streak: 0, kanjiKnown: 0, knownKanji: [], phase: 2, updatedAt,
-    });
-    household.data = {
-      householdName: 'Our home',
-      me: 'm-sam',
-      members: [member('m-ghost', 'Anna (old phone)', '2026-09-02T00:00:00Z'), member('m-sam', 'Sam', null),
-        member('m-anna', 'Anna', '2026-10-13T00:00:00Z')],
+      members: [member('m-sam', 'Sam', {}), partner],
       sharedStreak: 0,
-    };
-    try {
+      quest: { week: '2026-10-12', minimumDays: {}, togetherSessions: 0, shortfall: 8, met: false, reserveUsed: false, reserveLeft: true, daysLeft: 4 },
+      questStreakWeeks: 0,
+    });
+
+    beforeEach(async () => {
+      await updateSettings({ deviceToken: 'token', memberId: 'm-sam', householdName: 'Our home' });
+    });
+
+    it('shows effort only: minutes, together time and days this month, without accuracy', async () => {
+      state.household = household(member('m-anna', 'Anna',
+        { studyMinutes: 24, reviews: 31, correct: 29, newItems: 5, sessionComplete: true, minimumDone: true, togetherMinutes: 15 },
+        { daysThisMonth: 11 }));
       renderAt('/', '/', <Today />);
-      expect(await screen.findByRole('link', { name: /^Anna hasn't studied yet today/ })).toBeTruthy();
-      expect(screen.queryByText(/old phone/)).toBeNull();
-    } finally {
-      household.data = undefined;
-    }
+      const card = await screen.findByRole('link', { name: /Anna met today's goal/ });
+      expect(card.textContent).toContain("24 min today · 15 min together · 11 days studied this month");
+      expect(card.textContent).not.toContain('%');
+    });
+
+    it("shows the partner's quest stamps this week: days studied and sessions together", async () => {
+      const partner = member('m-anna', 'Anna', { studyMinutes: 20, minimumDone: true });
+      state.household = {
+        ...household(partner),
+        quest: { ...household(partner).quest, week: mondayOf(dayKey()), minimumDays: { 'm-anna': 3, 'm-sam': 2 }, togetherSessions: 1 },
+      };
+      renderAt('/', '/', <Today />);
+      const card = await screen.findByRole('link', { name: /Anna studied today/ });
+      expect(card.textContent).toContain('This week: 3 days studied · 1 of 3 sessions together');
+      expect(card.getAttribute('aria-label')).toContain('This week: 3 days studied · 1 of 3 sessions together');
+    });
+
+    it('leaves out a quest week cached before this one', async () => {
+      const partner = member('m-anna', 'Anna', { studyMinutes: 20, minimumDone: true });
+      state.household = {
+        ...household(partner),
+        quest: { ...household(partner).quest, week: shiftDay(mondayOf(dayKey()), -7), minimumDays: { 'm-anna': 5 }, togetherSessions: 3 },
+      };
+      renderAt('/', '/', <Today />);
+      const card = await screen.findByRole('link', { name: /Anna studied today/ });
+      expect(card.textContent).not.toContain('This week');
+    });
+
+    it('shows accuracy only when the partner shares it', async () => {
+      state.household = household(member('m-anna', 'Anna',
+        { studyMinutes: 20, reviews: 30, correct: 27, minimumDone: true, accuracyShared: true }));
+      renderAt('/', '/', <Today />);
+      const card = await screen.findByRole('link', { name: /Anna studied today/ });
+      expect(card.textContent).toContain('90% correct');
+    });
+  });
+});
+
+describe('choosePrompt', () => {
+  const inputs = (patch: Partial<PromptInputs> = {}, streak: Partial<StreakV2> = {}): PromptInputs => ({
+    today: '2026-10-15',
+    streak: { ...BASE_STREAK, ...streak },
+    comeback: { kind: 'none', missedDays: 0 },
+    settings: { planReviewDays: [] },
+    dismissed: new Set(),
+    ...patch,
   });
 
-  it("words the partner's streak as an n-day streak", async () => {
-    await updateSettings({ deviceToken: 'token', memberId: 'm-sam' });
-    const member = (id: string, name: string, streak: number): MemberStats => ({
-      member: { id, name, joinedAt: '2026-09-01T00:00:00Z', lastSeenAt: null },
-      days: [],
-      streak,
-      kanjiKnown: 0,
-      knownKanji: [],
-      phase: 2,
-      updatedAt: null,
-    });
-    household.data = { householdName: 'Our home', me: 'm-sam', members: [member('m-sam', 'Sam', 0), member('m-anna', 'Anna', 4)], sharedStreak: 0 };
-    renderAt('/', '/', <Today />);
-    expect(await screen.findByText('4-day streak so far')).toBeTruthy();
-    household.data = undefined;
+  it('shows at most one prompt, in the fixed order', () => {
+    const all = inputs(
+      {
+        comeback: { kind: 'welcome-back', missedDays: 1 },
+        settings: { travelUntil: '2026-10-20', planReviewDays: ['2026-10-15'] },
+      },
+      { offerTokenFor: '2026-10-14', makeupOffer: true, repairable: { date: '2026-10-13', deadline: new Date() } },
+    );
+    expect(choosePrompt(all)).toBe('rest-token');
+    expect(choosePrompt({ ...all, dismissed: new Set(['rest-token']) })).toBe('comeback');
+    expect(choosePrompt({ ...all, dismissed: new Set(['rest-token', 'comeback']) })).toBe('travel');
+    const noTravel = { ...all, settings: { planReviewDays: ['2026-10-15'] }, dismissed: new Set(['rest-token', 'comeback'] as const) };
+    expect(choosePrompt(noTravel)).toBe('plan-review');
+    expect(choosePrompt({ ...noTravel, settings: { planReviewDays: ['2026-11-12'] } })).toBe('makeup');
+    expect(choosePrompt(inputs())).toBeNull();
+  });
+
+  it('ignores a finished travel period and a plan review still to come', () => {
+    expect(choosePrompt(inputs({ settings: { travelUntil: '2026-10-14', planReviewDays: ['2026-10-16'] } }))).toBeNull();
   });
 });

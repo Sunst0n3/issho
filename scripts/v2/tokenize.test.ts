@@ -6,7 +6,7 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { coverageOf, detectKind, itemsOf } from './coverage.ts';
-import { getTokenizer, plainText, type RubyToken, type RubyTokenizer } from './tokenize.ts';
+import { getTokenizer, plainText, shareReading, type RubyToken, type RubyTokenizer } from './tokenize.ts';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const hasWords = existsSync(`${ROOT}public/data/words.json`);
@@ -47,6 +47,32 @@ describe('tokenizeRuby', () => {
     ]);
   });
 
+  it('splits a word that runs across a phrase mark into one token per phrase, keeping its ref', () => {
+    for (const text of ['「よろしく／おねがいします。」', 'すみません、／ちょっと／まってください。', 'ケンは／おなかが／すきました。']) {
+      const toks = tokens(text);
+      const phrases = plainText(text.replace(/／/g, '\u0000')).split('\u0000');
+      const byPhrase = phrases.map((_, n) => toks.filter((t) => t.phrase === n).map((t) => t.surface).join(''));
+      expect(byPhrase, text).toEqual(phrases);
+    }
+    expect(words('「よろしく／おねがいします。」')).toEqual(['よろしく=よろしくお願いします', 'おねがいします=よろしくお願いします']);
+    expect(words('ケンは／おなかが／すきました。').slice(1)).toEqual(['おなかが=お腹がすく', 'すき=お腹がすく']);
+    expect(tokens('{今日|きょう}は／お{腹|なか}が／すいた').filter((t) => t.ref === tokens('おなかがすいた')[0].ref).map((t) => [t.surface, t.reading, t.phrase])).toEqual([
+      ['お腹が', 'おなかが', 1],
+      ['すい', 'すい', 2],
+    ]);
+    // Without the mark the same words stay one token.
+    expect(words('よろしくおねがいします。')).toEqual(['よろしくおねがいします=よろしくお願いします']);
+  });
+
+  it.runIf(hasWords)('keeps a JMdict run inside its phrase', () => {
+    const jm = (text: string) => content(text).map((t) => [t.surface, t.phrase, t.ref?.slice(0, 5)]);
+    // 仕方がない is a JMdict expression; across the author's mark it reads as 仕方 + ない.
+    expect(jm('{仕方|しかた}がない。')).toEqual([['仕方がない', 0, 'word:']]);
+    expect(jm('{仕方|しかた}が／ない。')).toEqual([['仕方', 0, 'word:'], ['ない', 1, 'core:']]);
+    // A core word wins over a longer JMdict expression: 方がいい reads as the core words 方 (ほう) + いい.
+    expect(jm('スープの{方|ほう}がいい。')).toEqual([['スープ', 0, 'core:'], ['方', 0, 'core:'], ['いい', 0, 'core:']]);
+  });
+
   it('merges compounds kuromoji splits, する-verbs and set phrases into core words', () => {
     expect(words('{昨日|きのう}の{晩|ばん}ご{飯|はん}はおいしかったです。')).toEqual(['昨日=昨日', '晩ご飯=晩ご飯', 'おいしかっ=おいしい']);
     expect(words('{毎日|まいにち}{日本語|にほんご}を{勉強|べんきょう}しています。')).toEqual(['毎日=毎日', '日本語=日本語', '勉強し=勉強する']);
@@ -77,6 +103,20 @@ describe('tokenizeRuby', () => {
     const [six, hundred, yen] = content('{六百|ろっぴゃく}{円|えん}です');
     expect([six.reading, hundred.reading, yen.reading]).toEqual(['ろっ', 'ぴゃく', 'えん']);
     expect(words('{六百|ろっぴゃく}{円|えん}です')).toEqual(['六=六', '百=百', '円=円']);
+    // A number's odd reading never takes its counter's: 九 く + 時 じ, 四 よ + 人 にん.
+    expect(content('{朝|あさ}{九時|くじ}の{電車|でんしゃ}').map((t) => t.reading)).toEqual(['あさ', 'く', 'じ', 'でんしゃ']);
+    expect(words('{九時|くじ}ごろ')).toEqual(['九=九', '時=時', 'ごろ=ごろ']);
+    expect(words('{四人|よにん}で{食|た}べた')).toEqual(['四=四', '人=人', '食べ=食べる']);
+    expect(tk.core.get(content('{四人|よにん}')[1].ref!.slice(5))!.kana).toBe('にん');
+  });
+
+  it('shares a reading by the tokens’ possible readings, then by length', () => {
+    expect(shareReading([['ろく'], ['ひゃく']], 'ろっぴゃく')).toEqual(['ろっ', 'ぴゃく']);
+    expect(shareReading([['きゅう'], ['じ']], 'くじ')).toEqual(['く', 'じ']);
+    expect(shareReading([['よん', 'し'], ['じん', 'にん']], 'よにん')).toEqual(['よ', 'にん']);
+    expect(shareReading([['じゅう'], ['いち'], ['じ']], 'じゅういちじ')).toEqual(['じゅう', 'いち', 'じ']);
+    // Nothing fits: shared out by length, at least one kana each.
+    expect(shareReading([['abc'], ['d']], 'xy')).toEqual(['x', 'y']);
   });
 
   it('reads all-kana beginner text', () => {
@@ -112,7 +152,14 @@ describe('tokenizeRuby', () => {
 
   it('gives core words their teaching order', () => {
     const [eat] = content('{食|た}べる');
-    expect(coreOrder(eat)).toBe(103);
+    const taberu = [...tk.core.values()].find((w) => w.written === '食べる' && w.kana === 'たべる')!;
+    expect(eat.ref).toBe(`core:${taberu.id}`);
+    expect(coreOrder(eat)).toBe(taberu.order);
+  });
+
+  it('reads kanji without ruby (plain text) with kuromoji\'s readings', () => {
+    expect(tokens('今何時ですか。').map((t) => t.reading).join('')).toBe('いまなんじですか。');
+    expect(tokens('{今|いま}{何時|なんじ}ですか。').map((t) => t.reading).join('')).toBe('いまなんじですか。');
   });
 });
 

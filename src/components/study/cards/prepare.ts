@@ -1,97 +1,194 @@
-// Loads what a review card shows and picks its answer options.
+// Loads what a review card shows: its content, the cue text (the card's own word never gets a reading) and the
+// choices behind "Show options".
 
 import { db, getSettings } from '../../../lib/db.ts';
 import {
+  loadAccent,
+  loadCoreWords,
   loadCurriculum,
-  loadGrammar,
+  loadGrammarIndex,
   loadKana,
+  loadKanaExamples,
+  loadKanaRules,
   loadKanji,
-  loadRadicals,
-  loadSurvivalWords,
-  loadWordIndex,
+  loadSentences,
+  loadWordInfo,
   loadWords,
+  type KanaExample,
+  type WordInfo,
 } from '../../../lib/data.ts';
-import { isKanji } from '../../../lib/ruby.ts';
-import type { CardRecord, Curriculum, ItemKind, KanjiEntry, WordEntry } from '../../../lib/types.ts';
-import { choicesFrom, normalizeMeaning, shuffle, toHiragana } from '../../../srs/answers.ts';
-import { knownKanaSet, requiredKana } from '../../../srs/course.ts';
-import { isYoon } from '../../../srs/items.ts';
+import { parseRuby, type RubySegment } from '../../../lib/ruby.ts';
+import type { CardRecord, KanaEntry, RubyText, WordEntry } from '../../../lib/types.ts';
+import { choicesFrom, shuffle, toHiragana } from '../../../srs/answers.ts';
+import { loadCourseSnapshot, taughtKana } from '../../../srs/course.ts';
+import { exampleSentenceFor, loadKnownWords, type KnownWords } from '../../../srs/readListen.ts';
 import { cleanReading, sharedSoundRow } from '../format.ts';
-import { sentencesById } from '../sentences.ts';
-import type { BreakdownPart, PreparedCard } from './types.ts';
+import type { PreparedCard, SplitCue } from './types.ts';
 
 export const OPTION_COUNT = 4;
-/** Kanji this many curriculum units either side count as "similar level". */
-const LEVEL_WINDOW = 15;
-/** Words up to this JMdict rank are common enough to make fair distractors. */
-const COMMON_RANK = 30;
-/** Words up to this rank are everyday words, fair as English distractors for a beginner. */
-const EVERYDAY_RANK = 5;
 /** Kana that are also particles, said differently then: は "wa", へ "e", を "o". */
 const PARTICLE_SOUND: Record<string, string> = { は: 'wa', へ: 'e', を: 'o' };
+/** Basic kana that sound the same (お and を are both "o"): a sound-only prompt names the row. */
+const SOUND_TWINS: Record<string, string> = { お: 'を', を: 'お', オ: 'ヲ', ヲ: 'オ' };
+/** Words up to this JMdict rank are common enough to make fair distractors. */
+const COMMON_RANK = 30;
+/** The blank in a cloze sentence. */
+export const CLOZE_GAP = '＿＿';
+/** The box a written prompt shows instead of the character to write. */
+export const BLANK = '□';
 
 type Random = () => number;
 
+export interface PrepareContext {
+  courseDay: number;
+  /** CourseSnapshot.inSprint: kana-read cards take romaji and kana-write cards are sound-only while true. */
+  inSprint: boolean;
+  /** Taught kana for <KanaText>'s romaji helper (taughtKana()). */
+  taught: ReadonlySet<string>;
+  grammarIntroduced: number;
+  handsBusy: boolean;
+  known: KnownWords;
+  random?: () => number;
+}
+
+/** The context for preparing cards now, from the learner's progress and settings. */
+export async function loadPrepareContext(now: Date = new Date()): Promise<PrepareContext> {
+  const [snapshot, taught, known, settings, grammarIntroduced] = await Promise.all([
+    loadCourseSnapshot(now),
+    taughtKana(now),
+    loadKnownWords(now),
+    getSettings(),
+    db.items.where('kind').equals('grammar').count(),
+  ]);
+  return { courseDay: snapshot.courseDay, inSprint: snapshot.inSprint, taught, grammarIntroduced, handsBusy: settings.handsBusy, known };
+}
+
+/** Grammar build items are tiles until this many grammar points are introduced, then typed. */
+export const TYPED_BUILD_FROM = 60;
+
+/** '□本' for anchor 日本 and kanji 日 (every occurrence of the kanji). Never contains the target kanji. */
+export function blankKanji(written: string, char: string): string {
+  return written.split(char).join(BLANK);
+}
+
+const SMALL_AFTER = /^[ゃゅょぁぃぅぇぉャュョァィゥェォ]/;
+
+/** The word with each stand-alone occurrence of the kana as □ (か in かさ → □さ; not the き of きゃ). */
+export function blankKana(word: string, char: string): string {
+  let out = '';
+  let at = 0;
+  for (let i = word.indexOf(char); i >= 0; i = word.indexOf(char, i + char.length)) {
+    if ([...char].length === 1 && SMALL_AFTER.test(word.slice(i + char.length))) continue;
+    out += word.slice(at, i) + BLANK;
+    at = i + char.length;
+  }
+  return out + word.slice(at);
+}
+
+/** Segments back to ruby markup. */
+function toRuby(segs: readonly RubySegment[]): RubyText {
+  return segs.map((s) => (s.reading === undefined ? s.text : `{${s.text}|${s.reading}}`)).join('');
+}
+
+/** Ruby markup with the reading dropped from every segment that overlaps an occurrence of `surface`. */
+export function stripRubyOf(jp: RubyText, surface: string): RubyText {
+  if (!surface) return jp;
+  const segs = parseRuby(jp);
+  const plain = segs.map((s) => s.text).join('');
+  const covered = new Set<number>();
+  for (let i = plain.indexOf(surface); i >= 0; i = plain.indexOf(surface, i + 1)) {
+    for (let k = i; k < i + surface.length; k++) covered.add(k);
+  }
+  let pos = 0;
+  return toRuby(segs.map((s) => {
+    const start = pos;
+    pos += s.text.length;
+    if (s.reading === undefined) return s;
+    for (let k = start; k < pos; k++) if (covered.has(k)) return { text: s.text };
+    return s;
+  }));
+}
+
 /**
- * Distractors taken from the first tier first (in random order), then the next
- * tiers, all distinct by `key` and never equal to an excluded key.
+ * The sentence around one occurrence of `surface` (at plain-text offset `at` when given and right, else the first):
+ * the word itself as plain text, the rest as ruby markup with the word's readings removed wherever else it occurs.
+ * Null when the word is not in the sentence.
  */
-function distractors<T>(tiers: readonly (readonly T[])[], key: (item: T) => string, exclude: Iterable<string>, random: Random): T[] {
-  const out: T[] = [];
-  const seen = new Set(exclude);
-  for (const tier of tiers) {
-    for (const item of shuffle(tier, random)) {
-      if (out.length >= OPTION_COUNT - 1) return out;
-      const k = key(item);
-      if (seen.has(k)) continue;
-      seen.add(k);
-      out.push(item);
+export function splitCue(jp: RubyText, surface: string, at?: number): SplitCue | null {
+  const segs = parseRuby(jp);
+  const plain = segs.map((s) => s.text).join('');
+  const start = at !== undefined && plain.startsWith(surface, at) ? at : plain.indexOf(surface);
+  if (!surface || start < 0) return null;
+  const end = start + surface.length;
+  const before: RubySegment[] = [];
+  const after: RubySegment[] = [];
+  let pos = 0;
+  for (const s of segs) {
+    const from = pos;
+    pos += s.text.length;
+    if (pos <= start) before.push(s);
+    else if (from >= end) after.push(s);
+    else {
+      // A segment the word cuts through loses its reading: the reading would cover the word too.
+      if (from < start) before.push({ text: s.text.slice(0, start - from) });
+      if (pos > end) after.push({ text: s.text.slice(end - from) });
     }
   }
-  return out;
+  return { before: stripRubyOf(toRuby(before), surface), target: surface, after: stripRubyOf(toRuby(after), surface) };
 }
 
-function options(correct: string, tiers: readonly (readonly string[])[], random: Random, exclude: Iterable<string> = [], key = (s: string) => s): string[] {
-  return choicesFrom(correct, distractors(tiers, key, [key(correct), ...exclude], random), OPTION_COUNT, key, random);
+/** Plain-text offset of the first token with this ref (tokens spell the sentence in order). */
+export function tokenOffset(tokens: readonly { s: string; ref?: string }[], ref: string): number | undefined {
+  let at = 0;
+  for (const t of tokens) {
+    if (t.ref === ref) return at;
+    at += t.s.length;
+  }
+  return undefined;
 }
 
-async function introducedKeys(kind: ItemKind): Promise<Set<string>> {
-  const ids = await db.items.where('kind').equals(kind).primaryKeys();
-  return new Set(ids.map((id) => String(id).slice(kind.length + 1)));
+/** The Japanese a card shows before it is answered, and the word it asks about (for checking that word never gets ruby). */
+export function cueTexts(p: PreparedCard): { texts: RubyText[]; target?: string } {
+  switch (p.view) {
+    case 'kana-read': return { texts: [p.word?.kana ?? p.kana.char], target: p.word?.kana ?? p.kana.char };
+    case 'kana-write': return { texts: p.blanked ? [p.blanked] : [], target: p.kana.char };
+    case 'kana-rule': return { texts: [p.word.kana], target: p.word.kana };
+    case 'kanji-write': return { texts: p.blanked ? [p.blanked, p.reading] : [p.reading], target: p.kanji.char };
+    case 'kanji-meaning': return { texts: [p.kanji.char], target: p.kanji.char };
+    case 'word-read':
+    case 'cloze': return { texts: [p.cue.before, p.cue.target, p.cue.after], target: p.view === 'cloze' ? p.sentence.blank.surface : p.word.written };
+    case 'produce':
+    case 'listen': return { texts: [], target: p.word.written };
+    case 'grammar-comprehend': return { texts: [p.example.jp] };
+    case 'grammar-build': return { texts: p.tiles ? p.shuffledTiles : [] };
+  }
+}
+
+/** Distinct options: the answer plus up to 3 from `tiers` (in order, shuffled within each), compared by `key`. */
+function options(answer: string, tiers: readonly (readonly string[])[], random: Random, exclude: readonly string[] = [], key = (s: string) => s): string[] {
+  const seen = new Set([key(answer), ...exclude.map(key)]);
+  const picked: string[] = [];
+  for (const tier of tiers) {
+    for (const option of shuffle(tier, random)) {
+      if (picked.length >= OPTION_COUNT - 1) break;
+      const k = key(option);
+      if (seen.has(k)) continue;
+      seen.add(k);
+      picked.push(option);
+    }
+  }
+  return choicesFrom(answer, picked, OPTION_COUNT, key, random);
 }
 
 const kanaLength = (s: string) => [...s].length;
 
-/** Each kanji of a word with its meaning; empty for a one-character word, which needs no breakdown. */
-export function breakdownOf(written: string, kanji: Record<string, KanjiEntry>): BreakdownPart[] {
-  if ([...written].length < 2) return [];
-  return [...new Set([...written].filter(isKanji))].map((char) => ({ char, meaning: kanji[char]?.meanings[0] }));
-}
-
-/** Kanji units nearest to `char` in the curriculum, nearest first. */
-async function sameLevelKanji(char: string, kanji: Record<string, KanjiEntry>): Promise<KanjiEntry[]> {
-  const units = (await loadCurriculum()).units.filter((u) => u.type === 'kanji');
-  const at = units.findIndex((u) => u.char === char);
-  if (at < 0) return [];
-  return units
-    .slice(Math.max(0, at - LEVEL_WINDOW), at + LEVEL_WINDOW + 1)
-    .filter((u) => u.char !== char)
-    .flatMap((u) => (kanji[u.char] ? [kanji[u.char]] : []));
-}
-
 /**
- * Kana options for a reading: readings of common words of about the same
- * length, those sharing a kanji with the answer's word first. Words written
- * like the answer are left out (they would be a second right answer).
+ * Kana options for a reading: readings of common words of about the same length, those sharing a kanji with the
+ * answer's word first. Words written like the answer are left out (they would be a second right answer).
  */
 export async function readingOptions(
   answer: string,
-  { kanji = [], written, exclude = [] }: {
-    kanji?: readonly string[];
-    written?: string;
-    /** Readings that must not be offered either, e.g. the answer with or without its okurigana. */
-    exclude?: readonly string[];
-  },
+  { kanji = [], written, exclude = [] }: { kanji?: readonly string[]; written?: string; exclude?: readonly string[] },
   random: Random = Math.random,
 ): Promise<string[]> {
   const words = await loadWords();
@@ -101,198 +198,174 @@ export async function readingOptions(
   const related = kanji.length ? common.filter((w) => w.kanji.some((k) => kanji.includes(k))) : [];
   const sameLength = common.filter((w) => kanaLength(w.kana) === len);
   const tiers = [related.slice(0, 40), sameLength, common].map((tier) => tier.map((w) => w.kana));
-  return options(answer, tiers, random, exclude.map(toHiragana), toHiragana);
+  return options(answer, tiers, random, exclude, toHiragana);
 }
 
-/** Meaning options; candidates sharing any meaning with the answer are left out. */
-export function meaningOptions(meanings: readonly string[], candidates: readonly (readonly string[])[][], random: Random = Math.random): string[] {
-  const own = new Set(meanings.map(normalizeMeaning));
-  const fair = (ms: readonly string[]) => !ms.some((m) => own.has(normalizeMeaning(m)));
-  const tiers = candidates.map((tier) => tier.filter(fair).map((ms) => ms[0]));
-  return options(meanings[0], tiers, random, own, normalizeMeaning);
+/** Core-word kana for produce choices: the same part of speech and topic first. */
+async function produceOptions(word: WordInfo, random: Random): Promise<string[]> {
+  const core = await loadCoreWords();
+  const others = core.filter((c) => c.kana !== word.kana);
+  const pos = word.core?.pos;
+  const topic = word.core?.topic;
+  const tiers = [
+    others.filter((c) => c.pos === pos && c.topic === topic),
+    others.filter((c) => c.pos === pos),
+    others,
+  ].map((tier) => tier.map((c) => c.kana));
+  return options(word.kana, tiers, random, word.readings, toHiragana);
 }
 
-/** The reading shown with a kanji's write prompt: a one-kanji word, else a kun reading, else on. */
-export function writePromptReading(kanji: KanjiEntry, words: readonly WordEntry[]): string {
-  const single = words.find((w) => w.written === kanji.char);
-  if (single) return single.kana;
+/** The kana's sound twin and other basic kana of its script that share its romaji decide whether to name the row. */
+function soundRow(kana: KanaEntry, all: readonly KanaEntry[]): string | undefined {
+  const twin = SOUND_TWINS[kana.char];
+  if (twin) return all.filter((k) => k.script === kana.script && k.group === kana.group).sort((a, b) => a.order - b.order)[0]?.char;
+  return sharedSoundRow(kana, all.filter((k) => k.kind === 'basic'));
+}
+
+/** Reading shown with a zero-word kanji's write prompt: its first kun reading, else its first on reading. */
+export function zeroWordReading(kanji: { kun: readonly string[]; on: readonly string[] }): string {
   if (kanji.kun.length) return cleanReading(kanji.kun[0]);
   return kanji.on[0] ?? '';
 }
 
-/** Introduced words written with this kanji. */
-async function taughtWords(char: string): Promise<WordEntry[]> {
-  const [keys, index] = await Promise.all([introducedKeys('word'), loadWordIndex()]);
-  return [...keys].flatMap((id) => {
-    const w = index.get(id);
-    return w && w.kanji.includes(char) ? [w] : [];
-  });
-}
-
-function pick<T>(items: readonly T[], random: Random): T | undefined {
-  return items.length ? items[Math.floor(random() * items.length)] : undefined;
-}
-
-/**
- * Meanings a typed answer for this kanji must not be taken as a typo of: every
- * other kanji's meanings ("block" is 町, so it can't pass for "black"), except
- * meanings this kanji shares.
- */
-export function otherKanjiMeanings(entry: KanjiEntry, kanji: Record<string, KanjiEntry>): string[] {
-  const own = new Set(entry.meanings.map(normalizeMeaning));
-  const out = new Set<string>();
-  for (const k of Object.values(kanji)) {
-    if (k.char === entry.char) continue;
-    for (const m of k.meanings) if (!own.has(normalizeMeaning(m))) out.add(m);
+/** The tiles in an order that isn't already the answer (when the tiles allow it). */
+export function shuffleTiles(tiles: readonly string[], random: Random): string[] {
+  if (new Set(tiles).size < 2) return [...tiles];
+  for (let i = 0; i < 12; i++) {
+    const out = shuffle(tiles, random);
+    if (out.join('\u0000') !== tiles.join('\u0000')) return out;
   }
-  return [...out];
+  return [...tiles.slice(1), tiles[0]];
 }
 
-/** Words taught with the curriculum units near this word's unit (its level), nearest first. */
-function sameLevelWords(id: string, curriculum: Curriculum, index: ReadonlyMap<string, WordEntry>): WordEntry[] {
-  const units = curriculum.units;
-  const at = units.findIndex((u) => u.words?.includes(id));
-  if (at < 0) return [];
-  return units
-    .slice(Math.max(0, at - LEVEL_WINDOW), at + LEVEL_WINDOW + 1)
-    .flatMap((u) => u.words ?? [])
-    .flatMap((w) => (w !== id && index.get(w) ? [index.get(w)!] : []));
+const keyOf = (card: CardRecord) => card.itemId.slice(card.kind.length + 1);
+
+/** The word as ruby markup: `{written|kana}` once it is spelled (always for a JMdict word), else its kana. */
+export function wordDisplay(word: Pick<WordInfo, 'written' | 'kana'>, spelled: boolean): RubyText {
+  return spelled && word.written !== word.kana ? `{${word.written}|${word.kana}}` : word.kana;
 }
 
-/** Kana the learner can read: introduced, or a whole script they said they know. */
-async function readableKana(): Promise<{ course: Set<string>; known: Set<string> }> {
-  const [kana, settings, introduced] = await Promise.all([
-    loadKana(),
-    getSettings(),
-    db.items.where('kind').equals('kana').primaryKeys(),
-  ]);
-  return {
-    course: new Set(kana.map((k) => k.char)),
-    known: knownKanaSet({ kana, introduced: new Set(introduced.map(String)), ...settings }),
-  };
-}
-
-/** Context for a card shown as part of a block (a session's reviews, the first check). */
-export interface PrepareContext {
-  /** Every card id in the block, so two cards don't ask the same question. */
-  block?: readonly string[];
-}
-
-const WORD_READING = /^word:(.+)\|reading$/;
-
-/** Card content with answer options; null when its data is missing. */
-export async function prepareCard(card: CardRecord, random: Random = Math.random, context: PrepareContext = {}): Promise<PreparedCard | null> {
-  const key = card.itemId.slice(card.kind.length + 1);
+/** Card content with its options; null when its data is missing. */
+export async function prepareCard(card: CardRecord, ctx: PrepareContext): Promise<PreparedCard | null> {
+  const random = ctx.random ?? Math.random;
+  const key = keyOf(card);
+  const item = await db.items.get(card.itemId);
+  const base = { card, ...(item?.customMnemonic ? { customMnemonic: item.customMnemonic } : {}) };
 
   switch (card.kind) {
     case 'kana': {
-      const all = await loadKana();
+      const [all, examples] = await Promise.all([loadKana(), loadKanaExamples().catch(() => ({} as Record<string, KanaExample>))]);
       const kana = all.find((k) => k.char === key);
       if (!kana) return null;
-      if (card.type === 'write') return { view: 'kana-write', card, kana, row: sharedSoundRow(kana, all) };
-      const known = await introducedKeys('kana');
-      const peers = all.filter((k) => k.script === kana.script && isYoon(k.char) === isYoon(kana.char));
-      // を is also read "o": お's romaji would be a second right answer. Likewise は and へ
-      // are read "wa" and "e" as particles, as the grammar lessons teach, so those are never wrong options.
-      const alsoRight = [...(kana.altRomaji ?? []), ...(PARTICLE_SOUND[kana.char] ? [PARTICLE_SOUND[kana.char]] : [])];
-      const romaji = options(kana.romaji, [peers.filter((k) => known.has(k.char)).map((k) => k.romaji), peers.map((k) => k.romaji)], random, alsoRight);
-      return { view: 'kana-read', card, kana, options: romaji };
+      const word = examples[kana.char];
+      if (card.type === 'write') {
+        const prompt = ctx.inSprint || !word ? 'sound' : 'word';
+        return {
+          ...base, view: 'kana-write', kana, prompt, options: [], answer: kana.char,
+          ...(word ? { word } : {}),
+          ...(prompt === 'word' && word ? { blanked: blankKana(word.kana, kana.char) } : {}),
+          ...(soundRow(kana, all) ? { row: soundRow(kana, all) } : {}),
+        };
+      }
+      if (ctx.inSprint) {
+        // Romaji is only the way to type the sound here: the choices are other kana sounds of the script.
+        const peers = all.filter((k) => k.script === kana.script && k.kind === 'basic' && k.char !== kana.char);
+        const alsoRight = [...(kana.altRomaji ?? []), ...(PARTICLE_SOUND[kana.char] ? [PARTICLE_SOUND[kana.char]] : [])];
+        const twin = SOUND_TWINS[kana.char];
+        const exclude = twin ? [...alsoRight, ...(all.find((k) => k.char === twin)?.romaji ?? [])] : alsoRight;
+        return {
+          ...base, view: 'kana-read', kana, mode: 'romaji', answer: kana.romaji,
+          options: options(kana.romaji, [peers.map((k) => k.romaji)], random, exclude),
+          ...(word ? { word } : {}),
+        };
+      }
+      const shown = word?.kana ?? kana.char;
+      const sameScript = Object.entries(examples)
+        .filter(([c]) => all.find((k) => k.char === c)?.script === kana.script)
+        .map(([, w]) => w.kana);
+      return {
+        ...base, view: 'kana-read', kana, mode: 'word', answer: shown,
+        options: options(shown, [sameScript.filter((k) => Math.abs(kanaLength(k) - kanaLength(shown)) <= 1), sameScript], random, [], toHiragana),
+        ...(word ? { word } : {}),
+      };
     }
 
-    case 'radical': {
-      const radicals = await loadRadicals();
-      const radical = radicals.find((r) => r.char === key);
-      if (!radical) return null;
-      const others = radicals.filter((r) => r.char !== key).map((r) => [r.meaning]);
-      return { view: 'radical-meaning', card, radical, options: meaningOptions([radical.meaning], [others], random) };
+    case 'kanaRule': {
+      const rule = (await loadKanaRules()).find((r) => r.id === key);
+      if (!rule || !rule.practiceWords.length) return null;
+      const wordIndex = card.reps % rule.practiceWords.length;
+      const word = rule.practiceWords[wordIndex];
+      const others = rule.practiceWords.filter((w) => w.kana !== word.kana).map((w) => w.kana);
+      return { ...base, view: 'kana-rule', rule, word, wordIndex, answer: word.kana, options: options(word.kana, [others], random, [], toHiragana) };
     }
 
     case 'kanji': {
       const kanji = await loadKanji();
       const entry = kanji[key];
       if (!entry) return null;
-      if (card.type === 'meaning') {
-        const level = await sameLevelKanji(key, kanji);
-        const opts = meaningOptions(entry.meanings, [level.map((k) => k.meanings), Object.values(kanji).map((k) => k.meanings)], random);
-        return { view: 'kanji-meaning', card, kanji: entry, options: opts, notAccepted: otherKanjiMeanings(entry, kanji) };
+      if (card.type === 'meaning') return { ...base, view: 'kanji-meaning', kanji: entry, options: [], answer: entry.meanings[0] };
+      const [curriculum, info] = await Promise.all([loadCurriculum(), loadWordInfo()]);
+      const anchorRef = curriculum.units.find((u) => u.char === key)?.anchor ?? null;
+      const anchor = anchorRef ? info(anchorRef) : undefined;
+      if (anchor && anchor.written.includes(key)) {
+        return { ...base, view: 'kanji-write', kanji: entry, anchor, blanked: blankKanji(anchor.written, key), reading: anchor.kana, options: [], answer: key };
       }
-      const words = await taughtWords(key);
-      if (card.type === 'write') return { view: 'kanji-write', card, kanji: entry, reading: writePromptReading(entry, words) };
-
-      // A word whose own reading card is in the same block would be the same question twice.
-      const asked = new Set((context.block ?? []).flatMap((id) => WORD_READING.exec(id)?.[1] ?? []));
-      const word = pick(words.filter((w) => !asked.has(w.id)), random);
-      if (word) {
-        const opts = await readingOptions(word.kana, word, random);
-        return { view: 'kanji-reading', card, kanji: entry, word, answer: word.kana, options: opts, breakdown: breakdownOf(word.written, kanji) };
-      }
-      // No taught word to show (none yet, or all asked about already): ask for one of the
-      // kanji's own readings, one the block's word cards don't ask when there is one.
-      const own = [...new Set([...entry.kun.map(cleanReading), ...entry.on.map(toHiragana)])];
-      const askedKana = new Set(words.map((w) => toHiragana(w.kana)));
-      const answer = own.find((r) => !askedKana.has(r)) ?? own[0];
-      if (!answer) return null;
-      const level = await sameLevelKanji(key, kanji);
-      const others = level.flatMap((k) => [...k.kun.map(cleanReading), ...k.on.map(toHiragana)]);
-      const opts = options(answer, [others], random, own);
-      return { view: 'kanji-reading', card, kanji: entry, answer, options: opts, breakdown: [] };
+      return { ...base, view: 'kanji-write', kanji: entry, reading: zeroWordReading(entry), options: [], answer: key };
     }
 
-    case 'word': {
-      const [index, kanji] = await Promise.all([loadWordIndex(), loadKanji()]);
-      const word = index.get(key);
+    case 'word':
+    case 'core': {
+      const [info, accents] = await Promise.all([loadWordInfo(), loadAccent()]);
+      const word = info(card.itemId);
       if (!word) return null;
-      const breakdown = breakdownOf(word.written, kanji);
-      if (card.type === 'reading') {
-        return { view: 'word-reading', card, word, options: await readingOptions(word.kana, word, random), breakdown };
+      const accent = accents[card.itemId];
+      const withAccent = accent ? { accent } : {};
+      const display = wordDisplay(word, card.kind === 'word' || Boolean(item?.spelledAt));
+      if (card.type === 'listen') return { ...base, view: 'listen', word, ...withAccent, display, options: [], answer: word.kana };
+      if (card.type === 'produce') {
+        return { ...base, view: 'produce', word, ...withAccent, display, answer: word.kana, options: await produceOptions(word, random) };
       }
-      // English options at the learner's level: words already taught, then words taught
-      // around this one in the course, then everyday words (never "centrifugal force").
-      const [words, curriculum, taught] = await Promise.all([loadWords(), loadCurriculum(), introducedKeys('word')]);
-      const others = (list: readonly WordEntry[]) => list.filter((w) => w.id !== word.id);
-      const taughtWords = others([...taught].flatMap((id) => index.get(id) ?? []));
-      const level = sameLevelWords(word.id, curriculum, index);
-      const everyday = others(words.filter((w) => w.freqRank <= EVERYDAY_RANK));
-      const samePos = (list: readonly WordEntry[]) => list.filter((w) => w.pos[0] === word.pos[0]);
-      const tiers = [samePos(taughtWords), taughtWords, samePos(level), level, samePos(everyday), everyday];
-      const opts = meaningOptions(word.meanings, tiers.map((tier) => tier.map((w) => w.meanings)), random);
-      return { view: 'word-meaning', card, word, options: opts, breakdown };
-    }
-
-    case 'vocab': {
-      const survival = await loadSurvivalWords();
-      const vocab = survival.find((w) => w.id === key);
-      if (!vocab) return null;
-      const others = survival.filter((w) => w.id !== key);
-      if (card.type === 'recall') {
-        // Options the learner can read, so the answer can't be found by spotting the only familiar kana.
-        const { course, known } = await readableKana();
-        const canRead = (kana: string) => requiredKana(kana, course).every((k) => known.has(k));
-        const readable = others.filter((w) => canRead(w.kana));
-        // Early on few survival words use only those kana (just いいえ with あいうえ), so common
-        // words that do come next (あい, うえ, いう …), leaving out any that mean the same as the answer.
-        const own = new Set(vocab.en.split(/[;,]/).map(normalizeMeaning));
-        const words = await loadWords();
-        const clash = new Set(words.filter((w) => w.meanings.some((m) => own.has(normalizeMeaning(m)))).map((w) => w.kana));
-        const readableWords = words.filter((w) => w.freqRank <= COMMON_RANK && !clash.has(w.kana) && canRead(w.kana));
-        const len = kanaLength(vocab.kana);
-        const near = (list: readonly { kana: string }[]) => list.filter((w) => Math.abs(kanaLength(w.kana) - len) <= 1).map((w) => w.kana);
-        const tiers = [near(readable), readable.map((w) => w.kana), near(readableWords), readableWords.map((w) => w.kana), near(others), others.map((w) => w.kana)];
-        return { view: 'vocab-recall', card, vocab, options: options(vocab.kana, tiers, random) };
-      }
-      return { view: 'vocab-meaning', card, vocab, options: meaningOptions([vocab.en], [others.map((w) => [w.en])], random) };
+      // read: the word inside a known carrier phrase when there is one, else alone.
+      const carrier = exampleSentenceFor(card.itemId, await loadSentences(), ctx.known);
+      const surface = carrier?.tokens.find((t) => t.ref === card.itemId)?.s ?? word.written;
+      const cue = (carrier && splitCue(carrier.jp, surface, tokenOffset(carrier.tokens, card.itemId))) || { before: '', target: word.written, after: '' };
+      const opts = await readingOptions(word.kana, { kanji: word.kanji, written: word.written, exclude: word.readings }, random);
+      return {
+        ...base, view: 'word-read', word, ...(carrier && cue.before + cue.after ? { carrier } : {}), ...withAccent, cue,
+        display: wordDisplay(word, true), answer: word.kana, options: opts,
+      };
     }
 
     case 'grammar': {
-      const point = (await loadGrammar()).find((g) => g.id === key);
-      const drill = point && pick(point.drills, random);
-      if (!point || !drill) return null;
-      return { view: 'grammar-drill', card, point, drill, options: shuffle(drill.options, random) };
+      const point = (await loadGrammarIndex()).get(key);
+      if (!point) return null;
+      if (card.type === 'comprehend') {
+        if (!point.examples.length) return null;
+        // Examples 0–2 belong to the lesson: the rotation starts after them and never repeats the last two shown.
+        const exampleIndex = (3 + card.reps) % point.examples.length;
+        return { ...base, view: 'grammar-comprehend', point, example: point.examples[exampleIndex], exampleIndex, options: [], answer: point.examples[exampleIndex].en };
+      }
+      if (!point.buildItems.length) return null;
+      // buildItems[0] is the lesson's build: reviews start with the next one.
+      const itemIndex = (1 + card.reps) % point.buildItems.length;
+      const item = point.buildItems[itemIndex];
+      const tiles = ctx.grammarIntroduced < TYPED_BUILD_FROM;
+      const plainJp = parseRuby(item.jp).map((s) => s.text).join('');
+      const others = point.buildItems.filter((b) => b !== item).map((b) => parseRuby(b.jp).map((s) => s.text).join(''));
+      return {
+        ...base, view: 'grammar-build', point, item, itemIndex, tiles, shuffledTiles: shuffleTiles(item.tiles, random),
+        answer: plainJp, options: tiles ? [] : options(plainJp, [others], random, item.alternatives),
+      };
     }
 
     case 'sentence': {
-      const [sentence] = await sentencesById([key]);
-      return sentence ? { view: 'sentence-read', card, sentence } : null;
+      const sentence = await db.savedSentences.get(key);
+      if (!sentence) return null;
+      const cue = splitCue(sentence.jp, sentence.blank.surface);
+      if (!cue) return null;
+      const reading = sentence.blank.reading;
+      const opts = await readingOptions(reading, { written: sentence.blank.surface, exclude: [] }, random);
+      return { ...base, view: 'cloze', sentence, cue: { ...cue, target: CLOZE_GAP }, answer: reading, options: opts };
     }
   }
 }

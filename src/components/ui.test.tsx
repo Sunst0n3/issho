@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import { afterEach, describe, expect, it } from 'vitest';
-import { ProgressBar, TopBar } from './ui.tsx';
+import { Icon, ProgressBar, Ruby, TopBar } from './ui.tsx';
 
 afterEach(cleanup);
 
@@ -58,5 +58,32 @@ describe('TopBar', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Browser back' }));
     expect(screen.getByText('Home screen')).toBeTruthy();
     expect(screen.queryByRole('heading', { name: 'Settings' })).toBeNull();
+  });
+});
+
+describe('Ruby', () => {
+  it('passes each segment\'s base and reading to a show predicate', () => {
+    const seen: Array<[string, string | undefined]> = [];
+    render(<Ruby text="{食|た}べる{水|みず}" show={(base, reading) => { seen.push([base, reading]); return base === '水'; }} />);
+    expect(seen).toEqual([['食', 'た'], ['水', 'みず']]);
+    expect(document.querySelectorAll('rt')).toHaveLength(1);
+    expect(document.querySelector('rt')?.textContent).toBe('みず');
+  });
+
+  it("keeps working with a predicate that only reads the base, and with 'all' and 'none'", () => {
+    const { container, rerender } = render(<Ruby text="{明日|あした}" show={(base) => base.length > 1} />);
+    expect(container.querySelectorAll('rt')).toHaveLength(1);
+    rerender(<Ruby text="{明日|あした}" show="none" />);
+    expect(container.querySelectorAll('rt')).toHaveLength(0);
+    rerender(<Ruby text="{明日|あした}" />);
+    expect(container.querySelectorAll('rt')).toHaveLength(1);
+  });
+});
+
+describe('Icon', () => {
+  it.each(['rest', 'travel', 'repair', 'pitch', 'quest'] as const)('draws the %s icon', (name) => {
+    const { container } = render(<Icon name={name} />);
+    expect(container.querySelector('path')?.getAttribute('d')).toBeTruthy();
+    expect(container.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
   });
 });

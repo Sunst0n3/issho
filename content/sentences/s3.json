@@ -223,7 +223,8 @@
     "jp": "{医者|いしゃ}に{薬|くすり}をもらいました。",
     "en": "I got some medicine from the doctor.",
     "grammar": [
-      "masu-forms"
+      "masu-forms",
+      "masu-past"
     ]
   },
   {
@@ -368,7 +369,8 @@
     "jp": "{姉|あね}に{赤|あか}ちゃんが{生|う}まれました!",
     "en": "My older sister had a baby!",
     "grammar": [
-      "masu-forms"
+      "masu-forms",
+      "masu-past"
     ]
   },
   {

@@ -532,7 +532,7 @@
       "wo-kudasai",
       "ni-time-place"
     ],
-    "coreWordCeiling": 338,
+    "coreWordCeiling": 339,
     "canDos": [
       {
         "id": "u03-cd1",
@@ -736,7 +736,7 @@
       "de-place-means",
       "counters-people"
     ],
-    "coreWordCeiling": 415,
+    "coreWordCeiling": 416,
     "canDos": [
       {
         "id": "u04-cd1",
@@ -989,7 +989,7 @@
       "to-with",
       "deshita"
     ],
-    "coreWordCeiling": 472,
+    "coreWordCeiling": 473,
     "canDos": [
       {
         "id": "u05-cd1",
@@ -1227,7 +1227,7 @@
       "dictionary-form",
       "suki-kirai"
     ],
-    "coreWordCeiling": 535,
+    "coreWordCeiling": 536,
     "canDos": [
       {
         "id": "u06-cd1",
@@ -1474,7 +1474,7 @@
       "position-words",
       "te-form"
     ],
-    "coreWordCeiling": 593,
+    "coreWordCeiling": 594,
     "canDos": [
       {
         "id": "u07-cd1",
@@ -1715,7 +1715,7 @@
       "te-kudasai",
       "ga-subject"
     ],
-    "coreWordCeiling": 644,
+    "coreWordCeiling": 645,
     "canDos": [
       {
         "id": "u08-cd1",
@@ -1943,7 +1943,7 @@
       "casual-past",
       "kara-because"
     ],
-    "coreWordCeiling": 709,
+    "coreWordCeiling": 710,
     "canDos": [
       {
         "id": "u09-cd1",
@@ -2169,7 +2169,7 @@
       "ni-target",
       "ya-nado"
     ],
-    "coreWordCeiling": 762,
+    "coreWordCeiling": 763,
     "canDos": [
       {
         "id": "u10-cd1",
@@ -2284,7 +2284,7 @@
       "scripted": [
         {
           "role": "a",
-          "jp": "4{番|ばん}の{人|ひと}は{髪|かみ}が{長|なが}いよ。ケーキを{持|も}ってる。{誰|だれ}だと{思|おも}う？",
+          "jp": "{4番|よんばん}の{人|ひと}は{髪|かみ}が{長|なが}いよ。ケーキを{持|も}ってる。{誰|だれ}だと{思|おも}う？",
           "en": "Number 4 has long hair. She's holding a cake. Who do you think it is?"
         },
         {
@@ -2294,7 +2294,7 @@
         },
         {
           "role": "a",
-          "jp": "なるほど。5{番|ばん}の{人|ひと}は{髪|かみ}が{短|みじか}い。{犬|いぬ}と{一緒|いっしょ}にいる。",
+          "jp": "なるほど。{5番|ごばん}の{人|ひと}は{髪|かみ}が{短|みじか}い。{犬|いぬ}と{一緒|いっしょ}にいる。",
           "en": "I see. Number 5 has short hair, and is with a dog."
         },
         {
@@ -2304,7 +2304,7 @@
         },
         {
           "role": "a",
-          "jp": "6{番|ばん}の{人|ひと}はめがね。{椅子|いす}に{座|すわ}ってる。",
+          "jp": "{6番|ろくばん}の{人|ひと}はめがね。{椅子|いす}に{座|すわ}ってる。",
           "en": "Number 6 has glasses. He's sitting on a chair."
         },
         {
@@ -2314,12 +2314,12 @@
         },
         {
           "role": "a",
-          "jp": "じゃあ、{今度|こんど}は{左|ひだり}。1{番|ばん}の{人|ひと}は？",
+          "jp": "じゃあ、{今度|こんど}は{左|ひだり}。{1番|いちばん}の{人|ひと}は？",
           "en": "Okay, now the left side. What about number 1?"
         },
         {
           "role": "b",
-          "jp": "1{番|ばん}の{人|ひと}は{髪|かみ}が{短|みじか}い。ケーキを{食|た}べてる。",
+          "jp": "{1番|いちばん}の{人|ひと}は{髪|かみ}が{短|みじか}い。ケーキを{食|た}べてる。",
           "en": "Number 1 has short hair. They're eating cake."
         },
         {
@@ -2329,17 +2329,17 @@
         },
         {
           "role": "b",
-          "jp": "2{番|ばん}の{人|ひと}は{背|せ}が{高|たか}い。フライパンを{持|も}ってる。",
+          "jp": "{2番|にばん}の{人|ひと}は{背|せ}が{高|たか}い。フライパンを{持|も}ってる。",
           "en": "Number 2 is tall. He's holding a frying pan."
         },
         {
           "role": "a",
-          "jp": "それはお{父|とう}さん！ {料理|りょうり}がすごく{上手|じょうず}だよ。3{番|ばん}の{人|ひと}は？",
+          "jp": "それはお{父|とう}さん！ {料理|りょうり}がすごく{上手|じょうず}だよ。{3番|さんばん}の{人|ひと}は？",
           "en": "That's her dad! He's a brilliant cook. And number 3?"
         },
         {
           "role": "b",
-          "jp": "3{番|ばん}の{人|ひと}も{髪|かみ}が{短|みじか}い。すごく{笑|わら}ってる。",
+          "jp": "{3番|さんばん}の{人|ひと}も{髪|かみ}が{短|みじか}い。すごく{笑|わら}ってる。",
           "en": "Number 3 has short hair too. He's laughing away."
         },
         {
@@ -2382,7 +2382,7 @@
       "kedo-but",
       "te-kara"
     ],
-    "coreWordCeiling": 817,
+    "coreWordCeiling": 818,
     "canDos": [
       {
         "id": "u11-cd1",
@@ -2622,7 +2622,7 @@
       "te-iru-state",
       "hoshii"
     ],
-    "coreWordCeiling": 877,
+    "coreWordCeiling": 878,
     "canDos": [
       {
         "id": "u12-cd1",
@@ -2866,7 +2866,7 @@
       "n-desu",
       "nanika-nanimo"
     ],
-    "coreWordCeiling": 930,
+    "coreWordCeiling": 932,
     "canDos": [
       {
         "id": "u13-cd1",
@@ -3107,7 +3107,7 @@
       "duration-kakaru",
       "ichiban"
     ],
-    "coreWordCeiling": 987,
+    "coreWordCeiling": 989,
     "canDos": [
       {
         "id": "u14-cd1",
@@ -3334,7 +3334,7 @@
       "ta-koto-ga-aru",
       "hou-ga-ii"
     ],
-    "coreWordCeiling": 1044,
+    "coreWordCeiling": 1046,
     "canDos": [
       {
         "id": "u15-cd1",
@@ -3574,7 +3574,7 @@
       "tte-quote",
       "wa-contrast"
     ],
-    "coreWordCeiling": 1095,
+    "coreWordCeiling": 1098,
     "canDos": [
       {
         "id": "u16-cd1",
@@ -3816,7 +3816,7 @@
       "deshou",
       "nagara"
     ],
-    "coreWordCeiling": 1148,
+    "coreWordCeiling": 1151,
     "canDos": [
       {
         "id": "u17-cd1",
@@ -4061,7 +4061,7 @@
       "te-miru",
       "kamoshirenai"
     ],
-    "coreWordCeiling": 1202,
+    "coreWordCeiling": 1205,
     "canDos": [
       {
         "id": "u18-cd1",
@@ -4301,7 +4301,7 @@
       "tara-conditional",
       "kureru"
     ],
-    "coreWordCeiling": 1260,
+    "coreWordCeiling": 1263,
     "canDos": [
       {
         "id": "u19-cd1",
@@ -4539,7 +4539,7 @@
       "sou-looks",
       "te-kureru"
     ],
-    "coreWordCeiling": 1311,
+    "coreWordCeiling": 1314,
     "canDos": [
       {
         "id": "u20-cd1",
@@ -4779,7 +4779,7 @@
       "sou-hearsay",
       "te-oku"
     ],
-    "coreWordCeiling": 1366,
+    "coreWordCeiling": 1369,
     "canDos": [
       {
         "id": "u21-cd1",
@@ -5023,7 +5023,7 @@
       "you-da",
       "nakutemo-ii"
     ],
-    "coreWordCeiling": 1416,
+    "coreWordCeiling": 1419,
     "canDos": [
       {
         "id": "u22-cd1",
@@ -5263,7 +5263,7 @@
       "koto-ni-suru",
       "temo-even-if"
     ],
-    "coreWordCeiling": 1465,
+    "coreWordCeiling": 1468,
     "canDos": [
       {
         "id": "u23-cd1",
@@ -5502,7 +5502,7 @@
       "keigo-verbs",
       "embedded-questions"
     ],
-    "coreWordCeiling": 1526,
+    "coreWordCeiling": 1529,
     "canDos": [
       {
         "id": "u24-cd1",
@@ -5510,7 +5510,7 @@
         "check": {
           "kind": "listen",
           "instructions": "You're checking in at a hotel. Listen to the clerk — you only need to understand this very polite Japanese, not use it. Your own replies can be everyday です/ます (スミスです。よろしく おねがいします。). Then answer the questions.",
-          "material": "いらっしゃいませ。お{名前|なまえ}を{伺|うかが}えますか。\n……スミス{様|さま}でございますね。お{待|ま}ちしておりました。\n{今日|きょう}から{明後日|あさって}まで、お{二人|ふたり}{様|さま}ですね。お{部屋|へや}は805でございます。エレベーターは{右|みぎ}にございます。\n{朝|あさ}ご{飯|はん}は、{地下|ちか}のレストランで、{七時|しちじ}から{九時|くじ}まで{召|め}し{上|あ}がれます。\n{何|なに}かございましたら、いつでもお{電話|でんわ}ください。ごゆっくりどうぞ。",
+          "material": "いらっしゃいませ。お{名前|なまえ}を{伺|うかが}えますか。\n……スミス{様|さま}でございますね。お{待|ま}ちしておりました。\n{今日|きょう}から{明後日|あさって}まで、お{二人|ふたり}{様|さま}ですね。お{部屋|へや}は{805|はちまるご}でございます。エレベーターは{右|みぎ}にございます。\n{朝|あさ}ご{飯|はん}は、{地下|ちか}のレストランで、{七時|しちじ}から{九時|くじ}まで{召|め}し{上|あ}がれます。\n{何|なに}かございましたら、いつでもお{電話|でんわ}ください。ごゆっくりどうぞ。",
           "questions": [
             {
               "q": "How long are you staying?",
@@ -5695,7 +5695,7 @@
         },
         {
           "role": "a",
-          "jp": "スミスです。{電話番号|でんわばんごう}は090-1234-5678です。",
+          "jp": "スミスです。{電話番号|でんわばんごう}は{090-1234-5678|ゼロきゅうゼロのいちにさんよんのごろくななはち}です。",
           "en": "It's Smith. My number is 090-1234-5678."
         },
         {
@@ -5731,7 +5731,7 @@
       "noni",
       "causative"
     ],
-    "coreWordCeiling": 1577,
+    "coreWordCeiling": 1580,
     "canDos": [
       {
         "id": "u25-cd1",

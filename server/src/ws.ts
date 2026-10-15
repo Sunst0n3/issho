@@ -9,17 +9,49 @@ import { HttpError } from './errors.ts';
 export const WS_PATH = '/api/ws';
 export const WS_MAX_PAYLOAD = 16 * 1024;
 
+const id = z.string().min(1).max(100);
+const stage = z.literal([1, 2, 3, 4]);
+const status = z.enum(['waiting', 'active', 'done']);
+
+/** Relayed as parsed: fields the schema doesn't know are dropped. */
+const TogetherLiveStateSchema = z.object({
+  sessionId: id,
+  session: z.enum(['A', 'B', 'C', 'monthly']),
+  opener: id,
+  plan: z
+    .object({
+      conversation: z.object({ scriptId: id, stage }).optional(),
+      task: z.object({ unit: z.number().int().min(0).max(100), taskId: id, repeat: z.boolean() }).optional(),
+      rolePlayId: id.optional(),
+      storyId: id.optional(),
+      capstoneUnit: z.number().int().min(0).max(100).optional(),
+      showcase: z.boolean().optional(),
+    })
+    .optional(),
+  quizIds: z
+    .record(id, id)
+    .refine((ids) => Object.keys(ids).length <= 10, 'too many quiz ids')
+    .optional(),
+  step: z.string().min(1).max(40),
+  turn: id.optional(),
+  index: z.number().int().min(0).max(10_000).optional(),
+  timerStartedAt: z.number().int().min(0).optional(),
+  status,
+});
+
 const ClientEventSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('roleplay'),
     state: z.object({
-      sessionId: z.string().min(1).max(100),
-      scriptId: z.string().min(1).max(100),
+      sessionId: id,
+      scriptId: id,
       role: z.enum(['a', 'b']),
       lineIndex: z.number().int().min(0).max(10_000),
-      status: z.enum(['waiting', 'active', 'done']),
+      status,
+      stage: stage.optional(),
     }),
   }),
+  z.object({ type: z.literal('live'), state: TogetherLiveStateSchema }),
   z.object({ type: z.literal('ping') }),
 ]) satisfies z.ZodType<ClientEvent>;
 
@@ -81,8 +113,11 @@ function handleClientEvent(ctx: AppContext, member: Member, data: RawData): void
   if (!result.success) return;
 
   const event = result.data;
+  // Shared positions go to the other members only: the sender's phone already has them.
   if (event.type === 'roleplay') {
     ctx.hub.broadcast({ type: 'roleplay', memberId: member.id, state: event.state }, { exceptMemberId: member.id });
+  } else if (event.type === 'live') {
+    ctx.hub.broadcast({ type: 'live', memberId: member.id, state: event.state }, { exceptMemberId: member.id });
   }
   // 'ping' only keeps NAT and proxy idle timers from closing the connection.
 }

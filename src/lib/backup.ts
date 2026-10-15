@@ -1,5 +1,5 @@
 // Backup/restore of everything this device has learned (all IndexedDB tables) as
-// one JSON file, plus a request for persistent storage so the browser doesn't
+// one JSON file (format version 2; a v1 file restores settings and chat only), plus a request for persistent storage so the browser doesn't
 // evict progress under storage pressure.
 //
 // Dates are written as { "$date": ISO } so they come back as Date objects. Audio
@@ -13,11 +13,12 @@
 // throw off the catch-up cursor, and post old unsent texts to the wrong chat.
 
 import type { Table } from 'dexie';
-import { db, getSettings } from './db.ts';
-import type { ItemKind, Settings } from './types.ts';
+import { db, getSettings, migrateSettings } from './db.ts';
+import type { CardType, ItemKind, Settings } from './types.ts';
 
 const FORMAT = 'issho-backup';
-const VERSION = 1;
+/** v2: the v2 course and tables. A v1 file (the v1 course) restores settings and chat only. */
+const VERSION = 2;
 
 export class BackupError extends Error {
   constructor(message: string) {
@@ -38,32 +39,59 @@ type Row = Record<string, unknown>;
 const isStr = (v: unknown) => typeof v === 'string' && v.length > 0;
 const isNum = (v: unknown) => typeof v === 'number' && Number.isFinite(v);
 const isDate = (v: unknown) => v instanceof Date && !Number.isNaN(v.getTime());
+const isDayKey = (v: unknown) => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+const isObj = (v: unknown) => v !== null && typeof v === 'object' && !Array.isArray(v);
 
-const ITEM_KINDS = new Set<unknown>(['kana', 'radical', 'kanji', 'word', 'vocab', 'grammar', 'sentence'] satisfies ItemKind[]);
+const ITEM_KINDS = new Set<unknown>(['kana', 'kanaRule', 'kanji', 'word', 'core', 'grammar', 'sentence'] satisfies ItemKind[]);
+const CARD_TYPES = new Set<unknown>(['read', 'write', 'meaning', 'listen', 'produce', 'comprehend', 'build', 'cloze'] satisfies CardType[]);
 /** FSRS fields the scheduler does arithmetic on; a string or null here would silently corrupt scheduling. */
 const CARD_NUMBERS = ['stability', 'difficulty', 'state', 'reps', 'lapses'] as const;
 const DAY_NUMBERS = ['studyMs', 'reviews', 'correct', 'newItems'] as const;
-/** This device's conversation with its paired household (see the top of this file). */
-const CHAT_TABLES = new Set(['messages', 'outbox']);
+/**
+ * This device's conversation with its paired household (see the top of this file): restored only from a backup
+ * made by the same member.
+ */
+const CHAT_TABLES = new Set(['messages', 'outbox', 'togetherOutbox']);
 
-/** Per-table row checks after decoding. Tables marked required must be present in the file. */
-const TABLE_RULES: Record<string, { required: boolean; valid: (r: Row) => boolean }> = {
+interface TableRule { required: boolean; valid: (r: Row) => boolean }
+
+const CHAT_RULES: Record<string, TableRule> = {
+  outbox: { required: false, valid: (r) => isStr(r.clientId) && isDate(r.createdAt) && r.kind === 'text' },
+  messages: { required: false, valid: (r) => typeof r.id === 'number' && isStr(r.clientId) },
+};
+
+/** Per-table row checks of a v2 file after decoding. Tables marked required must be present in the file. */
+const TABLE_RULES: Record<string, TableRule> = {
   items: { required: true, valid: (r) => isStr(r.id) && ITEM_KINDS.has(r.kind) && typeof r.key === 'string' && isDate(r.introducedAt) },
   cards: {
     required: true,
-    valid: (r) => isStr(r.id) && isStr(r.itemId) && ITEM_KINDS.has(r.kind) && isStr(r.type) && isDate(r.due)
+    valid: (r) => isStr(r.id) && isStr(r.itemId) && ITEM_KINDS.has(r.kind) && CARD_TYPES.has(r.type) && isDate(r.due)
       && CARD_NUMBERS.every((k) => isNum(r[k])),
   },
-  reviewLogs: { required: true, valid: (r) => isStr(r.cardId) && isDate(r.reviewedAt) && typeof r.grade === 'number' },
-  days: {
-    required: true,
-    valid: (r) => typeof r.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(r.date)
-      && DAY_NUMBERS.every((k) => isNum(r[k])) && typeof r.sessionComplete === 'boolean',
-  },
+  reviewLogs: { required: true, valid: (r) => isStr(r.cardId) && isDate(r.reviewedAt) && isNum(r.grade) },
+  days: { required: true, valid: (r) => isDayKey(r.date) && DAY_NUMBERS.every((k) => isNum(r[k])) },
   settings: { required: true, valid: (r) => r.id === 'me' },
-  outbox: { required: false, valid: (r) => isStr(r.clientId) && isDate(r.createdAt) && r.kind === 'text' },
-  messages: { required: false, valid: (r) => typeof r.id === 'number' && isStr(r.clientId) },
+  ...CHAT_RULES,
   savedSentences: { required: false, valid: (r) => isStr(r.id) && typeof r.jp === 'string' && isDate(r.savedAt) },
+  encounters: { required: false, valid: (r) => isStr(r.itemId) && isDayKey(r.day) && isStr(r.source) && isDate(r.at) },
+  shownSentences: { required: false, valid: (r) => isStr(r.id) && isDayKey(r.day) },
+  staged: { required: false, valid: (r) => isStr(r.itemId) && isStr(r.kanji) && isDayKey(r.releaseDay) },
+  stories: { required: false, valid: (r) => isStr(r.storyId) && isNum(r.stage) },
+  restTokens: { required: false, valid: (r) => isDayKey(r.date) && isDayKey(r.week) && isDate(r.usedAt) },
+  outputs: { required: false, valid: (r) => isStr(r.id) && isDayKey(r.day) && isStr(r.check) && isDate(r.createdAt) },
+  canDos: { required: false, valid: (r) => isStr(r.id) && isNum(r.unit) && isNum(r.attempts) },
+  milestones: { required: false, valid: (r) => isStr(r.id) && isDate(r.reachedAt) },
+  togetherPlans: { required: false, valid: (r) => isDayKey(r.week) && isObj(r.plan) },
+  togetherOutbox: { required: false, valid: (r) => isStr(r.clientId) && isDate(r.createdAt) && typeof r.event === 'string' },
+  partnerQuizzes: { required: false, valid: (r) => isStr(r.quizId) && isDate(r.createdAt) },
+  pitchBoxes: { required: false, valid: (r) => isStr(r.ref) && isNum(r.box) && isDayKey(r.nextDay) },
+  fluency: { required: false, valid: (r) => isStr(r.kind) && isDayKey(r.day) && isDate(r.at) && isNum(r.value) },
+};
+
+/** A v1 file: only its settings (migrated) and chat come back. */
+const V1_RULES: Record<string, TableRule> = {
+  settings: { required: true, valid: (r) => r.id === 'me' },
+  ...CHAT_RULES,
 };
 
 function encode(value: unknown): unknown {
@@ -128,6 +156,11 @@ export interface BackupImport {
   /** Rows per table that will be restored (chat tables are 0 when the backup is another member's). */
   counts: Record<string, number>;
   /**
+   * A v1 backup: its learning progress belongs to the old course and is not restored; only settings and chat
+   * come back. Settings shows why.
+   */
+  progressDropped: boolean;
+  /**
    * Replaces all progress on this device with the backup. Call only after the
    * person has confirmed. This device's home-server pairing and chat are kept.
    */
@@ -156,10 +189,12 @@ export async function importBackup(file: Blob): Promise<BackupImport> {
   if (Number.isNaN(exportedAt.getTime()) || !backup.tables || typeof backup.tables !== 'object') {
     throw new BackupError('This backup is damaged (missing its contents).');
   }
+  const progressDropped = backup.version < VERSION;
+  const rules = progressDropped ? V1_RULES : TABLE_RULES;
 
   const known = new Set(db.tables.map((t) => t.name));
   const rowsByTable: Record<string, Row[]> = {};
-  for (const [name, rule] of Object.entries(TABLE_RULES)) {
+  for (const [name, rule] of Object.entries(rules)) {
     if (!known.has(name)) continue;
     const raw = backup.tables[name];
     if (raw === undefined && !rule.required) {
@@ -172,10 +207,12 @@ export async function importBackup(file: Blob): Promise<BackupImport> {
     if (bad >= 0) throw new BackupError(`This backup is damaged (row ${bad + 1} of ${name} is not valid).`);
     rowsByTable[name] = rows;
   }
-  const backupSettings = rowsByTable.settings ?? [];
+  let backupSettings = rowsByTable.settings ?? [];
   if (backupSettings.length > 1) {
     throw new BackupError('This backup is damaged (more than one settings row).');
   }
+  // A v1 settings row is migrated the way the Dexie upgrade migrates it (onboarding runs again).
+  if (progressDropped) backupSettings = backupSettings.map((s) => migrateSettings(s) as unknown as Row);
   const backupMemberId = backupSettings[0]?.memberId;
   const restoresChat = (s: Settings) => Boolean(s.deviceToken && s.memberId) && backupMemberId === s.memberId;
 
@@ -187,6 +224,7 @@ export async function importBackup(file: Blob): Promise<BackupImport> {
   return {
     exportedAt,
     counts,
+    progressDropped,
     async apply() {
       const current = await getSettings();
       const mergeChat = restoresChat(current);

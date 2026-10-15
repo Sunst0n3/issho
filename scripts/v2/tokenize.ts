@@ -18,6 +18,9 @@
 //   (食べ+放題 → 食べ放題, 勉強+し → 勉強する, お+願い+し+ます → お願いします, まい+あ+さ →
 //   まいあさ). A single token matches by written form or kana; the author's reading picks
 //   between homographs (人 ひと/にん/じん, 一日 いちにち/ついたち, 行っ → 行く not 行う).
+//   A core word that runs across a '／' mark (おなかが／すいた → お腹がすく) comes out as one
+//   token per phrase, all with the word's ref; a JMdict run never crosses one. Either way each
+//   phrase holds exactly its own tokens.
 //   Fallbacks: お/ご added or dropped, nouns as する-verbs, ない → ある, よい → いい, なん → 何,
 //   potential/passive/causative verbs → the base verb (読める → 読む), masu-stem nouns → the
 //   verb (遊び → 遊ぶ), compounds split into core words (もう少し → もう + 少し), and words
@@ -67,6 +70,8 @@ export interface CoreWordLite {
   kana: string;
   written?: string;
   pos: string;
+  /** Its JMdict entry: a JMdict match on that entry is this core word. */
+  jmdict?: string;
 }
 
 /** The fields of a public/data/words.json entry the tokenizer uses. */
@@ -390,6 +395,18 @@ class Lexicon {
     for (const k of this.coreKana.keys()) this.maxCoreKana = Math.max(this.maxCoreKana, k.length);
   }
 
+  /**
+   * Readings a token written `form` may have inside a ruby group: kuromoji's (`reading`), the core and
+   * JMdict readings of that spelling, and the number readings (九 く/きゅう, 人 にん, 時 じ).
+   */
+  readingsOf(form: string, reading: string): string[] {
+    const out = [reading];
+    for (const w of this.coreWritten.get(form) ?? []) out.push(toHiragana(w.kana));
+    for (const w of this.jmWritten.get(form) ?? []) out.push(toHiragana(w.kana));
+    for (const [kana, kanji] of NUMBER_PIECES) if (kanji === form) out.push(kana);
+    return [...new Set(out.filter(Boolean))];
+  }
+
   isCoreKana(kana: string): boolean {
     return this.coreKana.has(toHiragana(kana));
   }
@@ -564,7 +581,9 @@ function classify(pos: string, d1: string, d2: string, s: string): TokenKind {
   if (pos === '助詞' || pos === '助動詞') return 'function';
   if (pos === '接頭詞' && (s === 'お' || s === 'ご' || s === '御')) return 'function';
   if ((pos === '動詞' || pos === '形容詞') && (d1 === '非自立' || d1 === '接尾')) return 'function';
-  if (pos === '名詞' && (d1 === '非自立' || d1 === '特殊')) return 'function';
+  // Dependent nouns in kana (こと, もの, の, ところ) are grammar; written with kanji (いい日, その時,
+  // 大きい方) they are words the reader has to know.
+  if (pos === '名詞' && (d1 === '非自立' || d1 === '特殊')) return KANJI_RE.test(s) ? 'content' : 'function';
   if (pos === '名詞' && d1 === '接尾' && (d2 === '助動詞語幹' || FUNCTION_SUFFIXES.has(s))) return 'function';
   if (DIGITS_RE.test(s) || LATIN_RE.test(s)) return 'function';
   return 'content';
@@ -855,7 +874,7 @@ function rawTokens(tk: Tokenizer<IpadicFeatures>, lex: Lexicon, text: RubyText):
   const pt = prepare(text);
   const out = pt.chunks.flatMap((c) => chunkTokens(tk, lex, c));
   joinSplitSuffixes(out);
-  applyAuthorReadings(pt, out);
+  applyAuthorReadings(pt, out, lex);
   for (const r of out) r.lemmaKana = lemmaReading(r.surface, r.lemma, r.reading);
   markGrammar(out);
   return out;
@@ -898,12 +917,13 @@ function markGrammar(toks: Raw[]): void {
 }
 
 /**
- * Replace kuromoji's readings with the author's. Tokens whose boundary falls inside a ruby
+ * Replace kuromoji's readings with the author's (kanji the author gave no ruby keep kuromoji's
+ * reading). Tokens whose boundary falls inside a ruby
  * segment ({六百|ろっぴゃく} → 六 + 百) form a group: when kuromoji's readings spell the
- * author's reading they stay, otherwise the author's reading is shared out by length
- * (ろく+ひゃく → ろっ+ぴゃく).
+ * author's reading they stay, otherwise the author's reading is shared out (shareReading:
+ * ろく+ひゃく → ろっ+ぴゃく, きゅう+じ → く+じ, よん+じん → よ+にん).
  */
-function applyAuthorReadings(pt: PlainText, toks: Raw[]): void {
+function applyAuthorReadings(pt: PlainText, toks: Raw[], lex: Lexicon): void {
   let i = 0;
   while (i < toks.length) {
     let j = i;
@@ -914,22 +934,71 @@ function applyAuthorReadings(pt: PlainText, toks: Raw[]): void {
       pt.segAt[toks[j].end - 1] === pt.segAt[toks[j].end]
     ) j++;
     const author = spanReading(pt, toks[i].start, toks[j].end);
-    if (i === j) {
+    if (hasKanji(author)) {
+      // Kanji without ruby (plain text such as an alternative answer): kuromoji's reading stays.
+    } else if (i === j) {
       toks[i].reading = author;
     } else {
       const kuro = toks.slice(i, j + 1).map((t) => t.reading);
       if (kuro.join('') !== author) {
-        const total = kuro.reduce((n, r) => n + r.length, 0) || 1;
-        let used = 0;
-        for (let k = i; k <= j; k++) {
-          const share = k === j ? author.length - used : Math.round((kuro[k - i].length * author.length) / total);
-          toks[k].reading = author.slice(used, used + share);
-          used += share;
-        }
+        const group = toks.slice(i, j + 1);
+        const shares = shareReading(group.map((t) => lex.readingsOf(t.surface, t.reading)), author);
+        group.forEach((t, k) => (t.reading = shares[k]));
       }
     }
     i = j + 1;
   }
+}
+
+/** A reading as it may sound inside a compound: voiced at the start (時間 → 〜じかん, 百 → びゃく/ぴゃく), a small っ at the end (六 → ろっ). */
+function joinVariants(reading: string): string[] {
+  const out = new Set<string>();
+  for (const v of soundVariants(reading)) {
+    out.add(v);
+    if (v.length >= 2) out.add(v.slice(0, -1) + 'っ');
+  }
+  return [...out];
+}
+
+/**
+ * Shares the author's reading of a ruby group out over its tokens, given each token's possible
+ * readings. Every token takes one of its readings (with joinVariants) when that spells the author's
+ * reading ({四人|よにん} → よ+にん); otherwise one token takes whatever the others leave
+ * ({九時|くじ} → く+じ, the later token kept first); otherwise the reading is shared out by length,
+ * at least one kana each.
+ */
+export function shareReading(candidates: readonly (readonly string[])[], author: string): string[] {
+  const n = candidates.length;
+  const options = candidates.map((c) => [...new Set(c.flatMap(joinVariants))].filter(Boolean));
+  const solve = (k: number, pos: number, free: number): string[] | undefined => {
+    if (k === n) return pos === author.length ? [] : undefined;
+    const left = n - k - 1;
+    const pieces = k === free
+      ? Array.from({ length: Math.max(0, author.length - left - pos) }, (_, len) => author.slice(pos, pos + len + 1))
+      : options[k].filter((o) => author.startsWith(o, pos));
+    for (const piece of pieces) {
+      const rest = solve(k + 1, pos + piece.length, free);
+      if (rest) return [piece, ...rest];
+    }
+    return undefined;
+  };
+  // free = -1: every token constrained; then one free token, the first one first (a counter's reading is surer
+  // than its number's).
+  for (let free = -1; free < n; free++) {
+    const solved = solve(0, 0, free);
+    if (solved) return solved;
+  }
+  const lengths = candidates.map((c) => Math.max(1, c[0]?.length ?? 1));
+  const total = lengths.reduce((a, b) => a + b, 0);
+  const out: string[] = [];
+  let used = 0;
+  for (let k = 0; k < n; k++) {
+    const room = author.length - used - (n - k - 1);
+    const share = k === n - 1 ? author.length - used : Math.min(room, Math.max(1, Math.round((lengths[k] * author.length) / total)));
+    out.push(author.slice(used, used + share));
+    used += share;
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -967,7 +1036,39 @@ function merged(toks: Raw[], i: number, j: number, lemma: string, ref: TokenRef,
   return tok;
 }
 
-const agrees = (w: CoreWordLite, kanas: string[]) => kanas.includes(toHiragana(w.kana));
+/**
+ * Splits a merged core word that crosses a '／' phrase mark (おなかが／すいた → お腹がすく,
+ * よろしく／おねがいします) into one piece per phrase, each with the word's ref, lemma and kind:
+ * every phrase then holds exactly its own text (read-while-listening highlights by `phrase`) and
+ * the word keeps its identity.
+ */
+function splitAtPhrases(tok: RubyToken, toks: readonly Raw[], i: number, j: number): RubyToken[] {
+  if (toks[i].phrase === toks[j].phrase) return [tok];
+  const out: RubyToken[] = [];
+  for (let k = i; k <= j; ) {
+    let e = k;
+    while (e < j && toks[e + 1].phrase === toks[k].phrase) e++;
+    const run = toks.slice(k, e + 1);
+    out.push({ ...tok, surface: run.map((t) => t.surface).join(''), reading: run.map((t) => t.reading).join(''), phrase: toks[k].phrase });
+    k = e + 1;
+  }
+  return out;
+}
+
+/** Readings of one word that JMdict files as separate entries (何 なん before d/n/t sounds). */
+const SAME_WORD_READINGS: Readonly<Record<string, readonly string[]>> = { 何: ['なに', 'なん'] };
+/**
+ * The author's reading is the core word's, allowing for an お/ご prefix outside the token
+ * (お{風呂|ふろ}) and a する verb's noun ({結婚|けっこん}する).
+ */
+const agrees = (w: CoreWordLite, kanas: string[]) => {
+  const kana = toHiragana(w.kana);
+  const forms = [kana];
+  if (/^[おご]/.test(kana) && /^[おご御]/.test(w.written ?? kana)) forms.push(kana.slice(1));
+  if (kana.length > 2 && kana.endsWith('する')) forms.push(kana.slice(0, -2));
+  forms.push(...(SAME_WORD_READINGS[w.written ?? ''] ?? []));
+  return forms.some((f) => kanas.includes(f));
+};
 
 /** A verb or adjective whose written form shares the token's kanji stem and the author's reading. */
 function stemMatch(lex: Lexicon, t: Raw): CoreWordLite | undefined {
@@ -1127,7 +1228,7 @@ function match(lex: Lexicon, toks: Raw[]): RubyToken[] {
         if (w) hit = { j, w };
       }
       if (hit) {
-        out.push(merged(toks, i, hit.j, hit.w.written ?? hit.w.kana, `core:${hit.w.id}`, hit.w.pos));
+        out.push(...splitAtPhrases(merged(toks, i, hit.j, hit.w.written ?? hit.w.kana, `core:${hit.w.id}`, hit.w.pos), toks, i, hit.j));
         i = hit.j + 1;
         continue;
       }
@@ -1143,9 +1244,14 @@ function match(lex: Lexicon, toks: Raw[]): RubyToken[] {
 
     // 2. One token, then the token split into core words. A split wins over a word the author's
     //    reading rules out ({三十分|さんじゅっぷん}: 十 + 分, not 十分 じゅうぶん).
+    //    A homograph the author reads otherwise is another word when JMdict has it as another
+    //    entry: 日 ひ is not the core 日 にち, but 七 しち is the core 七 なな (one JMdict entry).
+    //    Derived forms (遊び → 遊ぶ, 結婚 → 結婚する, 風呂 → お風呂) keep their core word.
     const w = coreSingle(lex, t, toks[i + 1]);
-    const parts = !w || (hasKanji(t.surface) && !agrees(w, [t.reading, t.lemmaKana])) ? decompound(lex, t) : undefined;
-    if (w && !parts) {
+    const disagrees = !!w && hasKanji(t.surface) && t.surface === w.written && !agrees(w, [t.reading, t.lemmaKana]);
+    const parts = !w || disagrees ? decompound(lex, t) : undefined;
+    const other = disagrees && lex.hasJmdict ? lex.jmdict([t.surface, t.lemma], [t.reading, t.lemmaKana], true) : undefined;
+    if (w && !parts && !(other && other.id !== w.jmdict)) {
       out.push(finish(t, { ref: `core:${w.id}` }));
       i++;
       continue;
@@ -1156,9 +1262,11 @@ function match(lex: Lexicon, toks: Raw[]): RubyToken[] {
       continue;
     }
 
-    // 3. JMdict: the longest written run (生ビール, 店内), then the token alone.
+    // 3. JMdict: the longest written run (生ビール, 店内), then the token alone. Unlike a core
+    //    word, a JMdict run stays inside the author's phrase ({方|ほう}が／いい is 方 + いい).
     let jm: { j: number; e: JmdictLite } | undefined;
     for (let j = limit; j > i && !jm && lex.hasJmdict; j--) {
+      if (toks[j].phrase !== t.phrase) continue;
       const k = windowKeys(toks, i, j);
       const forms = k.forms.filter((f) => !isKanaWord(f));
       const e = forms.length ? lex.jmdict(forms, k.kanas, false) : undefined;

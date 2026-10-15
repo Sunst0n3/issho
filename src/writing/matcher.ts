@@ -499,3 +499,233 @@ export function matchCharacter(
     outOfOrder,
   };
 }
+
+// --- Whole-character recall (stroke order free) ------------------------------
+
+/** Cost of leaving an expected stroke undrawn, or a drawn stroke unused (the square matrix's padding). */
+export const MISSING_COST = 10;
+/** Confidence given to the first, bounding-box frame: placement is plausible but not yet backed by matched strokes. */
+const BOX_FRAME_CONFIDENCE = 0.4;
+/** The largest character the assignment solves (KanjiVG's densest jōyō kanji have 29 strokes). */
+const MAX_UNORDERED = 30;
+
+export interface UnorderedMatch {
+  /** No missing, no extra, no unmatched stroke. Stroke order never affects it. */
+  ok: boolean;
+  /** Expected stroke indexes with no drawn stroke. */
+  missing: number[];
+  /** Drawn stroke indexes matching nothing. */
+  extra: number[];
+  /** Expected strokes paired with a drawn stroke that failed matchStrokeOf. */
+  unmatched: number[];
+  /** Matched strokes drawn out of order (not in the longest in-order run). */
+  orderSlips: { expected: number; drawnAt: number }[];
+  /** assignment[expected] = drawn index or null. */
+  assignment: (number | null)[];
+}
+
+/**
+ * Min-cost assignment for a square matrix (Hungarian algorithm, O(n³)): returns the column chosen for each row.
+ * Throws for a matrix that is not square.
+ */
+export function hungarian(cost: readonly (readonly number[])[]): number[] {
+  const n = cost.length;
+  if (cost.some((row) => row.length !== n)) throw new RangeError('hungarian needs a square matrix');
+  if (n === 0) return [];
+  // Potentials u (rows) and v (columns), 1-based with a virtual column 0 (e-maxx formulation).
+  const u = new Array<number>(n + 1).fill(0);
+  const v = new Array<number>(n + 1).fill(0);
+  const rowOf = new Array<number>(n + 1).fill(0);
+  const way = new Array<number>(n + 1).fill(0);
+  for (let i = 1; i <= n; i++) {
+    rowOf[0] = i;
+    let col = 0;
+    const minv = new Array<number>(n + 1).fill(Infinity);
+    const used = new Array<boolean>(n + 1).fill(false);
+    do {
+      used[col] = true;
+      const row = rowOf[col];
+      let delta = Infinity;
+      let next = 0;
+      for (let j = 1; j <= n; j++) {
+        if (used[j]) continue;
+        const reduced = cost[row - 1][j - 1] - u[row] - v[j];
+        if (reduced < minv[j]) {
+          minv[j] = reduced;
+          way[j] = col;
+        }
+        if (minv[j] < delta) {
+          delta = minv[j];
+          next = j;
+        }
+      }
+      for (let j = 0; j <= n; j++) {
+        if (used[j]) {
+          u[rowOf[j]] += delta;
+          v[j] -= delta;
+        } else {
+          minv[j] -= delta;
+        }
+      }
+      col = next;
+    } while (rowOf[col] !== 0);
+    do {
+      const prev = way[col];
+      rowOf[col] = rowOf[prev];
+      col = prev;
+    } while (col !== 0);
+  }
+  const result = new Array<number>(n).fill(-1);
+  for (let j = 1; j <= n; j++) if (rowOf[j] > 0) result[rowOf[j] - 1] = j - 1;
+  return result;
+}
+
+interface Box { minX: number; minY: number; maxX: number; maxY: number }
+
+function boundsOf(groups: readonly (readonly Point[])[]): Box | null {
+  let box: Box | null = null;
+  for (const pts of groups) {
+    for (const p of pts) {
+      if (!box) box = { minX: p.x, minY: p.y, maxX: p.x, maxY: p.y };
+      else {
+        box.minX = Math.min(box.minX, p.x);
+        box.minY = Math.min(box.minY, p.y);
+        box.maxX = Math.max(box.maxX, p.x);
+        box.maxY = Math.max(box.maxY, p.y);
+      }
+    }
+  }
+  return box;
+}
+
+/**
+ * The first guess at where the learner wrote: the model's bounding box mapped onto the drawing's. The scale comes from
+ * the larger side (a thin character like 一 has no height to measure), clamped like estimateFrame's.
+ */
+function boxFrame(expected: readonly string[], drawn: readonly (readonly Point[])[]): Frame {
+  const model = boundsOf(expected.map((d) => samplePath(d, SAMPLE_POINTS)));
+  const user = boundsOf(drawn);
+  if (!model || !user) return IDENTITY_FRAME;
+  const mw = model.maxX - model.minX;
+  const mh = model.maxY - model.minY;
+  const uw = user.maxX - user.minX;
+  const uh = user.maxY - user.minY;
+  const raw = mw >= mh ? (mw > 0 ? uw / mw : 1) : uh / mh;
+  const [lo, hi] = FRAME_SCALE_RANGE;
+  const scale = Math.min(hi, Math.max(lo, raw));
+  const mcx = (model.minX + model.maxX) / 2;
+  const mcy = (model.minY + model.maxY) / 2;
+  const ucx = (user.minX + user.maxX) / 2;
+  const ucy = (user.minY + user.maxY) / 2;
+  return { scale, dx: ucx - scale * mcx, dy: ucy - scale * mcy, confidence: BOX_FRAME_CONFIDENCE };
+}
+
+interface Scored { cost: number[][]; ok: boolean[][] }
+
+/**
+ * Cost of pairing expected stroke i with drawn stroke j: 1 − score for an accepted stroke (0..0.5), 1 + (1 − score)
+ * for a rejected one (1..2). Padded to a square matrix with MISSING_COST.
+ */
+function scoreAll(expected: readonly string[], drawn: readonly (readonly Point[])[], frame: Frame, leniency: number | undefined): Scored {
+  const size = Math.max(expected.length, drawn.length);
+  const cost: number[][] = [];
+  const ok: boolean[][] = [];
+  for (let i = 0; i < size; i++) {
+    const row: number[] = [];
+    const okRow: boolean[] = [];
+    for (let j = 0; j < size; j++) {
+      if (i >= expected.length || j >= drawn.length) {
+        row.push(MISSING_COST);
+        okRow.push(false);
+        continue;
+      }
+      const r = matchStrokeOf(drawn[j], expected, i, { frame, leniency });
+      row.push(r.ok ? 1 - r.score : 2 - r.score);
+      okRow.push(r.ok);
+    }
+    cost.push(row);
+    ok.push(okRow);
+  }
+  return { cost, ok };
+}
+
+/** Indexes (into `seq`) of one longest strictly increasing subsequence. */
+function longestIncreasing(seq: readonly number[]): Set<number> {
+  const tails: number[] = [];
+  const prev = new Array<number>(seq.length).fill(-1);
+  for (let k = 0; k < seq.length; k++) {
+    let lo = 0;
+    let hi = tails.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (seq[tails[mid]] < seq[k]) lo = mid + 1;
+      else hi = mid;
+    }
+    if (lo > 0) prev[k] = tails[lo - 1];
+    tails[lo] = k;
+  }
+  const out = new Set<number>();
+  for (let k = tails.length ? tails[tails.length - 1] : -1; k >= 0; k = prev[k]) out.add(k);
+  return out;
+}
+
+/**
+ * Judges a whole character written from memory, in any stroke order. Each drawn stroke is paired with at most one
+ * expected stroke by a min-cost assignment over matchStrokeOf scores, in two passes: first with a bounding-box frame,
+ * then with the frame estimated from the strokes that pass matched. Stroke order is reported (`orderSlips`) but never
+ * makes the character wrong.
+ */
+export function matchCharacterUnordered(
+  expected: readonly string[],
+  drawn: readonly (readonly Point[])[],
+  opts: Omit<MatchOptions, 'frame'> = {},
+): UnorderedMatch {
+  if (expected.length > MAX_UNORDERED || drawn.length > MAX_UNORDERED) {
+    throw new RangeError(`matchCharacterUnordered handles at most ${MAX_UNORDERED} strokes`);
+  }
+  const strokes = drawn.filter((pts) => pts.length > 0);
+  const original = drawn.flatMap((pts, j) => (pts.length > 0 ? [j] : []));
+
+  const assign = (frame: Frame) => {
+    const scored = scoreAll(expected, strokes, frame, opts.leniency);
+    return { cols: hungarian(scored.cost), ok: scored.ok };
+  };
+
+  let pass = assign(boxFrame(expected, strokes));
+  const accepted: AcceptedStroke[] = [];
+  pass.cols.forEach((j, i) => {
+    if (i < expected.length && j < strokes.length && pass.ok[i][j]) accepted.push({ points: strokes[j], target: expected[i] });
+  });
+  if (accepted.length) pass = assign(estimateFrame(accepted));
+
+  const assignment: (number | null)[] = expected.map(() => null);
+  const missing: number[] = [];
+  const unmatched: number[] = [];
+  const used = new Set<number>();
+  expected.forEach((_, i) => {
+    const j = pass.cols[i];
+    if (j === undefined || j >= strokes.length) {
+      missing.push(i);
+      return;
+    }
+    used.add(j);
+    assignment[i] = original[j];
+    if (!pass.ok[i][j]) unmatched.push(i);
+  });
+  const extra = original.filter((_, j) => !used.has(j));
+
+  // Order: the matched strokes, by expected index; any not in the longest in-order run were drawn out of order.
+  const matched = expected.flatMap((_, i) => (assignment[i] !== null && !unmatched.includes(i) ? [i] : []));
+  const drawnOrder = matched.map((i) => assignment[i] as number);
+  const inOrder = longestIncreasing(drawnOrder);
+  const orderSlips = matched.flatMap((i, k) => (inOrder.has(k) ? [] : [{ expected: i, drawnAt: assignment[i] as number }]));
+
+  return {
+    ok: missing.length === 0 && extra.length === 0 && unmatched.length === 0,
+    missing,
+    extra,
+    unmatched,
+    orderSlips,
+    assignment,
+  };
+}

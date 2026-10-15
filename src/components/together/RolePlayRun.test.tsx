@@ -14,11 +14,13 @@ const SCRIPT: RolePlay = {
   titleJp: 'カフェで',
   level: 1,
   setting: 'Ordering a drink.',
+  register: 'polite',
+  targets: [],
   roles: { a: { name: 'Guest', nameJp: 'きゃく' }, b: { name: 'Server', nameJp: 'てんいん' } },
   lines: [
-    { role: 'a', jp: 'コーヒーを ください。', en: 'A coffee, please.', hint: 'ください = please give me.' },
-    { role: 'b', jp: 'はい、どうぞ。', en: 'Here you are.' },
-    { role: 'a', jp: 'ありがとう。', en: 'Thank you.' },
+    { role: 'a', jp: 'コーヒーを ください。', en: 'A coffee, please.', hint: 'ください = please give me.', cue: 'coffee · please' },
+    { role: 'b', jp: 'はい、どうぞ。', en: 'Here you are.', cue: '' },
+    { role: 'a', jp: 'ありがとう。', en: 'Thank you.', cue: '' },
   ],
 };
 
@@ -26,9 +28,11 @@ const HOUSEHOLD: HouseholdResponse = {
   householdName: 'Home',
   me: 'me',
   sharedStreak: 0,
+  quest: { week: '2026-10-12', minimumDays: {}, togetherSessions: 0, shortfall: 13, met: false, reserveUsed: false, reserveLeft: true, daysLeft: 4 },
+  questStreakWeeks: 0,
   members: [
-    { member: { id: 'me', name: 'Aiko', joinedAt: '', lastSeenAt: null }, days: [], streak: 0, kanjiKnown: 0, knownKanji: [], phase: 1, updatedAt: null },
-    { member: { id: 'ken', name: 'Ken', joinedAt: '', lastSeenAt: null }, days: [], streak: 0, kanjiKnown: 0, knownKanji: [], phase: 1, updatedAt: null },
+    { member: { id: 'me', name: 'Aiko', joinedAt: '', lastSeenAt: null }, days: [], streak: 0, kanjiKnown: 0, knownKanji: [], phase: 1, progress: null, updatedAt: null },
+    { member: { id: 'ken', name: 'Ken', joinedAt: '', lastSeenAt: null }, days: [], streak: 0, kanjiKnown: 0, knownKanji: [], phase: 1, progress: null, updatedAt: null },
   ],
 };
 
@@ -55,7 +59,10 @@ vi.mock('../../sync/socket.ts', () => ({
 vi.mock('../../sync/stats.ts', () => ({
   useHousehold: () => ({ data: HOUSEHOLD, loading: false, refresh: async () => {} }),
 }));
-vi.mock('../../lib/data.ts', () => ({ loadRolePlays: async () => [SCRIPT] }));
+vi.mock('../../lib/data.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../lib/data.ts')>()),
+  loadRolePlays: async () => [SCRIPT],
+}));
 
 function emit(ev: ServerEvent) {
   act(() => { for (const cb of [...mocks.listeners]) cb(ev); });
@@ -174,7 +181,8 @@ describe('RolePlayRun on two phones', () => {
     mocks.presence.set('ken', false);
     const first = renderRun();
     await screen.findByRole('heading', { name: 'At the café' });
-    expect(screen.getByText('Ken is offline right now.')).toBeTruthy();
+    // The pairing comes from settings, which can load after the script.
+    expect(await screen.findByText('Ken is offline right now.')).toBeTruthy();
     expect(screen.getByRole('radio', { name: 'Together, two phones' })).toHaveProperty('disabled', true);
     first.unmount();
 

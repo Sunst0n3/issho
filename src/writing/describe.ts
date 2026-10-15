@@ -1,7 +1,7 @@
 // Plain-English words for strokes and stroke mistakes, for feedback lines such
 // as "Next: a short stroke, top right, sweeping down-left."
 
-import type { StrokeAttempt } from './matcher.ts';
+import type { StrokeAttempt, UnorderedMatch } from './matcher.ts';
 import { BOX, distance, flattenPath, pathLength, polylineLength, type Point } from './path.ts';
 
 const SHORT_STROKE = 25;
@@ -103,4 +103,41 @@ export function mistakeMessage(attempt: StrokeAttempt, index: number, hintShown 
     default:
       return 'Not quite. Try that stroke again.';
   }
+}
+
+/** At most this many stroke-order notes after a recall attempt: more would bury the useful one. */
+export const MAX_ORDER_NOTES = 2;
+
+export interface OrderNote {
+  text: string;
+  /** The two model strokes the note is about (0-based): `first` usually comes before `then`. */
+  first: number;
+  then: number;
+}
+
+/**
+ * Coaching for strokes written out of order ("Stroke 1 usually comes before stroke 4."), from a whole-character
+ * recall match. Order never affects the grade; these notes only teach it.
+ */
+export function orderNotes(match: Pick<UnorderedMatch, 'orderSlips' | 'assignment' | 'unmatched'>): OrderNote[] {
+  const drawnAt = new Map<number, number>();
+  match.assignment.forEach((j, i) => {
+    if (j !== null && !match.unmatched.includes(i)) drawnAt.set(i, j);
+  });
+  const notes: OrderNote[] = [];
+  const seen = new Set<string>();
+  for (const slip of match.orderSlips) {
+    const e = slip.expected;
+    // An earlier stroke drawn after this one, else a later stroke drawn before it.
+    const earlier = [...drawnAt].filter(([f, d]) => f < e && d > slip.drawnAt).map(([f]) => f);
+    const later = [...drawnAt].filter(([f, d]) => f > e && d < slip.drawnAt).map(([f]) => f);
+    const pair = earlier.length ? { first: Math.min(...earlier), then: e } : later.length ? { first: e, then: Math.min(...later) } : null;
+    if (!pair) continue;
+    const key = `${pair.first}-${pair.then}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    notes.push({ ...pair, text: `Stroke ${pair.first + 1} usually comes before stroke ${pair.then + 1}.` });
+    if (notes.length >= MAX_ORDER_NOTES) break;
+  }
+  return notes;
 }

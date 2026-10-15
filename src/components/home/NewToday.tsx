@@ -1,48 +1,55 @@
-// "New today": a preview row of the items today's session will teach.
-import { loadGrammar, loadKana, loadKanji, loadRadicals, loadSurvivalWords } from '../../lib/data.ts';
+// "New today": a preview row of the items today's plan will teach. Kanji show the character and
+// keyword, core words their kana and English, grammar its pattern. No romaji labels.
+import { loadGrammarIndex, loadKanaRules, loadKanji, loadWordInfo } from '../../lib/data.ts';
 import { rubyToPlain } from '../../lib/ruby.ts';
-import type { GrammarPoint, KanaEntry, KanjiEntry, RadicalEntry, SurvivalWord } from '../../lib/types.ts';
+import type { KanaRule, KanjiEntry } from '../../lib/types.ts';
 import type { NewItemKind, NewItemPlan } from '../../srs/course.ts';
 import { Glyph } from '../Glyph.tsx';
 
 export interface NewTile {
   id: string;
   kind: NewItemKind;
-  /** A single character drawn with <Glyph> (kana, radicals, kanji)… */
+  /** A single character drawn with <Glyph> (kana, kanji)… */
   glyph?: string;
-  /** …or a short Japanese text (survival words, grammar patterns). */
+  /** …or a short Japanese text (words, grammar patterns). */
   text?: string;
-  /** One word of English (romaji for kana). */
+  /** A few words of English. */
   meaning: string;
 }
 
 const firstGloss = (en: string) => en.split(/[;,(]/)[0].trim();
 
+const SCRIPT_OF = (ch: string) => (/[゠-ヿ]/.test(ch) ? 'katakana' : 'hiragana');
+
 export async function newItemTiles(items: readonly NewItemPlan[]): Promise<NewTile[]> {
   if (!items.length) return [];
-  const has = (kind: NewItemKind) => items.some((i) => i.kind === kind);
-  const [kana, kanji, radicals, survival, grammar] = await Promise.all([
-    has('kana') ? loadKana() : ([] as KanaEntry[]),
+  const has = (...kinds: NewItemKind[]) => items.some((i) => kinds.includes(i.kind));
+  const [kanji, rules, grammar, wordInfo] = await Promise.all([
     has('kanji') ? loadKanji() : ({} as Record<string, KanjiEntry>),
-    has('radical') ? loadRadicals() : ([] as RadicalEntry[]),
-    has('vocab') ? loadSurvivalWords() : ([] as SurvivalWord[]),
-    has('grammar') ? loadGrammar() : ([] as GrammarPoint[]),
+    has('kanaRule') ? loadKanaRules() : ([] as KanaRule[]),
+    has('grammar') ? loadGrammarIndex() : undefined,
+    has('core', 'staged') ? loadWordInfo() : undefined,
   ]);
   return items.map((item): NewTile => {
     const base = { id: item.itemId, kind: item.kind };
     switch (item.kind) {
       case 'kana':
-        return { ...base, glyph: item.key, meaning: kana.find((k) => k.char === item.key)?.romaji ?? '' };
+        return { ...base, glyph: item.key, meaning: SCRIPT_OF(item.key) };
+      case 'kanaRule': {
+        const rule = rules.find((r) => r.id === item.key);
+        return { ...base, text: rule?.pairs[0]?.to ?? '', meaning: rule ? firstGloss(rule.title.split(':')[0]) : 'kana rule' };
+      }
       case 'kanji':
         return { ...base, glyph: item.key, meaning: kanji[item.key]?.meanings[0] ?? '' };
-      case 'radical':
-        return { ...base, glyph: item.key, meaning: radicals.find((r) => r.char === item.key)?.meaning ?? 'part' };
-      case 'vocab': {
-        const word = survival.find((w) => w.id === item.key);
-        return { ...base, text: word?.kana ?? '', meaning: word ? firstGloss(word.en) : '' };
+      case 'core':
+      case 'staged': {
+        const word = wordInfo?.(item.itemId);
+        // A core word is met by ear and in kana first; a staged word comes with its kanji spelling.
+        const text = item.kind === 'core' ? word?.kana : word?.written;
+        return { ...base, text: text ?? '', meaning: word ? firstGloss(word.en) : '' };
       }
       case 'grammar': {
-        const point = grammar.find((g) => g.id === item.key);
+        const point = grammar?.get(item.key);
         return { ...base, text: point ? rubyToPlain(point.pattern) : '', meaning: 'grammar' };
       }
     }

@@ -1,78 +1,30 @@
-// Free writing practice for one character (not graded): trace, guided or from
-// memory on the pad, or on paper with the stroke animation as the check.
+// Free writing practice for one character, never graded: the stroke order animated, then a guided pad (start dots,
+// each stroke checked) to copy it as often as you like.
 
 import { useRef, useState, type ReactNode } from 'react';
 import { StrokeAnimation } from '../../writing/StrokeOrder.tsx';
 import { useStrokes } from '../../writing/useStrokes.ts';
-import { WritingPad, type WritingMode, type WritingPadHandle } from '../../writing/WritingPad.tsx';
+import { WritingPad, type WritingPadHandle } from '../../writing/WritingPad.tsx';
 import { Icon } from '../ui.tsx';
-import { padLabel } from './learn/WriteSteps.tsx';
 import { useFocusHeading } from './focus.ts';
+import { padLabel } from './learn/WriteSteps.tsx';
 import { CoachText, PadTools, useStrokeCoach } from './StrokeCoach.tsx';
-import { useStudyTimer } from './time.ts';
 
-export type PracticeMode = WritingMode | 'paper';
-
-const MODES: { mode: PracticeMode; label: string }[] = [
-  { mode: 'trace', label: 'Trace' },
-  { mode: 'guided', label: 'Guided' },
-  { mode: 'memory', label: 'Memory' },
-  { mode: 'paper', label: 'Paper' },
-];
-
-const MODE_KEY = 'issho.write.mode';
 const NO_STROKES: string[] = [];
-
-function savedMode(): PracticeMode {
-  try {
-    const m = localStorage.getItem(MODE_KEY);
-    return MODES.some((x) => x.mode === m) ? (m as PracticeMode) : 'guided';
-  } catch {
-    return 'guided';
-  }
-}
-
-export function ModeSwitch({ mode, onChange }: { mode: PracticeMode; onChange: (mode: PracticeMode) => void }) {
-  return (
-    <div className="segmented" role="radiogroup" aria-label="Writing mode">
-      {MODES.map((m) => (
-        <button key={m.mode} type="button" role="radio" aria-checked={mode === m.mode} onClick={() => onChange(m.mode)}>
-          {m.label}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 export function PracticePad({ char, ask, target, label }: {
   char: string;
   ask: string;
   target: ReactNode;
-  /** `target` as plain text ('the kanji for "water" (みず)'), for the pad's accessible name. */
+  /** `target` as plain text, for the pad's accessible name. */
   label?: string;
 }) {
-  useStudyTimer();
   const { strokes, loading, missing, error } = useStrokes(char);
-  const [mode, setMode] = useState<PracticeMode>(savedMode);
-  const [revealed, setRevealed] = useState(false);
   const [done, setDone] = useState(false);
   const pad = useRef<WritingPadHandle>(null);
   const root = useRef<HTMLElement>(null);
-  // Opened from a tile that is now gone: focus the prompt rather than leaving it on the page.
   useFocusHeading(root, char);
-  const padMode: WritingMode = mode === 'paper' ? 'memory' : mode;
-  const coach = useStrokeCoach(strokes ?? NO_STROKES, padMode);
-
-  const changeMode = (next: PracticeMode) => {
-    setMode(next);
-    setRevealed(false);
-    setDone(false);
-    try {
-      localStorage.setItem(MODE_KEY, next);
-    } catch {
-      // Remembering the mode is a convenience only.
-    }
-  };
+  const coach = useStrokeCoach(strokes ?? NO_STROKES, 'guided');
 
   const again = () => {
     pad.current?.clear();
@@ -80,41 +32,20 @@ export function PracticePad({ char, ask, target, label }: {
     setDone(false);
   };
 
-  const noPad = !strokes || missing || error;
   return (
     <section className="st-write" aria-label={`Practice writing ${char}`} ref={root}>
       <div className="st-write-prompt">
         <h2 className="st-ask">{ask}</h2>
-        <p className="st-write-target">{target}</p>
+        <div className="st-write-target">{target}</div>
       </div>
-      <ModeSwitch mode={mode} onChange={changeMode} />
-
       {loading ? (
         <div className="writing-pad st-skeleton" aria-busy="true" aria-label="Loading the writing pad" />
-      ) : mode === 'paper' || noPad ? (
-        <div className="st-paper">
-          {noPad && <p className="muted">There is no stroke guide for this character yet.</p>}
-          {revealed && strokes ? (
-            <>
-              <StrokeAnimation strokes={strokes} label={char} />
-              <button type="button" className="btn secondary block" onClick={() => setRevealed(false)}>
-                <Icon name="refresh" size={18} />Write it again
-              </button>
-            </>
-          ) : (
-            <>
-              <p className="card st-paper-note">Write it on paper, then check it against the stroke order.</p>
-              {strokes && (
-                <button type="button" className="btn ink block" onClick={() => setRevealed(true)}>
-                  <Icon name="eye" size={18} />Show the strokes
-                </button>
-              )}
-            </>
-          )}
-        </div>
+      ) : !strokes || missing || error ? (
+        <p className="card st-paper-note">There is no stroke guide for this character yet.</p>
       ) : (
         <>
-          <WritingPad ref={pad} strokes={strokes} mode={padMode} label={padLabel(char, padMode, label)}
+          <StrokeAnimation strokes={strokes} label={`Stroke order of ${char}`} />
+          <WritingPad ref={pad} strokes={strokes} mode="guided" label={padLabel(char, 'guided', label)}
             onStrokeResult={coach.onStrokeResult}
             onComplete={(r) => {
               setDone(true);

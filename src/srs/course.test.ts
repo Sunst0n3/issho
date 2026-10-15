@@ -1,446 +1,450 @@
 import { State } from 'ts-fsrs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { db, itemId, updateSettings } from '../lib/db.ts';
+import { db, getSettings, updateSettings } from '../lib/db.ts';
+import type { GrammarPoint, StagedWordRecord } from '../lib/types.ts';
 import {
-  applyKnownKana,
+  applyPlacement,
+  buildSnapshot,
+  componentMap,
+  courseDay,
+  courseDayFrom,
+  courseGates,
   courseProgress,
-  currentPhase,
-  grammarDueToday,
+  currentUnit,
   introducePlanItem,
-  nextNewItems,
+  kanaSprint,
+  loadCourseSnapshot,
   nextUnits,
-  orderKanaCourse,
-  phaseFor,
-  planNewItems,
-  requiredKana,
-  SURVIVAL_WORDS_PER_DAY,
-  upcomingUnits,
-  type CourseSnapshot,
+  placementSet,
+  sprintPick,
+  streamCandidates,
+  studyDaysApart,
+  taughtKana,
+  type CourseData,
+  type KnownScripts,
   type NewItemPlan,
 } from './course.ts';
-import { introduceItem, markKnownMany } from './items.ts';
-import { shuffle, seededRandom } from './random.ts';
-import { at, BASIC_HIRAGANA, CURRICULUM, fixtures, G_WA_KANA, GRAMMAR, KANA, resetDb, SURVIVAL } from './test-fixtures.ts';
+import { addDays, getDay, updateDay } from './days.ts';
+import { seededRandom } from './random.ts';
+import { at, BASIC_HIRAGANA, BASIC_KATAKANA, CORE, CURRICULUM, GRAMMAR, KANA, resetDb, RULES } from './test-fixtures.ts';
 
 vi.mock('../lib/data.ts', async () => (await import('./test-fixtures.ts')).dataMock);
 
 beforeEach(resetDb);
 
-const kanaIds = (chars: Iterable<string>) => [...chars].map((c) => itemId('kana', c));
-const ALL_KANA = kanaIds(KANA.map((k) => k.char));
-const BASIC_KANA = kanaIds(KANA.filter((k) => k.kind === 'basic').map((k) => k.char));
-const UNITS = CURRICULUM.units.map((u) => itemId(u.type, u.char));
+const DATA: CourseData = { kana: KANA, rules: RULES, curriculum: CURRICULUM, core: CORE, grammar: GRAMMAR };
+const START = '2026-01-05';
+/** Study days 1..n − 1 before course day n (consecutive calendar days from START). */
+const studyDaysFor = (courseDayN: number) => Array.from({ length: courseDayN - 1 }, (_, i) => addDays(START, i));
+const todayFor = (courseDayN: number) => addDays(START, courseDayN - 1);
 
-function snapshot(patch: Partial<CourseSnapshot> = {}): CourseSnapshot {
-  return {
-    kana: KANA,
-    curriculum: CURRICULUM,
-    survival: SURVIVAL,
-    grammar: GRAMMAR,
-    introduced: new Set(),
-    knowsHiragana: false,
-    knowsKatakana: false,
-    grammarDue: false,
-    vocabToday: 0,
-    ...patch,
-  };
+function snapshot(courseDayN: number, introduced: Iterable<[string, string]>, patch: { known?: KnownScripts; staged?: StagedWordRecord[]; travel?: boolean; data?: CourseData } = {}) {
+  return buildSnapshot(patch.data ?? DATA, {
+    today: todayFor(courseDayN),
+    known: patch.known ?? {},
+    introduced: new Map(introduced),
+    studyDays: studyDaysFor(courseDayN),
+    staged: patch.staged ?? [],
+    travel: patch.travel ?? false,
+  });
 }
 
-const keys = (plan: { key: string }[]) => plan.map((p) => p.key);
-const grammarIn = (plan: NewItemPlan[]) => keys(plan.filter((p) => p.kind === 'grammar'));
+/** Every sprint item introduced on `day`. */
+const wholeSprint = (day: string): [string, string][] => [
+  ...[...BASIC_HIRAGANA, ...BASIC_KATAKANA].map((c): [string, string] => [`kana:${c}`, day]),
+  ...RULES.map((r): [string, string] => [`kanaRule:${r.id}`, day]),
+];
 
-describe('orderKanaCourse', () => {
-  it('teaches hiragana basic → dakuten → yōon, then katakana the same way', () => {
-    const ordered = orderKanaCourse(shuffle(KANA, seededRandom(7)));
-    expect(ordered.map((k) => k.char).join('')).toBe('あいうえおかきくけこんがごきゃアイウエオカキクケコンガキャ');
-  });
-
-  it('leaves out scripts the learner already knows', () => {
-    expect(orderKanaCourse(KANA, { hiragana: true }).every((k) => k.script === 'katakana')).toBe(true);
-    expect(orderKanaCourse(KANA, { hiragana: true, katakana: true })).toEqual([]);
-  });
-});
-
-describe('requiredKana', () => {
-  const course = new Set(KANA.map((k) => k.char));
-  it('counts yōon as one unit and ignores っ, ー and kana outside the course', () => {
-    expect(requiredKana('きゃく', course)).toEqual(['きゃ', 'く']);
-    expect(requiredKana('ココア', course)).toEqual(['コ', 'コ', 'ア']);
-    expect(requiredKana('かっこ', course)).toEqual(['か', 'こ']);
-    expect(requiredKana('コーク', course)).toEqual(['コ', 'ク']);
-    expect(requiredKana('きょう', course)).toEqual(['き', 'う']);
-  });
-});
-
-describe('grammarDueToday', () => {
-  it('is due on the first day and every 2nd study day after', () => {
-    expect(grammarDueToday([], [], '2026-10-14')).toBe(true);
-    expect(grammarDueToday(['2026-10-14'], ['2026-10-14'], '2026-10-14')).toBe(false);
-    expect(grammarDueToday(['2026-10-13'], ['2026-10-13'], '2026-10-14')).toBe(false);
-    expect(grammarDueToday(['2026-10-12'], ['2026-10-12', '2026-10-13'], '2026-10-14')).toBe(true);
-  });
-
-  it('counts study days, not calendar days', () => {
-    expect(grammarDueToday(['2026-10-01'], ['2026-10-01'], '2026-10-14')).toBe(false);
-    expect(grammarDueToday(['2026-10-01'], ['2026-10-01', '2026-10-09'], '2026-10-14')).toBe(true);
-  });
-});
-
-describe('phaseFor', () => {
-  it('stays in phase 1 until every basic hiragana and katakana is introduced', () => {
-    expect(phaseFor(snapshot())).toBe(1);
-    expect(phaseFor(snapshot({ introduced: new Set(BASIC_KANA.slice(1)) }))).toBe(1);
-    expect(phaseFor(snapshot({ introduced: new Set(BASIC_KANA) }))).toBe(2);
-  });
-
-  it('skips phase 1 when the learner knows both scripts', () => {
-    expect(phaseFor(snapshot({ knowsHiragana: true }))).toBe(1);
-    expect(phaseFor(snapshot({ knowsHiragana: true, knowsKatakana: true }))).toBe(2);
-  });
-
-  it('follows the phase of the first curriculum unit not yet introduced', () => {
-    const introduced = (units: number) => new Set([...BASIC_KANA, ...UNITS.slice(0, units)]);
-    expect(phaseFor(snapshot({ introduced: introduced(2) }))).toBe(2);
-    expect(phaseFor(snapshot({ introduced: introduced(3) }))).toBe(3);
-    expect(phaseFor(snapshot({ introduced: introduced(4) }))).toBe(4);
-    expect(phaseFor(snapshot({ introduced: introduced(5) }))).toBe(4);
-  });
-
-  it('does not jump to phase 4 when the curriculum is empty', () => {
-    const empty = { units: [], phaseEnds: {} };
-    expect(phaseFor(snapshot({ curriculum: empty, knowsHiragana: true, knowsKatakana: true }))).toBe(2);
-    // Phase-3 grammar stays locked.
-    const plan = planNewItems(
-      snapshot({
-        curriculum: empty,
-        knowsHiragana: true,
-        knowsKatakana: true,
-        grammarDue: true,
-        survival: [],
-        grammar: [...GRAMMAR, { ...GRAMMAR[0], id: 'g-3', order: 9, phase: 3 }],
-        introduced: new Set(['grammar:g-wa', 'grammar:g-ka', 'grammar:g-te']),
-      }),
-      5,
-    );
-    expect(plan).toEqual([]);
-  });
-});
-
-describe('planNewItems', () => {
-  it('starts with the first kana row', () => {
-    const plan = planNewItems(snapshot({ grammarDue: true }), 5);
-    expect(keys(plan)).toEqual([...'あいうえお']);
-    expect(plan[0]).toEqual({ itemId: 'kana:あ', kind: 'kana', key: 'あ' });
-  });
-
-  it('adds up to 2 survival words a day once all their kana are known', () => {
-    const introduced = new Set(kanaIds('あいうえお'));
-    expect(keys(planNewItems(snapshot({ introduced }), 5))).toEqual(['か', 'き', 'く', 'sw-ai', 'sw-iie']);
-    expect(keys(planNewItems(snapshot({ introduced, vocabToday: 1 }), 5))).toEqual(['か', 'き', 'く', 'け', 'sw-ai']);
-    expect(keys(planNewItems(snapshot({ introduced, vocabToday: 2 }), 5))).toEqual([...'かきくけこ']);
-  });
-
-  it('waits for yōon and dakuten before words that need them', () => {
-    const introduced = new Set(kanaIds([...BASIC_HIRAGANA, 'き', 'く']));
-    const words = (s: Set<string>) => planNewItems(snapshot({ introduced: s }), 8).filter((p) => p.kind === 'vocab');
-    expect(keys(words(new Set([...introduced, 'vocab:sw-ai', 'vocab:sw-iie'])))).toEqual(['sw-kao']);
-    const withYoon = new Set([...introduced, 'vocab:sw-ai', 'vocab:sw-iie', ...kanaIds(['きゃ'])]);
-    expect(keys(words(withYoon))).toEqual(['sw-kyaku', 'sw-kao']);
-  });
-
-  it('adds a grammar point on grammar days once its kana can be read', () => {
-    const introduced = new Set(kanaIds(BASIC_HIRAGANA));
-    expect(keys(planNewItems(snapshot({ introduced, grammarDue: true }), 5))).toEqual(['が', 'ご', 'きゃ', 'sw-ai', 'g-wa']);
-    expect(keys(planNewItems(snapshot({ introduced, grammarDue: false }), 5))).toEqual(['が', 'ご', 'きゃ', 'sw-ai', 'sw-iie']);
-
-    const early = new Set(kanaIds('あいうえお'));
-    expect(grammarIn(planNewItems(snapshot({ introduced: early, grammarDue: true }), 5))).toEqual([]);
-  });
-
-  it('needs every kana in the pattern, examples (furigana included), drills and options', () => {
-    const plan = (kana: string[]) => planNewItems(snapshot({ introduced: new Set(kanaIds(kana)), grammarDue: true }), 5);
-    expect(grammarIn(plan(G_WA_KANA))).toEqual(['g-wa']);
-    for (const missing of G_WA_KANA) {
-      expect(grammarIn(plan(G_WA_KANA.filter((k) => k !== missing))), `without ${missing}`).toEqual([]);
-    }
-  });
-
-  it('reads a course yōon as one kana and skips ー and other small kana', () => {
-    const needed = ['が', 'きゃ', 'く', 'き', 'う', 'ご', 'い'];
-    const plan = (kana: string[]) =>
-      planNewItems(snapshot({ introduced: new Set([...kanaIds(kana), 'grammar:g-wa']), grammarDue: true }), 5);
-    expect(grammarIn(plan(needed))).toEqual(['g-ka']);
-    expect(grammarIn(plan(needed.filter((k) => k !== 'きゃ')))).toEqual([]);
-  });
-
-  it('teaches grammar in order: a point that cannot be read yet holds back the ones after it', () => {
-    // g-ka (order 2) is readable, but g-wa (order 1) still needs あ, こ, え, お.
-    const introduced = new Set(kanaIds(['が', 'きゃ', 'く', 'き', 'う', 'ご', 'い', 'か']));
-    expect(grammarIn(planNewItems(snapshot({ introduced, grammarDue: true }), 5))).toEqual([]);
-  });
-
-  it('counts whole scripts the learner already knows as readable', () => {
-    expect(grammarIn(planNewItems(snapshot({ knowsHiragana: true, grammarDue: true }), 5))).toEqual(['g-wa']);
-  });
-
-  it('only offers grammar from the current phase or earlier', () => {
-    const introduced = new Set([...kanaIds(BASIC_HIRAGANA), 'grammar:g-wa', 'grammar:g-ka']);
-    expect(planNewItems(snapshot({ introduced, grammarDue: true }), 5).some((p) => p.kind === 'grammar')).toBe(false);
-
-    const phase2 = new Set([...ALL_KANA, 'grammar:g-wa', 'grammar:g-ka']);
-    expect(keys(planNewItems(snapshot({ introduced: phase2, grammarDue: true }), 5)).at(-1)).toBe('g-te');
-  });
-
-  it('teaches leftover phase-1 grammar after skipping the kana course', () => {
-    const plan = planNewItems(snapshot({ knowsHiragana: true, knowsKatakana: true, grammarDue: true, survival: [] }), 4);
-    expect(keys(plan)).toEqual(['亻', '一', '人', 'g-wa']);
-  });
-
-  it('keeps at least half the slots for the core track', () => {
-    const introduced = new Set(kanaIds(BASIC_HIRAGANA));
-    expect(keys(planNewItems(snapshot({ introduced, grammarDue: true }), 1))).toEqual(['が']);
-    expect(keys(planNewItems(snapshot({ introduced, grammarDue: true }), 2))).toEqual(['が', 'g-wa']);
-  });
-
-  it('moves from kana to curriculum units, listing each kanji unit’s words', () => {
-    const plan = planNewItems(snapshot({ introduced: new Set([...ALL_KANA, 'word:1003']), survival: [] }), 3);
-    expect(plan).toEqual([
-      { itemId: 'radical:亻', kind: 'radical', key: '亻' },
-      { itemId: 'kanji:一', kind: 'kanji', key: '一', words: ['1001'] },
-      { itemId: 'kanji:人', kind: 'kanji', key: '人', words: ['1002'] },
+describe('kanaSprint', () => {
+  it('runs 14 days when neither script is known', () => {
+    const sprint = kanaSprint(KANA, RULES, {});
+    expect(sprint.map((d) => d.day)).toEqual(Array.from({ length: 14 }, (_, i) => i + 1));
+    expect(sprint[0].kana.join('')).toBe('あいうえおかきくけこ');
+    expect(sprint[4].kana.join('')).toBe('らりるれろわをん');
+    expect(sprint.slice(0, 5).flatMap((d) => d.kana)).toHaveLength(46);
+    expect(sprint.map((d) => d.rule ?? null)).toEqual([
+      null, null, null, null, null, 'hira-dakuten', 'hira-yoon', null, null, null, null, null, 'kata-dakuten-yoon', 'kata-extended',
     ]);
+    expect(sprint.slice(7, 12).flatMap((d) => d.kana)).toEqual(BASIC_KATAKANA);
+    expect(sprint.filter((d) => d.kanaCheck).map((d) => d.day)).toEqual([14]);
   });
 
-  it('skips kana of scripts the learner knows', () => {
-    const plan = planNewItems(snapshot({ knowsHiragana: true }), 4);
-    expect(keys(plan)).toEqual(['ア', 'イ', 'sw-ai', 'sw-iie']);
-  });
-
-  it('fills the day with words and grammar once the core track is done', () => {
-    const introduced = new Set([...ALL_KANA, ...UNITS]);
-    expect(keys(planNewItems(snapshot({ introduced, grammarDue: true }), 5))).toEqual(['sw-ai', 'sw-iie', 'g-wa']);
-  });
-
-  it('plans nothing for a count of 0', () => {
-    expect(planNewItems(snapshot(), 0)).toEqual([]);
+  it('moves katakana to days 1–7 when hiragana is known, and is empty when both are', () => {
+    const sprint = kanaSprint(KANA, RULES, { hiragana: true });
+    expect(sprint.map((d) => d.day)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    expect(sprint.every((d) => d.script === 'katakana')).toBe(true);
+    expect(sprint[0].kana.join('')).toBe('アイウエオカキクケコ');
+    expect(sprint[6]).toMatchObject({ rule: 'kata-extended', kanaCheck: true });
+    expect(kanaSprint(KANA, RULES, { hiragana: true, katakana: true })).toEqual([]);
+    expect(kanaSprint(KANA, RULES, { katakana: true }).map((d) => d.script)).toEqual(Array(7).fill('hiragana'));
   });
 });
 
-describe('planNewItems: a second session the same day', () => {
-  it('offers exactly what is left, keeping the day’s survival words', () => {
-    const start = new Set(kanaIds('あいうえお'));
-    expect(keys(planNewItems(snapshot({ introduced: start }), 5))).toEqual(['か', 'き', 'く', 'sw-ai', 'sw-iie']);
-
-    const after = new Set([...start, ...kanaIds('かきく')]);
-    expect(keys(planNewItems(snapshot({ introduced: after, newToday: 3 }), 2))).toEqual(['sw-ai', 'sw-iie']);
-  });
-
-  it('keeps the day’s grammar point', () => {
-    const start = new Set(kanaIds(BASIC_HIRAGANA));
-    const morning = planNewItems(snapshot({ introduced: start, grammarDue: true }), 5);
-    expect(keys(morning)).toEqual(['が', 'ご', 'きゃ', 'sw-ai', 'g-wa']);
-
-    const after = new Set([...start, ...kanaIds(['が', 'ご', 'きゃ'])]);
-    expect(keys(planNewItems(snapshot({ introduced: after, grammarDue: true, newToday: 3 }), 2))).toEqual(['sw-ai', 'g-wa']);
-
-    after.add('vocab:sw-ai');
-    const last = snapshot({ introduced: after, grammarDue: true, newToday: 4, vocabToday: 1 });
-    expect(keys(planNewItems(last, 1))).toEqual(['g-wa']);
-  });
-
-  it('keeps the core track’s share when words and grammar came first', () => {
-    const introduced = new Set([...kanaIds(BASIC_HIRAGANA), 'vocab:sw-ai', 'grammar:g-wa']);
-    const s = snapshot({ introduced, newToday: 2, vocabToday: 1, grammarToday: 1 });
-    expect(keys(planNewItems(s, 3))).toEqual(['が', 'ご', 'きゃ']);
-  });
-
-  it('keeps the day’s limits, and its words and grammar, however the day is split', () => {
-    const random = seededRandom(11);
-    const isExtra = (p: NewItemPlan) => p.kind === 'vocab' || p.kind === 'grammar';
-    for (let run = 0; run < 30; run++) {
-      const perDay = 1 + Math.floor(random() * 6);
-      const introduced = new Set<string>();
-      let lastGrammarDay = -2;
-      for (let day = 0; day < 15; day++) {
-        const grammarDue = lastGrammarDay < day - 1;
-        const oneSession = planNewItems(snapshot({ introduced: new Set(introduced), grammarDue }), perDay);
-        const done = { newToday: 0, vocabToday: 0, grammarToday: 0 };
-        let core = 0;
-        // Sessions until the day's budget is used, each stopping after a random part of its plan.
-        while (done.newToday < perDay) {
-          const s = snapshot({ introduced, grammarDue: grammarDue && !done.grammarToday, ...done });
-          const plan = planNewItems(s, perDay - done.newToday);
-          if (!plan.length) break;
-          for (const item of plan.slice(0, 1 + Math.floor(random() * plan.length))) {
-            introduced.add(item.itemId);
-            done.newToday++;
-            if (item.kind === 'vocab') done.vocabToday++;
-            else if (item.kind === 'grammar') done.grammarToday++;
-            else core++;
-          }
-        }
-        if (done.grammarToday) lastGrammarDay = day;
-
-        const where = `run ${run}, ${perDay} a day, day ${day}`;
-        expect(done.vocabToday, where).toBeLessThanOrEqual(SURVIVAL_WORDS_PER_DAY);
-        expect(done.grammarToday, where).toBeLessThanOrEqual(1);
-        expect(done.vocabToday + done.grammarToday, where).toBeGreaterThanOrEqual(oneSession.filter(isExtra).length);
-        const coreLeft = planNewItems(snapshot({ introduced, survival: [], grammar: [] }), 1).length > 0;
-        if (coreLeft) expect(core, where).toBeGreaterThanOrEqual(Math.ceil(perDay / 2));
-      }
-    }
+describe('courseGates', () => {
+  it('sets the stream gates by what placement found', () => {
+    expect(courseGates({})).toEqual({ coreFrom: 3, grammarFrom: 8, kanjiFrom: 15, governorFrom: 15 });
+    expect(courseGates({ hiragana: true })).toEqual({ coreFrom: 1, grammarFrom: 1, kanjiFrom: 8, governorFrom: 8 });
+    expect(courseGates({ katakana: true })).toEqual({ coreFrom: 3, grammarFrom: 8, kanjiFrom: 8, governorFrom: 8 });
+    expect(courseGates({ hiragana: true, katakana: true })).toEqual({ coreFrom: 1, grammarFrom: 1, kanjiFrom: 1, governorFrom: 1 });
   });
 });
 
-describe('upcomingUnits and nextUnits', () => {
-  it('lists the next units not yet introduced, in teaching order', () => {
-    const shuffled = { ...CURRICULUM, units: shuffle(CURRICULUM.units, seededRandom(3)) };
-    expect(upcomingUnits(shuffled, new Set(['radical:亻', 'kanji:人']), 2).map((u) => u.char)).toEqual(['一', '大']);
-    expect(upcomingUnits(CURRICULUM, new Set(), 0)).toEqual([]);
+describe('sprintPick', () => {
+  const sprint = kanaSprint(KANA, RULES, {});
+
+  it('teaches a row missed on a review-only day first, then catches up', () => {
+    // Day 2 after a day 1 with only reviews: day 1's あ and か rows.
+    const day2 = sprintPick(sprint, new Map(), todayFor(2), 2);
+    expect(day2.kana.join('')).toBe('あいうえおかきくけこ');
+    expect(day2.rule).toBeNull();
+    // Day 3 then teaches day 2's rows.
+    const taught = new Map(day2.kana.map((c): [string, string] => [`kana:${c}`, todayFor(2)]));
+    expect(sprintPick(sprint, taught, todayFor(3), 3).kana.join('')).toBe('さしすせそたちつてと');
   });
 
-  it('reads what has been introduced from the database', async () => {
-    expect(await nextUnits(2)).toEqual(CURRICULUM.units.slice(0, 2));
-    await markKnownMany([
-      { kind: 'radical', key: '亻' },
-      { kind: 'kanji', key: '人' },
+  it('teaches at most 10 kana a day, counting earlier sittings', () => {
+    expect(sprintPick(sprint, new Map(), todayFor(5), 5).kana).toHaveLength(10);
+    const earlier = new Map(BASIC_HIRAGANA.slice(0, 4).map((c): [string, string] => [`kana:${c}`, todayFor(5)]));
+    expect(sprintPick(sprint, earlier, todayFor(5), 5).kana).toHaveLength(6);
+  });
+
+  it('teaches a rule only after its script rows, and at most one a day', () => {
+    const allButLast = new Map(BASIC_HIRAGANA.slice(0, 30).map((c): [string, string] => [`kana:${c}`, todayFor(5)]));
+    // 16 untaught kana: 10 fill the day and 6 are left, so the rule waits.
+    expect(sprintPick(sprint, allButLast, todayFor(6), 6)).toMatchObject({ rule: null });
+    const fewLeft = new Map(BASIC_HIRAGANA.slice(0, 40).map((c): [string, string] => [`kana:${c}`, todayFor(5)]));
+    // The last 6 are in today's pick, so the rule comes after them.
+    expect(sprintPick(sprint, fewLeft, todayFor(6), 6)).toMatchObject({ rule: 'hira-dakuten' });
+    expect(sprintPick(sprint, fewLeft, todayFor(6), 6).kana).toHaveLength(6);
+    const allHira = new Map(BASIC_HIRAGANA.map((c): [string, string] => [`kana:${c}`, todayFor(5)]));
+    expect(sprintPick(sprint, allHira, todayFor(7), 7).rule).toBe('hira-dakuten');
+    allHira.set('kanaRule:hira-dakuten', todayFor(7));
+    expect(sprintPick(sprint, allHira, todayFor(7), 7).rule).toBeNull();
+    expect(sprintPick(sprint, allHira, todayFor(8), 8).rule).toBe('hira-yoon');
+  });
+
+  it('does not count a same-day placement of the known script against the day', () => {
+    // Onboarding passed the hiragana check this morning: its 46 kana and 2 rules were introduced today.
+    const katakanaSprint = kanaSprint(KANA, RULES, { hiragana: true });
+    const placed = new Map<string, string>([
+      ...BASIC_HIRAGANA.map((c): [string, string] => [`kana:${c}`, todayFor(1)]),
+      ['kanaRule:hira-dakuten', todayFor(1)],
+      ['kanaRule:hira-yoon', todayFor(1)],
     ]);
-    expect((await nextUnits(10)).map((u) => u.char)).toEqual(['一', '大', '水']);
-    expect(await nextUnits(0)).toEqual([]);
+    const day1 = sprintPick(katakanaSprint, placed, todayFor(1), 1);
+    expect(day1.kana.join('')).toBe('アイウエオカキクケコ');
+    // The katakana rule still waits for its own rows, and today's placement rules do not block it later.
+    const allKata = new Map([...placed, ...BASIC_KATAKANA.map((c): [string, string] => [`kana:${c}`, todayFor(1)])]);
+    expect(sprintPick(katakanaSprint, allKata, todayFor(1), 6).rule).toBe('kata-dakuten-yoon');
+    expect(streamCandidates(snapshot(1, placed, { known: { hiragana: true } })).kana).toHaveLength(10);
   });
 });
 
-describe('nextNewItems and introducePlanItem', () => {
-  const DAY1 = at(2026, 10, 12, 8);
-  const DAY2 = at(2026, 10, 13, 8);
-  const DAY3 = at(2026, 10, 14, 8);
-
-  it('introduces a kanji with its words; only the kanji counts as new', async () => {
-    fixtures.grammar = [];
-    fixtures.survival = [];
-    await markKnownMany(KANA.map((k) => ({ kind: 'kana' as const, key: k.char })), DAY1);
-    const [radical, kanji] = await nextNewItems(2, DAY1);
-    expect(radical.key).toBe('亻');
-    expect(kanji).toMatchObject({ key: '一', words: ['1001'] });
-
-    const results = await introducePlanItem(kanji, DAY1);
-    expect(results.map((r) => r.item.id)).toEqual(['kanji:一', 'word:1001']);
-    expect(await db.items.get('word:1001')).toBeDefined();
-    expect(await db.cards.where('itemId').equals('word:1001').count()).toBe(2);
-    expect((await db.days.get('2026-10-12'))!.newItems).toBe(1);
-
-    expect(keys(await nextNewItems(2, DAY1))).toEqual(['亻', '人']);
+describe('course day', () => {
+  it('counts distinct study days before today', () => {
+    expect(courseDayFrom([], '2026-01-05')).toBe(1);
+    expect(courseDayFrom(['2026-01-05', '2026-01-05', '2026-01-07'], '2026-01-08')).toBe(3);
+    expect(courseDayFrom(['2026-01-05', '2026-01-09'], '2026-01-08')).toBe(2);
   });
 
-  it('spaces grammar points to every 2nd study day', async () => {
-    await markKnownMany(BASIC_HIRAGANA.map((key) => ({ kind: 'kana' as const, key })), DAY1);
-    fixtures.survival = [];
-
-    const day1 = await nextNewItems(5, DAY1);
-    expect(day1.at(-1)!.kind).toBe('grammar');
-    for (const item of day1) await introducePlanItem(item, DAY1);
-
-    const day2 = await nextNewItems(5, DAY2);
-    expect(day2.some((p) => p.kind === 'grammar')).toBe(false);
-    for (const item of day2) await introducePlanItem(item, DAY2);
-
-    const day3 = await nextNewItems(5, DAY3);
-    expect(day3.at(-1)).toMatchObject({ kind: 'grammar', key: 'g-ka' });
+  it('counts study days apart by their index distance', () => {
+    const days = ['2026-01-01', '2026-01-02', '2026-01-04', '2026-01-05'];
+    expect(studyDaysApart('2026-01-01', '2026-01-06', days)).toBe(4);
+    expect(studyDaysApart('2026-01-06', '2026-01-06', days)).toBe(0);
   });
 
-  it('tops the day up from where an earlier session stopped', async () => {
-    await markKnownMany(BASIC_HIRAGANA.map((key) => ({ kind: 'kana' as const, key })), DAY1);
-    const morning = await nextNewItems(5, DAY1);
-    expect(keys(morning)).toEqual(['が', 'ご', 'きゃ', 'sw-ai', 'g-wa']);
-    for (const item of morning.slice(0, 3)) await introducePlanItem(item, DAY1);
-
-    const evening = at(2026, 10, 12, 20);
-    expect(keys(await nextNewItems(2, evening))).toEqual(['sw-ai', 'g-wa']);
-    await introducePlanItem(morning[4], evening);
-    expect(keys(await nextNewItems(1, evening))).toEqual(['sw-ai']);
-  });
-
-  it('caps survival words at 2 per day across several sessions', async () => {
-    fixtures.grammar = [];
-    await markKnownMany(BASIC_HIRAGANA.map((key) => ({ kind: 'kana' as const, key })), DAY1);
-    await introduceItem('vocab', 'sw-ai', DAY1);
-    const later = await nextNewItems(5, at(2026, 10, 12, 20));
-    expect(later.filter((p) => p.kind === 'vocab').map((p) => p.key)).toEqual(['sw-iie']);
-    const tomorrow = await nextNewItems(5, DAY2);
-    expect(tomorrow.filter((p) => p.kind === 'vocab')).toHaveLength(2);
-  });
-});
-
-describe('phase transitions', () => {
-  it('moves to phase 2 when both scripts are marked as known', async () => {
-    expect(await currentPhase()).toBe(1);
-    await updateSettings({ knowsHiragana: true, knowsKatakana: true });
-    expect(await currentPhase()).toBe(2);
-
-    const now = at(2026, 10, 14, 9);
-    expect(await applyKnownKana(now)).toBe(KANA.length);
-    expect(await db.items.where('kind').equals('kana').count()).toBe(KANA.length);
-    const cards = await db.cards.where('kind').equals('kana').toArray();
-    expect(cards.every((c) => c.state === State.Review && c.due > now)).toBe(true);
-    expect(await db.days.get('2026-10-14')).toBeUndefined();
-    expect(keys(await nextNewItems(1, now))).toEqual(['亻']);
-  });
-
-  it('stays in phase 1 for katakana when only hiragana is known', async () => {
-    await updateSettings({ knowsHiragana: true });
-    await applyKnownKana();
-    expect(await currentPhase()).toBe(1);
-    expect(keys(await nextNewItems(2))[0]).toBe('ア');
-  });
-
-  it('reaches phase 2 by introducing every basic kana', async () => {
-    for (const k of KANA.filter((e) => e.kind === 'basic')) await introduceItem('kana', k.char);
-    expect(await currentPhase()).toBe(2);
-  });
-});
-
-describe('courseProgress', () => {
-  it('reports kana progress toward phase 2', async () => {
-    await markKnownMany(BASIC_HIRAGANA.map((key) => ({ kind: 'kana' as const, key })));
-    expect(await courseProgress()).toEqual({
-      phase: 1,
-      kanaIntroduced: BASIC_HIRAGANA.length,
-      kanaTotal: KANA.length,
-      unitsIntroduced: 0,
-      unitsTotal: CURRICULUM.units.length,
-      kanjiIntroduced: 0,
-      nextPhaseAt: 22,
-      phaseTarget: 22,
-      phaseDone: BASIC_HIRAGANA.length,
+  it('reads the study days from the DayRecords', async () => {
+    await updateDay('2026-01-05', (d) => {
+      d.reviews = 3;
     });
-  });
-
-  it('reports kanji progress toward the next phase', async () => {
-    await updateSettings({ knowsHiragana: true, knowsKatakana: true });
-    await markKnownMany([
-      { kind: 'radical', key: '亻' },
-      { kind: 'kanji', key: '一' },
-    ]);
-    expect(await courseProgress()).toMatchObject({
-      phase: 2,
-      unitsIntroduced: 2,
-      kanjiIntroduced: 1,
-      nextPhaseAt: 2,
-      phaseDone: 1,
+    await updateDay('2026-01-06', (d) => {
+      d.travel = true;
     });
+    await updateDay('2026-01-07', (d) => {
+      d.minimumDone = true;
+    });
+    expect(await courseDay(at(2026, 1, 8, 9))).toBe(3);
+    expect(await courseDay(at(2026, 1, 8, 3))).toBe(2); // before 4 a.m. it is still the 7th
+  });
+});
+
+describe('streamCandidates', () => {
+  it('gates core words from day 3 and grammar from day 8 during the sprint', () => {
+    expect(streamCandidates(snapshot(2, [])).core).toEqual([]);
+    expect(streamCandidates(snapshot(3, [])).core.map((c) => c.key)).toEqual(['cw-0001', 'cw-0002', 'cw-0003']);
+    expect(streamCandidates(snapshot(7, [])).grammar).toBeNull();
+    expect(streamCandidates(snapshot(8, [])).grammar?.key).toBe('wa-desu');
   });
 
-  it("counts each phase in its own kanji, like the library's phase groups", async () => {
-    await updateSettings({ knowsHiragana: true, knowsKatakana: true });
-    // A phase-4 kanji learned ahead of schedule counts in phase 4, not in phase 2.
-    await markKnownMany([{ kind: 'kanji', key: '水' }]);
-    expect(await courseProgress()).toMatchObject({ phase: 2, phaseDone: 0, phaseTarget: 2, nextPhaseAt: 2, kanjiIntroduced: 1 });
+  it('offers no kanji on day 15 while a sprint row is untaught, and does once it is taught', () => {
+    const missing = wholeSprint(todayFor(13)).filter(([id]) => id !== 'kana:ン');
+    const s = snapshot(15, missing);
+    expect(s.sprintComplete).toBe(false);
+    expect(streamCandidates(s).kanji).toEqual([]);
+    expect(streamCandidates(s).kana.map((k) => k.key)).toEqual(['ン']);
+    expect(streamCandidates(snapshot(15, wholeSprint(todayFor(13)))).kanji.length).toBeGreaterThan(0);
+  });
 
-    // Phase 3 counts only its own kanji (大), not the ones from phase 2.
-    await markKnownMany([{ kind: 'radical', key: '亻' }, { kind: 'kanji', key: '一' }, { kind: 'kanji', key: '人' }]);
-    expect(await courseProgress()).toMatchObject({ phase: 3, phaseDone: 0, phaseTarget: 1, nextPhaseAt: 1 });
+  it('keeps the sprint display rules on the day the sprint completes, not the next', () => {
+    expect(snapshot(14, wholeSprint(todayFor(14))).inSprint).toBe(true);
+    expect(snapshot(15, wholeSprint(todayFor(14))).inSprint).toBe(false);
+    expect(snapshot(10, []).inSprint).toBe(true);
+    const known = snapshot(1, [], { known: { hiragana: true, katakana: true } });
+    expect(known.sprintComplete).toBe(true);
+    expect(known.inSprint).toBe(false);
+  });
 
-    await markKnownMany([{ kind: 'kanji', key: '大' }]);
-    expect(await courseProgress()).toMatchObject({ phase: 4, phaseDone: 1, phaseTarget: 1, nextPhaseAt: null });
+  it('prices kanji with an anchor at 188 s and zero-word kanji at 160 s', () => {
+    const before = wholeSprint(todayFor(1));
+    const done = (chars: string[]) => chars.map((c): [string, string] => [`kanji:${c}`, todayFor(1)]);
+    const s = snapshot(20, [...before, ...done(['一', '二', '三', '四', '五', '日', '元', '気', '未', '末', '本'])]);
+    const kanji = streamCandidates(s).kanji;
+    expect(kanji.map((k) => [k.key, k.priceSec, k.anchor])).toEqual([['乙', 160, null], ['人', 188, 'word:1007']]);
+  });
+
+  it('defers a visual look-alike introduced fewer than 5 study days ago', () => {
+    const sprintDone = wholeSprint(todayFor(1));
+    const firstEight = ['一', '二', '三', '四', '五', '日', '元', '気'].map((c): [string, string] => [`kanji:${c}`, todayFor(1)]);
+    const fourAgo: [string, string] = ['kanji:未', todayFor(16)];
+    const fiveAgo: [string, string] = ['kanji:未', todayFor(15)];
+    expect(streamCandidates(snapshot(20, [...sprintDone, ...firstEight, fourAgo])).kanji.map((k) => k.key)).toEqual(['本', '乙', '人']);
+    expect(streamCandidates(snapshot(20, [...sprintDone, ...firstEight, fiveAgo])).kanji.map((k) => k.key)).toEqual(['末', '本', '乙', '人']);
+  });
+
+  it('holds back a kanji whose component waits behind a look-alike (国 never before 玉)', () => {
+    const sprintDone = wholeSprint(todayFor(1));
+    const firstEight = ['一', '二', '三', '四', '五', '日', '元', '気'].map((c): [string, string] => [`kanji:${c}`, todayFor(1)]);
+    const fourAgo: [string, string] = ['kanji:未', todayFor(16)];
+    // 本 is built on 末 here (a test stand-in); 乙's part 乚 is not a curriculum kanji and never holds it back.
+    const data: CourseData = { ...DATA, components: new Map([['本', ['末']], ['乙', ['乚']]]) };
+    expect(streamCandidates(snapshot(20, [...sprintDone, ...firstEight, fourAgo], { data })).kanji.map((k) => k.key)).toEqual(['乙', '人']);
+    // Once 末 can come, it comes first and 本 may follow it in the same batch.
+    const fiveAgo: [string, string] = ['kanji:未', todayFor(15)];
+    expect(streamCandidates(snapshot(20, [...sprintDone, ...firstEight, fiveAgo], { data })).kanji.map((k) => k.key)).toEqual(['末', '本', '乙', '人']);
+    expect(componentMap({ 本: { components: ['末'] }, 末: { components: [] } })).toEqual(new Map([['本', ['末']]]));
+  });
+
+  it('allows at most 3 numbers a day, counting an earlier sitting', () => {
+    const sprintDone = wholeSprint(todayFor(1));
+    expect(streamCandidates(snapshot(20, sprintDone)).kanji.map((k) => k.key)).toEqual(['一', '二', '三', '日']);
+    const morning: [string, string][] = [['kanji:一', todayFor(20)], ['kanji:二', todayFor(20)]];
+    expect(streamCandidates(snapshot(20, [...sprintDone, ...morning])).kanji.map((k) => k.key)).toEqual(['三', '日', '元', '気']);
+  });
+
+  it('keeps は and が at least 5 study days apart', () => {
+    const base: [string, string][] = [
+      ...wholeSprint(todayFor(1)),
+      ['grammar:ka-question', todayFor(2)],
+      ['grammar:no-possession', todayFor(4)],
+      ['grammar:mo-also', todayFor(6)],
+    ];
+    const fourAgo = streamCandidates(snapshot(20, [...base, ['grammar:wa-desu', todayFor(16)]]));
+    expect(fourAgo.grammar?.key).toBe('numbers-prices');
+    const fiveAgo = streamCandidates(snapshot(20, [...base, ['grammar:wa-desu', todayFor(15)]]));
+    expect(fiveAgo.grammar?.key).toBe('ga-subject');
+  });
+
+  it('skips a point whose prerequisite is not taught, and allows grammar every second study day only', () => {
+    const grammar: GrammarPoint[] = [
+      { ...GRAMMAR[0], id: 'g1', order: 1, prerequisites: [], contrastWith: [] },
+      { ...GRAMMAR[0], id: 'g2', order: 2, prerequisites: ['g9'], contrastWith: [] },
+      { ...GRAMMAR[0], id: 'g3', order: 3, prerequisites: ['g1'], contrastWith: [] },
+      { ...GRAMMAR[0], id: 'g9', order: 9, prerequisites: [], contrastWith: [] },
+    ];
+    const data = { ...DATA, grammar };
+    expect(streamCandidates(snapshot(20, [['grammar:g1', todayFor(10)]], { data })).grammar?.key).toBe('g3');
+    // g1 was taught on the previous study day: no grammar today.
+    expect(streamCandidates(snapshot(20, [['grammar:g1', todayFor(19)]], { data })).grammar).toBeNull();
+    expect(streamCandidates(snapshot(20, [['grammar:g1', todayFor(20)]], { data })).grammar).toBeNull();
+  });
+
+  it('flags the weekly grammar floor', () => {
+    // 2026-01-05 is a Monday: course day 20 is Saturday 2026-01-24, its week began on the 19th.
+    const one: [string, string][] = [...wholeSprint(todayFor(1)), ['grammar:wa-desu', '2026-01-19']];
+    expect(streamCandidates(snapshot(20, one)).grammarBelowFloor).toBe(true);
+    const two: [string, string][] = [...one, ['grammar:ka-question', '2026-01-21']];
+    expect(streamCandidates(snapshot(20, two)).grammarBelowFloor).toBe(false);
+  });
+
+  it('plans no kanji and no grammar while travelling', () => {
+    const s = snapshot(20, wholeSprint(todayFor(1)), { travel: true });
+    expect(streamCandidates(s).kanji).toEqual([]);
+    expect(streamCandidates(s).grammar).toBeNull();
+  });
+
+  it('releases due staged words, oldest first, at most 4', () => {
+    const rows: StagedWordRecord[] = Array.from({ length: 6 }, (_, i) => ({
+      itemId: `word:${3000 + i}`, kanji: '日', releaseDay: todayFor(20 - i), slot: 2,
+    }));
+    rows.push({ itemId: 'word:4000', kanji: '日', releaseDay: todayFor(21), slot: 3 });
+    rows.push({ itemId: 'core:cw-0040', kanji: '元', releaseDay: todayFor(10), slot: 2, releasedAt: at(2026, 1, 14) });
+    const staged = streamCandidates(snapshot(20, wholeSprint(todayFor(1)), { staged: rows })).staged;
+    expect(staged.map((s) => s.itemId)).toEqual(['word:3005', 'word:3004', 'word:3003', 'word:3002']);
+    expect(staged[0]).toMatchObject({ kind: 'staged', stream: 'staged', priceSec: 28, kanji: '日', key: '3005' });
+  });
+});
+
+describe('introducePlanItem', () => {
+  const NOW = at(2026, 1, 20, 9);
+
+  it('introduces a kanji with its anchor and stages its later words +3 and +8 calendar days', async () => {
+    const plan: NewItemPlan = { itemId: 'kanji:日', kind: 'kanji', key: '日', anchor: 'word:1001', priceSec: 188, stream: 'kanji' };
+    const results = await introducePlanItem(plan, NOW);
+    expect(results.map((r) => r.item.id)).toEqual(['kanji:日', 'word:1001']);
+    expect(results[0].cards.map((c) => c.type)).toEqual(['write']);
+    expect(results[1].cards.map((c) => c.type)).toEqual(['read']);
+    expect(await db.staged.toArray()).toEqual([
+      { itemId: 'word:1002', kanji: '日', releaseDay: '2026-01-23', slot: 2 },
+      { itemId: 'word:1008', kanji: '日', releaseDay: '2026-01-28', slot: 3 },
+    ]);
+    const day = await getDay('2026-01-20');
+    expect(day.newItems).toBe(1);
+    expect(day.newSec.kanji).toBe(188);
+  });
+
+  it('is idempotent: a second call creates nothing and counts nothing', async () => {
+    const plan: NewItemPlan = { itemId: 'kanji:日', kind: 'kanji', key: '日', anchor: 'word:1001', priceSec: 188, stream: 'kanji' };
+    await introducePlanItem(plan, NOW);
+    const again = await introducePlanItem(plan, new Date(NOW.getTime() + 60_000));
+    expect(again[0].created).toBe(false);
+    expect(await db.items.count()).toBe(2);
+    expect(await db.staged.count()).toBe(2);
+    const day = await getDay('2026-01-20');
+    expect(day.newItems).toBe(1);
+    expect(day.newSec.kanji).toBe(188);
+  });
+
+  it("gives a zero-word kanji a meaning card", async () => {
+    const [kanji] = await introducePlanItem({ itemId: 'kanji:乙', kind: 'kanji', key: '乙', anchor: null, priceSec: 160, stream: 'kanji' }, NOW);
+    expect(kanji.cards.map((c) => c.type)).toEqual(['write', 'meaning']);
+  });
+
+  it("merges a core anchor already known: 元気's kanji adds exactly one card, the read card", async () => {
+    const [word] = await introducePlanItem({ itemId: 'core:cw-0040', kind: 'core', key: 'cw-0040', priceSec: 35, stream: 'core' }, at(2026, 1, 10));
+    expect(word.cards.map((c) => c.type)).toEqual(['listen', 'produce']);
+    const before = await db.cards.count();
+    const results = await introducePlanItem({ itemId: 'kanji:元', kind: 'kanji', key: '元', anchor: 'core:cw-0040', priceSec: 188, stream: 'kanji' }, NOW);
+    expect(results[1].cards.map((c) => c.id)).toEqual(['core:cw-0040|read']);
+    expect(await db.cards.where('itemId').equals('core:cw-0040').count()).toBe(3);
+    expect(await db.cards.count()).toBe(before + 2); // the kanji's write card + the word's read card
+    expect(await db.items.where('kind').equals('core').count()).toBe(1);
+    expect((await db.items.get('core:cw-0040'))?.spelledAt).toEqual(NOW);
+  });
+
+  it('introduces a core anchor not yet known with listen, produce and read', async () => {
+    const results = await introducePlanItem({ itemId: 'kanji:元', kind: 'kanji', key: '元', anchor: 'core:cw-0040', priceSec: 188, stream: 'kanji' }, NOW);
+    expect(results[1].cards.map((c) => c.type)).toEqual(['listen', 'produce', 'read']);
+  });
+
+  it('spells a core word with kanji once all its kanji are introduced', async () => {
+    await introducePlanItem({ itemId: 'kanji:人', kind: 'kanji', key: '人', anchor: 'word:1007', priceSec: 188, stream: 'kanji' }, NOW);
+    const [word] = await introducePlanItem({ itemId: 'core:cw-0044', kind: 'core', key: 'cw-0044', priceSec: 35, stream: 'core' }, NOW);
+    expect(word.cards.map((c) => c.type)).toEqual(['listen', 'produce', 'read']);
+    const [kanaOnly] = await introducePlanItem({ itemId: 'core:cw-0042', kind: 'core', key: 'cw-0042', priceSec: 35, stream: 'core' }, NOW);
+    expect(kanaOnly.cards.map((c) => c.type)).toEqual(['listen', 'produce']);
+  });
+
+  it('settles a pending staged row when the core stream teaches the word with its spelling first', async () => {
+    await introducePlanItem({ itemId: 'kanji:人', kind: 'kanji', key: '人', anchor: 'word:1007', priceSec: 188, stream: 'kanji' }, NOW);
+    await db.staged.bulkPut([
+      { itemId: 'core:cw-0044', kanji: '人', releaseDay: '2026-01-25', slot: 2 },
+      { itemId: 'core:cw-0040', kanji: '元', releaseDay: '2026-01-25', slot: 2 },
+    ]);
+    await introducePlanItem({ itemId: 'core:cw-0044', kind: 'core', key: 'cw-0044', priceSec: 35, stream: 'core' }, NOW);
+    expect((await db.staged.get('core:cw-0044'))?.releasedAt).toEqual(NOW);
+    // Taught in kana (元 and 気 not introduced): its release still has the read card to add.
+    await introducePlanItem({ itemId: 'core:cw-0040', kind: 'core', key: 'cw-0040', priceSec: 35, stream: 'core' }, NOW);
+    expect((await db.staged.get('core:cw-0040'))?.releasedAt).toBeUndefined();
+  });
+
+  it('releases a staged word (a spelling upgrade counts its price but not as a new item)', async () => {
+    await db.staged.bulkPut([
+      { itemId: 'word:1002', kanji: '日', releaseDay: '2026-01-20', slot: 2 },
+      { itemId: 'core:cw-0040', kanji: '元', releaseDay: '2026-01-20', slot: 2 },
+    ]);
+    await introducePlanItem({ itemId: 'core:cw-0040', kind: 'core', key: 'cw-0040', priceSec: 35, stream: 'core' }, at(2026, 1, 10));
+    const [released] = await introducePlanItem({ itemId: 'word:1002', kind: 'staged', key: '1002', kanji: '日', priceSec: 28, stream: 'staged' }, NOW);
+    expect(released.item.via).toBe('staged');
+    expect(released.cards.map((c) => c.type)).toEqual(['read', 'produce']);
+    const [upgrade] = await introducePlanItem({ itemId: 'core:cw-0040', kind: 'staged', key: 'cw-0040', kanji: '元', upgrade: true, priceSec: 28, stream: 'staged' }, NOW);
+    expect(upgrade.cards.map((c) => c.id)).toEqual(['core:cw-0040|read']);
+    expect((await db.staged.get('word:1002'))?.releasedAt).toEqual(NOW);
+    const day = await getDay('2026-01-20');
+    expect(day.newItems).toBe(1);
+    expect(day.newSec.staged).toBe(56);
+  });
+
+  it('introduces grammar with comprehend and build, or comprehend only for recognition', async () => {
+    const [point] = await introducePlanItem({ itemId: 'grammar:wa-desu', kind: 'grammar', key: 'wa-desu', priceSec: 200, stream: 'grammar' }, NOW);
+    expect(point.cards.map((c) => c.type)).toEqual(['comprehend', 'build']);
+    const [passive] = await introducePlanItem({ itemId: 'grammar:passive', kind: 'grammar', key: 'passive', priceSec: 200, stream: 'grammar' }, NOW);
+    expect(passive.cards.map((c) => c.type)).toEqual(['comprehend']);
+  });
+
+  it('counts sprint items under the sprint stream', async () => {
+    await introducePlanItem({ itemId: 'kana:あ', kind: 'kana', key: 'あ', priceSec: 53, stream: 'sprint' }, NOW);
+    await introducePlanItem({ itemId: 'kanaRule:hira-dakuten', kind: 'kanaRule', key: 'hira-dakuten', priceSec: 150, stream: 'sprint' }, NOW);
+    const day = await getDay('2026-01-20');
+    expect(day.newSec.sprint).toBe(203);
+    expect(day.newItems).toBe(2);
+    expect((await db.cards.where('itemId').equals('kana:あ').toArray()).map((c) => c.type).sort()).toEqual(['read', 'write']);
+  });
+});
+
+describe('placement', () => {
+  it('draws 20 basic kana of the script', () => {
+    const set = placementSet(KANA, 'katakana', seededRandom(1));
+    expect(set).toHaveLength(20);
+    expect(set.every((k) => k.script === 'katakana' && k.kind === 'basic')).toBe(true);
+    expect(new Set(set.map((k) => k.char)).size).toBe(20);
+  });
+
+  it('18 of 20 puts the script in Review; 17 starts the sprint', async () => {
+    const NOW = at(2026, 1, 5, 9);
+    expect(await applyPlacement('hiragana', 17, NOW)).toBe('sprint');
+    expect(await db.items.count()).toBe(0);
+    expect((await getSettings()).knowsHiragana).toBe(false);
+
+    expect(await applyPlacement('hiragana', 18, NOW)).toBe('known');
+    const kanaCards = await db.cards.where('kind').equals('kana').toArray();
+    expect(kanaCards).toHaveLength(92);
+    expect(kanaCards.every((c) => c.state === State.Review && c.stability === 10)).toBe(true);
+    const dueDays = kanaCards.map((c) => Math.round((c.due.getTime() - NOW.getTime()) / 86_400_000));
+    expect(Math.min(...dueDays)).toBeGreaterThanOrEqual(1);
+    expect(Math.max(...dueDays)).toBeLessThanOrEqual(10);
+    expect((await db.items.where('kind').equals('kanaRule').toArray()).map((i) => i.key).sort()).toEqual(['hira-dakuten', 'hira-yoon']);
+    expect((await db.items.get('kana:あ'))?.via).toBe('placement');
+    expect((await getSettings()).knowsHiragana).toBe(true);
+    // Placement creates no study day.
+    expect(await courseDay(NOW)).toBe(1);
+  });
+});
+
+describe('snapshot and progress from the database', () => {
+  it('builds the snapshot from settings, items, days and staged rows', async () => {
+    await updateSettings({ knowsHiragana: true, travelUntil: '2026-02-01' });
+    await updateDay('2026-01-05', (d) => {
+      d.reviews = 1;
+    });
+    const s = await loadCourseSnapshot(at(2026, 1, 6, 9));
+    expect(s.courseDay).toBe(2);
+    expect(s.known).toEqual({ hiragana: true, katakana: false });
+    expect(s.sprint).toHaveLength(7);
+    expect(s.travel).toBe(true);
+    expect(s.studyDays).toEqual(['2026-01-05']);
+  });
+
+  it('reports course progress, the current unit, next units and the taught kana', async () => {
+    await introducePlanItem({ itemId: 'kana:あ', kind: 'kana', key: 'あ', priceSec: 53, stream: 'sprint' }, at(2026, 1, 5, 9));
+    await introducePlanItem({ itemId: 'kanaRule:hira-dakuten', kind: 'kanaRule', key: 'hira-dakuten', priceSec: 150, stream: 'sprint' }, at(2026, 1, 5, 9));
+    await introducePlanItem({ itemId: 'grammar:wa-desu', kind: 'grammar', key: 'wa-desu', priceSec: 200, stream: 'grammar' }, at(2026, 1, 5, 9));
+    const progress = await courseProgress(at(2026, 1, 6, 9));
+    expect(progress).toMatchObject({ kanaIntroduced: 1, kanaTotal: 92, grammarIntroduced: 1, kanjiTotal: CURRICULUM.units.length, sprintDone: false, courseComplete: false });
+    expect(await currentUnit()).toBe(1);
+    expect((await nextUnits(2)).map((u) => u.char)).toEqual(['一', '二']);
+    const taught = await taughtKana();
+    expect(taught.has('あ')).toBe(true);
+    expect(taught.has('が')).toBe(true);
+    expect(taught.has('か')).toBe(false);
   });
 });

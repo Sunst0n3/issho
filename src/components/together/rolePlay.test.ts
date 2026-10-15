@@ -1,10 +1,24 @@
 import { describe, expect, it } from 'vitest';
 import type { RolePlaySyncState } from '../../../shared/api.ts';
 import type { RolePlay } from '../../lib/types.ts';
-import { initialRun, levelForPhase, pickTonight, runReducer, syncStateOf, type RunState } from './rolePlay.ts';
+import {
+  cueOf,
+  cueOnly,
+  englishHidden,
+  initialRun,
+  initialStage,
+  lineClip,
+  pickTonight,
+  runReducer,
+  stageReducer,
+  swapRoles,
+  syncStateOf,
+  type RunState,
+  type Stage,
+} from './rolePlay.ts';
 
 const script = (id: string, level: 1 | 2 | 3): RolePlay => ({
-  id, level, title: id, titleJp: id, setting: '', lines: [],
+  id, level, title: id, titleJp: id, setting: '', lines: [], register: 'plain', targets: [],
   roles: { a: { name: 'A', nameJp: 'え' }, b: { name: 'B', nameJp: 'び' } },
 });
 
@@ -18,19 +32,73 @@ function duo(patch: Partial<RunState> = {}): RunState {
 }
 
 describe('picking role-plays', () => {
-  it('maps phases to levels', () => {
-    expect([1, 2, 3, 4].map(levelForPhase)).toEqual([1, 2, 3, 3]);
+  it('picks the script done longest ago, never-done first', () => {
+    const scripts = [script('b', 2), script('c', 2), script('d', 2)];
+    expect(pickTonight(scripts, {})?.id).toBe('b');
+    expect(pickTonight(scripts, { b: 300, c: 100 })?.id).toBe('d');
+    expect(pickTonight(scripts, { b: 300, c: 100, d: 200 })?.id).toBe('c');
+    expect(pickTonight([], {})).toBeUndefined();
+  });
+});
+
+describe('conversation stages', () => {
+  const members = ['me', 'partner'];
+
+  it('advances only when both partners mark the stage smooth', () => {
+    let s = initialStage('rp-u01', 1);
+    s = stageReducer(s, { type: 'smooth', memberId: 'me', members });
+    expect(s).toMatchObject({ stage: 1, smooth: { me: true }, finished: false });
+    // Marking twice changes nothing.
+    s = stageReducer(s, { type: 'smooth', memberId: 'me', members });
+    expect(s.stage).toBe(1);
+    s = stageReducer(s, { type: 'smooth', memberId: 'partner', members });
+    expect(s).toMatchObject({ stage: 2, smooth: {}, finished: false });
   });
 
-  it("picks the level's script done longest ago, never-done first", () => {
-    const scripts = [script('a', 1), script('b', 2), script('c', 2), script('d', 2)];
-    expect(pickTonight(scripts, 2, {})?.id).toBe('b');
-    expect(pickTonight(scripts, 2, { b: 300, c: 100 })?.id).toBe('d');
-    expect(pickTonight(scripts, 2, { b: 300, c: 100, d: 200 })?.id).toBe('c');
+  it('clears the marks on "again next time"', () => {
+    let s = stageReducer(initialStage('x', 2), { type: 'smooth', memberId: 'me', members });
+    s = stageReducer(s, { type: 'again' });
+    expect(s).toMatchObject({ stage: 2, smooth: {} });
   });
 
-  it('falls back to a lower level when one is empty', () => {
-    expect(pickTonight([script('a', 1)], 3, {})?.id).toBe('a');
+  it('finishes after stage 4', () => {
+    let s = initialStage('x', 4);
+    for (const m of members) s = stageReducer(s, { type: 'smooth', memberId: m, members });
+    expect(s).toMatchObject({ stage: 4, finished: true });
+    expect(initialStage('x', 5).finished).toBe(true);
+  });
+
+  it('follows the server forward, never back', () => {
+    let s = stageReducer(initialStage('x', 1), { type: 'sync', stage: 1, smooth: ['partner'] });
+    expect(s.smooth).toEqual({ partner: true });
+    s = stageReducer(s, { type: 'smooth', memberId: 'me', members });
+    expect(s.stage).toBe(2);
+    expect(stageReducer(s, { type: 'sync', stage: 1, smooth: [] }).stage).toBe(2);
+    expect(stageReducer(s, { type: 'sync', stage: 3, smooth: [] }).stage).toBe(3);
+    expect(stageReducer(s, { type: 'sync', stage: 5, smooth: [] }).finished).toBe(true);
+  });
+
+  it('hides English at S2–S4, swaps roles at S3 and shows cue cards only at S4', () => {
+    const stages: Stage[] = [1, 2, 3, 4];
+    expect(stages.map(englishHidden)).toEqual([false, true, true, true]);
+    expect(stages.map(swapRoles)).toEqual([false, false, true, false]);
+    expect(stages.map(cueOnly)).toEqual([false, false, false, true]);
+  });
+
+  it('uses the authored cue, else the first three English words', () => {
+    expect(cueOf({ cue: 'coffee · two', en: 'Two coffees, please.' })).toBe('coffee · two');
+    expect(cueOf({ cue: '', en: 'Two coffees, please.' })).toBe('Two coffees, please');
+    expect(cueOf({ cue: '', en: 'Where is the station?' })).toBe('Where is the');
+  });
+
+  it('plays role a with the main voice and role b with the second', () => {
+    expect(lineClip('rp-u01', 3, { role: 'b', jp: 'はい' })).toEqual({ ref: 'rp:rp-u01#3', voice: 'm', text: 'はい' });
+    expect(lineClip('rp-u01', 0, { role: 'a', jp: 'ねえ' }).voice).toBe('f');
+  });
+
+  it('carries the stage in the shared role-play state', () => {
+    const waiting = runReducer({ ...initialRun(), mode: 'duo' }, { type: 'start', sessionId: 'x' });
+    expect(syncStateOf(waiting, 'rp', 3)?.stage).toBe(3);
   });
 });
 

@@ -1,14 +1,15 @@
-// Pieces of the kanji page: readings, memory hook, the learner's card status.
+// Pieces of the kanji page: readings, memory hook, the learner's card status and the handwriting pin.
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { loadWordIndex } from '../../lib/data.ts';
-import { dayKey, db, itemId } from '../../lib/db.ts';
-import type { CardRecord, CurriculumUnit, ItemRecord, WordEntry } from '../../lib/types.ts';
-import { introducePlanItem } from '../../srs/course.ts';
+import { dayKey, db } from '../../lib/db.ts';
+import type { CardRecord, ItemRecord, MnemonicEntry } from '../../lib/types.ts';
+import { setPinned } from '../../srs/items.ts';
 import { daysBetween } from '../../srs/days.ts';
-import { MNEMONIC_MAX } from '../study/learn/KanjiLesson.tsx';
 import { focusLost } from '../together/focus.ts';
 import { Icon } from '../ui.tsx';
-import { kanaToRomaji } from './romaji.ts';
+import { Switch } from './controls.tsx';
+
+/** Longest memory hook a learner can write (the lesson's hook editor uses the same). */
+export const MNEMONIC_MAX = 200;
 
 /** KANJIDIC marks okurigana with '.' and affix use with '-': 'た.べる', '-び'. */
 function splitReading(r: string): { stem: string; okurigana: string; spoken: string } {
@@ -22,18 +23,18 @@ export function spokenReading(kun: readonly string[], on: readonly string[]): st
   return kun.length ? splitReading(kun[0]).spoken : on[0] ?? '';
 }
 
-export function ReadingRow({ label, readings, romaji }: { label: string; readings: readonly string[]; romaji: boolean }) {
+/** One line of readings, in kana only (romaji lives in the kana chart). */
+export function ReadingRow({ label, readings }: { label: string; readings: readonly string[] }) {
   if (!readings.length) return null;
   return (
     <div className="kd-reading">
       <dt>{label}</dt>
       <dd>
         {readings.map((r) => {
-          const { stem, okurigana, spoken } = splitReading(r);
+          const { stem, okurigana } = splitReading(r);
           return (
             <span key={r} className="kd-reading-item">
               <span lang="ja" className="kd-kana">{stem}{okurigana && <span className="kd-okurigana">{okurigana}</span>}</span>
-              {romaji && <span className="kd-romaji">{kanaToRomaji(spoken)}</span>}
             </span>
           );
         })}
@@ -42,10 +43,10 @@ export function ReadingRow({ label, readings, romaji }: { label: string; reading
   );
 }
 
-export function MemoryHook({ item, stock }: { item?: ItemRecord; stock?: string }) {
+export function MemoryHook({ item, stock }: { item?: ItemRecord; stock?: MnemonicEntry }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
-  const text = item?.customMnemonic ?? stock;
+  const text = item?.customMnemonic ?? stock?.meaning;
   const input = useRef<HTMLTextAreaElement>(null);
   const editButton = useRef<HTMLButtonElement>(null);
   const wasEditing = useRef(false);
@@ -113,6 +114,7 @@ export function MemoryHook({ item, stock }: { item?: ItemRecord; stock?: string 
       ) : (
         <>
           <p className="kd-hook-text">{text}</p>
+          {stock?.sound && !item?.customMnemonic && <p className="kd-hook-sound"><span className="kd-hook-sound-label">Sound:</span> {stock.sound}</p>}
           {item && (
             <div className="kd-hook-actions">
               <button ref={editButton} type="button" className="btn ghost small"
@@ -136,7 +138,7 @@ function whenDue(due: Date, now: Date): string {
   return `In ${days} days · ${DAY.format(due)}`;
 }
 
-/** `justLearned`: it replaces "Learn this now", whose button had focus; focus moves here. */
+/** `justLearned`: focus moves here (the control the learner used is gone). */
 export function CardStatus({ item, cards, justLearned = false }: {
   item: ItemRecord;
   cards: readonly CardRecord[];
@@ -148,7 +150,8 @@ export function CardStatus({ item, cards, justLearned = false }: {
   }, [justLearned]);
   const active = cards.filter((c) => !c.suspended);
   const next = active.reduce<Date | undefined>((min, c) => (!min || c.due < min ? c.due : min), undefined);
-  const lapses = active.reduce((sum, c) => sum + c.lapses, 0);
+  const lapses = cards.reduce((sum, c) => sum + c.lapses, 0);
+  const retired = cards.some((c) => c.type === 'write' && c.suspended === 'retired');
   return (
     <section ref={section} className="card kd-status" aria-label="Your progress" tabIndex={justLearned ? -1 : undefined}>
       <div>
@@ -160,64 +163,36 @@ export function CardStatus({ item, cards, justLearned = false }: {
         <span className="kd-stat">{next ? whenDue(next, new Date()) : 'Not scheduled'}</span>
       </div>
       <div>
-        <span className="kd-stat-label">Forgotten</span>
-        <span className="kd-stat">{lapses === 0 ? 'Never' : lapses === 1 ? 'Once' : `${lapses} times`}</span>
+        <span className="kd-stat-label">{retired ? 'Handwriting' : 'Forgotten'}</span>
+        <span className="kd-stat">
+          {retired ? 'Reading only' : lapses === 0 ? 'Never' : lapses === 1 ? 'Once' : `${lapses} times`}
+        </span>
       </div>
     </section>
   );
 }
 
-/**
- * The unit's words that can come along when it is learned ahead of the course:
- * only those whose other kanji are already known, as the course guarantees
- * when it reaches the unit in order.
- */
-export async function readableWords(unit: CurriculumUnit): Promise<string[]> {
-  if (unit.type !== 'kanji' || !unit.words.length) return [];
-  const [index, known] = await Promise.all([
-    // Without the word list the kanji still comes, just on its own.
-    loadWordIndex().catch(() => new Map<string, WordEntry>()),
-    db.items.where('kind').equals('kanji').primaryKeys(),
-  ]);
-  const knownKanji = new Set(known.map((id) => String(id).slice('kanji:'.length)));
-  knownKanji.add(unit.char);
-  return unit.words.filter((id) => {
-    const word = index.get(id);
-    return word !== undefined && word.kanji.every((k) => knownKanji.has(k));
-  });
-}
-
-export function ComingUp({ unit, nextUp, onShow }: { unit: CurriculumUnit; nextUp: boolean; onShow?(): void }) {
+/** "Keep in handwriting": a pinned kanji keeps its write card beyond the handwriting list. */
+export function PinToggle({ item }: { item: ItemRecord }) {
   const [busy, setBusy] = useState(false);
-  const shown = useRef(onShow);
-  shown.current = onShow;
-  useEffect(() => shown.current?.(), [unit.char]);
-  const [error, setError] = useState(false);
-  const learn = async () => {
+  const [problem, setProblem] = useState(false);
+  const toggle = async (pinned: boolean) => {
     setBusy(true);
-    setError(false);
+    setProblem(false);
     try {
-      await introducePlanItem({
-        itemId: itemId(unit.type, unit.char),
-        kind: unit.type,
-        key: unit.char,
-        ...(unit.type === 'kanji' ? { words: await readableWords(unit) } : {}),
-      });
+      await setPinned(item.key, pinned);
     } catch {
-      setError(true);
+      setProblem(true);
+    } finally {
       setBusy(false);
     }
   };
   return (
-    <section className="card kd-coming">
-      <p>
-        <strong>{nextUp ? 'Next up' : `Coming up in unit ${unit.index + 1}`}</strong>
-        <span className="muted"> · Learn it now and it joins your reviews from today.</span>
-      </p>
-      <button type="button" className="btn secondary small" onClick={() => void learn()} disabled={busy}>
-        <Icon name="plus" size={18} />{busy ? 'Adding…' : 'Learn this now'}
-      </button>
-      {error && <p className="hm-error" role="alert">Couldn't add it. Try again.</p>}
-    </section>
+    <div className="card kd-pin">
+      <Switch label="Keep in handwriting"
+        hint="Its write card stays even past your handwriting list in Settings."
+        checked={Boolean(item.pinned)} disabled={busy} onChange={(v) => void toggle(v)} />
+      {problem && <p className="hm-error" role="alert">Couldn't change that. Try again.</p>}
+    </div>
   );
 }

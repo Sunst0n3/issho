@@ -1,0 +1,174 @@
+{
+  "engine": "0.25.2",
+  "speaker": 30,
+  "queries": {
+    "雨": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "ア",
+              "consonant": null,
+              "consonant_length": null,
+              "vowel": "a",
+              "vowel_length": 0.0989723727107048,
+              "pitch": 5.390005588531494
+            },
+            {
+              "text": "メ",
+              "consonant": "m",
+              "consonant_length": 0.05877096951007843,
+              "vowel": "e",
+              "vowel_length": 0.2159472405910492,
+              "pitch": 5.4417405128479
+            }
+          ],
+          "accent": 1,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "ア'メ"
+    },
+    "雨が": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "ア",
+              "consonant": null,
+              "consonant_length": null,
+              "vowel": "a",
+              "vowel_length": 0.09227851033210754,
+              "pitch": 5.450345993041992
+            },
+            {
+              "text": "メ",
+              "consonant": "m",
+              "consonant_length": 0.06841664016246796,
+              "vowel": "e",
+              "vowel_length": 0.08287538588047028,
+              "pitch": 5.721888065338135
+            },
+            {
+              "text": "ガ",
+              "consonant": "g",
+              "consonant_length": 0.134110227227211,
+              "vowel": "a",
+              "vowel_length": 0.05197032541036606,
+              "pitch": 5.027188301086426
+            }
+          ],
+          "accent": 1,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "ア'メガ"
+    },
+    "あめ": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "ア",
+              "consonant": null,
+              "consonant_length": null,
+              "vowel": "a",
+              "vowel_length": 0.0989723727107048,
+              "pitch": 5.170422077178955
+            },
+            {
+              "text": "メ",
+              "consonant": "m",
+              "consonant_length": 0.05877096951007843,
+              "vowel": "e",
+              "vowel_length": 0.2159472405910492,
+              "pitch": 5.474168300628662
+            }
+          ],
+          "accent": 2,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "アメ'"
+    },
+    "あめが": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "ア",
+              "consonant": null,
+              "consonant_length": null,
+              "vowel": "a",
+              "vowel_length": 0.09227851033210754,
+              "pitch": 5.163538932800293
+            },
+            {
+              "text": "メ",
+              "consonant": "m",
+              "consonant_length": 0.06841664016246796,
+              "vowel": "e",
+              "vowel_length": 0.08287538588047028,
+              "pitch": 5.460260391235352
+            },
+            {
+              "text": "ガ",
+              "consonant": "g",
+              "consonant_length": 0.134110227227211,
+              "vowel": "a",
+              "vowel_length": 0.05197032541036606,
+              "pitch": 5.408664226531982
+            }
+          ],
+          "accent": 3,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "アメガ'"
+    }
+  }
+}

@@ -455,3 +455,114 @@
 .tg-quiz-result.tg-is-right { border-color: var(--good); color: var(--ai-ink); }
 .tg-quiz-result.tg-is-missed { border-color: transparent; background: var(--shu-tint); color: var(--shu-ink); }
 .tg-quiz-result.tg-is-new { color: var(--muted); }
+
+/* ---- Together v2: week plan, quest, sessions ---- */
+.tg-session-list { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.tg-session-row {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px;
+  min-height: var(--tap); padding: 8px 12px; border-radius: 12px; border: 1px solid var(--line);
+  color: var(--ink); text-decoration: none;
+}
+.tg-session-row.tg-today { border-color: var(--shu); background: var(--shu-tint); }
+.tg-session-row.tg-done { color: var(--muted); }
+.tg-session-when { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+.tg-session-what { min-width: 0; overflow-wrap: anywhere; }
+.tg-status-done { background: var(--paper-deep); }
+.tg-status-today, .tg-status-overdue { background: var(--shu); color: var(--on-accent); }
+.tg-session-steps { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
+.tg-step-head { display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px; }
+.tg-pass-note { padding: 10px 12px; border-radius: 12px; background: var(--ai-tint); color: var(--ai-ink); font-weight: 700; }
+
+.tg-quest h2 { display: flex; align-items: center; gap: 6px; font-size: 17px; font-weight: 700; }
+.tg-quest.tg-met { border-color: var(--shu); }
+.tg-quest-line { margin-top: 6px; }
+.tg-quest-streak { margin-top: 10px; font-weight: 700; color: var(--shu-ink); }
+
+.tg-today-card { display: flex; align-items: center; gap: 12px; color: var(--ink); text-decoration: none; }
+.tg-today-icon {
+  width: var(--tap); height: var(--tap); border-radius: 50%; flex-shrink: 0;
+  display: grid; place-items: center; background: var(--ai); color: var(--on-accent);
+}
+.tg-today-body { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.tg-today-title { font-weight: 700; }
+.tg-today-detail { font-size: 14px; color: var(--muted); }
+
+.tg-rules-list { margin: 8px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.tg-rules summary { cursor: pointer; min-height: var(--tap); display: flex; align-items: center; }
+
+/* Quiz: asker and answerer */
+.tg-quiz-asker, .tg-quiz-answerer { display: flex; flex-direction: column; gap: 12px; }
+.tg-quiz-instruction { color: var(--muted); }
+.tg-quiz-turn { font-family: var(--font-display); font-size: 24px; font-weight: 700; }
+.tg-quiz-answer { display: flex; flex-direction: column; gap: 2px; padding: 12px; border-radius: 12px; background: var(--paper-deep); }
+.tg-quiz-answer-text { font-family: var(--font-display); font-size: 28px; }
+.tg-verdicts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tg-quiz-pad { display: flex; flex-direction: column; gap: 8px; }
+
+/* Teach-me, task card, timers */
+.tg-teach { display: flex; flex-direction: column; gap: 10px; }
+.tg-teach-glyph { display: flex; justify-content: center; }
+.tg-teach-ref { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+.tg-teach-hook { font-style: italic; }
+.tg-task { display: flex; flex-direction: column; gap: 10px; }
+.tg-task-twist { padding: 8px 12px; border-radius: 12px; background: var(--shu-tint); color: var(--shu-ink); }
+.tg-task-roles { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; }
+.tg-task-targets { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.tg-target { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line-strong); }
+.tg-target.tg-mine { border-color: var(--shu); background: var(--shu-tint); }
+.tg-task-halves { display: flex; flex-direction: column; gap: 8px; }
+.tg-task-info { padding: 12px; border-radius: 12px; background: var(--paper-deep); white-space: pre-line; }
+.tg-task-run { display: flex; flex-direction: column; gap: 10px; }
+.tg-task-log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.tg-task-log li { display: flex; flex-direction: column; gap: 2px; padding: 8px 12px; border-radius: 12px; background: var(--paper-deep); }
+.tg-task-log li.tg-ai { background: var(--ai-tint); color: var(--ai-ink); }
+.tg-ai-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: 13px; }
+.tg-planning, .tg-retell, .tg-outcome, .tg-recap, .tg-checkin, .tg-goal, .tg-capstone, .tg-story-talk, .tg-showcase, .tg-stage-marks {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.tg-countdown { position: relative; width: 120px; height: 120px; margin: 4px auto; }
+.tg-countdown-ring { width: 100%; height: 100%; }
+.tg-countdown-track { fill: none; stroke: var(--paper-deep); stroke-width: 3; }
+.tg-countdown-fill { fill: none; stroke: var(--shu); stroke-width: 3; stroke-linecap: round; transition: stroke-dasharray 0.25s linear; }
+.tg-countdown-text {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-family: var(--font-display); font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+
+/* Conversation stages */
+.tg-stage { display: flex; flex-direction: column; gap: 12px; }
+.tg-stage-line { display: flex; flex-direction: column; gap: 8px; }
+.tg-stage-line.tg-mine { border-color: var(--shu); }
+.tg-stage-cue { font-family: var(--font-display); font-size: 22px; font-weight: 700; }
+
+/* Check-in and goal forms */
+.tg-select, .tg-time, .tg-textarea {
+  min-height: var(--tap); padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line-strong);
+  background: var(--card); color: var(--ink); font: inherit; max-width: 100%;
+}
+.tg-textarea { width: 100%; resize: vertical; }
+.tg-slot-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.tg-slot-name { min-width: 84px; font-weight: 700; }
+.tg-rest-days { display: flex; flex-wrap: wrap; gap: 6px 12px; }
+.tg-rest-day, .tg-check-row { display: flex; align-items: center; gap: 6px; min-height: var(--tap); }
+.tg-checkin-history { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.tg-story-prompts { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.tg-showcase-list, .tg-recap-points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.tg-capstone-lines, .tg-capstone-cues { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.tg-capstone-lines li.tg-mine .label { color: var(--shu-ink); }
+
+/* Two-step tips: issue spans and the diff */
+.tg-issue-text { font-size: 17px; line-height: 1.8; }
+.tg-issue-span { background: var(--shu-tint); color: var(--ink); border-bottom: 2px solid var(--shu); border-radius: 2px; padding: 0 1px; }
+.tg-issue-span sup { font-size: 10px; font-weight: 700; color: var(--shu-ink); margin-left: 1px; }
+.tg-issue-list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.tg-diff { font-size: 17px; line-height: 1.8; }
+.tg-diff-del { color: var(--muted); text-decoration: line-through; }
+.tg-diff-ins { color: var(--shu-ink); background: var(--shu-tint); text-decoration: none; font-weight: 700; }
+.tg-daily-label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; opacity: 0.8; margin-bottom: 2px; }
+.tg-reply-btn { font-size: 13px; }
+.tg-reply-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 6px 10px;
+  border-radius: 10px; background: var(--ai-tint); color: var(--ai-ink); font-size: 14px;
+}
+.tg-reply-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

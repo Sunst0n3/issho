@@ -19,6 +19,11 @@ describe('serving the built app', () => {
     await writeFile(path.join(dist, 'index.html'), '<!doctype html><title>Issho</title>');
     await writeFile(path.join(dist, 'sw.js'), 'self.addEventListener("fetch", () => {});');
     await writeFile(path.join(dist, 'assets', 'index-abc123.js'), 'console.log(1)');
+    await mkdir(path.join(dist, 'audio', 'a3'), { recursive: true });
+    await mkdir(path.join(dist, 'data'), { recursive: true });
+    await writeFile(path.join(dist, 'audio', 'a3', 'a3f09c1e5b2d7781.m4a'), Buffer.from('....ftypM4A clip'));
+    await writeFile(path.join(dist, 'audio', 'manifest.json'), '{"version":1,"clips":{},"byRef":{},"byText":{}}');
+    await writeFile(path.join(dist, 'data', 'kana.json'), '[]');
     await writeFile(path.join(dist, '.env'), 'SECRET=dotfile');
     await writeFile(path.join(outside, 'secret.txt'), 'SECRET=outside');
     server = await createTestServer({ staticDir: dist });
@@ -42,6 +47,29 @@ describe('serving the built app', () => {
     const res = await get('/assets/index-abc123.js');
     assert.equal(res.statusCode, 200);
     assert.equal(res.headers['cache-control'], 'public, max-age=31536000, immutable');
+  });
+
+  it('serves voice clips as immutable (their names are content hashes) and the audio manifest without caching', async () => {
+    const clip = await get('/audio/a3/a3f09c1e5b2d7781.m4a');
+    assert.equal(clip.statusCode, 200);
+    assert.equal(clip.headers['cache-control'], 'public, max-age=31536000, immutable');
+    assert.match(String(clip.headers['content-type']), /^audio\/(mp4|x-m4a|m4a)/);
+
+    const manifest = await get('/audio/manifest.json');
+    assert.equal(manifest.statusCode, 200);
+    assert.equal(manifest.headers['cache-control'], 'no-cache');
+
+    const data = await get('/data/kana.json');
+    assert.equal(data.headers['cache-control'], 'no-cache');
+  });
+
+  it('404s missing audio and data files instead of answering with the app', async () => {
+    for (const url of ['/audio/x.m4a', '/audio/ff/ffffffffffffffff.m4a', '/audio/ff', '/audio', '/data/content/missing.json', '/data/nope']) {
+      const res = await get(url);
+      assert.equal(res.statusCode, 404, url);
+      assert.deepEqual(res.json(), { error: 'not_found' }, url);
+      assert.doesNotMatch(res.body, /<title>Issho/, url);
+    }
   });
 
   it('falls back to index.html for app routes', async () => {
@@ -110,6 +138,8 @@ describe('compressed app files', () => {
     await writeFile(path.join(dist, 'data', 'words.json'), words);
     await writeFile(path.join(dist, 'data', 'tiny.json'), '{}');
     await writeFile(path.join(dist, 'icons', 'icon.png'), Buffer.alloc(4096, 1));
+    await mkdir(path.join(dist, 'audio', 'ab'), { recursive: true });
+    await writeFile(path.join(dist, 'audio', 'ab', 'abcdef0123456789.m4a'), Buffer.alloc(4096, 2));
     server = await createTestServer({ staticDir: dist });
   });
   after(async () => {
@@ -120,10 +150,13 @@ describe('compressed app files', () => {
   const get = (url: string, encoding?: string) =>
     server.app.inject({ method: 'GET', url, headers: encoding ? { 'accept-encoding': encoding } : {} });
 
-  it('writes brotli and gzip copies of text files only, once', async () => {
+  it('writes brotli and gzip copies of text files only (never of voice clips), once', async () => {
     assert.deepEqual(await precompressStatic(dist), { written: 4, upToDate: 0 });
     const files = (await readdir(dist, { recursive: true })).map((f) => f.split(path.sep).join('/')).sort();
     assert.deepEqual(files, [
+      'audio',
+      'audio/ab',
+      'audio/ab/abcdef0123456789.m4a',
       'data',
       'data/tiny.json',
       'data/words.json',

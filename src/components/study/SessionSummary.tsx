@@ -1,69 +1,106 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import type { StreakInfo } from '../../srs/progress.ts';
-import { Glyph } from '../Glyph.tsx';
-import { streakText } from '../home/labels.ts';
+import type { CardFamily } from '../../lib/types.ts';
+import type { StreakV2 } from '../../srs/habits.ts';
+import type { RetentionStat } from '../../srs/progress.ts';
 import { Icon } from '../ui.tsx';
-import type { LearnedLabel } from './learn/data.ts';
 
-export interface SessionStats {
-  /** Visible study time, ms. */
-  ms: number;
-  reviews: number;
-  correct: number;
-  learned: LearnedLabel[];
+export interface SummaryData {
+  /** "You can now …" from today's items; absent when nothing new was introduced. */
+  canNow?: string;
+  /** Today's study minutes, every sitting together. */
+  minutesToday: number;
+  /** "Tomorrow about N min". */
+  tomorrowMin?: number;
+  /** Shown on the first sitting of each ISO week. */
+  retention?: RetentionStat[];
+  streak?: StreakV2;
 }
 
-/** One character per tile; longer things (vocab, grammar) in the body face. */
-function LearnedTile({ item }: { item: LearnedLabel }) {
-  const single = [...item.text].length === 1;
+const FAMILY_NAMES: Record<CardFamily, string> = {
+  write: 'Writing',
+  read: 'Reading',
+  listen: 'Listening',
+  produce: 'Saying',
+  grammar: 'Grammar',
+};
+
+const pct = (rate: number) => `${Math.round(rate * 100)} %`;
+
+/** Real recall by card family at about 1 week and about 1 month (hidden while there are fewer than 10 answers). */
+export function RetentionCard({ stats }: { stats: readonly RetentionStat[] }) {
+  const rows = stats.filter((s) => s.week.rate !== null || s.month.rate !== null);
+  if (!rows.length) return null;
   return (
-    <li className="st-learned">
-      {single ? <Glyph char={item.text} size={30} /> : <span lang={item.lang} className="st-learned-text">{item.text}</span>}
-      {item.meaning && <span className="st-learned-meaning">{item.meaning}</span>}
-    </li>
+    <section className="card st-retention" aria-labelledby="st-retention-title">
+      <h2 id="st-retention-title" className="label">Real recall this month</h2>
+      <ul>
+        {rows.map((s) => (
+          <li key={s.family}>
+            <span className="st-retention-family">{FAMILY_NAMES[s.family]}</span>
+            <span>
+              {s.week.rate !== null && <>about 1 week <strong>{pct(s.week.rate)}</strong></>}
+              {s.week.rate !== null && s.month.rate !== null && ', '}
+              {s.month.rate !== null && <>about 1 month <strong>{pct(s.month.rate)}</strong></>}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
-export function SessionSummary({ stats, streak, newBlocked, onDone }: {
-  stats: SessionStats;
-  streak?: StreakInfo;
-  newBlocked?: string;
+const WEEKDAY = new Intl.DateTimeFormat('en', { weekday: 'long' });
+/** 'Tuesday' for a day key. */
+export function weekdayOf(day: string): string {
+  const [y, m, d] = day.split('-').map(Number);
+  return WEEKDAY.format(new Date(y, m - 1, d, 12));
+}
+
+export function SessionSummary({ data, onDone, onMakeup }: {
+  data?: SummaryData;
   onDone: () => void;
+  /** The make-up offer was taken: the session leaves for it (in place of following the link). */
+  onMakeup?: () => void;
 }) {
   // The last answer's button is gone: start screen readers and keyboards at the title.
   const title = useRef<HTMLHeadingElement>(null);
   useEffect(() => title.current?.focus({ preventScroll: true }), []);
-  const minutes = Math.max(stats.ms > 0 ? 1 : 0, Math.round(stats.ms / 60_000));
-  const accuracy = stats.reviews ? `${Math.round((stats.correct / stats.reviews) * 100)}%` : '–';
+  const repairable = data?.streak?.makeupOffer ? data.streak.repairable : undefined;
   return (
     <section className="st-summary" aria-labelledby="st-summary-title">
       <p className="st-eyebrow" lang="ja">おつかれさま</p>
-      <h1 id="st-summary-title" className="st-summary-title" ref={title} tabIndex={-1}>Session complete</h1>
+      <h1 id="st-summary-title" className="st-summary-title" ref={title} tabIndex={-1}>Done for now</h1>
 
-      {streak && streak.current > 0 && (
-        <div className="card st-streak">
-          <span className="st-streak-badge"><Icon name="flame" size={22} filled /></span>
-          <span><strong>{streakText(streak.current)}</strong>{streak.best > streak.current && <span className="muted"> · best {streak.best}</span>}</span>
-        </div>
+      {!data ? (
+        <div className="st-skeleton st-skeleton-list" aria-busy="true" aria-label="Adding up today" />
+      ) : (
+        <>
+          {data.canNow && <p className="card st-can-now">{data.canNow}</p>}
+          <dl className="st-stats two">
+            <div><dt>Today</dt><dd>{data.minutesToday} min</dd></div>
+            {data.tomorrowMin !== undefined && <div><dt>Tomorrow</dt><dd>about {data.tomorrowMin} min</dd></div>}
+          </dl>
+          {data.streak?.alive && data.streak.current > 1 && (
+            <div className="card st-streak">
+              <span className="st-streak-badge"><Icon name="flame" size={22} filled /></span>
+              <span><strong>{data.streak.current} days in a row</strong></span>
+            </div>
+          )}
+          {data.retention && <RetentionCard stats={data.retention} />}
+          {repairable && (
+            <Link className="card st-link" to="/session?mode=makeup"
+              onClick={onMakeup && ((e) => {
+                e.preventDefault();
+                onMakeup();
+              })}>
+              <Icon name="refresh" size={22} />
+              <span><strong>Make up {weekdayOf(repairable.date)}: 10 more minutes</strong><span className="muted">Keeps your streak</span></span>
+              <Icon name="forward" size={18} />
+            </Link>
+          )}
+        </>
       )}
-
-      <dl className="st-stats">
-        <div><dt>Minutes</dt><dd>{minutes}</dd></div>
-        <div><dt>Reviews</dt><dd>{stats.reviews}</dd></div>
-        <div><dt>Correct</dt><dd>{accuracy}</dd></div>
-      </dl>
-
-      {stats.learned.length > 0 && (
-        <section className="st-section">
-          <h2 className="label">Learned today</h2>
-          <ul className="st-learned-row">
-            {stats.learned.map((item) => <LearnedTile key={item.itemId} item={item} />)}
-          </ul>
-        </section>
-      )}
-
-      {newBlocked && <p className="card st-note">{newBlocked}</p>}
 
       <div className="st-footer">
         <button type="button" className="btn primary st-grow" onClick={onDone}>Done</button>
@@ -72,30 +109,22 @@ export function SessionSummary({ stats, streak, newBlocked, onDone }: {
   );
 }
 
-/**
- * Nothing to review and nothing new: point to the practice that is always open.
- * `limitReached` when cards are due but today's review limit is used up.
- */
-export function SessionEmpty({ limitReached = false, newBlocked }: { limitReached?: boolean; newBlocked?: string }) {
+/** Nothing left to do in this sitting: say so, and point to what is always open. */
+export function SessionEmpty() {
   return (
     <section className="st-summary st-empty" aria-labelledby="st-empty-title">
       <p className="st-eyebrow" lang="ja">よくできました</p>
-      <h1 id="st-empty-title" className="st-summary-title">{limitReached ? "Today's reviews are done" : "You're all caught up"}</h1>
-      <p className="muted">
-        {limitReached
-          ? "You've reached today's review limit. The rest wait for tomorrow, so nothing gets rushed. Until then:"
-          : "Nothing is due right now and today's new items are done. New reviews arrive as cards come due. Until then:"}
-      </p>
-      {newBlocked && <p className="card st-note">{newBlocked}</p>}
+      <h1 id="st-empty-title" className="st-summary-title">You're all caught up</h1>
+      <p className="muted">Nothing is due right now and today's new items are done. Cards come back as they are due. Until then:</p>
       <div className="st-links">
-        <Link className="card st-link" to="/write">
-          <Icon name="pen" size={22} />
-          <span><strong>Practice writing</strong><span className="muted">Kana and kanji you have learned</span></span>
-          <Icon name="forward" size={18} />
-        </Link>
         <Link className="card st-link" to="/read">
           <Icon name="book" size={22} />
-          <span><strong>Read and shadow</strong><span className="muted">A few sentences at your level</span></span>
+          <span><strong>Read</strong><span className="muted">Stories and sentences at your level</span></span>
+          <Icon name="forward" size={18} />
+        </Link>
+        <Link className="card st-link" to="/grammar">
+          <Icon name="pen" size={22} />
+          <span><strong>Grammar</strong><span className="muted">Look back at what you have learned</span></span>
           <Icon name="forward" size={18} />
         </Link>
       </div>

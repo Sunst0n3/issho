@@ -1,27 +1,32 @@
-import { WriteQuestion } from './WriteQuestion.tsx';
+import { clipRef } from '../../../../shared/voicevox.ts';
+import { AudioButton } from '../AudioButton.tsx';
+import { useAutoPlay } from './parts.tsx';
 import type { CardProps } from './types.ts';
+import { WriteQuestion } from './WriteQuestion.tsx';
 
-/** What to write for a kana: its romaji, and its row when the romaji alone is ambiguous. */
-export function KanaTarget({ romaji, row }: { romaji: string; row?: string }) {
-  return (
-    <>
-      <span className="st-write-romaji">{romaji}</span>
+/**
+ * Sound → write the kana. During the sprint the prompt is the sound only (played at once, with a replay button):
+ * never a romaji label. After it, the kana's example word with the kana as □, its English and its audio.
+ */
+export function KanaWriteCard({ prepared, onAnswer, paperAllowed }: CardProps<'kana-write'>) {
+  const { kana, prompt, word, blanked, row } = prepared;
+  const sound = prompt === 'sound';
+  useAutoPlay(sound ? { ref: clipRef.kana(kana.char) } : null, { fallbackText: kana.char });
+  const target = sound ? (
+    <div className="st-row st-center">
+      <AudioButton source={{ ref: clipRef.kana(kana.char) }} fallbackText={kana.char} label="Play the sound" />
       {row && <span className="st-write-reading">(<span lang="ja">{row}</span> row)</span>}
-    </>
+    </div>
+  ) : (
+    <div className="st-row st-center">
+      <span lang="ja">{blanked}</span>
+      {word && <span className="st-write-en">· {word.en}</span>}
+      {word && <AudioButton compact source={{ ref: clipRef.kanaEx(kana.char) }} fallbackText={word.kana} label={`Listen to ${blanked}`} />}
+    </div>
   );
-}
-
-/** What to write, as plain text for a writing pad's name: 'the hiragana for "ji" (ざ row)'. */
-export function kanaTargetLabel(script: string, romaji: string, row?: string): string {
-  return `the ${script} for "${romaji}"${row ? ` (${row} row)` : ''}`;
-}
-
-/** romaji → draw the kana */
-export function KanaWriteCard({ prepared, onAnswer, practice }: CardProps<'kana-write'>) {
-  const { kana, row, card } = prepared;
   return (
-    <WriteQuestion card={card} char={kana.char} ask={`Write the ${kana.script} for`} practice={practice}
-      target={<KanaTarget romaji={kana.romaji} row={row} />} label={kanaTargetLabel(kana.script, kana.romaji, row)}
-      speak={kana.char} onAnswer={onAnswer} />
+    <WriteQuestion char={kana.char} ask={sound ? `Write the ${kana.script} you hear` : `Write the missing ${kana.script}`}
+      target={target} label={sound ? `the ${kana.script} you hear` : `the missing ${kana.script} in ${blanked}`}
+      paperAllowed={paperAllowed} onAnswer={onAnswer} />
   );
 }

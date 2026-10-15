@@ -1,30 +1,106 @@
-// Role-play logic shared by the list, the Together card and the run screen:
-// which level fits the learner's phase, tonight's pick, and the run state that
-// two phones keep in step over the socket.
+// Role-play logic shared by the list, the Together screens and the run screens:
+// tonight's pick, the conversation stages S1–S4 of a core conversation, and the
+// run state that two phones keep in step over the socket.
 
 import type { RolePlaySyncState } from '../../../shared/api.ts';
-import type { RolePlay } from '../../lib/types.ts';
+import { clipRef } from '../../../shared/voicevox.ts';
+import type { RolePlay, RolePlayLine } from '../../lib/types.ts';
 
 export type Level = RolePlay['level'];
 
-export function levelForPhase(phase: number): Level {
-  return phase <= 1 ? 1 : phase === 2 ? 2 : 3;
-}
-
 export const LEVEL_NAMES: Record<Level, string> = { 1: 'Starter', 2: 'Everyday', 3: 'Going further' };
 
+/** A free role-play to suggest: never-done first (in list order), then the one done longest ago. */
+export function pickTonight(scripts: readonly RolePlay[], history: Record<string, number>): RolePlay | undefined {
+  return [...scripts].sort((a, b) => (history[a.id] ?? 0) - (history[b.id] ?? 0))[0];
+}
+
+// ---- Conversation stages -------------------------------------------------------
+
 /**
- * Tonight's role-play: one at the learner's level that hasn't been done lately
- * (never-done first, in course order, then the longest ago). Falls back to
- * lower levels when a level has no scripts.
+ * S1 listen to the model audio and shadow, S2 perform from the Japanese (English behind a tap),
+ * S3 swap roles, S4 keyword cue cards only.
  */
-export function pickTonight(scripts: readonly RolePlay[], level: Level, history: Record<string, number>): RolePlay | undefined {
-  for (let l = level; l >= 1; l--) {
-    const atLevel = scripts.filter((s) => s.level === l);
-    if (!atLevel.length) continue;
-    return [...atLevel].sort((a, b) => (history[a.id] ?? 0) - (history[b.id] ?? 0))[0];
+export type Stage = 1 | 2 | 3 | 4;
+
+export const STAGE_NAMES: Record<Stage, string> = {
+  1: 'Listen and shadow',
+  2: 'Perform from the Japanese',
+  3: 'Swap roles',
+  4: 'Cue cards only',
+};
+
+export interface StageState {
+  scriptId: string;
+  stage: Stage;
+  /** memberId → marked this stage smooth. */
+  smooth: Record<string, boolean>;
+  /** Stage 4 was marked smooth by everyone: the conversation is done. */
+  finished: boolean;
+}
+
+export type StageAction =
+  | { type: 'smooth'; memberId: string; members: readonly string[] }
+  | { type: 'again' }
+  /** The server's view: the script's stage and who marked it smooth (TogetherState.stages / smooth). */
+  | { type: 'sync'; stage: number; smooth: readonly string[] };
+
+export function initialStage(scriptId: string, stage: number): StageState {
+  return { scriptId, stage: toStage(stage), smooth: {}, finished: stage > 4 };
+}
+
+function toStage(stage: number): Stage {
+  return Math.min(4, Math.max(1, Math.trunc(stage) || 1)) as Stage;
+}
+
+/** Advances only when every member in `members` marked smooth; stage 4 smooth → finished. */
+export function stageReducer(s: StageState, a: StageAction): StageState {
+  switch (a.type) {
+    case 'smooth': {
+      if (s.finished) return s;
+      const smooth = { ...s.smooth, [a.memberId]: true };
+      if (!a.members.every((m) => smooth[m])) return { ...s, smooth };
+      return s.stage === 4 ? { ...s, smooth: {}, finished: true } : { ...s, stage: (s.stage + 1) as Stage, smooth: {} };
+    }
+    case 'again':
+      return { ...s, smooth: {} };
+    case 'sync': {
+      if (a.stage > 4) return { ...s, smooth: {}, finished: true };
+      const stage = toStage(a.stage);
+      // Never step back below what this phone already reached: the server catches up.
+      if (stage < s.stage) return s;
+      const smooth = stage === s.stage ? { ...s.smooth } : {};
+      for (const m of a.smooth) smooth[m] = true;
+      return { ...s, stage, smooth, finished: false };
+    }
   }
-  return scripts[0];
+}
+
+/** English is hidden from S2 on (behind a tap). */
+export function englishHidden(stage: Stage): boolean {
+  return stage >= 2;
+}
+
+/** Roles swap at S3. */
+export function swapRoles(stage: Stage): boolean {
+  return stage === 3;
+}
+
+/** S4 shows keyword cue cards only. */
+export function cueOnly(stage: Stage): boolean {
+  return stage === 4;
+}
+
+/** A line's cue card: its authored keywords, else the first three English words. */
+export function cueOf(line: Pick<RolePlayLine, 'cue' | 'en'>): string {
+  const cue = line.cue?.trim();
+  if (cue) return cue;
+  return line.en.split(/\s+/).filter(Boolean).slice(0, 3).join(' ').replace(/[.,!?;:]+$/, '');
+}
+
+/** The clip of a role-play line: role a speaks with the main voice, role b with the second. */
+export function lineClip(scriptId: string, index: number, line: Pick<RolePlayLine, 'role' | 'jp'>) {
+  return { ref: clipRef.rolePlay(scriptId, index), voice: line.role === 'a' ? ('f' as const) : ('m' as const), text: line.jp };
 }
 
 // ---- A run -------------------------------------------------------------------
@@ -139,7 +215,7 @@ function applyRemote(s: RunState, remote: RolePlaySyncState, total: number): Run
 }
 
 /** What this phone tells the partner's phone about the session. */
-export function syncStateOf(s: RunState, scriptId: string): RolePlaySyncState | null {
+export function syncStateOf(s: RunState, scriptId: string, stage?: Stage): RolePlaySyncState | null {
   if (s.mode !== 'duo' || s.step === 'setup' || !s.sessionId || s.part === 'both') return null;
   return {
     sessionId: s.sessionId,
@@ -147,6 +223,7 @@ export function syncStateOf(s: RunState, scriptId: string): RolePlaySyncState | 
     role: s.part,
     lineIndex: s.lineIndex,
     status: s.step === 'waiting' ? 'waiting' : s.step === 'done' ? 'done' : 'active',
+    ...(stage ? { stage } : {}),
   };
 }
 

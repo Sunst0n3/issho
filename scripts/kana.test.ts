@@ -53,6 +53,20 @@ describe('kana table', () => {
     expect(byChar.get('ピョ')).toMatchObject({ romaji: 'pyo', script: 'katakana' });
   });
 
+  it('gives the 92 basic kana their sprint day: hiragana rows on days 1–5, katakana on 8–12', () => {
+    const basic = table.filter((k) => k.kind === 'basic');
+    expect(basic).toHaveLength(92);
+    expect(table.filter((k) => k.sprintDay !== undefined)).toEqual(basic);
+    const day = (ch: string) => byChar.get(ch)?.sprintDay;
+    expect([day('あ'), day('こ'), day('さ'), day('と'), day('な'), day('ほ'), day('ま'), day('よ'), day('ら'), day('を'), day('ん')]).toEqual([
+      1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5,
+    ]);
+    expect([day('ア'), day('ソ'), day('ン')]).toEqual([8, 9, 12]);
+    for (const d of [1, 2, 3, 4, 5]) expect(hiragana.filter((k) => k.sprintDay === d).length, `day ${d}`).toBeGreaterThanOrEqual(8);
+    expect(day('が')).toBeUndefined();
+    expect(day('きゃ')).toBeUndefined();
+  });
+
   it('has unique characters', () => {
     expect(byChar.size).toBe(table.length);
   });

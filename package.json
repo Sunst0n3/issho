@@ -7,6 +7,9 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "build:data": "node scripts/build-data.ts",
+    "build:audio": "node scripts/audio/generate.ts",
+    "check:content": "node scripts/check-content.ts",
+    "coverage": "node scripts/v2/coverage.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "preview": "vite preview"

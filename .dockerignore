@@ -5,6 +5,9 @@
 dist
 server/data
 issho-data
+# Audio generation leftovers (the committed public/audio/ is what the image ships).
+.cache
+scripts/audio/last-run.json
 
 # public/data/ (committed) is what the image ships. data-raw/, when present, stays in the context
 # so a checkout without public/data/ can still build it (see the Dockerfile).

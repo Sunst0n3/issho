@@ -6,6 +6,11 @@
 # Members, devices and the household name, also while it runs:
 #   docker compose exec issho node server/src/admin.ts list      (or: help)
 #
+# Voice: the app ships pre-recorded VOICEVOX clips for its course. The optional `voicevox` service
+# below reads everything else aloud (chat lines, AI replies, rarer words) in the same voices. It is
+# a large image (about 2 GB) and uses CPU only while it speaks. Without it the app uses the
+# phone's own Japanese voice for those. To leave it out: `docker compose up -d --build issho`.
+#
 # HTTPS is needed on the phones: on a plain http://192.168.x.x:8787 address the browser won't let
 # Issho work offline or record voice (only https:// and localhost may). Easiest: Tailscale on this
 # machine and both phones, then `tailscale serve --bg 8787` and open https://<machine>.<tailnet>.ts.net.
@@ -23,9 +28,19 @@ services:
       PORT: "8787"
       DATA_DIR: /data
       STATIC_DIR: /app/dist
+      # The speech engine below, on Docker's internal network. While it is down or still warming
+      # up, /api/health says ttsEnabled: false and the phones use their own voice.
+      VOICEVOX_URL: http://voicevox:50021
     # Behind Tailscale serve or a proxy on this machine, "127.0.0.1:8787:8787" keeps the plain
     # http port off the network.
     ports:
       - "8787:8787"
     volumes:
       - ./issho-data:/data
+
+  # Optional speech engine (VOICEVOX, CPU build). No depends_on: Issho works without it.
+  voicevox:
+    image: voicevox/voicevox_engine:cpu-latest
+    restart: unless-stopped
+    # Internal: issho reaches it at http://voicevox:50021. Not published to the network.
+    expose: ["50021"]

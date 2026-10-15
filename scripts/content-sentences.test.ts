@@ -1,34 +1,36 @@
 // @vitest-environment node
 // Regression checks for content/sentences/*.json, from the reviews of each
-// file. Every file covers a band of the curriculum: its kanji sentences unlock
-// (their last kanji is taught) after the previous band and no later than the
-// unit teaching the band's last kanji, sorted by unlock. Kana-only sentences
-// (ids s-k…) can be read from the start. The curriculum checks need public/data
-// (npm run build:data) and skip without it.
+// file (written in four bands of the v1 curriculum, s1–s4). Kana-only sentences
+// (ids s-k…) can be read from the start. Grammar tags are grammar-v2 ids after the
+// v1 → v2 mapping (scripts/lib/grammar-map.ts). The checks of the published
+// sentences need public/data (npm run build:data) and skip without it.
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { kanjiIn, parseRuby, rubyToKana, rubyToPlain } from '../src/lib/ruby.ts';
-import type { Curriculum, GrammarPoint, KanjiEntry, SentenceEntry, WordEntry } from '../src/lib/types.ts';
-import { checkContent, lateGrammarTags, readingMismatches } from './lib/content.ts';
+import type { CoreWord, Curriculum, GrammarPoint, SentenceEntry, UnitSpec, WordEntry } from '../src/lib/types.ts';
+import { checkContent, mergeContent, readContentSources, readingMismatches } from './lib/content.ts';
+import { V1_TO_V2_GRAMMAR, mapGrammarTags } from './lib/grammar-map.ts';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const read = <T,>(path: string): T => JSON.parse(readFileSync(ROOT + path, 'utf8')) as T;
-const built = existsSync(`${ROOT}public/data/curriculum.json`) && existsSync(`${ROOT}public/data/words.json`);
+const built =
+  existsSync(`${ROOT}public/data/curriculum.json`) &&
+  existsSync(`${ROOT}public/data/content/sentences.json`) &&
+  read<{ version?: number }>('public/data/curriculum.json').version === 2;
 
-/** Each band ends at the unit teaching this kanji (units 119, 279, 499 and 899 when the files were written). */
-const BANDS = [
-  { file: 's1', last: '車' },
-  { file: 's2', last: '住' },
-  { file: 's3', last: '勝' },
-  { file: 's4', last: '宣' },
-];
+/** The four files, written for bands of the v1 curriculum. */
+const BANDS = [{ file: 's1' }, { file: 's2' }, { file: 's3' }, { file: 's4' }];
 
 const files = readdirSync(`${ROOT}content/sentences`).filter((f) => f.endsWith('.json'));
-const byFile = new Map(BANDS.map(({ file }) => [file, read<SentenceEntry[]>(`content/sentences/${file}.json`)]));
+/** A sentence as authored: the build adds tokens, refs and unit (SentenceEntry). */
+type AuthoredSentence = Pick<SentenceEntry, 'id' | 'jp' | 'en'> & { grammar?: string[] };
+
+const byFile = new Map(BANDS.map(({ file }) => [file, read<AuthoredSentence[]>(`content/sentences/${file}.json`)]));
 const all = [...byFile.values()].flat();
-const grammar = read<GrammarPoint[]>('content/grammar.json');
-const isKanaSentence = (s: SentenceEntry) => s.id.startsWith('s-k');
+const grammarSet = readContentSources(`${ROOT}content`, 'grammar', ROOT);
+const grammar = mergeContent('grammar', grammarSet.sources).data as { id: string; order: number }[];
+const isKanaSentence = (s: AuthoredSentence) => s.id.startsWith('s-k');
 
 const plain = (jp: string) => rubyToPlain(jp).replace(/[。、！？「」!?\s]/g, '');
 /** The sentence as heard: readings applied, katakana folded into hiragana. */
@@ -63,7 +65,7 @@ describe('content/sentences/*.json', () => {
   });
 
   it('never repeats an id, a sentence (as written or as heard) or a translation', () => {
-    const keys: [string, (s: SentenceEntry) => string][] = [
+    const keys: [string, (s: AuthoredSentence) => string][] = [
       ['id', (s) => s.id],
       ['Japanese', (s) => plain(s.jp)],
       ['spoken form', (s) => spoken(s.jp)],
@@ -81,13 +83,11 @@ describe('content/sentences/*.json', () => {
     }
   });
 
-  it('tags only known grammar points; kana-only sentences only phase-1 ones', () => {
-    const phase = new Map(grammar.map((g) => [g.id, g.phase]));
+  it('tags only grammar-v2 points (v1 ids map to themselves), and keeps kana-only sentences free of kanji', () => {
+    const ids = new Set(grammar.map((g) => g.id));
+    for (const [v1, v2] of Object.entries(V1_TO_V2_GRAMMAR)) expect(v2 === null || ids.has(v2), v1).toBe(true);
     for (const s of all) {
-      for (const g of s.grammar ?? []) {
-        expect(phase.has(g), `${s.id}: ${g}`).toBe(true);
-        if (isKanaSentence(s)) expect(phase.get(g), `${s.id}: ${g}`).toBe(1);
-      }
+      for (const g of mapGrammarTags(s.grammar ?? [])) expect(ids.has(g), `${s.id}: ${g}`).toBe(true);
       if (isKanaSentence(s)) expect(kanjiIn(s.jp), s.id).toEqual([]);
     }
   });
@@ -111,41 +111,35 @@ describe('content/sentences/*.json', () => {
   });
 });
 
-describe.skipIf(!built)('content/sentences/*.json against the curriculum', () => {
-  const { units } = built ? read<Curriculum>('public/data/curriculum.json') : { units: [] };
-  const unitOf = new Map(units.map((u) => [u.char, u]));
-  const unlock = (s: SentenceEntry) => Math.max(-1, ...kanjiIn(s.jp).map((k) => unitOf.get(k)?.index ?? Infinity));
-  const bandRange = (i: number) => ({
-    from: i === 0 ? 0 : unitOf.get(BANDS[i - 1].last)!.index + 1,
-    to: unitOf.get(BANDS[i].last)!.index,
-  });
-  const grammarPhase = new Map(grammar.map((g) => [g.id, g.phase]));
+describe.skipIf(!built)('published sentences', () => {
+  const published = built ? read<SentenceEntry[]>('public/data/content/sentences.json') : [];
+  const units = built ? read<UnitSpec[]>('public/data/content/units.json') : [];
+  const core = built ? read<CoreWord[]>('public/data/content/core-words.json') : [];
 
-  it('unlocks every kanji sentence inside its band, sorted by unlock', () => {
-    BANDS.forEach(({ file }, i) => {
-      const { from, to } = bandRange(i);
-      let last = -1;
-      for (const s of byFile.get(file)!.filter((x) => !isKanaSentence(x))) {
-        const u = unlock(s);
-        expect(u >= from && u <= to, `${s.id} unlocks at ${u}, outside ${from}–${to}`).toBe(true);
-        expect(u, `${s.id} is out of unlock order`).toBeGreaterThanOrEqual(last);
-        last = u;
-      }
-    });
+  it('ships every sentence, in file order', () => {
+    expect(published.map((s) => s.id)).toEqual(all.map((s) => s.id));
   });
 
-  it('tags no grammar from a phase after its band', () => {
-    BANDS.forEach(({ file }, i) => {
-      const { from, to } = bandRange(i);
-      const bandPhase = Math.max(...units.filter((u) => u.index >= from && u.index <= to).map((u) => u.phase));
-      for (const s of byFile.get(file)!) {
-        for (const g of s.grammar ?? []) expect(grammarPhase.get(g), `${s.id}: ${g}`).toBeLessThanOrEqual(bandPhase);
-      }
-    });
+  it('gives each sentence the highest unit of its grammar and core words (its audio pack)', () => {
+    const grammarUnit = new Map(units.flatMap((u) => u.grammar.map((g) => [g, u.id] as const)));
+    const coreUnit = new Map(core.map((c) => [`core:${c.id}`, c.unit]));
+    for (const s of published) {
+      const expected = Math.max(1, ...s.grammar.map((g) => grammarUnit.get(g)!), ...s.refs.map((r) => coreUnit.get(r) ?? 1));
+      expect(s.unit, s.id).toBe(expected);
+    }
   });
 
-  it('has no sentence that uses grammar before it is taught', () => {
-    expect(lateGrammarTags(all, units, grammarPhase).map((l) => `${l.id} ${l.grammar}`)).toEqual([]);
+  it('is never offered before the past polite or ね/よ it uses (re-tagged for grammar-v2)', () => {
+    const order = new Map(read<GrammarPoint[]>('public/data/content/grammar.json').map((g) => [g.id, g.order]));
+    const gate = (s: SentenceEntry) => Math.max(0, ...s.grammar.map((g) => order.get(g) ?? 0));
+    const early = (id: string, pattern: RegExp) =>
+      published.filter((s) => pattern.test(rubyToPlain(s.jp)) && gate(s) < order.get(id)!).map((s) => `${s.id} needs ${id}`);
+    expect([...early('masu-past', /ました|ませんでした/), ...early('ne-yo', /ですね。$/)]).toEqual([]);
+  });
+
+  it('uses only kanji the curriculum teaches', () => {
+    const taught = new Set(read<Curriculum>('public/data/curriculum.json').units.map((u) => u.char));
+    expect(all.flatMap((s) => kanjiIn(s.jp).filter((k) => !taught.has(k)).map((k) => `${s.id}: ${k}`))).toEqual([]);
   });
 
   it('reads whole words as words.json does', () => {
@@ -156,17 +150,9 @@ describe.skipIf(!built)('content/sentences/*.json against the curriculum', () =>
     const items = checkContent('sentences', all).items;
     expect(items.flatMap((item) => readingMismatches(item, byWritten))).toEqual([]);
   });
-
-  it('covers every s2 kanji except the six with no usable everyday word', () => {
-    const kanji = read<Record<string, KanjiEntry>>('public/data/kanji.json');
-    const { from, to } = bandRange(BANDS.findIndex((b) => b.file === 's2'));
-    const used = new Set(byFile.get('s2')!.flatMap((s) => kanjiIn(s.jp)));
-    const missing = units.filter((u) => u.index >= from && u.index <= to && u.char in kanji && !used.has(u.char));
-    expect(missing.map((u) => u.char).sort()).toEqual([...'又巾是予介吏'].sort());
-  });
 });
 
-/** Constructions a phase-2 learner has not met (phase-3 points, or none in grammar.json). */
+/** Constructions s1 and s2 leave out: grammar a beginner has not met yet (the v1 phase-3 points and later). */
 const BEYOND_PHASE_2: [string, RegExp][] = [
   ['ta-koto-ga-aru', /[ただ]ことが/],
   ['to-omou', /と(おも|思)/],
@@ -195,11 +181,11 @@ const dice = <T,>(a: Set<T>, b: Set<T>) => {
   return (2 * n) / (a.size + b.size);
 };
 /** Same structure (Japanese bigrams) and the same message (English words). */
-const sayTheSame = (a: SentenceEntry, b: SentenceEntry) =>
+const sayTheSame = (a: AuthoredSentence, b: AuthoredSentence) =>
   overlap(bigrams(plain(a.jp)), bigrams(plain(b.jp))) >= 0.5 && overlap(englishWords(a.en), englishWords(b.en)) >= 0.4;
 
 describe('sentence wording', () => {
-  it('uses only grammar a phase-2 learner has been taught in s1 and s2', () => {
+  it('uses only beginner grammar in s1 and s2', () => {
     const problems: string[] = [];
     for (const s of [...byFile.get('s1')!, ...byFile.get('s2')!]) {
       const text = rubyToPlain(s.jp);

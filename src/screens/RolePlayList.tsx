@@ -1,40 +1,72 @@
-// Every role-play, grouped by level, with the level that fits your phase marked.
+// Free role-plays: the scripts that fit what both partners have been taught (never a unit's
+// core conversation, which Session A runs in stages), grouped by level.
 
 import { useEffect, useId, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { timeAgo } from '../components/together/household.ts';
-import { LEVEL_NAMES, levelForPhase, type Level } from '../components/together/rolePlay.ts';
+import type { MemberProgress } from '../../shared/api.ts';
+import { splitHousehold, timeAgo } from '../components/together/household.ts';
+import { LEVEL_NAMES, type Level } from '../components/together/rolePlay.ts';
 import { rolePlayHistory } from '../components/together/storage.ts';
 import '../components/together/together.css';
 import { Icon, Ruby, Screen, TopBar } from '../components/ui.tsx';
-import { loadRolePlays } from '../lib/data.ts';
+import { loadCoreIndex, loadGrammarIndex, loadRolePlays, loadUnits } from '../lib/data.ts';
+import { db } from '../lib/db.ts';
 import { useRubyShow } from '../lib/hooks.ts';
-import type { RolePlay } from '../lib/types.ts';
-import { currentPhase } from '../srs/course.ts';
+import type { RolePlay, TargetRef } from '../lib/types.ts';
+import { memberProgress } from '../srs/memberProgress.ts';
+import { coupleSettledUnit, eligibleRolePlays } from '../srs/together.ts';
+import { useHousehold } from '../sync/stats.ts';
 
 const LEVELS: Level[] = [1, 2, 3];
 
+/**
+ * The free role-plays for this couple. A target counts as introduced for both when this phone
+ * introduced it and the partner's progress reaches its order (this phone alone when unpaired).
+ */
+export async function freeRolePlays(partner: MemberProgress | null | undefined): Promise<RolePlay[]> {
+  const [scripts, units, core, grammar, mine, items] = await Promise.all([
+    loadRolePlays(),
+    loadUnits().catch(() => []),
+    loadCoreIndex().catch(() => new Map()),
+    loadGrammarIndex().catch(() => new Map()),
+    memberProgress().catch(() => undefined),
+    db.items.where('kind').anyOf('core', 'grammar').primaryKeys(),
+  ]);
+  const introduced = new Set(items as string[]);
+  const partnerHas = (t: TargetRef): boolean => {
+    if (!partner) return true;
+    const [kind, key] = t.split(':') as ['core' | 'grammar', string];
+    const order = kind === 'core' ? core.get(key)?.order : grammar.get(key)?.order;
+    if (order === undefined) return false;
+    return order <= (kind === 'core' ? partner.coreReached : partner.grammarReached);
+  };
+  const coreConversations = new Set(units.map((u) => u.conversation));
+  const settled = coupleSettledUnit(mine?.settledUnit ?? 0, partner?.settledUnit);
+  return eligibleRolePlays(scripts, coreConversations, (t) => introduced.has(t) && partnerHas(t), settled);
+}
+
 export default function RolePlayList() {
   const rubyShow = useRubyShow();
+  const { data } = useHousehold();
+  const partner = splitHousehold(data).partner?.progress;
   const [scripts, setScripts] = useState<RolePlay[]>();
   const [failed, setFailed] = useState(false);
-  const [level, setLevel] = useState<Level>();
   const [attempt, setAttempt] = useState(0);
   const [history] = useState(rolePlayHistory);
   const id = useId();
+  const partnerKey = partner ? `${partner.coreReached}:${partner.grammarReached}:${partner.settledUnit}` : '';
 
   useEffect(() => {
     let live = true;
     setFailed(false);
-    loadRolePlays().then((s) => { if (live) setScripts(s); }, () => { if (live) setFailed(true); });
-    currentPhase().then((p) => { if (live) setLevel(levelForPhase(p)); }, () => { /* no highlight */ });
+    freeRolePlays(partner).then((s) => { if (live) setScripts(s); }, () => { if (live) setFailed(true); });
     return () => { live = false; };
-  }, [attempt]);
+  }, [attempt, partnerKey]);
 
   return (
     <Screen label="Role-plays">
       <TopBar back="/together" title="Role-plays" />
-      <p className="muted">Short scenes to say out loud: together on two phones, or passing one back and forth.</p>
+      <p className="muted">Short scenes to say out loud: together on two phones, or passing one back and forth. These fit the words and grammar you both know.</p>
 
       {failed && (
         <div className="tg-notice-card" role="alert">
@@ -49,20 +81,19 @@ export default function RolePlayList() {
           <div className="tg-skeleton-block" />
         </div>
       )}
-      {scripts?.length === 0 && <p className="empty">No role-plays yet. They arrive with the next update.</p>}
+      {scripts?.length === 0 && (
+        <p className="empty">No free role-play fits yet. They open up as you both learn the words they use.</p>
+      )}
 
       {scripts && LEVELS.map((l) => {
         const atLevel = scripts.filter((s) => s.level === l);
         if (!atLevel.length) return null;
-        const recommended = l === level;
         return (
-          <section key={l} className={recommended ? 'tg-rp-level tg-recommended' : 'tg-rp-level'} aria-labelledby={`rp-level-${l}`}>
-            {/* The chip sits beside the heading, not in it: "Level 2 · Everyday", not "…EverydayFor you now". */}
+          <section key={l} className="tg-rp-level" aria-labelledby={`rp-level-${l}`}>
             <div className="tg-rp-level-head">
               <h2 id={`rp-level-${l}`} className="tg-rp-level-title">
                 Level {l} <span className="muted">· {LEVEL_NAMES[l]}</span>
               </h2>
-              {recommended && <span className="chip shu">For you now</span>}
             </div>
             <ul className="tg-rp-list">
               {atLevel.map((s) => (

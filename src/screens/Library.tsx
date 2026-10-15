@@ -1,22 +1,39 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigationType } from 'react-router-dom';
+import { Link, Navigate, useNavigationType, useParams } from 'react-router-dom';
 import { Glyph } from '../components/Glyph.tsx';
 import { Segmented } from '../components/home/controls.tsx';
-import { PHASE_NAMES } from '../components/home/labels.ts';
-import { loadLibrary, type UnitView } from '../components/home/library.ts';
+import { percent, plural } from '../components/home/labels.ts';
+import {
+  loadKanjiLibrary,
+  loadStoryShelves,
+  loadWordLibrary,
+  matchesWord,
+  wordSpeechText,
+  type KanjiState,
+  type KanjiTileView,
+  type StoryView,
+  type WordView,
+} from '../components/home/library.ts';
 import { useLive } from '../components/home/useLive.ts';
-import { Icon, Screen, TopBar } from '../components/ui.tsx';
-import type { Phase } from '../srs/course.ts';
+import { AudioButton } from '../components/study/AudioButton.tsx';
+import { PitchLine } from '../components/study/PitchLine.tsx';
+import { Icon, Ruby, Screen } from '../components/ui.tsx';
+import { loadAccent } from '../lib/data.ts';
+import { useRubyShow } from '../lib/hooks.ts';
+import type { AccentFile } from '../lib/types.ts';
 import '../components/home/home.css';
 import '../components/home/library.css';
 
-type Filter = 'all' | 'learned' | 'work';
-const FILTERS: readonly Filter[] = ['all', 'learned', 'work'];
+type Tab = 'kanji' | 'words' | 'stories';
+const TABS: readonly Tab[] = ['kanji', 'words', 'stories'];
+
+type Filter = 'all' | 'learned';
+const FILTERS: readonly Filter[] = ['all', 'learned'];
 
 /**
- * How the library was left: the filter, the groups opened or closed, how many
- * tiles each list shows and the scroll position. Kept for the browser session,
- * so going back from a kanji page finds the library as it was.
+ * How the kanji tab was left: the filter, the chapters opened or closed, how many tiles each list
+ * shows and the scroll position. Kept for the browser session, so going back from a kanji page
+ * finds the library as it was.
  */
 interface LibraryView {
   filter: Filter;
@@ -49,31 +66,40 @@ function writeView(view: LibraryView) {
   }
 }
 
-/** Tiles rendered per group before "Show more" (phase 4 alone has ~1,300 units). */
+/** Tiles rendered per chapter before "Show more". */
 const PAGE = 180;
+/** Words rendered before "Show more". */
+const WORD_PAGE = 60;
 
-const STATE_TEXT = { learned: 'learned', next: 'next up', locked: 'not learned yet' } as const;
+const STATE_TEXT: Record<KanjiState, string> = {
+  canWrite: 'can write',
+  learning: 'learning',
+  readingOnly: 'reading only',
+  next: 'next up',
+  locked: 'not learned yet',
+};
 
-function Tile({ view }: { view: UnitView }) {
-  const { unit, meaning, state, struggling } = view;
-  const kind = unit.type === 'radical' ? 'part' : 'kanji';
+const learnedState = (s: KanjiState) => s === 'canWrite' || s === 'learning' || s === 'readingOnly';
+
+function Tile({ view }: { view: KanjiTileView }) {
+  const { unit, meaning, state, pinned } = view;
   return (
-    <Link to={`/kanji/${encodeURIComponent(unit.char)}`} className={`lib-tile ${state}${struggling ? ' struggling' : ''}`}
-      aria-label={`${unit.char}, ${meaning || kind}, ${STATE_TEXT[state]}${struggling ? ', needs work' : ''}`}>
+    <Link to={`/kanji/${encodeURIComponent(unit.char)}`} className={`lib-tile ${state}${pinned ? ' pinned' : ''}`}
+      aria-label={`${unit.char}, ${meaning || 'kanji'}, ${STATE_TEXT[state]}${pinned ? ', pinned' : ''}`}>
       <Glyph char={unit.char} size={28} />
       <span className="lib-meaning" aria-hidden="true">{meaning}</span>
-      {struggling && <span className="lib-flag" aria-hidden="true" />}
+      {pinned && <span className="lib-pin" aria-hidden="true"><Icon name="pen" size={12} /></span>}
     </Link>
   );
 }
 
-function TileGrid({ views, limit = PAGE, onMore }: { views: readonly UnitView[]; limit?: number; onMore: (limit: number) => void }) {
+function TileGrid({ views, limit = PAGE, onMore }: { views: readonly KanjiTileView[]; limit?: number; onMore: (limit: number) => void }) {
   const shown = views.slice(0, limit);
   const rest = views.length - shown.length;
   return (
     <div className="lib-grid-wrap">
       <div className="lib-grid">
-        {shown.map((v) => <Tile key={`${v.unit.type}:${v.unit.char}`} view={v} />)}
+        {shown.map((v) => <Tile key={v.unit.char} view={v} />)}
       </div>
       {rest > 0 && (
         <button type="button" className="btn secondary small lib-more" onClick={() => onMore(limit + PAGE)}>
@@ -84,20 +110,18 @@ function TileGrid({ views, limit = PAGE, onMore }: { views: readonly UnitView[];
   );
 }
 
-function PhaseGroup({ phase, views, open, onToggle, limit, onMore }: {
-  phase: number;
-  views: readonly UnitView[];
+function ChapterGroup({ chapter, views, open, onToggle, limit, onMore }: {
+  chapter: number;
+  views: readonly KanjiTileView[];
   open: boolean;
   onToggle: () => void;
   limit?: number;
   onMore: (limit: number) => void;
 }) {
-  // Counted in kanji, like Today and Learn ("0 of 300 kanji"); the parts are extra tiles.
-  const kanji = views.filter((v) => v.unit.type === 'kanji');
-  const learned = kanji.filter((v) => v.state === 'learned').length;
-  const name = `Phase ${phase} · ${PHASE_NAMES[phase as Phase]}`;
-  const count = `${learned.toLocaleString()} of ${kanji.length.toLocaleString()} kanji`;
-  const panelId = `lib-phase-${phase}`;
+  const learned = views.filter((v) => learnedState(v.state)).length;
+  const name = `Chapter ${chapter}`;
+  const count = `${learned} of ${views.length} kanji`;
+  const panelId = `lib-chapter-${chapter}`;
   return (
     <section className="lib-group">
       <h2 className="lib-group-head">
@@ -116,20 +140,15 @@ function PhaseGroup({ phase, views, open, onToggle, limit, onMore }: {
   );
 }
 
-const EMPTY: Record<Exclude<Filter, 'all'>, string> = {
-  learned: 'Nothing here yet. Kanji you meet in your sessions show up here.',
-  work: 'Nothing needs work right now. Kanji you keep forgetting will show up here.',
-};
-
 /** Scroll position of the page (the document scrolls, not the screen). */
 const pageScroll = () => document.documentElement.scrollTop;
 
-export default function Library() {
+function KanjiTab() {
   const [saved] = useState(readView);
   const [filter, setFilter] = useState<Filter>(saved.filter);
-  const [openPhases, setOpenPhases] = useState<Record<number, boolean>>(saved.open);
+  const [openChapters, setOpenChapters] = useState<Record<number, boolean>>(saved.open);
   const [limits, setLimits] = useState<Record<string, number>>(saved.limits);
-  const lib = useLive(loadLibrary, []);
+  const lib = useLive(loadKanjiLibrary, []);
   const views = lib.status === 'ready' ? lib.value : undefined;
   const navigationType = useNavigationType();
 
@@ -137,9 +156,9 @@ export default function Library() {
   const view = useRef(saved);
   const tracking = useRef(false);
   useEffect(() => {
-    view.current = { ...view.current, filter, open: openPhases, limits };
+    view.current = { ...view.current, filter, open: openChapters, limits };
     writeView(view.current);
-  }, [filter, openPhases, limits]);
+  }, [filter, openChapters, limits]);
   useEffect(() => {
     let frame = 0;
     const onScroll = () => {
@@ -173,37 +192,35 @@ export default function Library() {
 
   const groups = useMemo(() => {
     if (!views) return [];
-    const keep = (v: UnitView) =>
-      filter === 'all' || (filter === 'learned' ? v.state === 'learned' : v.struggling);
-    const byPhase = new Map<number, UnitView[]>();
+    const byChapter = new Map<number, KanjiTileView[]>();
     for (const v of views) {
-      if (!keep(v)) continue;
-      const list = byPhase.get(v.unit.phase) ?? [];
+      if (filter === 'learned' && !learnedState(v.state)) continue;
+      const list = byChapter.get(v.unit.chapter) ?? [];
       list.push(v);
-      byPhase.set(v.unit.phase, list);
+      byChapter.set(v.unit.chapter, list);
     }
-    return [...byPhase.entries()].sort(([a], [b]) => a - b);
+    return [...byChapter.entries()].sort(([a], [b]) => a - b);
   }, [views, filter]);
 
-  // The phase being worked on starts open; the others stay closed until tapped.
-  const currentPhase = views?.find((v) => v.state !== 'learned')?.unit.phase ?? 2;
-  const isOpen = (phase: number) => openPhases[phase] ?? phase === currentPhase;
-  const learnedKanji = views?.filter((v) => v.state === 'learned' && v.unit.type === 'kanji').length ?? 0;
-  const totalKanji = views?.filter((v) => v.unit.type === 'kanji').length ?? 0;
+  // The chapter being worked on starts open; the others stay closed until tapped.
+  const currentChapter = views?.find((v) => !learnedState(v.state))?.unit.chapter ?? 1;
+  const isOpen = (chapter: number) => openChapters[chapter] ?? chapter === currentChapter;
+  const learnedCount = views?.filter((v) => learnedState(v.state)).length ?? 0;
+  const writeCount = views?.filter((v) => v.state === 'canWrite').length ?? 0;
 
   return (
-    <Screen label="Kanji library">
-      <TopBar back="/learn" title="Kanji library" />
+    <>
+      {/* Counts per chapter only: no "N of 2,136" toward the whole list (the plan drops that framing). */}
       {views && (
         <p className="muted lib-summary">
-          {learnedKanji.toLocaleString()} of {totalKanji.toLocaleString()} kanji learned. Parts (radicals) come before the kanji that use them.
+          {plural(learnedCount, 'kanji', 'kanji')} learned so far, {writeCount.toLocaleString()} you can write
+          from memory. Kanji past your handwriting list stay in reading practice.
         </p>
       )}
       <Segmented label="Show" value={filter} onChange={setFilter}
         options={[
           { value: 'all', label: 'All' },
           { value: 'learned', label: 'Learned' },
-          { value: 'work', label: 'Needs work' },
         ]} />
 
       {lib.status === 'loading' && <div className="lib-grid lib-skeleton" aria-busy="true" aria-label="Loading the library">
@@ -217,21 +234,161 @@ export default function Library() {
         </section>
       )}
 
-      {views && filter === 'all' && groups.map(([phase, list]) => (
-        <PhaseGroup key={phase} phase={phase} views={list} open={isOpen(phase)}
-          onToggle={() => setOpenPhases((o) => ({ ...o, [phase]: !isOpen(phase) }))}
-          limit={limits[`all-${phase}`]} onMore={(n) => setLimits((l) => ({ ...l, [`all-${phase}`]: n }))} />
+      {views && filter === 'learned' && groups.length === 0 && (
+        <p className="empty">Nothing here yet. Kanji you meet in your sessions show up here.</p>
+      )}
+      {views && groups.map(([chapter, list]) => (
+        <ChapterGroup key={`${filter}-${chapter}`} chapter={chapter} views={list}
+          open={filter === 'learned' || isOpen(chapter)}
+          onToggle={() => setOpenChapters((o) => ({ ...o, [chapter]: !isOpen(chapter) }))}
+          limit={limits[`${filter}-${chapter}`]}
+          onMore={(n) => setLimits((l) => ({ ...l, [`${filter}-${chapter}`]: n }))} />
       ))}
+    </>
+  );
+}
 
-      {views && filter !== 'all' && (groups.length === 0 ? (
-        <p className="empty">{EMPTY[filter]}</p>
-      ) : groups.map(([phase, list]) => (
-        <section key={`${filter}-${phase}`} className="lib-group">
-          <h2 className="lib-group-title">Phase {phase} · {PHASE_NAMES[phase as Phase]} <span className="muted">({list.length})</span></h2>
-          <TileGrid views={list} limit={limits[`${filter}-${phase}`]}
-            onMore={(n) => setLimits((l) => ({ ...l, [`${filter}-${phase}`]: n }))} />
-        </section>
-      )))}
+function WordRow({ view, accent }: { view: WordView; accent: AccentFile }) {
+  const { info } = view;
+  const pitch = accent[info.ref];
+  return (
+    <li>
+      <div className="kd-word-text">
+        <span className="kd-word-written" lang="ja">{info.written}</span>
+        {info.written !== info.kana && <span className="kd-word-kana" lang="ja">{info.kana}</span>}
+        {pitch && <PitchLine accent={pitch} kana={info.kana} size="sm" />}
+        <span className="kd-word-meaning">{info.en}</span>
+      </div>
+      <AudioButton source={{ ref: info.ref }} fallbackText={wordSpeechText(info)} compact label={`Listen to ${info.written}`} />
+    </li>
+  );
+}
+
+function WordsTab() {
+  const words = useLive(async () => {
+    const [list, accent] = await Promise.all([loadWordLibrary(), loadAccent().catch((): AccentFile => ({}))]);
+    return { list, accent };
+  }, []);
+  const [query, setQuery] = useState('');
+  const [limit, setLimit] = useState(WORD_PAGE);
+  const shown = useMemo(
+    () => (words.status === 'ready' ? words.value.list.filter((w) => matchesWord(w.info, query)) : []),
+    [words, query],
+  );
+  return (
+    <>
+      <div className="hm-field">
+        <label className="visually-hidden" htmlFor="lib-word-search">Search your words</label>
+        <input id="lib-word-search" className="text-input" type="search" value={query} placeholder="Search in Japanese or English"
+          autoComplete="off" autoCapitalize="none" onChange={(e) => { setQuery(e.target.value); setLimit(WORD_PAGE); }} />
+      </div>
+      {words.status === 'loading' && <div className="hm-skeleton kd-words-skeleton" aria-hidden="true" />}
+      {words.status === 'error' && <p className="muted">The word list didn't load. It shows once the study data has downloaded.</p>}
+      {words.status === 'ready' && (
+        <>
+          <p className="muted lib-summary" role="status">
+            {query ? `${plural(shown.length, 'word')} found` : `${plural(words.value.list.length, 'word')} met so far, newest first`}
+          </p>
+          {shown.length > 0 ? (
+            <ul className="card kd-words">
+              {shown.slice(0, limit).map((w) => <WordRow key={w.info.ref} view={w} accent={words.value.accent} />)}
+            </ul>
+          ) : (
+            <p className="empty">{query ? 'No word you know matches that.' : 'Words you meet in your sessions show up here.'}</p>
+          )}
+          {shown.length > limit && (
+            <button type="button" className="btn secondary small lib-more" onClick={() => setLimit(limit + WORD_PAGE)}>
+              Show {Math.min(shown.length - limit, WORD_PAGE)} more
+            </button>
+          )}
+        </>
+      )}
+    </>
+  );
+}
+
+const LEVEL_NAMES: Record<StoryView['story']['level'], string> = { start: 'Start', L0: 'Level 0', L1: 'Level 1' };
+
+function StoryList({ title, hint, views, stretch = false }: { title: string; hint: string; views: readonly StoryView[]; stretch?: boolean }) {
+  const show = useRubyShow();
+  if (!views.length) return null;
+  return (
+    <section className="lib-group" aria-label={title}>
+      <h2 className="lib-group-title">{title} <span className="muted">({views.length})</span></h2>
+      <p className="hm-hint">{hint}</p>
+      <ul className="lib-stories">
+        {views.map(({ story, coverage, progress }) => (
+          <li key={story.id}>
+            <Link to={`/read/${encodeURIComponent(story.id)}`} className="lib-story">
+              <span className="lib-story-text">
+                <Ruby text={story.titleJp} show={show} className="lib-story-jp" />
+                <span className="lib-story-title">{story.title}</span>
+                <span className="hm-hint">
+                  {LEVEL_NAMES[story.level]} · {story.chars.toLocaleString()} characters
+                  {stretch ? ` · ${percent(coverage)} known · tap words for English` : ''}
+                  {progress && progress.stage >= 3 ? ' · finished' : progress && progress.stage > 0 ? ' · in progress' : ''}
+                </span>
+              </span>
+              <Icon name="forward" size={18} />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function StoriesTab() {
+  const shelves = useLive(loadStoryShelves, []);
+  if (shelves.status === 'loading') return <div className="hm-skeleton card-sized" aria-busy="true" aria-label="Loading stories" />;
+  if (shelves.status === 'error') {
+    return (
+      <section className="card hm-notice" role="alert">
+        <h2 className="hm-notice-title">The stories didn't load</h2>
+        <button type="button" className="btn secondary small" onClick={shelves.retry}>Try again</button>
+      </section>
+    );
+  }
+  const { easy, stretch, read, later } = shelves.value;
+  const none = !easy.length && !stretch.length && !read.length;
+  return (
+    <>
+      {none && <p className="empty">Stories open up once you know enough of their words, at about 200 words.</p>}
+      <StoryList title="Easy" hint="You know nearly every word: read while listening." views={easy} />
+      <StoryList title="Stretch" hint="A few new words: tap a word for its English." views={stretch} stretch />
+      <StoryList title="Read" hint="Stories you've started or finished." views={read} />
+      {later > 0 && !none && (
+        <p className="hm-hint">{plural(later, 'more story', 'more stories')} {later === 1 ? 'opens' : 'open'} up as you learn words.</p>
+      )}
+    </>
+  );
+}
+
+const TAB_NAMES: Record<Tab, string> = { kanji: 'Kanji', words: 'Words', stories: 'Stories' };
+
+export default function Library() {
+  const param = useParams().tab;
+  if (param !== undefined && !TABS.includes(param as Tab)) return <Navigate to="/library" replace />;
+  const tab: Tab = (param as Tab | undefined) ?? 'kanji';
+
+  return (
+    <Screen tabs label="Library">
+      <header>
+        <p className="hm-eyebrow" lang="ja">書庫</p>
+        <h1 className="hm-page-title">Library</h1>
+      </header>
+      <nav className="lib-tabs" aria-label="Library sections">
+        {TABS.map((t) => (
+          <Link key={t} to={`/library/${t}`} replace className={t === tab ? 'active' : undefined}
+            aria-current={t === tab ? 'page' : undefined}>
+            {TAB_NAMES[t]}
+          </Link>
+        ))}
+        <Link to="/grammar">Grammar</Link>
+      </nav>
+      {tab === 'kanji' && <KanjiTab />}
+      {tab === 'words' && <WordsTab />}
+      {tab === 'stories' && <StoriesTab />}
     </Screen>
   );
 }

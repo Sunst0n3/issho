@@ -113,6 +113,14 @@ describe('queueChatMessage + flushOutbox', () => {
     expect(stored[0]).toMatchObject({ clientId, text: 'ただいま', kind: 'text', memberId: 'me' });
   });
 
+  it("sends the output step's sentence with its 'daily' tag", async () => {
+    const clientId = await queueChatMessage({ kind: 'text', text: 'もう{食|た}べた', tag: 'daily' });
+    expect((await pendingRows())[0]).toMatchObject({ clientId, tag: 'daily' });
+    await flushOutbox();
+    expect(server.posts).toEqual([{ clientId, writtenAt: expect.any(String), kind: 'text', text: 'もう{食|た}べた', tag: 'daily' }]);
+    expect((await db.messages.toArray())[0]).toMatchObject({ clientId, tag: 'daily' });
+  });
+
   it('uploads voice audio first, then sends the message with its audioId', async () => {
     const clientId = await queueChatMessage({ kind: 'voice', text: '', transcript: 'おかえり', audio: audioBlob() });
     await flushOutbox();

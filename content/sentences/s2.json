@@ -33,13 +33,13 @@
     "id": "s-s2-006",
     "jp": "{二人|ふたり}で{占|うらな}いに{行|い}きました。",
     "en": "The two of us went to see a fortune-teller.",
-    "grammar": ["masu-forms", "ni-time-place"]
+    "grammar": ["masu-forms", "ni-time-place", "masu-past"]
   },
   {
     "id": "s-s2-007",
     "jp": "{今日|きょう}はいい{天気|てんき}ですね。",
     "en": "Nice weather today, isn't it?",
-    "grammar": ["wa-desu"]
+    "grammar": ["wa-desu", "ne-yo"]
   },
   {
     "id": "s-s2-008",
@@ -105,7 +105,7 @@
     "id": "s-s2-018",
     "jp": "{二人|ふたり}で{馬|うま}にのりました。",
     "en": "We went horseback riding together.",
-    "grammar": ["masu-forms"]
+    "grammar": ["masu-forms", "masu-past"]
   },
   {
     "id": "s-s2-019",
@@ -141,7 +141,7 @@
     "id": "s-s2-024",
     "jp": "{電車|でんしゃ}に{間|ま}に{合|あ}いました！",
     "en": "I made the train!",
-    "grammar": ["masu-forms"]
+    "grammar": ["masu-forms", "masu-past"]
   },
   {
     "id": "s-s2-025",
@@ -195,7 +195,7 @@
     "id": "s-s2-033",
     "jp": "{学生|がくせい}{時代|じだい}の{友|とも}だちに{会|あ}いました。",
     "en": "I met up with a friend from my school days.",
-    "grammar": ["no-possession", "masu-forms"]
+    "grammar": ["no-possession", "masu-forms", "masu-past"]
   },
   {
     "id": "s-s2-034",
@@ -261,7 +261,7 @@
     "id": "s-s2-044",
     "jp": "{食事|しょくじ}の{用意|ようい}ができました。",
     "en": "Dinner is ready.",
-    "grammar": ["masu-forms"]
+    "grammar": ["masu-forms", "masu-past"]
   },
   {
     "id": "s-s2-045",
@@ -351,7 +351,7 @@
     "id": "s-s2-059",
     "jp": "{雨|あめ}が{止|や}みましたね。",
     "en": "The rain has stopped.",
-    "grammar": ["masu-forms"]
+    "grammar": ["masu-forms", "masu-past"]
   },
   {
     "id": "s-s2-060",
@@ -363,13 +363,13 @@
     "id": "s-s2-061",
     "jp": "{元旦|がんたん}は{二人|ふたり}でお{寺|てら}に{行|い}きました。",
     "en": "On New Year's Day the two of us went to a temple.",
-    "grammar": ["ni-time-place", "masu-forms"]
+    "grammar": ["ni-time-place", "masu-forms", "masu-past"]
   },
   {
     "id": "s-s2-062",
     "jp": "ダウンロードが{完了|かんりょう}しました。",
     "en": "The download is complete.",
-    "grammar": ["masu-forms"]
+    "grammar": ["masu-forms", "masu-past"]
   },
   {
     "id": "s-s2-063",
@@ -387,7 +387,7 @@
     "id": "s-s2-065",
     "jp": "{京都|きょうと}のお{土産|みやげ}を{買|か}いました。",
     "en": "I bought some souvenirs from Kyoto.",
-    "grammar": ["wo-object", "masu-forms"]
+    "grammar": ["wo-object", "masu-forms", "masu-past"]
   },
   {
     "id": "s-s2-066",
@@ -495,13 +495,13 @@
     "id": "s-s2-083",
     "jp": "{近所|きんじょ}に{新|あたら}しい{店|みせ}ができました。",
     "en": "A new shop opened in our neighborhood.",
-    "grammar": ["ni-time-place"]
+    "grammar": ["ni-time-place", "masu-past"]
   },
   {
     "id": "s-s2-084",
     "jp": "{友|とも}だちの{作品|さくひん}を{見|み}に{行|い}きました。",
     "en": "We went to see our friend's work.",
-    "grammar": ["no-possession", "masu-forms"]
+    "grammar": ["no-possession", "masu-forms", "masu-past"]
   },
   {
     "id": "s-s2-085",
@@ -513,7 +513,7 @@
     "id": "s-s2-086",
     "jp": "うちの{金魚|きんぎょ}が{死|し}にました。",
     "en": "Our goldfish died.",
-    "grammar": ["masu-forms"]
+    "grammar": ["masu-forms", "masu-past"]
   },
   {
     "id": "s-s2-087",

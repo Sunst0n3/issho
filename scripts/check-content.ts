@@ -6,23 +6,26 @@
 // curriculum unit among its kanji: the entry is readable once that unit is
 // learned), kanji the curriculum never teaches, ruby readings that are not
 // among JMdict's readings for that spelling (words.json when data-raw/ is
-// absent), sentence grammar tags taught in a later phase than the sentence
-// unlocks, and with --max-unit the entries that unlock too late.
+// absent), sentence grammar tags that grammar-v2 does not define (the build
+// drops those sentences), and with --max-unit the entries that unlock too late.
 // Exits 1 when the file has validation errors, 2 on bad usage or missing data.
 
 import { existsSync, readFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Curriculum, WordEntry } from '../src/lib/types.ts';
+import { isObj } from './lib/checker.ts';
 import {
   CONTENT_KINDS,
   checkContent,
   detectContentKind,
-  lateGrammarTags,
+  mergeContent,
+  readContentSources,
   readingMismatches,
   unlockOf,
   type ContentKind,
 } from './lib/content.ts';
+import { mapGrammarTags } from './lib/grammar-map.ts';
 import { readJmdictReadings } from './lib/readings.ts';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
@@ -113,11 +116,15 @@ async function main(): Promise<void> {
   if (!kind) fail(`cannot tell what kind of content ${args.file} is; pass --kind\n${USAGE}`);
 
   const curriculum = readJson<Curriculum>(join(DATA, 'curriculum.json'), 'curriculum.json');
+  if (curriculum.version !== 2) fail('public/data/curriculum.json is not version 2: run `npm run build:data` first');
   const unitIndex = new Map(curriculum.units.map((u) => [u.char, u.index]));
-  const phaseOf = (index: number) => curriculum.units[index]?.phase;
+  const chapterOf = (index: number) => curriculum.units[index]?.chapter;
   const readings = await loadReadings();
 
-  const report = checkContent(kind, data);
+  // v1 role-plays (content/roleplays.json) have no register, targets or cues.
+  const first = Array.isArray(data) ? data[0] : data;
+  const v1 = kind === 'roleplays' && isObj(first) && !('register' in first);
+  const report = checkContent(kind, data, v1);
   const rel = relative(process.cwd(), path);
   const label = rel && !rel.startsWith('..') ? rel : path;
   console.log(`${label}: ${kind}, ${report.items.length} entries`);
@@ -138,7 +145,7 @@ async function main(): Promise<void> {
   for (const item of report.items) {
     const unlock = unlockOf(item, unitIndex);
     let line = `  ${item.where.padEnd(width)}  `;
-    if (unlock.index >= 0) line += `${String(unlock.index).padStart(4)}  ${unlock.char}  phase ${phaseOf(unlock.index)}`;
+    if (unlock.index >= 0) line += `${String(unlock.index).padStart(4)}  ${unlock.char}  chapter ${chapterOf(unlock.index)}`;
     else line += unlock.missing.length > 0 ? '   —' : 'kana only';
     if (args.maxUnit !== undefined && unlock.index > args.maxUnit) {
       line += `   > max ${args.maxUnit}`;
@@ -154,7 +161,7 @@ async function main(): Promise<void> {
   for (const [ch, ids] of notTaught) {
     flags.push(`${ch} is not taught by the curriculum (${ids.slice(0, 6).join(', ')}${ids.length > 6 ? ', …' : ''})`);
   }
-  if (kind === 'sentences') flags.push(...grammarFlags(data, curriculum));
+  if (kind === 'sentences') flags.push(...grammarFlags(data));
 
   if (flags.length > 0) {
     console.log(`\nFlagged (${flags.length})`);
@@ -164,19 +171,17 @@ async function main(): Promise<void> {
   if (report.errors.length > 0) process.exitCode = 1;
 }
 
-/** Grammar tags that content/grammar.json does not define, or teaches after the sentence unlocks. */
-function grammarFlags(sentences: unknown, curriculum: Curriculum): string[] {
-  const grammarPath = join(ROOT, 'content', 'grammar.json');
-  if (!existsSync(grammarPath)) return [];
-  const grammar = readJson<{ id: string; phase: number }[]>(grammarPath, 'content/grammar.json');
-  const phases = new Map(grammar.map((g) => [g.id, g.phase]));
+/** Grammar tags (mapped from v1 ids) that grammar-v2 does not define: the build drops those sentences. */
+function grammarFlags(sentences: unknown): string[] {
+  const set = readContentSources(join(ROOT, 'content'), 'grammar', ROOT);
+  const grammar = mergeContent('grammar', set.sources).data as unknown[];
+  const ids = new Set(grammar.flatMap((g) => (isObj(g) && typeof g.id === 'string' ? [g.id] : [])));
+  if (ids.size === 0) return [];
   const flags: string[] = [];
   for (const s of Array.isArray(sentences) ? (sentences as { id?: string; grammar?: unknown }[]) : []) {
     if (!Array.isArray(s.grammar)) continue;
-    for (const g of s.grammar) if (!phases.has(g)) flags.push(`${s.id} refers to unknown grammar "${g}"`);
-  }
-  for (const late of lateGrammarTags(sentences, curriculum.units, phases)) {
-    flags.push(`${late.id} unlocks in phase ${late.unlockPhase} but uses "${late.grammar}" from phase ${late.grammarPhase}`);
+    const tags = mapGrammarTags(s.grammar.filter((g): g is string => typeof g === 'string'));
+    for (const g of tags) if (!ids.has(g)) flags.push(`${s.id} refers to unknown grammar "${g}" (the build drops it)`);
   }
   return flags;
 }

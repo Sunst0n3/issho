@@ -1,39 +1,32 @@
 import { useLiveQuery } from 'dexie-react-hooks';
+import { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
+import { ChapterLine } from '../components/home/ChapterLine.tsx';
+import { dismiss, isDismissed, loadHabitSnapshot } from '../components/home/habitData.ts';
+import { dateOfKey, greeting, WEEKDAYS_EN, WEEKDAYS_JA } from '../components/home/labels.ts';
 import { NewToday, newItemTiles } from '../components/home/NewToday.tsx';
 import { ConnectHint, PartnerCard, SyncFooter } from '../components/home/PartnerCard.tsx';
+import { PlanPanel, plannedItems } from '../components/home/PlanPanel.tsx';
 import { SecureNotice } from '../components/home/SecureNotice.tsx';
-import { SessionPanel } from '../components/home/SessionPanel.tsx';
 import { StreakCard } from '../components/home/StreakCard.tsx';
 import {
-  dateOfKey,
-  greeting,
-  phaseFraction,
-  phaseProgressText,
-  WEEKDAYS_EN,
-  WEEKDAYS_JA,
-} from '../components/home/labels.ts';
+  choosePrompt,
+  FreshStartHeader,
+  MakeupLater,
+  TodayPrompt,
+  type TodayPromptKind,
+} from '../components/home/TodayPrompts.tsx';
 import { useClockTick, useLive } from '../components/home/useLive.ts';
+import { TogetherTodayCard } from '../components/together/TogetherTodayCard.tsx';
 import { Icon, Screen } from '../components/ui.tsx';
 import { dayKey, getSettings } from '../lib/db.ts';
-import { courseProgress, type CourseProgress } from '../srs/course.ts';
+import { courseProgress } from '../srs/course.ts';
 import { planToday } from '../srs/planner.ts';
-import { streak } from '../srs/progress.ts';
+import { setDefaultAudioRate } from '../speech/audio.ts';
 import { isPairedSettings } from '../sync/client.ts';
 import '../components/home/home.css';
 
-function PhaseLine({ progress }: { progress: CourseProgress }) {
-  const pct = `${Math.round(phaseFraction(progress) * 100)}%`;
-  return (
-    <Link to="/learn" className="today-phase">
-      <span className="today-phase-text">
-        <strong>Phase {progress.phase}</strong> · {phaseProgressText(progress)}
-      </span>
-      <span className="today-phase-bar" aria-hidden="true"><span style={{ width: pct }} /></span>
-      <Icon name="forward" size={16} />
-    </Link>
-  );
-}
+const PROMPTS: readonly TodayPromptKind[] = ['rest-token', 'comeback', 'travel', 'plan-review', 'makeup'];
 
 function TodaySkeleton() {
   return (
@@ -53,23 +46,32 @@ export default function Today() {
   // never sees a flash of the welcome redirect.
   const settings = useLiveQuery(() => getSettings(), []);
   const tick = useClockTick();
-  const streakLive = useLive(() => streak(), [tick]);
+  const habits = useLive(() => loadHabitSnapshot(), [tick]);
   const today = useLive(async () => {
     const [plan, progress] = await Promise.all([planToday(), courseProgress()]);
-    return {
-      plan,
-      progress,
-      tiles: await newItemTiles(plan.newItems),
-    };
+    return { plan, progress, tiles: await newItemTiles(plannedItems(plan)) };
   }, [tick]);
+  // Prompts put away ("Not now") in this visit, as 'kind@day'; earlier visits' come from storage.
+  const [putAway, setPutAway] = useState<ReadonlySet<string>>(() => new Set());
+
+  const courseDay = today.status === 'ready' ? today.value.plan.courseDay : undefined;
+  const audioRate = settings?.audioRate;
+  useEffect(() => {
+    if (courseDay !== undefined) setDefaultAudioRate(courseDay, audioRate);
+  }, [courseDay, audioRate]);
 
   if (!settings) return <TodaySkeleton />;
   if (!settings.onboarded) return <Navigate to="/welcome" replace />;
 
   const now = new Date();
-  const studyDay = dateOfKey(dayKey(now)).getDay();
+  const todayKey = dayKey(now);
+  const studyDay = dateOfKey(todayKey).getDay();
   const paired = isPairedSettings(settings);
-  const todayDone = streakLive.status === 'ready' && streakLive.value.todayDone;
+  const h = habits.status === 'ready' ? habits.value : undefined;
+  const dismissed = new Set(PROMPTS.filter((p) => putAway.has(`${p}@${todayKey}`) || isDismissed(p, todayKey)));
+  const promptInputs = h && { today: h.today, streak: h.streak, comeback: h.comeback, settings, dismissed };
+  const prompt = promptInputs ? choosePrompt(promptInputs) : null;
+  const goalMet = Boolean(h?.streak.todayGoal);
 
   return (
     <Screen tabs label="Today">
@@ -87,9 +89,18 @@ export default function Today() {
 
       <SecureNotice />
 
-      {streakLive.status === 'ready'
-        ? <StreakCard info={streakLive.value} />
+      {h
+        ? <StreakCard info={h.streak} freshStart={settings.freshStart && settings.freshStart <= todayKey ? settings.freshStart : undefined} />
         : <div className="hm-skeleton streak" aria-hidden="true" />}
+
+      <FreshStartHeader freshStart={settings.freshStart} today={todayKey} />
+      {promptInputs && (
+        <TodayPrompt kind={prompt} inputs={promptInputs} freshStart={settings.freshStart}
+          onDismiss={(kind) => {
+            dismiss(kind, todayKey);
+            setPutAway((set) => new Set(set).add(`${kind}@${todayKey}`));
+          }} />
+      )}
 
       {today.status === 'loading' && <div className="hm-skeleton panel" aria-hidden="true" />}
       {today.status === 'error' && (
@@ -99,23 +110,16 @@ export default function Today() {
           <button type="button" className="btn secondary small" onClick={today.retry}>Try again</button>
         </section>
       )}
-      {today.status === 'ready' && (
-        <>
-          <SessionPanel
-            plan={today.value.plan}
-            todayDone={todayDone}
-            // Nothing new is left at all (kana, kanji, words, grammar), and every kanji is met.
-            courseFinished={today.value.plan.courseComplete === true
-              && today.value.progress.unitsTotal > 0
-              && today.value.progress.unitsIntroduced === today.value.progress.unitsTotal}
-          />
-          {!todayDone && <NewToday tiles={today.value.tiles} />}
-        </>
-      )}
+      {today.status === 'ready' && <PlanPanel plan={today.value.plan} goalMet={goalMet} />}
+      {h && <MakeupLater streak={h.streak} />}
+
+      <TogetherTodayCard />
+
+      {today.status === 'ready' && !goalMet && <NewToday tiles={today.value.tiles} />}
 
       {paired ? <PartnerCard /> : <ConnectHint />}
 
-      {today.status === 'ready' && <PhaseLine progress={today.value.progress} />}
+      {today.status === 'ready' && <ChapterLine progress={today.value.progress} />}
 
       <SyncFooter paired={paired} />
     </Screen>

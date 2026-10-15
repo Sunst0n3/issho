@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RecorderError, startRecording, type Recording } from '../../speech/recorder.ts';
 import { Shadow } from './Shadow.tsx';
+import { audioMock } from './test-utils.tsx';
 
 vi.mock('../../speech/recorder.ts', async (original) => ({
   ...(await original<typeof import('../../speech/recorder.ts')>()),
@@ -9,7 +10,7 @@ vi.mock('../../speech/recorder.ts', async (original) => ({
   startRecording: vi.fn(),
 }));
 vi.mock('../../speech/recognition.ts', () => ({ recognitionAvailable: () => false, listen: vi.fn() }));
-vi.mock('../../speech/tts.ts', () => ({ speak: vi.fn(async () => {}), stopSpeaking: vi.fn(), ttsAvailable: () => true }));
+vi.mock('../../speech/audio.ts', async () => (await import('./test-utils.tsx')).audioMock);
 
 /** A recording that finishes when stopped. */
 function fakeTake() {
@@ -46,12 +47,16 @@ describe('Shadow', () => {
   it('records a take, offers it back, and frees the audio when it goes away', async () => {
     const take = fakeTake();
     vi.mocked(startRecording).mockResolvedValue(take);
-    const view = render(<Shadow text="{水|みず}をのむ。" />);
+    const view = render(<Shadow text="{水|みず}をのむ。" source={{ ref: 'sentence:s-1' }} />);
 
     fireEvent.click(shadowButton());
     fireEvent.click(await screen.findByRole('button', { name: 'Stop' }));
     expect(await screen.findByRole('button', { name: 'Record again' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Yours' })).toBeTruthy();
+
+    // The model is the sentence's own clip.
+    fireEvent.click(screen.getByRole('button', { name: 'Model' }));
+    expect(audioMock.play).toHaveBeenCalledWith({ ref: 'sentence:s-1' }, { fallbackText: '{水|みず}をのむ。' });
 
     view.unmount();
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:take');

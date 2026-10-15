@@ -1,0 +1,258 @@
+{
+  "engine": "0.25.2",
+  "speaker": 30,
+  "queries": {
+    "箸": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "ハ",
+              "consonant": "h",
+              "consonant_length": 0.047157760709524155,
+              "vowel": "a",
+              "vowel_length": 0.05202993005514145,
+              "pitch": 5.841127395629883
+            },
+            {
+              "text": "シ",
+              "consonant": "sh",
+              "consonant_length": 0.14343641698360443,
+              "vowel": "i",
+              "vowel_length": 0.13567054271697998,
+              "pitch": 4.620025157928467
+            }
+          ],
+          "accent": 1,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "ハ'シ"
+    },
+    "箸が": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "ハ",
+              "consonant": "h",
+              "consonant_length": 0.04853539541363716,
+              "vowel": "a",
+              "vowel_length": 0.048254288733005524,
+              "pitch": 5.8878254890441895
+            },
+            {
+              "text": "シ",
+              "consonant": "sh",
+              "consonant_length": 0.11388813704252243,
+              "vowel": "i",
+              "vowel_length": 0.04400879144668579,
+              "pitch": 5.592360019683838
+            },
+            {
+              "text": "ガ",
+              "consonant": "g",
+              "consonant_length": 0.1278132051229477,
+              "vowel": "a",
+              "vowel_length": 0.052904896438121796,
+              "pitch": 5.000058650970459
+            }
+          ],
+          "accent": 1,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "ハ'シガ"
+    },
+    "橋": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "ハ",
+              "consonant": "h",
+              "consonant_length": 0.047157760709524155,
+              "vowel": "a",
+              "vowel_length": 0.05202993005514145,
+              "pitch": 5.764799118041992
+            },
+            {
+              "text": "シ",
+              "consonant": "sh",
+              "consonant_length": 0.14343641698360443,
+              "vowel": "i",
+              "vowel_length": 0.13567054271697998,
+              "pitch": 4.2810893058776855
+            }
+          ],
+          "accent": 2,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "ハシ'"
+    },
+    "橋が": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "ハ",
+              "consonant": "h",
+              "consonant_length": 0.04853539541363716,
+              "vowel": "a",
+              "vowel_length": 0.048254288733005524,
+              "pitch": 5.522796630859375
+            },
+            {
+              "text": "シ",
+              "consonant": "sh",
+              "consonant_length": 0.11388813704252243,
+              "vowel": "i",
+              "vowel_length": 0.04400879144668579,
+              "pitch": 5.621291637420654
+            },
+            {
+              "text": "ガ",
+              "consonant": "g",
+              "consonant_length": 0.1278132051229477,
+              "vowel": "a",
+              "vowel_length": 0.052904896438121796,
+              "pitch": 5.05712890625
+            }
+          ],
+          "accent": 2,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "ハシ'ガ"
+    },
+    "端": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "ハ",
+              "consonant": "h",
+              "consonant_length": 0.047157760709524155,
+              "vowel": "a",
+              "vowel_length": 0.05202993005514145,
+              "pitch": 5.764799118041992
+            },
+            {
+              "text": "シ",
+              "consonant": "sh",
+              "consonant_length": 0.14343641698360443,
+              "vowel": "i",
+              "vowel_length": 0.13567054271697998,
+              "pitch": 4.2810893058776855
+            }
+          ],
+          "accent": 2,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "ハシ'"
+    },
+    "端が": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "ハ",
+              "consonant": "h",
+              "consonant_length": 0.04853539541363716,
+              "vowel": "a",
+              "vowel_length": 0.048254288733005524,
+              "pitch": 5.4159650802612305
+            },
+            {
+              "text": "シ",
+              "consonant": "sh",
+              "consonant_length": 0.11388813704252243,
+              "vowel": "i",
+              "vowel_length": 0.04400879144668579,
+              "pitch": 5.625606060028076
+            },
+            {
+              "text": "ガ",
+              "consonant": "g",
+              "consonant_length": 0.1278132051229477,
+              "vowel": "a",
+              "vowel_length": 0.052904896438121796,
+              "pitch": 5.324202060699463
+            }
+          ],
+          "accent": 3,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "ハシガ'"
+    }
+  }
+}

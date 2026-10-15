@@ -1,172 +1,210 @@
-// What each new-item lesson shows, loaded from the static data.
+// What each new-item lesson shows, loaded from the static data and the learner's progress.
 
 import { db } from '../../../lib/db.ts';
 import {
+  loadAccent,
+  loadAudioManifest,
   loadCurriculum,
-  loadGrammar,
+  loadGrammarIndex,
   loadKana,
   loadKanaExamples,
+  loadKanaRules,
   loadKanji,
   loadMnemonics,
   loadRadicals,
-  loadSurvivalWords,
-  loadWordIndex,
-  loadWords,
+  loadWordInfo,
+  type KanaExample,
+  type WordInfo,
 } from '../../../lib/data.ts';
 import { rubyToPlain } from '../../../lib/ruby.ts';
-import type { GrammarPoint, KanaEntry, KanjiEntry, RadicalEntry, SurvivalWord, WordEntry } from '../../../lib/types.ts';
+import type {
+  AccentInfo,
+  ClipAccentPhrase,
+  CurriculumUnit,
+  GrammarPoint,
+  KanaEntry,
+  KanaRule,
+  KanjiEntry,
+  MnemonicEntry,
+  RubyText,
+} from '../../../lib/types.ts';
 import type { NewItemPlan } from '../../../srs/course.ts';
+import type { IntroduceResult } from '../../../srs/items.ts';
+import { clipRef } from '../../../../shared/voicevox.ts';
+import { grammarGloss } from '../format.ts';
+import type { LearnedItem } from '../session/machine.ts';
 
-export interface ExampleWord {
-  kana: string;
-  /** The usual kanji spelling, if any. */
-  written?: string;
-  en: string;
+/** One entry of a kanji's parts panel: a component kanji (its keyword) or a named part (its name). */
+export interface PartInfo {
+  char: string;
+  name: string;
+  kind: 'kanji' | 'part';
+  /** The learner met it before: an introduced component kanji, or a named part of an earlier lesson's kanji. */
+  known: boolean;
 }
 
 export type LessonData =
-  | { kind: 'kanji'; kanji: KanjiEntry; words: WordEntry[]; mnemonic?: string; kana: KanaEntry[] }
-  | { kind: 'radical'; radical: RadicalEntry; examples: KanjiEntry[]; mnemonic?: string }
-  | { kind: 'kana'; kana: KanaEntry; example?: ExampleWord; all: KanaEntry[] }
-  | { kind: 'vocab'; vocab: SurvivalWord; kana: KanaEntry[] }
-  | { kind: 'grammar'; point: GrammarPoint };
+  | { kind: 'kana'; kana: KanaEntry; example?: KanaExample }
+  | { kind: 'kanaRule'; rule: KanaRule }
+  | {
+      kind: 'kanji';
+      kanji: KanjiEntry;
+      unit?: CurriculumUnit;
+      anchor?: WordInfo;
+      anchorAccent?: AccentInfo;
+      mnemonic?: MnemonicEntry;
+      parts: PartInfo[];
+      /** Some part is new to the learner: the lesson starts with a trace. */
+      newPart: boolean;
+    }
+  | { kind: 'core'; word: WordInfo; accent?: AccentInfo; display: RubyText }
+  | { kind: 'staged'; word: WordInfo; accent?: AccentInfo; upgrade: boolean }
+  | { kind: 'grammar'; point: GrammarPoint; examplePitch: (ClipAccentPhrase[] | undefined)[] };
 
-/** How a learned item appears in the session summary: the character and a word of meaning. */
-export interface LearnedLabel {
-  itemId: string;
-  text: string;
-  lang?: 'ja';
-  meaning?: string;
+/** The word as ruby markup: `{written|kana}` when it has a kanji spelling the learner can be shown, else kana. */
+export function wordRuby(word: Pick<WordInfo, 'written' | 'kana'>, spelled = true): RubyText {
+  return spelled && word.written !== word.kana ? `{${word.written}|${word.kana}}` : word.kana;
 }
 
-const EXAMPLES_PER_RADICAL = 3;
-const EXAMPLE_MAX_LENGTH = 5;
-
-/** Kanji containing the radical: ones already learned first, then in teaching order. */
-async function radicalExamples(char: string): Promise<KanjiEntry[]> {
-  const [curriculum, kanji, known] = await Promise.all([
-    loadCurriculum(),
-    loadKanji(),
-    db.items.where('kind').equals('kanji').primaryKeys(),
-  ]);
-  const knownSet = new Set(known.map((id) => String(id).slice('kanji:'.length)));
-  const using = curriculum.units
-    .filter((u) => u.type === 'kanji' && kanji[u.char]?.components.includes(char))
-    .map((u) => kanji[u.char]);
-  return [...using.filter((k) => knownSet.has(k.char)), ...using.filter((k) => !knownSet.has(k.char))].slice(0, EXAMPLES_PER_RADICAL);
+async function introducedIds(kind: 'kanji'): Promise<Set<string>> {
+  return new Set((await db.items.where('kind').equals(kind).primaryKeys()).map((id) => String(id).slice(kind.length + 1)));
 }
 
 /**
- * Whether `word` uses `char` on its own: か in かさ, but not き in きゅう (a
- * yōon) or フ in ファ. A yōon `char` is matched as a whole.
+ * The parts panel of a kanji: its component kanji with their keyword and its named parts with their names, each
+ * marked known or new. A named part counts as known once a kanji that has it was introduced.
  */
-export function usesKana(word: string, char: string): boolean {
-  let at = word.indexOf(char);
-  while (at >= 0) {
-    if ([...char].length > 1 || !/^[ゃゅょャュョぁぃぅぇぉァィゥェォ]/.test(word.slice(at + char.length))) return true;
-    at = word.indexOf(char, at + 1);
-  }
-  return false;
-}
-
-/** A short everyday word with this kana (not only inside a yōon), preferring words that start with it. */
-async function searchedKanaExample(kana: KanaEntry): Promise<ExampleWord | undefined> {
-  const starts = (s: string) => (s.startsWith(kana.char) ? 0 : 1);
-  const best = <T extends { kana: string }>(list: T[], rank: (w: T) => number) =>
-    list
-      .filter((w) => usesKana(w.kana, kana.char) && [...w.kana].length <= EXAMPLE_MAX_LENGTH)
-      .sort((a, b) => starts(a.kana) - starts(b.kana) || rank(a) - rank(b))[0];
-
-  const survival = best(await loadSurvivalWords(), (w) => [...w.kana].length);
-  if (survival) return { kana: survival.kana, en: survival.en };
-  // Katakana mostly appears in loanwords written in kana.
-  const words = (await loadWords()).filter((w) => w.written === w.kana && w.freqRank <= 30);
-  const word = best(words, (w) => w.freqRank);
-  return word && { kana: word.kana, en: word.meanings[0] };
-}
-
-/**
- * The example word on a kana's learn card: the hand-picked one from
- * kana-examples.json, else a word found in the survival words and the dictionary.
- */
-export async function kanaExample(kana: KanaEntry): Promise<ExampleWord | undefined> {
-  try {
-    const picked = (await loadKanaExamples())[kana.char];
-    if (picked) return { kana: picked.kana, ...(picked.written ? { written: picked.written } : {}), en: picked.en };
-  } catch {
-    // An older offline copy may not have the file yet: search for a word instead.
-  }
-  return searchedKanaExample(kana);
+async function partsOf(kanji: KanjiEntry, all: Record<string, KanjiEntry>): Promise<PartInfo[]> {
+  const [radicals, introduced] = await Promise.all([loadRadicals(), introducedIds('kanji')]);
+  const names = new Map(radicals.map((r) => [r.char, r.name]));
+  const seenParts = new Set([...introduced].flatMap((c) => (c === kanji.char ? [] : (all[c]?.parts ?? []))));
+  return [
+    ...kanji.components.map((c): PartInfo => ({ char: c, name: all[c]?.meanings[0] ?? '', kind: 'kanji', known: introduced.has(c) })),
+    ...kanji.parts.map((c): PartInfo => ({ char: c, name: names.get(c) ?? '', kind: 'part', known: seenParts.has(c) })),
+  ];
 }
 
 /** The lesson content for a planned item; null when its data is missing. */
 export async function loadLesson(plan: NewItemPlan): Promise<LessonData | null> {
   switch (plan.kind) {
+    case 'kana': {
+      const [all, examples] = await Promise.all([loadKana(), loadKanaExamples().catch(() => ({} as Record<string, KanaExample>))]);
+      const kana = all.find((k) => k.char === plan.key);
+      if (!kana) return null;
+      const example = examples[kana.char];
+      return { kind: 'kana', kana, ...(example ? { example } : {}) };
+    }
+    case 'kanaRule': {
+      const rule = (await loadKanaRules()).find((r) => r.id === plan.key);
+      return rule ? { kind: 'kanaRule', rule } : null;
+    }
     case 'kanji': {
-      const [kanji, index, mnemonics, kana] = await Promise.all([loadKanji(), loadWordIndex(), loadMnemonics(), loadKana()]);
+      const [kanji, curriculum, mnemonics, info, accents] = await Promise.all([
+        loadKanji(), loadCurriculum(), loadMnemonics(), loadWordInfo(), loadAccent(),
+      ]);
       const entry = kanji[plan.key];
       if (!entry) return null;
-      const words = (plan.words ?? []).flatMap((id) => index.get(id) ?? []);
-      return { kind: 'kanji', kanji: entry, words, mnemonic: mnemonics[plan.key], kana };
+      const unit = curriculum.units.find((u) => u.char === plan.key);
+      const anchorRef = plan.anchor ?? unit?.anchor ?? null;
+      const anchor = anchorRef ? info(anchorRef) : undefined;
+      const parts = await partsOf(entry, kanji);
+      const mnemonic = mnemonics[plan.key];
+      const anchorAccent = anchorRef ? accents[anchorRef] : undefined;
+      return {
+        kind: 'kanji', kanji: entry, parts, newPart: parts.some((p) => !p.known),
+        ...(unit ? { unit } : {}), ...(anchor ? { anchor } : {}), ...(anchorAccent ? { anchorAccent } : {}), ...(mnemonic ? { mnemonic } : {}),
+      };
     }
-    case 'radical': {
-      const [radicals, mnemonics] = await Promise.all([loadRadicals(), loadMnemonics()]);
-      const radical = radicals.find((r) => r.char === plan.key);
-      return radical
-        ? { kind: 'radical', radical, examples: await radicalExamples(plan.key), mnemonic: mnemonics[plan.key] }
-        : null;
-    }
-    case 'kana': {
-      const all = await loadKana();
-      const kana = all.find((k) => k.char === plan.key);
-      return kana ? { kind: 'kana', kana, example: await kanaExample(kana), all } : null;
-    }
-    case 'vocab': {
-      const [survival, kana] = await Promise.all([loadSurvivalWords(), loadKana()]);
-      const vocab = survival.find((w) => w.id === plan.key);
-      return vocab ? { kind: 'vocab', vocab, kana } : null;
+    case 'core':
+    case 'staged': {
+      const [info, accents, introduced] = await Promise.all([loadWordInfo(), loadAccent(), introducedIds('kanji')]);
+      const word = info(plan.itemId);
+      if (!word) return null;
+      const accent = accents[plan.itemId];
+      if (plan.kind === 'staged') return { kind: 'staged', word, upgrade: Boolean(plan.upgrade), ...(accent ? { accent } : {}) };
+      // A core word is shown in kana until every kanji of its spelling has been taught.
+      const spelled = word.kanji.length > 0 && word.kanji.every((c) => introduced.has(c));
+      return { kind: 'core', word, display: wordRuby(word, spelled), ...(accent ? { accent } : {}) };
     }
     case 'grammar': {
-      const point = (await loadGrammar()).find((g) => g.id === plan.key);
-      return point ? { kind: 'grammar', point } : null;
+      const [index, manifest] = await Promise.all([loadGrammarIndex(), loadAudioManifest()]);
+      const point = index.get(plan.key);
+      if (!point) return null;
+      const examplePitch = point.examples.slice(0, 3).map((_, n) => {
+        const id = manifest.byRef[clipRef.grammarExample(point.id, n)];
+        return id ? manifest.clips[id]?.accentPhrases : undefined;
+      });
+      return { kind: 'grammar', point, examplePitch };
     }
-  }
-}
-
-const vocabGloss = (vocab: SurvivalWord) => vocab.en.split(/[;,(]/)[0].trim();
-
-export function lessonLabel(itemId: string, data: LessonData): LearnedLabel {
-  switch (data.kind) {
-    case 'kanji': return { itemId, text: data.kanji.char, lang: 'ja', meaning: data.kanji.meanings[0] };
-    case 'radical': return { itemId, text: data.radical.char, lang: 'ja', meaning: data.radical.meaning };
-    case 'kana': return { itemId, text: data.kana.char, lang: 'ja', meaning: data.kana.romaji };
-    case 'vocab': return { itemId, text: data.vocab.kana, lang: 'ja', meaning: vocabGloss(data.vocab) };
-    case 'grammar': return { itemId, text: rubyToPlain(data.point.pattern), lang: 'ja', meaning: 'grammar' };
   }
 }
 
 /**
- * Summary labels for items by id ('kanji:水'), in the order given. Words and
- * saved sentences (which come along with other things) and unknown items are left out.
+ * What a sitting learned from one introduced plan item: the item ids, its New cards, and the card the memory pass
+ * retrieves (kanji/kana write, core produce, else core listen; none for rules, grammar and staged words).
  */
-export async function learnedLabels(itemIds: readonly string[]): Promise<LearnedLabel[]> {
-  const [kanji, radicals, kana, survival, grammar] = await Promise.all([
-    loadKanji(), loadRadicals(), loadKana(), loadSurvivalWords(), loadGrammar(),
-  ]);
-  return itemIds.flatMap((itemId): LearnedLabel[] => {
-    const at = itemId.indexOf(':');
-    const kind = itemId.slice(0, at);
-    const key = itemId.slice(at + 1);
-    let label: LearnedLabel | undefined;
-    if (kind === 'kanji' && kanji[key]) label = lessonLabel(itemId, { kind, kanji: kanji[key], words: [], kana: [] });
-    const radical = kind === 'radical' ? radicals.find((r) => r.char === key) : undefined;
-    if (radical) label = lessonLabel(itemId, { kind: 'radical', radical, examples: [] });
-    const k = kind === 'kana' ? kana.find((e) => e.char === key) : undefined;
-    if (k) label = lessonLabel(itemId, { kind: 'kana', kana: k, all: [] });
-    const vocab = kind === 'vocab' ? survival.find((w) => w.id === key) : undefined;
-    if (vocab) label = lessonLabel(itemId, { kind: 'vocab', vocab, kana: [] });
-    const point = kind === 'grammar' ? grammar.find((g) => g.id === key) : undefined;
-    if (point) label = lessonLabel(itemId, { kind: 'grammar', point });
-    return label ? [label] : [];
-  });
+export function learnedItem(plan: NewItemPlan, results: readonly IntroduceResult[]): LearnedItem {
+  const cards = results.flatMap((r) => r.cards);
+  const fresh = cards.filter((c) => c.reps === 0 && !c.suspended).map((c) => c.id);
+  const has = (id: string) => fresh.includes(id);
+  let memoryCardId: string | undefined;
+  if (plan.kind === 'kanji' || plan.kind === 'kana') memoryCardId = `${plan.itemId}|write`;
+  else if (plan.kind === 'core') memoryCardId = has(`${plan.itemId}|produce`) ? `${plan.itemId}|produce` : `${plan.itemId}|listen`;
+  return {
+    plan,
+    itemIds: [...new Set(results.map((r) => r.item.id))],
+    cardIds: fresh,
+    ...(memoryCardId && has(memoryCardId) ? { memoryCardId } : {}),
+  };
+}
+
+/** "read あかい and かお" / "write 休 and read 休み" style phrases joined into one line. */
+function joinAnd(parts: readonly string[]): string {
+  if (parts.length <= 1) return parts[0] ?? '';
+  return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
+}
+
+const MAX_NAMED = 2;
+
+/**
+ * The summary's "You can now …" line from what was introduced today: kanji first ("write 休 and read 休み"), then
+ * grammar ("use 〜たい: want to"), then kana (read two of today's practice words, or the kana themselves), then core
+ * words ("say ありがとう"). Undefined when nothing was introduced.
+ */
+export async function youCanNow(itemIds: readonly string[], kanaWords: readonly string[] = []): Promise<string | undefined> {
+  const byKind = (kind: string) => itemIds.filter((id) => id.startsWith(`${kind}:`)).map((id) => id.slice(kind.length + 1));
+  const clauses: string[] = [];
+  const kanjiChars = byKind('kanji');
+  if (kanjiChars.length) {
+    const [curriculum, info] = await Promise.all([loadCurriculum(), loadWordInfo()]);
+    const named = kanjiChars.slice(0, MAX_NAMED);
+    const anchors = named.flatMap((c) => {
+      const ref = curriculum.units.find((u) => u.char === c)?.anchor;
+      const w = ref ? info(ref) : undefined;
+      return w && w.written !== c ? [w.written] : [];
+    });
+    clauses.push(`write ${joinAnd(named)}${anchors.length ? ` and read ${joinAnd(anchors)}` : ''}`);
+  }
+  const grammarIds = byKind('grammar');
+  if (grammarIds.length) {
+    const index = await loadGrammarIndex();
+    const point = index.get(grammarIds[0]);
+    if (point) clauses.push(`use ${rubyToPlain(point.pattern)} (${grammarGloss(point).replace(/^"|"$/g, '')})`);
+  }
+  const kanaChars = byKind('kana');
+  if (kanaChars.length && clauses.length < 2) {
+    clauses.push(kanaWords.length ? `read ${joinAnd(kanaWords.slice(0, MAX_NAMED))}` : `read ${joinAnd(kanaChars.slice(0, 5))}`);
+  }
+  const rules = byKind('kanaRule');
+  if (rules.length && clauses.length < 2) {
+    const rule = (await loadKanaRules()).find((r) => r.id === rules[0]);
+    if (rule) clauses.push(`read ${joinAnd(rule.practiceWords.slice(0, MAX_NAMED).map((w) => w.kana))}`);
+  }
+  const cores = byKind('core');
+  if (cores.length && clauses.length < 2) {
+    const info = await loadWordInfo();
+    const words = cores.slice(0, MAX_NAMED).flatMap((id) => info(`core:${id}`)?.kana ?? []);
+    if (words.length) clauses.push(`say ${joinAnd(words)}`);
+  }
+  return clauses.length ? `You can now ${joinAnd(clauses)}.` : undefined;
 }

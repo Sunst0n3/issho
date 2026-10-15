@@ -1,0 +1,158 @@
+{
+  "id": "st-l1-17",
+  "level": "L1",
+  "unit": 22,
+  "title": "Ken starts running",
+  "titleJp": "ケン、{走|はし}り{始|はじ}める",
+  "topic": "health",
+  "grammar": [
+    "to-conditional",
+    "you-ni-naru",
+    "you-da",
+    "nakutemo-ii",
+    "sugiru",
+    "hou-ga-ii",
+    "volitional",
+    "potential-form",
+    "temo-ii",
+    "sou-hearsay",
+    "te-miru",
+    "te-shimau",
+    "te-imasu"
+  ],
+  "sentences": [
+    {
+      "jp": "{去年|きょねん}の／{秋|あき}、／ケンは／{病院|びょういん}で／{体|からだ}を／{調|しら}べてもらいました。",
+      "en": "Last autumn, Ken had a check-up at the hospital."
+    },
+    {
+      "jp": "お{医者|いしゃ}さんは／「{少|すこ}し／{太|ふと}りすぎですね。／{毎日|まいにち}／{運動|うんどう}したほうが／いいですよ。」と／{言|い}いました。",
+      "en": "The doctor said, \"You're a little overweight. You should exercise every day.\""
+    },
+    {
+      "jp": "ケンは／{毎朝|まいあさ}／{走|はし}ろうと／{決|き}めました。",
+      "en": "Ken decided to go running every morning."
+    },
+    {
+      "jp": "{最初|さいしょ}の／{日|ひ}、／ケンは／{六時|ろくじ}に／{起|お}きて、／{近|ちか}くの／{公園|こうえん}へ／{行|い}きました。",
+      "en": "On the first day, Ken got up at six and went to the park nearby."
+    },
+    {
+      "jp": "でも、／{五分|ごふん}／{走|はし}ると、／もう／{疲|つか}れてしまいました。",
+      "en": "But after five minutes of running, he was already worn out."
+    },
+    {
+      "jp": "「だめだ。／{一|いち}キロも／{走|はし}れない。」",
+      "en": "\"This is hopeless. I can't even run one kilometre.\""
+    },
+    {
+      "jp": "{次|つぎ}の／{日|ひ}は／{足|あし}が／{痛|いた}くて、／{階段|かいだん}を／{上|あ}がるのも／{大変|たいへん}でした。",
+      "en": "The next day his legs hurt so much that even climbing the stairs was hard."
+    },
+    {
+      "jp": "ミキは／「{無理|むり}しなくても／いいよ。／{最初|さいしょ}は／{歩|ある}いても／いいんじゃない？」と／{言|い}いました。",
+      "en": "Miki said, \"You don't have to push yourself. Isn't it fine to just walk at first?\""
+    },
+    {
+      "jp": "それで、／ケンは／{最初|さいしょ}の／{一週間|いっしゅうかん}、／{歩|ある}く／だけに／しました。",
+      "en": "So for the first week, Ken just walked."
+    },
+    {
+      "jp": "{二週間目|にしゅうかんめ}から、／{少|すこ}しずつ／{走|はし}るように／なりました。",
+      "en": "From the second week, he gradually started to run."
+    },
+    {
+      "jp": "{一|いっ}か{月|げつ}／{続|つづ}けると、／{三|さん}キロ／{走|はし}れるように／なりました。",
+      "en": "After a month of keeping it up, he could run three kilometres."
+    },
+    {
+      "jp": "{朝|あさ}、／{公園|こうえん}に／{行|い}くと、／いつも／{同|おな}じ／おじいさんが／{犬|いぬ}と／{散歩|さんぽ}していました。",
+      "en": "Whenever he went to the park in the morning, the same old man was always out walking his dog."
+    },
+    {
+      "jp": "{最初|さいしょ}は／{挨拶|あいさつ}／だけでしたが、／{少|すこ}しずつ／{話|はな}すように／なりました。",
+      "en": "At first they only said hello, but little by little they started to chat."
+    },
+    {
+      "jp": "おじいさんは／{若|わか}い／とき、／{毎日|まいにち}／{十|じゅっ}キロ／{走|はし}っていたそうです。",
+      "en": "Apparently, when he was young, the old man used to run ten kilometres every day."
+    },
+    {
+      "jp": "「{毎日|まいにち}／{続|つづ}けると、／{体|からだ}が／{変|か}わりますよ。」と／おじいさんは／{言|い}いました。",
+      "en": "\"If you keep it up every day, your body will change,\" the old man said."
+    },
+    {
+      "jp": "{本当|ほんとう}に、／その／とおりでした。",
+      "en": "And he was right."
+    },
+    {
+      "jp": "{冬|ふゆ}に／なると、／ケンは／{前|まえ}より／{早|はや}く／{起|お}きられるように／なりました。",
+      "en": "By winter, Ken was able to get up earlier than before."
+    },
+    {
+      "jp": "{会社|かいしゃ}の／{階段|かいだん}も、／もう／{大変|たいへん}じゃ／ありません。",
+      "en": "The stairs at work weren't hard any more, either."
+    },
+    {
+      "jp": "ズボンも／{少|すこ}し／{大|おお}きく／なったようです。",
+      "en": "His trousers seemed to have got a little bigger, too."
+    },
+    {
+      "jp": "ミキが／「{最近|さいきん}、／{元気|げんき}に／なったね。」と／{言|い}いました。",
+      "en": "Miki said, \"You've got so much more energy lately.\""
+    },
+    {
+      "jp": "ある／{朝|あさ}、／ミキも／「{私|わたし}も／{一緒|いっしょ}に／{走|はし}ってみたい。」と／{言|い}いました。",
+      "en": "One morning, Miki said, \"I want to try running with you too.\""
+    },
+    {
+      "jp": "でも、／ミキは／{五分|ごふん}／{走|はし}ると、／{止|と}まってしまいました。",
+      "en": "But after five minutes of running, Miki had to stop."
+    },
+    {
+      "jp": "「ケン、／{毎朝|まいあさ}／こんな／ことを／しているの？」",
+      "en": "\"Ken, you do this every morning?\""
+    },
+    {
+      "jp": "ケンは／{笑|わら}って／{言|い}いました。／「{大丈夫|だいじょうぶ}。／{速|はや}く／{走|はし}らなくても／いいんだよ。」",
+      "en": "Ken laughed and said, \"It's fine. You don't have to run fast.\""
+    },
+    {
+      "jp": "{春|はる}に／なると、／{二人|ふたり}は／{週末|しゅうまつ}に／{一緒|いっしょ}に／{走|はし}るように／なりました。",
+      "en": "When spring came, the two of them started running together at weekends."
+    },
+    {
+      "jp": "ミキは／{途中|とちゅう}で／よく／{歩|ある}きますが、／{最後|さいご}まで／{頑張|がんば}ります。",
+      "en": "Miki often walks part of the way, but she keeps going to the end."
+    },
+    {
+      "jp": "ある／{日曜日|にちようび}、／ケンは／{初|はじ}めて／{十|じゅっ}キロ／{走|はし}りました。",
+      "en": "One Sunday, Ken ran ten kilometres for the first time."
+    },
+    {
+      "jp": "{公園|こうえん}の／{入|い}り{口|ぐち}で、／あの／おじいさんが／{待|ま}っていました。",
+      "en": "At the park entrance, the old man was waiting for him."
+    },
+    {
+      "jp": "「すごいですね。／もう／{私|わたし}より／{速|はや}いようですね。」",
+      "en": "\"Wonderful. It looks like you're already faster than me.\""
+    },
+    {
+      "jp": "その／{夜|よる}、／{二人|ふたり}は／ビールで／{乾杯|かんぱい}しました。",
+      "en": "That night, the two of them toasted with beer."
+    },
+    {
+      "jp": "「{明日|あした}は／{走|はし}らなくても／いいよね？」／「うん。／でも、／{明後日|あさって}は／また／{走|はし}ろうね。」",
+      "en": "\"We don't have to run tomorrow, right?\" \"Right. But let's run again the day after.\""
+    }
+  ],
+  "gist": {
+    "q": "How did Ken manage to start running?",
+    "options": [
+      "He ran ten kilometres on the very first day",
+      "He walked for the first week, then slowly started running",
+      "He joined a running club at work"
+    ],
+    "answer": 1
+  }
+}

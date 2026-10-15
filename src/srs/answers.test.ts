@@ -4,12 +4,18 @@ import type { KanaEntry } from '../lib/types.ts';
 import {
   choicesFrom,
   gradeFor,
+  gradeForRecallWriting,
   gradeForWriting,
+  gradeWordRead,
+  isSurpriseMiss,
   kanaMatches,
   meaningMatches,
+  needsCalibrationTip,
   normalizeKana,
   romajiMatches,
   seededRandom,
+  selfGrade,
+  sentenceMatches,
   slipCount,
   toKana,
 } from './answers.ts';
@@ -346,5 +352,81 @@ describe('choicesFrom', () => {
       Array.from({ length: 40 }, (_, seed) => choicesFrom('water', pool, 4, key, seededRandom(seed)).indexOf('water')),
     );
     expect(positions.size).toBe(4);
+  });
+});
+
+describe('v2 grades', () => {
+  it('never returns Easy for any combination of answer flags', () => {
+    for (const correct of [true, false]) {
+      for (const usedHint of [true, false, undefined]) {
+        for (const choice of [true, false, undefined]) {
+          for (const retries of [0, 1, 3, undefined]) {
+            const grade = gradeFor({ correct, usedHint, choice, retries });
+            expect(grade).not.toBe(Rating.Easy);
+            if (!correct) expect(grade).toBe(Rating.Again);
+            else if (usedHint || choice || (retries ?? 0) > 0) expect(grade).toBe(Rating.Hard);
+            else expect(grade).toBe(Rating.Good);
+          }
+        }
+      }
+    }
+  });
+
+  it('grades a typed answer: right → Good, after a hint → Hard, after a choice hint → Hard, wrong → Again', () => {
+    expect(gradeFor({ correct: true })).toBe(Rating.Good);
+    expect(gradeFor({ correct: true, usedHint: true })).toBe(Rating.Hard);
+    expect(gradeFor({ correct: true, choice: true })).toBe(Rating.Hard);
+    expect(gradeFor({ correct: false })).toBe(Rating.Again);
+  });
+
+  it('self-grades Missed → Again and Got it → Good', () => {
+    expect(selfGrade(false)).toBe(Rating.Again);
+    expect(selfGrade(true)).toBe(Rating.Good);
+  });
+
+  it('grades word reads on both the reading and the meaning', () => {
+    expect(gradeWordRead({ readingCorrect: true, retries: 0, knewMeaning: true })).toBe(Rating.Good);
+    expect(gradeWordRead({ readingCorrect: true, retries: 0, knewMeaning: false })).toBe(Rating.Again);
+    expect(gradeWordRead({ readingCorrect: false, retries: 0, knewMeaning: true })).toBe(Rating.Again);
+    expect(gradeWordRead({ readingCorrect: true, retries: 1, knewMeaning: true })).toBe(Rating.Hard);
+    expect(gradeWordRead({ readingCorrect: true, retries: 0, usedHint: true, knewMeaning: true })).toBe(Rating.Hard);
+    expect(gradeWordRead({ readingCorrect: true, retries: 0, choice: true, knewMeaning: true })).toBe(Rating.Hard);
+  });
+
+  it('judges recall writing as a whole, never by stroke order', () => {
+    const base = { strokeCount: 4, missing: 0, extra: 0, unmatched: 0, hintUsed: false };
+    expect(gradeForRecallWriting({ ...base, missing: 1 })).toBe(Rating.Again);
+    expect(gradeForRecallWriting({ ...base, extra: 1 })).toBe(Rating.Again);
+    expect(gradeForRecallWriting({ ...base, strokeCount: 10, unmatched: 2 })).toBe(Rating.Again);
+    expect(gradeForRecallWriting({ ...base, strokeCount: 6, unmatched: 1 })).toBe(Rating.Again);
+    expect(gradeForRecallWriting({ ...base, strokeCount: 10, unmatched: 1 })).toBe(Rating.Hard);
+    expect(gradeForRecallWriting({ ...base, strokeCount: 7, unmatched: 1 })).toBe(Rating.Hard);
+    expect(gradeForRecallWriting({ ...base, hintUsed: true })).toBe(Rating.Hard);
+    expect(gradeForRecallWriting(base)).toBe(Rating.Good);
+    expect(gradeForRecallWriting({ ...base, missing: 1, override: true })).toBe(Rating.Hard);
+  });
+
+  it('matches a typed sentence against the accepted answers, with the は→わ variant', () => {
+    const answers = ['わたしはかいしゃいんです', 'わたしわかいしゃいんです'];
+    expect(sentenceMatches('watashiwakaishaindesu', answers)).toBe(true);
+    expect(sentenceMatches('watashi wa kaishain desu.', answers)).toBe(true);
+    expect(sentenceMatches('わたしはかいしゃいんです。', answers)).toBe(true);
+    expect(sentenceMatches('watashigakaishaindesu', answers)).toBe(false);
+    expect(sentenceMatches('', answers)).toBe(false);
+  });
+
+  it('flags a surprise miss after a fast Good', () => {
+    expect(isSurpriseMiss({ grade: Rating.Good, durationMs: 2000 }, 5000, Rating.Again)).toBe(true);
+    expect(isSurpriseMiss({ grade: Rating.Good, durationMs: 4000 }, 5000, Rating.Again)).toBe(false);
+    expect(isSurpriseMiss({ grade: Rating.Hard, durationMs: 2000 }, 5000, Rating.Again)).toBe(false);
+    expect(isSurpriseMiss({ grade: Rating.Good, durationMs: 2000 }, 5000, Rating.Good)).toBe(false);
+    expect(isSurpriseMiss(undefined, 5000, Rating.Again)).toBe(false);
+  });
+
+  it('shows the calibration tip when more than 10 % of 20+ write answers were overridden', () => {
+    const logs = (overrides: number, n = 20) => Array.from({ length: n }, (_, i) => (i < overrides ? { override: true as const } : {}));
+    expect(needsCalibrationTip(logs(3))).toBe(true);
+    expect(needsCalibrationTip(logs(2))).toBe(false);
+    expect(needsCalibrationTip(logs(3, 19))).toBe(false);
   });
 });

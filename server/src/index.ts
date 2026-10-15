@@ -3,6 +3,7 @@ import { createAnthropicAi } from './ai.ts';
 import { buildApp, loggerOptions } from './app.ts';
 import { ConfigError, dataPaths, loadConfig, type Config } from './config.ts';
 import { Store } from './db.ts';
+import { createVoicevoxTts } from './tts.ts';
 
 /** Below Docker's default 10 s stop timeout, so we exit on our own terms before SIGKILL. */
 const SHUTDOWN_TIMEOUT_MS = 8000;
@@ -34,7 +35,10 @@ const store = new Store(dataPaths(config.dataDir).database);
 const ai = config.anthropicApiKey
   ? createAnthropicAi({ apiKey: config.anthropicApiKey, model: config.anthropicModel })
   : null;
-const app = await buildApp({ config, store, ai, logger: loggerOptions(config.logLevel) });
+const tts = config.voicevoxUrl
+  ? createVoicevoxTts({ baseUrl: config.voicevoxUrl, cacheDir: dataPaths(config.dataDir).tts, maxCacheMb: config.ttsCacheMb })
+  : null;
+const app = await buildApp({ config, store, ai, tts, logger: loggerOptions(config.logLevel) });
 
 let shuttingDown = false;
 async function shutdown(signal: NodeJS.Signals): Promise<void> {
@@ -71,6 +75,12 @@ if (config.householdCode.length < 8) {
   app.log.warn('HOUSEHOLD_CODE is shorter than 8 characters; anyone who guesses it can join');
 }
 app.log.info(
-  { household: store.householdName() ?? config.householdName, aiEnabled: ai !== null, model: ai ? config.anthropicModel : undefined },
+  {
+    household: store.householdName() ?? config.householdName,
+    aiEnabled: ai !== null,
+    model: ai ? config.anthropicModel : undefined,
+    // The engine may still be starting (its image warms up for a while); /api/health follows it.
+    tts: tts ? config.voicevoxUrl : 'off',
+  },
   'issho server ready',
 );

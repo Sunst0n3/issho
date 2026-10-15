@@ -1,19 +1,24 @@
-// Writing a new character three times: trace, guided (start dot only), then
-// from memory. Each pass moves on by itself after a short "Nice".
+// Writing a new character in a lesson: a trace (only when one of its parts is new) and a guided copy beside the
+// model with the learner's ink visible. Each pass moves on by itself after a short "Nice". (Free practice can add a
+// pass from memory.)
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { StrokeOrderStrip } from '../../../writing/StrokeOrder.tsx';
 import { useStrokes } from '../../../writing/useStrokes.ts';
 import { WritingPad, type WritingMode, type WritingPadHandle, type WritingResult } from '../../../writing/WritingPad.tsx';
+import { Glyph } from '../../Glyph.tsx';
 import { Icon } from '../../ui.tsx';
 import { CoachText, PadTools, useStrokeCoach } from '../StrokeCoach.tsx';
 
 export const ALL_PASSES: WritingMode[] = ['trace', 'guided', 'memory'];
-const PASS_NAMES: Record<WritingMode, string> = { trace: 'Trace', guided: 'Guided', memory: 'Memory' };
+/** A lesson's passes: a trace only when a part is new, then the guided copy. */
+export const LESSON_PASSES: WritingMode[] = ['trace', 'guided'];
+const PASS_NAMES: Record<WritingMode, string> = { trace: 'Trace', guided: 'Copy', memory: 'Memory', recall: 'Recall' };
 const NEXT_PASS: Record<WritingMode, string> = {
   trace: 'trace it',
-  guided: 'write it with just the start dots',
+  guided: 'copy it beside the model',
   memory: 'write it from memory',
+  recall: 'write it from memory',
 };
 /** How long the "Nice" state shows before the next pass. */
 export const NICE_MS = 900;
@@ -107,9 +112,12 @@ export function WriteSteps({ char, passes = ALL_PASSES, ask, target, label, onDo
     <section className="st-write st-write-steps" aria-label={`Writing ${char}`}>
       <div className="st-write-prompt">
         <h2 className="st-ask">{ask}</h2>
-        <p className="st-write-target">{target}</p>
+        <div className="st-write-target">{target}</div>
       </div>
       <PassSteps passes={passes} at={at} done={status === 'done'} />
+      {mode === 'guided' && (
+        <div className="st-model" aria-hidden="true"><Glyph char={char} size={56} /></div>
+      )}
       <WritingPad ref={pad} strokes={strokes} mode={mode} label={padLabel(char, mode, label)}
         onStrokeResult={coach.onStrokeResult} onComplete={complete} disabled={status !== 'writing'} />
       <CoachText line={coach.line} />

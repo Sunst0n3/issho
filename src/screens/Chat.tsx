@@ -13,11 +13,12 @@ import { TIcon } from '../components/together/icons.tsx';
 import { markMessagesRead, readJson, STORAGE_KEYS, writeJson } from '../components/together/storage.ts';
 import '../components/together/together.css';
 import { Screen, TopBar } from '../components/ui.tsx';
-import { db } from '../lib/db.ts';
+import { db, dayKey } from '../lib/db.ts';
 import { useKnownKanji, useRubyShow, useSettings, useSettingsLoaded } from '../lib/hooks.ts';
 import { isKanji } from '../lib/ruby.ts';
 import type { Settings } from '../lib/types.ts';
-import { syncMessages, useChatMessages } from '../sync/chat.ts';
+import { loadCourseSnapshot } from '../srs/course.ts';
+import { syncMessages, useChatMessages, type ChatItem } from '../sync/chat.ts';
 import { useServerStatus } from '../sync/socket.ts';
 import { useHousehold } from '../sync/stats.ts';
 
@@ -79,6 +80,16 @@ function Conversation({ settings }: { settings: Settings }) {
     if (settings.furigana === 'always') return 'all' as const;
     return (base: string) => [...base].some((ch) => isKanji(ch) && !known.has(ch));
   }, [furigana, settings.furigana, known]);
+
+  const [replyTo, setReplyTo] = useState<ChatItem>();
+  // Today's output step still open: a reply to the partner's daily sentence counts as it.
+  const outputOpen = useLiveQuery(async () => !(await db.days.get(dayKey()))?.steps?.includes('output'), []) ?? false;
+  const [inSprint, setInSprint] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    loadCourseSnapshot().then((s) => { if (alive) setInSprint(s.inSprint); }, () => {});
+    return () => { alive = false; };
+  }, []);
 
   const recentKanji = useLiveQuery(async () => {
     const items = await db.items.where('kind').equals('kanji').toArray();
@@ -177,7 +188,8 @@ function Conversation({ settings }: { settings: Settings }) {
           </div>
         )}
         {messages && messages.length > 0 && (
-          <MessageList messages={messages} dict={dict} show={show} online={online} senderName={senderName} />
+          <MessageList messages={messages} dict={dict} show={show} online={online} senderName={senderName}
+            onReply={(item) => setReplyTo(item)} />
         )}
       </section>
 
@@ -195,7 +207,9 @@ function Conversation({ settings }: { settings: Settings }) {
             markAiDisabled();
             setAiOff(true);
           }}
-          recentKanji={recentKanji} context={context} rubyShow={rubyShow} />
+          recentKanji={recentKanji} context={context} rubyShow={rubyShow}
+          replyTo={replyTo} onCancelReply={() => setReplyTo(undefined)} outputOpen={outputOpen}
+          justShowMe={settings.justShowMe} inSprint={inSprint} />
       </div>
     </Screen>
   );

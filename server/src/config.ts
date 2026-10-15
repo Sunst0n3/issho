@@ -20,6 +20,10 @@ export interface Config {
    */
   trustProxy: boolean | string;
   logLevel: string;
+  /** VOICEVOX_URL: the speech engine POST /api/tts proxies to. null = server speech off. */
+  voicevoxUrl: string | null;
+  /** TTS_CACHE_MB: disk cap of synthesized speech in DATA_DIR/tts (10–5000, default 300). */
+  ttsCacheMb: number;
 }
 
 export class ConfigError extends Error {
@@ -30,6 +34,7 @@ export class ConfigError extends Error {
 const SERVER_DIR = fileURLToPath(new URL('..', import.meta.url));
 
 export const DEFAULT_ANTHROPIC_MODEL = 'claude-opus-5-5';
+export const DEFAULT_TTS_CACHE_MB = 300;
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const householdCode = env.HOUSEHOLD_CODE?.trim();
@@ -49,6 +54,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     anthropicModel: env.ANTHROPIC_MODEL?.trim() || DEFAULT_ANTHROPIC_MODEL,
     trustProxy: parseTrustProxy(env.TRUST_PROXY),
     logLevel: env.LOG_LEVEL?.trim() || 'info',
+    voicevoxUrl: parseVoicevoxUrl(env.VOICEVOX_URL),
+    ttsCacheMb: parseTtsCacheMb(env.TTS_CACHE_MB),
   };
 }
 
@@ -61,8 +68,8 @@ export function loadAdminConfig(env: NodeJS.ProcessEnv = process.env): Pick<Conf
 }
 
 /** Where things live inside DATA_DIR. */
-export function dataPaths(dataDir: string): { database: string; voice: string } {
-  return { database: path.join(dataDir, 'issho.db'), voice: path.join(dataDir, 'voice') };
+export function dataPaths(dataDir: string): { database: string; voice: string; tts: string } {
+  return { database: path.join(dataDir, 'issho.db'), voice: path.join(dataDir, 'voice'), tts: path.join(dataDir, 'tts') };
 }
 
 function parsePort(value: string | undefined): number {
@@ -94,6 +101,31 @@ function parseTrustProxy(value: string | undefined): boolean | string {
     );
   }
   return entries.join(',');
+}
+
+/** VOICEVOX_URL: an http(s) address such as http://voicevox:50021 (trailing slashes dropped); unset or empty = off. */
+function parseVoicevoxUrl(value: string | undefined): string | null {
+  const text = value?.trim().replace(/\/+$/, '') ?? '';
+  if (!text) return null;
+  let url: URL | undefined;
+  try {
+    url = new URL(text);
+  } catch {
+    url = undefined;
+  }
+  if (!url || (url.protocol !== 'http:' && url.protocol !== 'https:') || url.search || url.hash || url.username) {
+    throw new ConfigError(`VOICEVOX_URL must be the engine's http address, like http://voicevox:50021 (got "${value}").`);
+  }
+  return text;
+}
+
+function parseTtsCacheMb(value: string | undefined): number {
+  if (!value?.trim()) return DEFAULT_TTS_CACHE_MB;
+  const mb = Number(value);
+  if (!Number.isInteger(mb) || mb < 10 || mb > 5000) {
+    throw new ConfigError(`TTS_CACHE_MB must be a whole number of megabytes between 10 and 5000 (got "${value}").`);
+  }
+  return mb;
 }
 
 const NAMED_PROXY_RANGES = new Set(['loopback', 'linklocal', 'uniquelocal']);

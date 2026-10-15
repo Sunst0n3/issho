@@ -1,15 +1,16 @@
-// Settings: You, Study, Kana and Appearance sections.
+// Settings: You, Study and Appearance sections.
+import { useLiveQuery } from 'dexie-react-hooks';
 import { useId, useState, type ReactNode } from 'react';
-import { loadKana } from '../../lib/data.ts';
-import { getSettings, updateSettings } from '../../lib/db.ts';
-import type { KanaScript, Settings } from '../../lib/types.ts';
-import { applyKnownKana } from '../../srs/course.ts';
+import { db, getSettings, MAX_WRITE_LIST, RECEPTIVE_RETENTIONS, updateSettings } from '../../lib/db.ts';
+import type { DailyMinutes, KanaScript, Settings } from '../../lib/types.ts';
+import { syncWriteRetirement } from '../../srs/items.ts';
 import { speak, ttsAvailable, useJapaneseVoices } from '../../speech/tts.ts';
 import { isPairedSettings } from '../../sync/client.ts';
 import { Icon } from '../ui.tsx';
 import { Segmented, Switch } from './controls.tsx';
-import { minutesForPace } from './labels.ts';
+import { MINUTES_NOTES, percent, plural } from './labels.ts';
 import { syncMemberName } from './nameSync.ts';
+import { PlacementCheck, placementText, type PlacementResult, type PlacementSummary } from './PlacementCheck.tsx';
 import { setTheme, storedTheme, type ThemeChoice } from './theme.ts';
 import { useDraft } from './useDraft.ts';
 
@@ -68,39 +69,6 @@ export function voiceLabel(name: string): string {
   return short || name;
 }
 
-function RangeRow({ label, hint, min, max, step, value, format, onChange }: {
-  label: string;
-  hint: ReactNode;
-  min: number;
-  max: number;
-  step: number;
-  value: number;
-  format: (v: number) => string;
-  onChange: (v: number) => void;
-}) {
-  const id = useId();
-  return (
-    <div className="set-row set-range">
-      <div className="set-range-head">
-        <label className="hm-field-label" htmlFor={id}>{label}</label>
-        <output htmlFor={id} className="set-value">{format(value)}</output>
-      </div>
-      <input id={id} type="range" min={min} max={max} step={step} value={value}
-        aria-valuetext={format(value)} aria-describedby={`${id}-hint`}
-        onChange={(e) => onChange(Number(e.target.value))} />
-      <p id={`${id}-hint`} className="hm-hint">{hint}</p>
-    </div>
-  );
-}
-
-function retentionHint(r: number): string {
-  if (r >= 0.93) return "You'll remember more, but expect noticeably more reviews each day.";
-  if (r <= 0.87) return "Fewer reviews, but you'll forget a little more between them.";
-  return 'How sure you want to be of an answer when it comes back. 90% is a good balance.';
-}
-
-const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
-
 function VoicePicker({ settings }: { settings: Settings }) {
   const voices = useJapaneseVoices();
   const labels = voices.map((v) => voiceLabel(v.name));
@@ -109,7 +77,7 @@ function VoicePicker({ settings }: { settings: Settings }) {
     labels.indexOf(labels[i]) === labels.lastIndexOf(labels[i]) ? labels[i] : v.name;
   const [testing, setTesting] = useState(false);
   if (!ttsAvailable()) {
-    return <p className="hm-hint set-row">This browser can't speak Japanese, so audio stays off.</p>;
+    return <p className="hm-hint set-row">This browser has no Japanese voice of its own. Recorded audio still plays.</p>;
   }
   const test = async () => {
     setTesting(true);
@@ -121,9 +89,9 @@ function VoicePicker({ settings }: { settings: Settings }) {
   };
   return (
     <div className="hm-field set-row">
-      <label className="hm-field-label" htmlFor="set-voice">Japanese voice</label>
+      <label className="hm-field-label" htmlFor="set-voice">Device voice</label>
       <div className="set-inline">
-        <select id="set-voice" className="set-select" value={settings.ttsVoice ?? ''}
+        <select id="set-voice" className="set-select" value={settings.ttsVoice ?? ''} aria-describedby="set-voice-hint"
           onChange={(e) => void updateSettings({ ttsVoice: e.target.value || undefined })}>
           <option value="">Best available</option>
           {voices.map((v, i) => <option key={v.voiceURI} value={v.voiceURI}>{labelOf(v, i)}</option>)}
@@ -132,46 +100,168 @@ function VoicePicker({ settings }: { settings: Settings }) {
           <Icon name="speaker" size={16} />{testing ? 'Playing' : 'Test'}
         </button>
       </div>
-      {voices.length === 0 && (
-        <p className="hm-hint">
-          No Japanese voice found yet. On iPhone, add one in Settings → Accessibility → Spoken Content → Voices → Japanese.
-        </p>
-      )}
+      <p id="set-voice-hint" className="hm-hint">
+        Used only for text without a recording, when the home server can't speak it either.
+        {voices.length === 0 && ' No Japanese voice found yet. On iPhone, add one in Settings → Accessibility → Spoken Content → Voices → Japanese.'}
+      </p>
+    </div>
+  );
+}
+
+const RETENTION_NOTE =
+  'Lower means fewer reviews of reading and listening cards, and a little more forgetting. Handwriting and production stay at 90 %.';
+
+
+const WRITE_LIST_STEP = 50;
+/** The slider's last stop: the whole list. */
+const WRITE_LIST_STOPS = Math.ceil(MAX_WRITE_LIST / WRITE_LIST_STEP);
+
+/**
+ * pure: slider stop → handwriting list size, 50 kanji a stop. The last stop is all 2,136 (a range input
+ * stepping by 50 up to 2,136 itself could only reach 2,100).
+ */
+export function writeListAt(stop: number): number {
+  return Math.max(0, Math.min(MAX_WRITE_LIST, Math.round(stop) * WRITE_LIST_STEP));
+}
+
+/** pure: handwriting list size → the nearest slider stop. */
+export function writeListStop(size: number): number {
+  return Math.max(0, Math.min(WRITE_LIST_STOPS, Math.round(size / WRITE_LIST_STEP)));
+}
+
+/** The write list: kanji ranked within it keep their handwriting card; the rest retire once solid. */
+function WriteListRow({ settings }: { settings: Settings }) {
+  const id = useId();
+  const pinned = useLiveQuery(
+    () => db.items.where('kind').equals('kanji').filter((i) => Boolean(i.pinned)).count(),
+    [],
+  );
+  const [status, setStatus] = useState<string>();
+  const [value, setValue] = useDraft(settings.writeList, async (writeList: number) => {
+    await updateSettings({ writeList });
+    try {
+      const { retired, restored } = await syncWriteRetirement();
+      const parts = [];
+      if (retired) parts.push(`${plural(retired, 'kanji', 'kanji')} now reading only`);
+      if (restored) parts.push(`${plural(restored, 'kanji', 'kanji')} back in handwriting`);
+      setStatus(parts.length ? `${parts.join(', ')}.` : undefined);
+    } catch {
+      setStatus("The list is saved. Cards update at your next session.");
+    }
+  }, 400);
+  const text = (n: number) => `${n.toLocaleString()} kanji kept in handwriting`;
+  return (
+    <div className="set-row set-range">
+      <div className="set-range-head">
+        <label className="hm-field-label" htmlFor={id}>Handwriting list</label>
+        <output htmlFor={id} className="set-value set-value-wide">{value.toLocaleString()}</output>
+      </div>
+      <input id={id} type="range" min={0} max={WRITE_LIST_STOPS} step={1} value={writeListStop(value)}
+        aria-valuetext={text(value)} aria-describedby={`${id}-hint`}
+        onChange={(e) => setValue(writeListAt(Number(e.target.value)))} />
+      <p id={`${id}-hint`} className="hm-hint">
+        {text(value)}{pinned ? `, plus ${pinned.toLocaleString()} pinned` : ''}. Kanji beyond it keep their reading
+        practice and stop asking for handwriting once they're solid.
+      </p>
+      {status && <p className="hm-ok" role="status">{status}</p>}
+    </div>
+  );
+}
+
+type RateChoice = 'auto' | '0.85' | '1';
+
+function rateChoice(rate: number | undefined): RateChoice {
+  if (rate === undefined) return 'auto';
+  return rate < 0.95 ? '0.85' : '1';
+}
+
+/**
+ * A re-check from Settings. A pass moves the script's kana into reviews (as in onboarding). A fail changes
+ * nothing: kana already passed stay in reviews, and the others are taught by the course as planned, so
+ * no sprint length is promised (the learner may be in the middle of it, or past it).
+ */
+export function recheckSummary(r: PlacementResult, passedBefore: boolean): PlacementSummary {
+  if (r.outcome === 'known') {
+    return {
+      title: placementText(r, false),
+      detail: passedBefore
+        ? `Your ${r.script} stay in your reviews.`
+        : `Your ${r.script} move into your reviews, and the course skips their lessons.`,
+    };
+  }
+  return {
+    title: `${r.correct}/${r.total} — nothing changes`,
+    detail: passedBefore
+      ? `Your ${r.script} stay in your reviews, which keep them fresh.`
+      : `The course teaches and reviews ${r.script} as planned.`,
+  };
+}
+
+function PlacementRow({ settings }: { settings: Settings }) {
+  const known = (s: KanaScript) => (s === 'hiragana' ? settings.knowsHiragana : settings.knowsKatakana);
+  // Whether the script was passed before this check (a pass sets it, so it is read at the start).
+  const [checking, setChecking] = useState<{ script: KanaScript; passedBefore: boolean }>();
+  const [result, setResult] = useState<PlacementSummary>();
+  if (checking) {
+    const summary = (r: PlacementResult) => recheckSummary(r, checking.passedBefore);
+    return (
+      <div className="set-row">
+        <PlacementCheck script={checking.script} summary={summary}
+          onDone={(r) => { setResult(summary(r)); setChecking(undefined); }}
+          onCancel={() => setChecking(undefined)} />
+      </div>
+    );
+  }
+  const start = (script: KanaScript) => {
+    setResult(undefined);
+    setChecking({ script, passedBefore: known(script) });
+  };
+  return (
+    <div className="set-row">
+      <p className="hm-field-label">Kana check</p>
+      <p className="hm-hint">
+        Know a script already? A 3-minute check moves its kana straight into your reviews.
+        {known('hiragana') && ' Hiragana: passed.'}
+        {known('katakana') && ' Katakana: passed.'}
+      </p>
+      <div className="set-buttons">
+        <button type="button" className="btn secondary small" onClick={() => start('hiragana')}>
+          Check hiragana
+        </button>
+        <button type="button" className="btn secondary small" onClick={() => start('katakana')}>
+          Check katakana
+        </button>
+      </div>
+      {result && <p className="hm-ok" role="status">{result.title}. {result.detail}</p>}
     </div>
   );
 }
 
 export function StudySection({ settings }: { settings: Settings }) {
-  const [newPerDay, setNewPerDay] = useDraft(settings.newPerDay, (v: number) => updateSettings({ newPerDay: v }));
-  const [maxReviews, setMaxReviews] = useDraft(settings.maxReviewsPerDay, (v: number) => updateSettings({ maxReviewsPerDay: v }));
-  const [retention, setRetention] = useDraft(settings.desiredRetention, (v: number) => updateSettings({ desiredRetention: v }));
+  const [minutes, setMinutes] = useDraft<DailyMinutes>(settings.dailyMinutes, (m) => updateSettings({ dailyMinutes: m }));
+  const retention = (RECEPTIVE_RETENTIONS as readonly number[]).includes(settings.receptiveRetention)
+    ? settings.receptiveRetention
+    : 0.9;
 
   return (
     <SettingsSection id="set-study" title="Study">
-      <div className="set-row">
-        <div className="set-range-head">
-          <span className="hm-field-label" id="set-new-label">New items per day</span>
-          <div className="set-stepper" role="group" aria-labelledby="set-new-label">
-            <button type="button" className="icon-btn outlined" aria-label="Fewer new items"
-              disabled={newPerDay <= 1} onClick={() => setNewPerDay(clamp(newPerDay - 1, 1, 15))}>
-              <span aria-hidden="true" className="set-step-sign">−</span>
-            </button>
-            <output className="set-value" aria-live="polite">{newPerDay}</output>
-            <button type="button" className="icon-btn outlined" aria-label="More new items"
-              disabled={newPerDay >= 15} onClick={() => setNewPerDay(clamp(newPerDay + 1, 1, 15))}>
-              <Icon name="plus" size={18} />
-            </button>
-          </div>
-        </div>
-        <p className="hm-hint">About {minutesForPace(newPerDay)} minutes a day once reviews build up.</p>
+      <div className="set-row hm-field">
+        <span className="hm-field-label" id="set-minutes-label">Minutes each day</span>
+        <Segmented label="Minutes each day" value={String(minutes) as `${DailyMinutes}`}
+          onChange={(v) => setMinutes(Number(v) as DailyMinutes)}
+          options={[20, 25, 30, 40].map((m) => ({ value: String(m) as `${DailyMinutes}`, label: `${m} min` }))} />
+        <p className="hm-hint" aria-live="polite">At {minutes} minutes: {MINUTES_NOTES[minutes]}.</p>
       </div>
 
-      <RangeRow label="Most reviews per day" min={50} max={300} step={10} value={maxReviews}
-        format={(v) => String(v)} onChange={setMaxReviews}
-        hint="Anything over this waits for the next day. New items pause if a big backlog builds up." />
+      <WriteListRow settings={settings} />
 
-      <RangeRow label="How much to remember" min={0.85} max={0.95} step={0.01} value={retention}
-        format={(v) => `${Math.round(v * 100)}%`} onChange={setRetention} hint={retentionHint(retention)} />
+      <div className="set-row hm-field">
+        <span className="hm-field-label">Recall target for reading and listening</span>
+        <Segmented label="Recall target for reading and listening" value={String(retention)}
+          onChange={(v) => void updateSettings({ receptiveRetention: Number(v) })}
+          options={RECEPTIVE_RETENTIONS.map((r) => ({ value: String(r), label: percent(r) }))} />
+        <p className="hm-hint">{RETENTION_NOTE}</p>
+      </div>
 
       <div className="set-row hm-field">
         <span className="hm-field-label">Readings over kanji (furigana)</span>
@@ -179,19 +269,26 @@ export function StudySection({ settings }: { settings: Settings }) {
           onChange={(furigana) => void updateSettings({ furigana })}
           options={[
             { value: 'always', label: 'Always' },
-            { value: 'unknown', label: 'New kanji' },
+            { value: 'unknown', label: 'Not yet solid' },
             { value: 'never', label: 'Never' },
           ]} />
-        <p className="hm-hint">“New kanji” shows readings only for kanji you haven't learned yet.</p>
+        <p className="hm-hint">“Not yet solid” hides the reading of words you read reliably, so you and your partner see different readings.</p>
       </div>
 
       <div className="set-row">
-        <Switch label="Show romaji" hint="Latin letters under kana while you're learning them."
-          checked={settings.romaji} onChange={(romaji) => void updateSettings({ romaji })} />
-      </div>
-      <div className="set-row">
-        <Switch label="Play audio automatically" hint="Hear words and sentences as they appear."
+        <Switch label="Play audio" hint="Hear words and sentences as they appear."
           checked={settings.audio} onChange={(audio) => void updateSettings({ audio })} />
+      </div>
+      <div className="set-row hm-field">
+        <span className="hm-field-label">Audio speed</span>
+        <Segmented label="Audio speed" value={rateChoice(settings.audioRate)}
+          onChange={(v) => void updateSettings({ audioRate: v === 'auto' ? undefined : Number(v) })}
+          options={[
+            { value: 'auto', label: 'Auto' },
+            { value: '0.85', label: 'Slower' },
+            { value: '1', label: 'Natural' },
+          ]} />
+        <p className="hm-hint">Auto plays a little slower for your first three months, then at natural speed.</p>
       </div>
       <VoicePicker settings={settings} />
 
@@ -204,45 +301,15 @@ export function StudySection({ settings }: { settings: Settings }) {
             { value: 'stylus', label: 'Stylus' },
           ]} />
       </div>
-    </SettingsSection>
-  );
-}
-
-export function KanaSection({ settings }: { settings: Settings }) {
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<{ ok: boolean; text: string }>();
-
-  const change = async (script: KanaScript, on: boolean) => {
-    setBusy(true);
-    setMessage(undefined);
-    try {
-      await updateSettings(script === 'hiragana' ? { knowsHiragana: on } : { knowsKatakana: on });
-      if (on) {
-        await applyKnownKana();
-        // applyKnownKana covers every known script; the message is about the one just turned on.
-        const count = (await loadKana()).filter((k) => k.script === script).length;
-        setMessage({ ok: true, text: `Done: ${count} ${script} are now in your reviews as known.` });
-      } else {
-        setMessage({ ok: true, text: "Kana you've already learned stay in your reviews." });
-      }
-    } catch {
-      setMessage({ ok: false, text: "Couldn't update your kana. Try again in a moment." });
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <SettingsSection id="set-kana" title="Kana">
       <div className="set-row">
-        <Switch label="I already know hiragana" hint="Skips the hiragana lessons." disabled={busy}
-          checked={settings.knowsHiragana} onChange={(v) => void change('hiragana', v)} />
+        <Switch label="Hands-busy mode" hint="Typed answers offer choices instead. Answers given that way count a little less."
+          checked={settings.handsBusy} onChange={(handsBusy) => void updateSettings({ handsBusy })} />
       </div>
       <div className="set-row">
-        <Switch label="I already know katakana" hint="Skips the katakana lessons." disabled={busy}
-          checked={settings.knowsKatakana} onChange={(v) => void change('katakana', v)} />
+        <Switch label="Show corrections straight away" hint="Your daily sentence skips the find-it-yourself step."
+          checked={settings.justShowMe} onChange={(justShowMe) => void updateSettings({ justShowMe })} />
       </div>
-      {message && <p className={message.ok ? 'hm-ok' : 'hm-error'} role="status">{message.text}</p>}
+      <PlacementRow settings={settings} />
     </SettingsSection>
   );
 }

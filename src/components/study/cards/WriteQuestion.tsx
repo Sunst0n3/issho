@@ -1,92 +1,94 @@
-// Writing from memory, used by the kana and kanji write cards. The pad checks
-// each stroke; "Write on paper instead" shows the answer for a self-grade.
+// Writing from memory on a review card: the recall pad judges the whole character when the learner taps Done
+// (stroke order never counts against it). When it says Again, "I wrote it right" re-grades the card Hard. "Write on
+// paper" (not in an anywhere sitting) shows the answer after Done for a Missed / Got it self-check.
 
-import { useRef, useState, type ReactNode } from 'react';
-import { Rating } from 'ts-fsrs';
-import type { CardRecord } from '../../../lib/types.ts';
-import { gradeForWriting } from '../../../srs/answers.ts';
+import { useState, type ReactNode } from 'react';
+import { Rating, type Grade } from 'ts-fsrs';
+import { useSettings } from '../../../lib/hooks.ts';
+import { gradeForRecallWriting } from '../../../srs/answers.ts';
 import { StrokeAnimation } from '../../../writing/StrokeOrder.tsx';
 import { useStrokes } from '../../../writing/useStrokes.ts';
-import { WritingPad, type WritingPadHandle, type WritingResult } from '../../../writing/WritingPad.tsx';
+import { WritingPad, type RecallResult } from '../../../writing/WritingPad.tsx';
 import { Glyph } from '../../Glyph.tsx';
-import { CoachText, PadTools, useStrokeCoach } from '../StrokeCoach.tsx';
 import { SelfGrade } from './parts.tsx';
 import type { CardAnswer } from './types.ts';
 
-const NO_STROKES: string[] = [];
-
-function writtenTitle(grade: number): string | undefined {
-  if (grade === Rating.Good) return 'Well written';
-  if (grade === Rating.Hard) return 'Written, with a little help';
-  return undefined;
+/** What went wrong, in one line, for the learner to compare with the model. */
+export function recallSummary(r: RecallResult): string {
+  const { missing, extra, unmatched } = r.match;
+  const parts: string[] = [];
+  if (missing.length) parts.push(`${missing.length} ${missing.length === 1 ? 'stroke' : 'strokes'} missing`);
+  if (extra.length) parts.push(`${extra.length} extra ${extra.length === 1 ? 'stroke' : 'strokes'}`);
+  if (unmatched.length) parts.push(`${unmatched.length} ${unmatched.length === 1 ? 'stroke looks' : 'strokes look'} off`);
+  return parts.length ? `${parts.join(', ')}.` : 'Compare your writing with the model.';
 }
 
-export function WriteQuestion({ card, char, ask, target, label, note, speak, onAnswer, practice = false }: {
-  card: CardRecord;
+export function WriteQuestion({ char, ask, target, label, paperAllowed = true, onAnswer }: {
   char: string;
-  /** "Write the kanji for" */
+  /** "Write the kanji" */
   ask: string;
-  /** What to write, e.g. the meaning and a reading. */
+  /** The prompt: keyword and anchor with □, or the sound. Never the character itself. */
   target: ReactNode;
-  /**
-   * The same as plain text for the pad's accessible name, without the answer:
-   * 'the kanji for "water" (みず)' → "Writing pad for the kanji for "water" (みず)".
-   */
+  /** What to write as plain text, for the pad's accessible name, without the answer. */
   label: string;
-  /** The other half of the answer shown afterwards, e.g. the reading. */
-  note?: ReactNode;
-  /** Japanese read aloud by Listen afterwards. */
-  speak?: string;
+  paperAllowed?: boolean;
   onAnswer: (answer: CardAnswer) => void;
-  practice?: boolean;
 }) {
   const { strokes, loading, missing, error } = useStrokes(char);
-  const pad = useRef<WritingPadHandle>(null);
+  const { writingHand } = useSettings();
   const [paper, setPaper] = useState(false);
-  const [revealed, setRevealed] = useState(false);
-  const [finished, setFinished] = useState(false);
-  const coach = useStrokeCoach(strokes ?? NO_STROKES, 'memory');
-  // Without stroke data the pad can't check anything: write on paper instead.
-  const onPaper = paper || missing || Boolean(error);
+  const [checking, setChecking] = useState(false);
+  const [judged, setJudged] = useState<RecallResult | null>(null);
+  const [answered, setAnswered] = useState(false);
+  // Without stroke data the pad can't judge: write it (on paper, or in the air when there is no pen) and self-check.
+  const noPad = !loading && (!strokes || missing || Boolean(error));
+  const selfCheck = paper || noPad;
 
-  const complete = (result: WritingResult) => {
-    setFinished(true);
-    const grade = gradeForWriting(result);
-    onAnswer({
-      grade,
-      mode: 'written',
-      correct: grade !== Rating.Again,
-      feedback: { title: writtenTitle(grade), expected: char, expectedLang: 'ja', note, speak },
-    });
+  const answer = (a: CardAnswer) => {
+    if (answered) return;
+    setAnswered(true);
+    onAnswer(a);
   };
 
-  const selfGrade = (grade: CardAnswer['grade']) => {
-    setFinished(true);
-    onAnswer({ grade, mode: 'self', correct: grade !== Rating.Again });
+  const recallDone = (r: RecallResult) => {
+    const grade: Grade = gradeForRecallWriting({
+      strokeCount: strokes?.length ?? r.match.assignment.length,
+      missing: r.match.missing.length,
+      extra: r.match.extra.length,
+      unmatched: r.match.unmatched.length,
+      hintUsed: r.hintUsed,
+    });
+    if (grade === Rating.Again) setJudged(r);
+    else answer({ grade, mode: 'written', input: writingHand });
   };
 
   return (
     <section className="st-question st-write">
       <div className="st-write-prompt">
         <h2 className="st-ask">{ask}</h2>
-        <p className="st-write-target">{target}</p>
+        <div className="st-write-target">{target}</div>
       </div>
 
-      {onPaper ? (
+      {selfCheck ? (
         <div className="st-paper">
-          {!revealed ? (
+          {!checking ? (
             <>
               <p className="card st-paper-note">
-                Write it on paper (or in the air). When you are done, check it.
+                {paperAllowed ? 'Write it on paper. When you are done, check it.' : 'Write it in the air or on your palm. When you are done, check it.'}
               </p>
-              <button type="button" className="btn ink block" onClick={() => setRevealed(true)}>Show the answer</button>
+              <button type="button" className="btn ink block" onClick={() => setChecking(true)}>Done</button>
             </>
           ) : (
             <>
               {strokes ? <StrokeAnimation strokes={strokes} label={char} /> : (
                 <div className="st-paper-answer"><Glyph char={char} size={120} /></div>
               )}
-              {!finished && <SelfGrade card={card} onGrade={selfGrade} intervals={!practice} prompt="How did your writing compare?" />}
+              {!answered && (
+                <SelfGrade prompt="How did your writing compare?"
+                  onGrade={(gotIt) => answer(paperAllowed
+                    ? { grade: gotIt ? Rating.Good : Rating.Again, mode: 'paper', input: 'paper', revealed: true }
+                    : { grade: gotIt ? Rating.Good : Rating.Again, mode: 'self', revealed: true })} />
+              )}
             </>
           )}
         </div>
@@ -94,16 +96,23 @@ export function WriteQuestion({ card, char, ask, target, label, note, speak, onA
         <div className="writing-pad st-skeleton" aria-busy="true" aria-label="Loading the writing pad" />
       ) : (
         <>
-          <WritingPad ref={pad} strokes={strokes} mode="memory" label={label}
-            onStrokeResult={coach.onStrokeResult} onComplete={complete} />
-          {!finished && (
-            <>
-              <CoachText line={coach.line} />
-              <PadTools pad={pad} coach={coach} last="giveUp" />
-              <button type="button" className="btn ghost small st-center" onClick={() => setPaper(true)}>
-                Write on paper instead
-              </button>
-            </>
+          <WritingPad strokes={strokes} mode="recall" label={label} onRecallDone={recallDone} disabled={answered} />
+          {judged && !answered && (
+            <div className="feedback bad st-feedback" role="status">
+              <p className="st-fb-title">Not quite</p>
+              <p className="st-fb-note">{recallSummary(judged)}</p>
+              <div className="st-row">
+                <button type="button" className="btn secondary small" onClick={() => answer({ grade: Rating.Hard, mode: 'written', input: writingHand, override: true })}>
+                  I wrote it right
+                </button>
+                <button type="button" className="btn ink small st-grow" onClick={() => answer({ grade: Rating.Again, mode: 'written', input: writingHand })}>
+                  Continue
+                </button>
+              </div>
+            </div>
+          )}
+          {!judged && !answered && paperAllowed && (
+            <button type="button" className="btn ghost small st-center" onClick={() => setPaper(true)}>Write on paper</button>
           )}
         </>
       )}

@@ -1,27 +1,50 @@
 // @vitest-environment node
-import { describe, expect, it } from 'vitest';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { afterAll, describe, expect, it } from 'vitest';
 import {
   checkContent,
+  checkGrammarSet,
   detectContentKind,
   itemKanji,
-  lateGrammarTags,
+  kanaReadableBy,
   mergeContent,
+  readContentSources,
   readingMismatches,
   readingsAgree,
   unlockOf,
 } from './lib/content.ts';
 
+const examples = [
+  ['{私|わたし}は{学生|がくせい}です。', 'I am a student.'],
+  ['これは{本|ほん}です。', 'This is a book.'],
+  ['あれは{山|やま}です。', 'That is a mountain.'],
+  ['それはペンです。', 'That is a pen.'],
+  ['つまはせんせいです。', 'My wife is a teacher.'],
+  ['ここはえきです。', 'This is the station.'],
+  ['きょうはやすみです。', 'Today is a day off.'],
+  ['わたしはエマです。', "I'm Emma."],
+].map(([jp, en]) => ({ jp, en }));
+
+const build = (jp: string, tiles: string[], alternatives: string[] = []) => ({ en: 'x', jp, tiles, alternatives });
+
 const grammarPoint = {
   id: 'wa-desu',
   order: 1,
-  phase: 1,
+  level: 'N5',
   title: 'X は Y です',
   pattern: '〜は〜です',
+  register: 'polite',
+  prerequisites: [],
+  contrastWith: [],
   explanation: 'Says what something is.',
-  examples: [
-    { jp: '{私|わたし}は{学生|がくせい}です。', en: 'I am a student.' },
-    { jp: 'これは{本|ほん}です。', en: 'This is a book.' },
-    { jp: 'あれは{山|やま}です。', en: 'That is a mountain.' },
+  examples,
+  buildItems: [
+    build('これは{本|ほん}です。', ['これ', 'は', '本', 'です。']),
+    build('わたしはエマです。', ['わたし', 'は', 'エマ', 'です。'], ['エマです。']),
+    build('ここはえきです。', ['ここ', 'は', 'えき', 'です。']),
+    build('つまはせんせいです。', ['つま', 'は', 'せんせい', 'です。']),
   ],
   drills: [
     { prompt: 'これ＿＿{本|ほん}です。', options: ['は', 'を', 'に'], answer: 0, en: 'This is a book.' },
@@ -30,6 +53,10 @@ const grammarPoint = {
     { prompt: 'あれ＿＿{山|やま}です。', options: ['は', 'を', 'で'], answer: 0, en: 'That is a mountain.' },
   ],
 };
+
+function coreWord(extra: Record<string, unknown>) {
+  return { id: 'cw-0001', order: 1, kana: 'みず', en: 'water', pos: 'noun', register: 'both', topic: 'drink', use: true, ...extra };
+}
 
 describe('checkContent', () => {
   it('accepts a valid grammar point and collects its Japanese fields', () => {
@@ -40,26 +67,35 @@ describe('checkContent', () => {
     expect(itemKanji(report.items[0])).toEqual(['私', '学', '生', '本', '山']);
   });
 
-  it('reports bad ruby, duplicate ids and drill problems with their location', () => {
+  it('reports bad ruby, duplicate ids, short points, tiles and drill problems with their location', () => {
     const bad = {
       ...grammarPoint,
       examples: [{ jp: '私は{学生|がくせい}です。', en: 'I am a student.' }],
+      buildItems: [build('これは{本|ほん}です。', ['これ', 'が', '本', 'です。'])],
       drills: [
         { prompt: 'これは{本|ほん}です。', options: ['は', '本'], answer: 2, en: 'x' },
         { prompt: '{山|yama}＿＿', options: ['は', 'は'], answer: 0, en: 'x' },
       ],
     };
-    const { errors, warnings } = checkContent('grammar', [grammarPoint, bad]);
+    const { errors } = checkContent('grammar', [grammarPoint, bad]);
     expect(errors).toEqual([
       '[1]: duplicate id "wa-desu"',
+      '[1] wa-desu: has 1 examples (at least 8)',
       '[1] wa-desu.examples[0].jp: kanji "私" has no reading in "私は{学生|がくせい}です。"',
-      '[1] wa-desu.drills[0]: prompt has no blank "＿＿"',
+      '[1] wa-desu: has 1 build items (at least 4)',
+      '[1] wa-desu.buildItems[0]: tiles "これ|が|本|です。" do not join to "これは本です。"',
+      '[1] wa-desu: has 2 drills (at least 4)',
+      '[1] wa-desu.drills[0]: prompt must have one blank "＿＿"',
       '[1] wa-desu.drills[0]: option "本" must be plain kana',
       '[1] wa-desu.drills[0]: "answer" 2 is not an index into its 2 options',
       '[1] wa-desu.drills[1].prompt: reading "yama" for "山" is not kana in "{山|yama}＿＿"',
       '[1] wa-desu.drills[1]: options must be distinct',
     ]);
-    expect(warnings).toEqual(['[1] wa-desu: has 1 examples (3+ expected)', '[1] wa-desu: has 2 drills (4+ expected)']);
+  });
+
+  it('lets a recognition-only point go without build items', () => {
+    const passive = { ...grammarPoint, id: 'passive', recognitionOnly: true, buildItems: [] };
+    expect(checkContent('grammar', [passive]).errors).toEqual([]);
   });
 
   it('checks the shape of every content kind', () => {
@@ -67,25 +103,70 @@ describe('checkContent', () => {
     expect(checkContent('sentences', [{ id: 's-1', jp: '{水|みず}', en: 'water', grammar: [3] }]).errors).toEqual([
       '[0] s-1: "grammar" must list grammar point ids',
     ]);
-    expect(checkContent('survival-words', [{ id: 'sw-1', kana: 'ありがとう', en: 'thanks' }]).errors).toEqual([]);
-    expect(checkContent('survival-words', [{ id: 'sw-1', kana: '有難う', en: 'thanks' }]).errors).toEqual([
-      '[0] sw-1: "kana" must be kana only, got "有難う"',
+    expect(checkContent('core-words', [coreWord({})]).errors).toEqual([]);
+    expect(checkContent('core-words', [coreWord({ kana: '有難う' })]).errors).toEqual([
+      '[0] cw-0001: "kana" must be kana only, got "有難う"',
     ]);
     expect(checkContent('mnemonics', { 水: 'Water drips down.', 氵: '' }).errors).toEqual([
       '"氵": memory hook must be a non-empty string',
     ]);
+    expect(checkContent('mnemonics', { 水: { meaning: 'Water drips down.', sound: 'Me, zoo.' } }).errors).toEqual([]);
+    expect(checkContent('mnemonics', { 水: { sound: 'x' } }).errors).toEqual(['"水": "meaning" must be a non-empty string']);
     const roleplay = {
       id: 'rp-1',
       title: 'Café',
       titleJp: 'カフェ',
       level: 4,
       setting: 'A café.',
+      register: 'polite',
+      targets: [],
       roles: { a: { name: 'Guest', nameJp: '{客|きゃく}' }, b: { name: 'Staff', nameJp: '{店員|てんいん}' } },
-      lines: [{ role: 'c', jp: 'コーヒー', en: 'Coffee' }],
+      lines: [{ role: 'c', jp: 'コーヒー', en: 'Coffee', cue: '' }],
     };
     expect(checkContent('roleplays', [roleplay]).errors).toEqual([
       '[0] rp-1: "level" must be one of 1, 2, 3',
       '[0] rp-1.lines[0]: "role" must be one of "a", "b"',
+    ]);
+    const { register: _register, targets: _targets, ...v1 } = roleplay;
+    expect(checkContent('roleplays', [{ ...v1, level: 1, lines: [{ role: 'a', jp: 'コーヒー', en: 'Coffee' }] }], true).errors).toEqual([]);
+    expect(checkContent('confusables', [{ id: 'v-x', chars: ['未', '末', 'a'], kind: 'visual' }]).errors).toEqual([
+      '[0] v-x: "a" must be one kanji',
+    ]);
+  });
+
+  it('checks the kana rules: ids, days, pairs and practice words readable by their day', () => {
+    const rule = {
+      id: 'hira-dakuten',
+      day: 6,
+      title: 'Voiced sounds',
+      explanation: 'Two marks.',
+      pairs: [{ from: 'か', to: 'が', romaji: 'ga' }],
+      practiceWords: ['がっこう', 'かぎ', 'ごはん', 'ぎんこう', 'かぜ', 'ひざ', 'みず', 'ぶた'].map((kana) => ({ kana, en: 'x' })),
+    };
+    const report = checkContent('kana-rules', [rule]);
+    expect(report.errors).toEqual([]);
+    // ぎ ご ぜ ざ ず ぶ are not paired by this one-pair rule.
+    expect(report.warnings.length).toBeGreaterThan(0);
+    expect(checkContent('kana-rules', [{ ...rule, day: 7 }]).errors).toEqual(['[0] hira-dakuten: "day" must be 6']);
+    expect(kanaReadableBy(1, []).has('か')).toBe(true);
+    expect(kanaReadableBy(1, []).has('さ')).toBe(false);
+    expect(kanaReadableBy(6, [rule]).has('が')).toBe(true);
+  });
+});
+
+describe('checkGrammarSet', () => {
+  it('needs 110 points, earlier acyclic prerequisites and known contrasts', () => {
+    const points = [
+      { id: 'a', order: 1, prerequisites: [], contrastWith: ['z'] },
+      { id: 'b', order: 2, prerequisites: ['c'], contrastWith: [] },
+      { id: 'c', order: 3, prerequisites: ['b', 'x'], contrastWith: [] },
+    ];
+    expect(checkGrammarSet(points).errors).toEqual([
+      'grammar-v2 has 3 points (at least 110)',
+      'a: contrastWith "z" does not exist',
+      'b: prerequisite "c" (#3) does not come before it (#2)',
+      'c: prerequisite "x" does not exist',
+      'prerequisite cycle: b → c → b',
     ]);
   });
 });
@@ -114,6 +195,15 @@ describe('mergeContent', () => {
     expect(errors).toEqual(['b.json: id "s-2" is also used in a.json']);
   });
 
+  it('reads a file holding one entry as a list of one, and sorts core words by order', () => {
+    const merged = mergeContent('core-words', [
+      { file: 'part2.json', data: coreWord({ id: 'cw-0002', order: 2, kana: 'ひ' }) },
+      { file: 'part1.json', data: [coreWord({})] },
+    ]);
+    expect(merged.errors).toEqual([]);
+    expect((merged.data as { id: string }[]).map((w) => w.id)).toEqual(['cw-0001', 'cw-0002']);
+  });
+
   it('combines mnemonic maps', () => {
     const merged = mergeContent('mnemonics', [
       { file: 'a.json', data: { 水: 'Drops.' } },
@@ -124,29 +214,66 @@ describe('mergeContent', () => {
   });
 });
 
-describe('lateGrammarTags', () => {
-  const units = [
-    { char: '水', index: 0, phase: 2 },
-    { char: '話', index: 1, phase: 3 },
-  ];
-  const phases = new Map([
-    ['wa-desu', 1],
-    ['te-form', 2],
-    ['casual-past', 3],
-  ]);
+describe('readContentSources', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'issho-content-'));
+  const content = join(dir, 'content');
+  const write = (path: string, data: unknown) => {
+    mkdirSync(join(content, path, '..'), { recursive: true });
+    writeFileSync(join(content, path), typeof data === 'string' ? data : JSON.stringify(data));
+  };
+  afterAll(() => rmSync(dir, { recursive: true, force: true }));
 
-  it('finds grammar taught in a later phase than the sentence unlocks', () => {
-    const sentences = [
-      { id: 'kana', jp: 'これはペンです。', en: 'x', grammar: ['wa-desu', 'te-form'] },
-      { id: 'water', jp: '{水|みず}を{飲|の}んだ。', en: 'x', grammar: ['casual-past', 'unknown'] },
-      { id: 'talk', jp: '{話|はな}した。', en: 'x', grammar: ['casual-past'] },
-      { id: 'untagged', jp: '{水|みず}', en: 'x' },
-    ];
-    expect(lateGrammarTags(sentences, units, phases)).toEqual([
-      { id: 'kana', grammar: 'te-form', grammarPhase: 2, unlockPhase: 1 },
-      { id: 'water', grammar: 'casual-past', grammarPhase: 3, unlockPhase: 2 },
+  it('reads every *.json of a folder by file name, ignoring other files', () => {
+    write('stories/st-2.json', { id: 'st-2' });
+    write('stories/st-10.json', [{ id: 'st-10' }]);
+    write('stories/notes.txt', 'not json');
+    const set = readContentSources(content, 'stories', dir);
+    expect(set.label).toBe('content/stories');
+    expect(set.sources.map((s) => s.file)).toEqual(['content/stories/st-2.json', 'content/stories/st-10.json']);
+    expect(set.errors).toEqual([]);
+  });
+
+  it('lets a units/ or roleplays-v2/ folder win over the single file, naming the ids that differ', () => {
+    write('units/u01.json', { id: 1, title: 'New' });
+    write('units/u02.json', { id: 2, title: 'Two' });
+    write('units.json', [{ id: 1, title: 'Old' }, { id: 2, title: 'Two' }, { id: 3, title: 'Gone' }]);
+    const set = readContentSources(content, 'units', dir);
+    expect(set.sources.map((s) => s.file)).toEqual(['content/units/u01.json', 'content/units/u02.json']);
+    expect(set.warnings).toEqual([
+      'content/units.json is ignored because content/units/ exists; 1 differ (1); only in the file: 3',
     ]);
-    expect(lateGrammarTags({ not: 'a list' }, units, phases)).toEqual([]);
+    expect(set.notes).toEqual([]);
+  });
+
+  it('only notes a single file that holds the same content as its folder', () => {
+    write('units/u01.json', { id: 1, title: 'One' });
+    write('units/u02.json', { id: 2, title: 'Two' });
+    write('units.json', [{ id: 1, title: 'One' }, { id: 2, title: 'Two' }]);
+    const set = readContentSources(content, 'units', dir);
+    expect(set.sources.map((s) => s.file)).toEqual(['content/units/u01.json', 'content/units/u02.json']);
+    expect(set.warnings).toEqual([]);
+    expect(set.notes).toEqual(['content/units.json is ignored because content/units/ exists (same content)']);
+  });
+
+  it('prefers the single core-words.json over its part files, and falls back to the parts', () => {
+    write('core-words/part1.json', [coreWord({})]);
+    expect(readContentSources(content, 'core-words', dir).sources.map((s) => s.file)).toEqual(['content/core-words/part1.json']);
+    write('core-words.json', [coreWord({})]);
+    expect(readContentSources(content, 'core-words', dir).sources.map((s) => s.file)).toEqual(['content/core-words.json']);
+  });
+
+  it('falls back to v1 roleplays.json, and publishes a missing kind empty with a warning', () => {
+    write('roleplays.json', []);
+    const v1 = readContentSources(content, 'roleplays', dir);
+    expect(v1).toMatchObject({ v1: true, label: 'content/roleplays.json', missing: false });
+    const missing = readContentSources(content, 'confusables', dir);
+    expect(missing).toMatchObject({ missing: true, sources: [] });
+    expect(missing.warnings).toEqual(['content/confusables.json is missing; publishing it empty']);
+  });
+
+  it('reports bad JSON as an error', () => {
+    write('kana-rules.json', '[{');
+    expect(readContentSources(content, 'kana-rules', dir).errors[0]).toMatch(/^content\/kana-rules\.json is not valid JSON/);
   });
 });
 
@@ -238,19 +365,27 @@ describe('reading mismatches', () => {
     expect(readingMismatches(item, jmdict, new Set(['今日']))).toEqual([]);
   });
 
-  it('compares a survival word with its written form', () => {
-    const [item] = checkContent('survival-words', [{ id: 'sw', kana: 'よん', written: '四', en: 'four' }]).items;
-    expect(readingMismatches(item, readings).map((m) => m.path)).toEqual(['[0] sw.written']);
+  it('compares a core word with its written form', () => {
+    const [item] = checkContent('core-words', [coreWord({ id: 'cw-1', kana: 'よん', written: '四', en: 'four' })]).items;
+    expect(readingMismatches(item, readings).map((m) => m.path)).toEqual(['[0] cw-1.written']);
   });
 });
 
 describe('detectContentKind', () => {
-  it('uses the file name, then the shape of the data', () => {
-    expect(detectContentKind('content/grammar.json', [])).toBe('grammar');
+  it('uses the file name or folder, then the shape of the data', () => {
+    expect(detectContentKind('content/grammar-v2.json', [])).toBe('grammar');
+    expect(detectContentKind('content/core-words/part1.json', [])).toBe('core-words');
+    expect(detectContentKind('content/units/u03.json', {})).toBe('units');
+    expect(detectContentKind('content/stories/st-l0-07.json', {})).toBe('stories');
+    expect(detectContentKind('content/roleplays-v2/rp-u01.json', {})).toBe('roleplays');
     expect(detectContentKind('/tmp/draft-sentences.json', [])).toBe('sentences');
+    expect(detectContentKind('content/kana-rules.json', [])).toBe('kana-rules');
+    expect(detectContentKind('content/confusables.json', [])).toBe('confusables');
     expect(detectContentKind('draft.json', { 水: 'x' })).toBe('mnemonics');
+    expect(detectContentKind('draft.json', { 水: { meaning: 'x' } })).toBe('kana-examples');
     expect(detectContentKind('draft.json', [{ id: 'r', lines: [] }])).toBe('roleplays');
-    expect(detectContentKind('draft.json', [{ id: 'w', kana: 'あ' }])).toBe('survival-words');
+    expect(detectContentKind('draft.json', [{ id: 'w', kana: 'あ', pos: 'noun' }])).toBe('core-words');
+    expect(detectContentKind('draft.json', { id: 3, coreWordCeiling: 300 })).toBe('units');
     expect(detectContentKind('draft.json', [{ id: 's', jp: 'あ' }])).toBe('sentences');
     expect(detectContentKind('draft.json', [1])).toBeUndefined();
   });

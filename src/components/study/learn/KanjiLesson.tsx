@@ -1,13 +1,13 @@
-import { useEffect, useId, useRef, useState } from 'react';
-import { useSettings } from '../../../lib/hooks.ts';
-import { isKanji } from '../../../lib/ruby.ts';
-import type { KanaEntry, KanjiEntry, WordEntry } from '../../../lib/types.ts';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import type { KanjiEntry } from '../../../lib/types.ts';
 import { StrokeOrderStrip } from '../../../writing/StrokeOrder.tsx';
 import { useStrokes } from '../../../writing/useStrokes.ts';
 import { Glyph } from '../../Glyph.tsx';
-import { SpeakButton } from '../../SpeakButton.tsx';
-import { Icon } from '../../ui.tsx';
-import { cleanReading, kanaToRomaji } from '../format.ts';
+import { Icon, Ruby } from '../../ui.tsx';
+import { AudioButton } from '../AudioButton.tsx';
+import { MixedText } from '../MixedText.tsx';
+import { PitchLine } from '../PitchLine.tsx';
+import { wordRuby, type LessonData, type PartInfo } from './data.ts';
 import { Readings } from './Readings.tsx';
 
 /** The longest memory hook, here and on the kanji page. */
@@ -76,17 +76,61 @@ export function MemoryHook({ text, onChange }: { text?: string; onChange: (text:
   );
 }
 
-export function KanjiLesson({ kanji, words, mnemonic, kana, onHookChange, onPractice }: {
-  kanji: KanjiEntry;
-  words: readonly WordEntry[];
-  mnemonic?: string;
-  kana: readonly KanaEntry[];
+/** The pre-guess lasts this long, then the meaning is revealed. */
+export const PRE_GUESS_MS = 5000;
+
+/** Its parts and their names: what might it mean? Ungraded; reveals itself after 5 s. */
+function PreGuess({ kanji, parts, onReveal }: { kanji: KanjiEntry; parts: readonly PartInfo[]; onReveal: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onReveal, PRE_GUESS_MS);
+    return () => clearTimeout(t);
+  }, [onReveal]);
+  return (
+    <>
+      <article className="card st-lesson">
+        <p className="label">New kanji</p>
+        <h2 className="st-lesson-meaning">What might it mean?</h2>
+        <div className="st-glyph-box st-center"><Glyph char={kanji.char} size={84} /></div>
+        <PartsPanel parts={parts} />
+        <div className="st-timer" aria-hidden="true"><span style={{ animationDuration: `${PRE_GUESS_MS}ms` }} /></div>
+      </article>
+      <div className="st-footer">
+        <button type="button" className="btn ink st-grow" onClick={onReveal}>Show me</button>
+      </div>
+    </>
+  );
+}
+
+/** Component kanji and named parts with their names: a plain list. */
+export function PartsPanel({ parts }: { parts: readonly PartInfo[] }) {
+  if (!parts.length) return null;
+  return (
+    <section className="st-section st-parts">
+      <h3 className="label">Parts</h3>
+      <ul className="st-parts-list">
+        {parts.map((p) => (
+          <li key={p.char}>
+            <Glyph char={p.char} size={28} />
+            <span className="st-part-name">{p.name || ' '}</span>
+            {!p.known && <span className="chip st-chip-muted">new</span>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+export function KanjiLesson({ data, customMnemonic, onHookChange, onPractice }: {
+  data: Extract<LessonData, { kind: 'kanji' }>;
+  customMnemonic?: string;
   onHookChange: (text: string) => void;
   onPractice: () => void;
 }) {
-  const [hook, setHook] = useState(mnemonic);
-  const { romaji } = useSettings();
-  const reading = kanji.kun[0] ? cleanReading(kanji.kun[0]) : kanji.on[0];
+  const { kanji, unit, anchor, anchorAccent, mnemonic, parts, newPart } = data;
+  const [guessing, setGuessing] = useState(Boolean(unit?.inferable && parts.length));
+  const [hook, setHook] = useState(customMnemonic ?? mnemonic?.meaning);
+  const reveal = useCallback(() => setGuessing(false), []);
+  if (guessing) return <PreGuess kanji={kanji} parts={parts} onReveal={reveal} />;
   return (
     <>
       <article className="card st-lesson">
@@ -95,40 +139,35 @@ export function KanjiLesson({ kanji, words, mnemonic, kana, onHookChange, onPrac
           <div className="st-lesson-gloss">
             <h2 className="st-lesson-meaning">{kanji.meanings[0]}</h2>
             {kanji.meanings.length > 1 && <p className="muted">{kanji.meanings.slice(1).join(', ')}</p>}
-            {reading && <SpeakButton text={reading} />}
+            {kanji.jlptOld && <span className="chip st-chip-muted">Old JLPT {kanji.jlptOld}</span>}
           </div>
         </div>
-        <Readings kun={kanji.kun} on={kanji.on} kana={kana} />
+        <PartsPanel parts={parts} />
+        <Readings kun={kanji.kun} on={kanji.on} />
       </article>
 
-      <StrokeOrderSection char={kanji.char} />
-      <MemoryHook text={hook} onChange={(text) => { setHook(text || mnemonic); onHookChange(text); }} />
+      <MemoryHook text={hook} onChange={(text) => { setHook(text || mnemonic?.meaning); onHookChange(text); }} />
 
-      {words.length > 0 && (
+      {anchor && (
         <section className="st-section">
-          <h3 className="label">Words with <span lang="ja">{kanji.char}</span></h3>
-          <ul className="card st-words">
-            {words.map((w) => (
-              <li key={w.id}>
-                <span className="st-word-written" lang="ja">{w.written}</span>
-                <span className="st-word-text">
-                  <span className="st-word-kana">
-                    <span lang="ja">{w.kana}</span>
-                    {/* A final は is the particle only when it is written as kana (実は "jitsuwa"), not read from a kanji (枝葉 "edaha"). */}
-                    {romaji && <span className="st-romaji">{kanaToRomaji(w.kana, kana, { particles: !isKanji([...w.written].at(-1) ?? '') })}</span>}
-                  </span>
-                  <span className="st-word-en">{w.meanings.slice(0, 2).join('; ')}</span>
-                </span>
-                <SpeakButton text={w.kana} compact label={`Listen to ${w.kana}`} />
-              </li>
-            ))}
-          </ul>
+          <h3 className="label">Word</h3>
+          <div className="card st-anchor">
+            <span className="st-anchor-text">
+              <Ruby text={wordRuby(anchor)} className="st-word-written" show="all" />
+              {anchorAccent && <PitchLine accent={anchorAccent} kana={anchor.kana} size="sm" />}
+              <span className="st-word-en">{anchor.en}</span>
+              {mnemonic?.sound && <span className="st-note"><MixedText text={mnemonic.sound} /></span>}
+            </span>
+            <AudioButton compact source={{ ref: anchor.ref }} fallbackText={wordRuby(anchor)} label={`Listen to ${anchor.kana}`} />
+          </div>
         </section>
       )}
 
+      <StrokeOrderSection char={kanji.char} />
+
       <div className="st-footer">
         <button type="button" className="btn primary st-grow" onClick={onPractice}>
-          <Icon name="pen" size={20} />Practice writing it
+          <Icon name="pen" size={20} />{newPart ? 'Trace it' : 'Copy it'}
         </button>
       </div>
     </>

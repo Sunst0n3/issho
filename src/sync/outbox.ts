@@ -29,6 +29,8 @@ export interface NewChatMessage {
   text: string;
   transcript?: string;
   audio?: Blob;
+  /** 'daily' = the output step's sentence of the day (or the partner's reply to it). */
+  tag?: 'daily';
 }
 
 export interface FlushResult {
@@ -73,6 +75,7 @@ export async function queueChatMessage(msg: NewChatMessage): Promise<string> {
   if (householdId) row.householdId = householdId;
   if (msg.transcript !== undefined) row.transcript = msg.transcript;
   if (msg.audio) row.audio = msg.audio;
+  if (msg.tag) row.tag = msg.tag;
   await outbox().add(row);
   void flushOutbox();
   return row.clientId;
@@ -131,6 +134,7 @@ async function flushOnce(): Promise<FlushResult> {
         text: row.text,
         ...(row.transcript !== undefined ? { transcript: row.transcript } : {}),
         ...(audioId ? { audioId } : {}),
+        ...(row.tag ? { tag: row.tag } : {}),
       });
       // The outbox row (and its recording) goes away now; keep the audio for playback.
       if (audioId && row.audio) rememberVoice(audioId, row.audio);

@@ -1,256 +1,364 @@
 // @vitest-environment node
+// Curriculum v2 (scripts/lib/curriculum.ts) on small fixtures, then the design's checks on the
+// built public/data (skipped until `npm run build:data` has produced a version 2 curriculum).
+import { existsSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import type { CurriculumUnit, WordEntry } from '../src/lib/types.ts';
+import { readJMdict } from './lib/jmdict.ts';
+import { selectWord } from './lib/words.ts';
+import type { CoreWord, Curriculum, KanjiEntry, WordEntry, WordRef } from '../src/lib/types.ts';
 import {
+  BOOST,
+  CONFUSABLE_GAP,
   buildCurriculum,
-  compareKanjiPriority,
-  computePhaseEnds,
-  isKunWord,
+  commonReading,
+  compareSpine,
+  effectiveRank,
+  kanjiBoosts,
+  kanjiReadingIn,
   pickUnitWords,
+  rareKanji,
+  readingsOf,
   type CurriculumKanji,
+  type UnitCandidate,
 } from './lib/curriculum.ts';
 
-const kanji: CurriculumKanji[] = [
-  { char: '森', grade: 1, strokeCount: 12 },
-  { char: '体', jlptOld: 3, freq: 88, grade: 2, strokeCount: 7 },
-  { char: '休', jlptOld: 4, freq: 642, grade: 1, strokeCount: 6 },
-  { char: '林', freq: 1000, grade: 1, strokeCount: 8 },
-  { char: '木', jlptOld: 4, freq: 317, grade: 1, strokeCount: 4 },
-  { char: '本', jlptOld: 4, freq: 10, grade: 1, strokeCount: 5 },
-  { char: '一', jlptOld: 4, freq: 2, grade: 1, strokeCount: 1 },
-  { char: '日', jlptOld: 4, freq: 1, grade: 1, strokeCount: 4 },
-  { char: '末', grade: 4, strokeCount: 5 },
-];
-
-const components = new Map<string, string[]>([
-  ['本', ['木']],
-  ['休', ['亻', '木']],
-  ['体', ['亻', '本']],
-  ['林', ['木']],
-  ['森', ['木', '林']],
-  ['末', ['木', '氺']],
-]);
-
 let nextId = 1000;
-function word(written: string, kana: string, freqRank: number, pos = ['n'], meanings = ['x']): WordEntry {
-  const chars = [...written].filter((ch) => /\p{Script=Han}/u.test(ch));
-  return { id: String(nextId++), written, kana, meanings, pos, freqRank, kanji: [...new Set(chars)] };
+function word(written: string, kana: string, pri: string[], extra: Partial<UnitCandidate> = {}): UnitCandidate {
+  const id = String(nextId++);
+  const kanji = [...new Set([...written].filter((ch) => /\p{Script=Han}/u.test(ch)))];
+  const nf = pri.find((p) => /^nf\d\d$/.test(p));
+  return {
+    ref: extra.core ? `core:cw-${id}` : `word:${id}`,
+    id,
+    written,
+    kana,
+    kanji,
+    pos: ['n'],
+    meanings: ['x'],
+    pri,
+    freqRank: nf ? Number(nf.slice(2)) : 49,
+    ...extra,
+  };
 }
 
-const words = [
-  word('日', 'ひ', 3),
-  word('日', 'にち', 49, ['suf']),
-  word('日本', 'にほん', 1),
-  word('一', 'いち', 33),
-  word('一つ', 'ひとつ', 1),
-  word('一日', 'いちにち', 49),
-  word('一人', 'ひとり', 2),
-  word('木', 'き', 1),
-  word('本', 'ほん', 49),
-  word('本日', 'ほんじつ', 15),
-  word('休日', 'きゅうじつ', 5),
-  word('休み', 'やすみ', 10),
-  word('休む', 'やすむ', 20),
-  word('休業', 'きゅうぎょう', 4),
-  word('林', 'はやし', 6),
-];
-const core = new Set(words.filter((w) => ['本', '休む', '一日'].includes(w.written)).map((w) => w.id));
+describe('spine', () => {
+  it('boosts the kanji of core words by order and of target words by 150', () => {
+    const boosts = kanjiBoosts(
+      [
+        { written: '休む', order: 5 },
+        { written: '林', order: 600 },
+        { written: '森林', order: 1200 },
+        { order: 7 },
+      ],
+      ['寺'],
+    );
+    expect(Object.fromEntries(boosts)).toEqual({ 休: BOOST.early, 林: BOOST.mid, 森: BOOST.late, 寺: BOOST.early });
+  });
 
-const curriculum = buildCurriculum({ kanji, components, radicals: new Set(['亻', '氵']), words, coreWords: core });
-const units = curriculum.units;
-const byChar = new Map(units.map((u) => [u.char, u]));
-const wordById = new Map(words.map((w) => [w.id, w]));
-const written = (u: CurriculumUnit | undefined) => (u?.words ?? []).map((id) => wordById.get(id)!.written);
+  it('orders by frequency rank minus boost, then frequency rank, then codepoint; a boost moves a kanji up by ≤ 150', () => {
+    const kanji: CurriculumKanji[] = [
+      { char: '休', freq: 642, strokeCount: 6 },
+      { char: '体', freq: 88, strokeCount: 7 },
+      { char: '林', freq: 1000, strokeCount: 8 },
+      { char: '森', strokeCount: 12 },
+      { char: '本', freq: 600, strokeCount: 5 },
+    ];
+    const boosts = new Map([['休', 150], ['森', 50]]);
+    expect([...kanji].sort(compareSpine(boosts)).map((k) => k.char)).toEqual(['体', '休', '本', '林', '森']);
+    for (const k of kanji) expect((k.freq ?? 2501) - effectiveRank(k, boosts)).toBeLessThanOrEqual(150);
+  });
 
-describe('kanji priority', () => {
-  it('orders old JLPT 4, then JLPT 3, then the rest by frequency, grade and strokes', () => {
-    const sorted = [...kanji].sort(compareKanjiPriority).map((k) => k.char);
-    expect(sorted).toEqual(['日', '一', '本', '木', '休', '体', '林', '森', '末']);
+  it('calls a kanji rare when its frequency rank is over 1000 or it has no useful word', () => {
+    const kanji: CurriculumKanji[] = [
+      { char: '斤', freq: 2200, strokeCount: 4 },
+      { char: '新', freq: 51, strokeCount: 13 },
+      { char: '吏', freq: 900, strokeCount: 6 },
+    ];
+    const words = [word('新しい', 'あたらしい', ['ichi1']), word('官吏', 'かんり', ['news2', 'nf40'])];
+    expect([...rareKanji(kanji, words)].sort()).toEqual(['吏', '斤']);
   });
 });
 
 describe('buildCurriculum', () => {
-  it('teaches components first, recursively, with radicals as their own units', () => {
-    expect(units.map((u) => (u.type === 'radical' ? `[${u.char}]` : u.char)).join(' ')).toBe(
-      '日 一 木 本 [亻] 休 体 林 森 末',
-    );
+  const kanji: CurriculumKanji[] = [
+    { char: '日', freq: 1, strokeCount: 4, on: ['ニチ'], kun: ['ひ'] },
+    { char: '木', freq: 300, strokeCount: 4, kun: ['き'] },
+    { char: '新', freq: 50, strokeCount: 13, on: ['シン'], kun: ['あたら.しい'] },
+    { char: '立', freq: 60, strokeCount: 5, kun: ['た.つ'] },
+    { char: '斤', freq: 2200, strokeCount: 4 },
+    { char: '休', freq: 700, strokeCount: 6, kun: ['やす.む'] },
+    { char: '本', freq: 10, strokeCount: 5, on: ['ホン'] },
+    { char: '未', freq: 400, strokeCount: 5 },
+    { char: '末', freq: 410, strokeCount: 5 },
+  ];
+  const components = new Map<string, string[]>([
+    ['新', ['立', '木', '斤']],
+    ['休', ['亻', '木']],
+    ['本', ['木']],
+    ['未', ['木']],
+    ['末', ['木']],
+  ]);
+  const words = [
+    word('日', 'ひ', ['ichi1', 'news1', 'nf03']),
+    word('日', 'にち', ['spec1'], { core: true, coreOrder: 400 }),
+    word('毎日', 'まいにち', ['ichi1']),
+    word('本', 'ほん', ['ichi1'], { core: true, coreOrder: 50 }),
+    word('日本', 'にほん', ['ichi1', 'news1', 'nf01'], { core: true, coreOrder: 20 }),
+    word('本山', 'ほんざん', ['news1', 'nf20']),
+    word('新しい', 'あたらしい', ['ichi1', 'news1', 'nf02'], { core: true, coreOrder: 90 }),
+    word('新木', 'あらき', ['news2', 'nf40']),
+    word('休む', 'やすむ', ['ichi1'], { core: true, coreOrder: 70 }),
+    word('木', 'き', ['ichi1']),
+    word('立つ', 'たつ', ['ichi1']),
+    word('未定', 'みてい', ['news1', 'nf10']),
+  ];
+  const built = buildCurriculum({
+    kanji,
+    components,
+    words,
+    boosts: new Map([['休', 150]]),
+    phonetic: new Set(['新']),
+    confusables: [{ id: 'v-未末', chars: ['未', '末'], kind: 'visual' }],
+  });
+  const { units } = built.curriculum;
+  const unit = (ch: string) => units.find((u) => u.char === ch)!;
+  const shown = (ref: WordRef | null) => words.find((w) => w.ref === ref)?.written ?? null;
+
+  it('teaches every kanji once, components first, rare components left in place as named parts', () => {
+    expect(built.curriculum.version).toBe(2);
+    // 末 waits 10 places after 未; with nothing else left it comes last.
+    expect(units.map((u) => u.char).join('')).toBe('日木本立新未休斤末');
     expect(units.map((u) => u.index)).toEqual(units.map((_, i) => i));
+    expect(built.components.get('新')).toEqual(['立', '木']);
+    expect(built.parts.get('新')).toEqual(['斤']);
+    expect(built.parts.get('休')).toEqual(['亻']);
+    expect(built.rare.has('斤')).toBe(true);
   });
 
-  it('ignores components that are neither kanji nor known radicals', () => {
-    expect(byChar.has('氺')).toBe(false);
-    expect(byChar.has('氵')).toBe(false);
+  it('keeps visual confusables at least 10 positions apart', () => {
+    const many: CurriculumKanji[] = Array.from({ length: 14 }, (_, i) => ({ char: String.fromCodePoint(0x4e00 + i * 3), freq: 100 + i, strokeCount: 3 }));
+    const [a, b] = [many[1].char, many[2].char];
+    const spaced = buildCurriculum({ kanji: many, components: new Map(), words: [], confusables: [{ id: 'v', chars: [a, b], kind: 'visual' }] });
+    const at = new Map(spaced.curriculum.units.map((u) => [u.char, u.index]));
+    expect(at.get(b)! - at.get(a)!).toBe(CONFUSABLE_GAP);
+    expect(spaced.spaced).toEqual([b]);
+    const meaning = buildCurriculum({ kanji: many, components: new Map(), words: [], confusables: [{ id: 'm', chars: [a, b], kind: 'meaning' }] });
+    expect(meaning.curriculum.units.map((u) => u.char)).toEqual(many.map((k) => k.char));
+    expect(meaning.curriculum.confusables).toEqual([{ id: 'm', chars: [a, b], kind: 'meaning' }]);
   });
 
-  it('gives each kanji up to three words whose kanji are all taught', () => {
+  it('gives each kanji an anchor and up to two staged words whose kanji are taught', () => {
+    expect(shown(unit('日').anchor)).toBe('日');
+    expect(unit('日').anchor).toBe(words[1].ref); // にち: core and the common reading
+    expect(shown(unit('本').anchor)).toBe('日本');
+    expect(unit('本').staged.map(shown)).toEqual(['本']);
+    expect(shown(unit('新').anchor)).toBe('新しい');
+    expect(shown(unit('立').anchor)).toBe('立つ');
+    expect(unit('斤').anchor).toBeNull();
     for (const u of units) {
-      expect(u.words.length).toBeLessThanOrEqual(3);
-      for (const id of u.words) {
-        for (const ch of wordById.get(id)!.kanji) expect(byChar.get(ch)!.index).toBeLessThanOrEqual(u.index);
+      expect(u.staged.length).toBeLessThanOrEqual(2);
+      for (const ref of [u.anchor, ...u.staged].filter((r): r is WordRef => !!r)) {
+        const w = words.find((x) => x.ref === ref)!;
+        for (const ch of w.kanji) expect(unit(ch).index).toBeLessThanOrEqual(u.index);
       }
     }
-    expect(byChar.get('亻')!.words).toEqual([]);
-    expect(written(byChar.get('本'))).toEqual(['本', '日本', '本日']);
-    expect(written(byChar.get('林'))).toEqual(['林']);
-    expect(written(byChar.get('森'))).toEqual([]);
+    const refs = units.flatMap((u) => [u.anchor, ...u.staged]).filter(Boolean);
+    expect(new Set(refs).size).toBe(refs.length);
   });
 
-  it('uses each word once and never two words spelled the same in one unit', () => {
-    const ids = units.flatMap((u) => u.words);
-    expect(new Set(ids).size).toBe(ids.length);
-    expect(written(byChar.get('日'))).toEqual(['日']);
-    expect(byChar.get('日')!.words.map((id) => wordById.get(id)!.kana)).toEqual(['ひ']);
+  it('drops words whose only priority is the news (本山, 新木, 未定)', () => {
+    const all = units.flatMap((u) => [u.anchor, ...u.staged]).map(shown);
+    for (const w of ['本山', '新木', '未定']) expect(all).not.toContain(w);
   });
 
-  it('starts with the basic word, then the most frequent and shortest', () => {
-    expect(written(byChar.get('一'))).toEqual(['一', '一つ', '一日']);
-    expect(written(byChar.get('休'))).toEqual(['休む', '休日', '休み']);
+  it('marks inferable kanji: two or more known parts and no phonetic component', () => {
+    expect(unit('休').inferable).toBe(true);
+    expect(unit('新').inferable).toBe(false);
+    expect(unit('本').inferable).toBe(false);
   });
 
-  it('uses each kanji\'s kun readings to find its native word', () => {
-    const nagasa = word('長さ', 'ながさ', 7);
-    const nagai = word('長い', 'ながい', 20, ['adj-i']);
-    const { units: [unit] } = buildCurriculum({
-      kanji: [{ char: '長', jlptOld: 4, freq: 12, strokeCount: 8, kun: ['なが.い'] }],
-      components: new Map(),
-      radicals: new Set(),
-      words: [nagasa, nagai],
-    });
-    expect(unit.words).toEqual([nagai.id, nagasa.id]);
+  it('counts a repeated component each time for inferable (林 is 木 + 木)', () => {
+    const forest: CurriculumKanji[] = [
+      { char: '木', freq: 1, strokeCount: 4 },
+      { char: '林', freq: 2, strokeCount: 8 },
+    ];
+    const input = { kanji: forest, components: new Map([['林', ['木']]]), words: [] };
+    const inferable = (counts?: Map<string, number>) =>
+      buildCurriculum({ ...input, componentCounts: counts }).curriculum.units.find((u) => u.char === '林')!.inferable;
+    expect(inferable(new Map([['林', 2]]))).toBe(true);
+    expect(inferable(new Map([['林', 2]]).set('木', 0))).toBe(true);
+    expect(inferable()).toBe(false);
+    expect(buildCurriculum({ ...input, componentCounts: new Map([['林', 2]]), phonetic: new Set(['林']) }).curriculum.units[1].inferable).toBe(false);
   });
 
-  it('assigns phases from phaseEnds', () => {
-    expect(curriculum.phaseEnds).toEqual({ 2: units.length, 3: units.length, 4: units.length });
-    expect(units.every((u) => u.phase === 2)).toBe(true);
+  it('numbers chapters of 15 kanji', () => {
+    const many: CurriculumKanji[] = Array.from({ length: 31 }, (_, i) => ({ char: String.fromCodePoint(0x4e00 + i), freq: i + 1, strokeCount: 3 }));
+    const { units: list } = buildCurriculum({ kanji: many, components: new Map(), words: [] }).curriculum;
+    expect(list.map((u) => u.chapter)).toEqual([...Array(15).fill(1), ...Array(15).fill(2), 3]);
   });
-});
 
-describe('word overrides', () => {
-  const kanji: CurriculumKanji[] = [
-    { char: '上', jlptOld: 4, freq: 35, strokeCount: 3, kun: ['うえ', 'あ.がる', 'あ.げる'] },
-    { char: '行', jlptOld: 4, freq: 20, strokeCount: 6, kun: ['い.く', 'おこな.う'] },
-    { char: '銀', jlptOld: 3, freq: 300, strokeCount: 14 },
-  ];
-  const ue = word('上', 'うえ', 49);
-  const agaru = word('上がる', 'あがる', 13, ['v5r']);
-  const ageru = word('上げる', 'あげる', 42, ['v1']);
-  const agattari = word('上がったり', 'あがったり', 2);
-  const iku = word('行く', 'いく', 49, ['v5k-s']);
-  const okonau = word('行う', 'おこなう', 1, ['v5u']);
-  const gyou = word('行', 'ぎょう', 8);
-  const ginkou = word('銀行', 'ぎんこう', 1);
-  const vocab = [ue, agaru, ageru, agattari, iku, okonau, gyou, ginkou];
-  const ref = (w: WordEntry) => [w.id, w.written, w.kana] as const;
-
-  const build = (overrides: Record<string, (readonly [string, string, string])[]>) => {
+  it('teaches listed override words first and warns about unusable ones', () => {
     const warnings: string[] = [];
-    const { units } = buildCurriculum({
+    const ho = words[3];
+    const { curriculum } = buildCurriculum({
       kanji,
-      components: new Map(),
-      radicals: new Set(),
-      words: vocab,
-      overrides,
+      components,
+      words,
+      overrides: { 本: [[ho.id, '本', 'ほん'], ['999999', '本屋', 'ほんや']] },
       warn: (m) => warnings.push(m),
     });
-    const wordsOf = (ch: string) =>
-      units.find((u) => u.char === ch)!.words.map((id) => vocab.find((w) => w.id === id)!.written);
-    return { wordsOf, warnings };
-  };
-
-  it('teaches exactly the listed words, in order', () => {
-    expect(build({}).wordsOf('上')).toEqual(['上', '上がったり', '上がる']);
-    const { wordsOf, warnings } = build({ 上: [ref(ue), ref(agaru), ref(ageru)], 行: [ref(iku)] });
-    expect(wordsOf('上')).toEqual(['上', '上がる', '上げる']);
-    expect(wordsOf('行')).toEqual(['行く']);
-    expect(warnings).toEqual([]);
-  });
-
-  it('falls back to the automatic pick, with a warning, for a word that needs a later kanji', () => {
-    const { wordsOf, warnings } = build({ 行: [ref(iku), ref(ginkou)] });
-    expect(wordsOf('行')).toEqual(['行く', '行う']);
-    expect(wordsOf('銀')).toEqual(['銀行']);
+    const u = curriculum.units.find((x) => x.char === '本')!;
+    expect(u.anchor).toBe(ho.ref);
+    expect(u.staged.map(shown)).toEqual(['日本']);
     expect(warnings).toEqual([
-      `word override for 行: 銀行 ぎんこう (${ginkou.id}) needs 銀, which is taught later; using the automatic pick`,
-    ]);
-  });
-
-  it('reports words missing from words.json, respelled or without the kanji', () => {
-    const { wordsOf, warnings } = build({
-      上: [['999999', '上る', 'のぼる'], [ue.id, '上', 'かみ'], ref(iku)],
-    });
-    expect(wordsOf('上')).toEqual(['上', '上がったり', '上がる']);
-    expect(warnings).toEqual([
-      'word override for 上: 上る のぼる (999999) is not in words.json; using the automatic pick',
-      `word override for 上: 上 かみ (${ue.id}) is now 上 うえ; using the automatic pick`,
-      `word override for 上: 行く いく (${iku.id}) does not contain 上; using the automatic pick`,
+      'word override for 本: 本屋 ほんや (999999) is not a candidate (not in words.json, or a core word usually written in kana); using the automatic pick',
     ]);
   });
 });
 
 describe('pickUnitWords', () => {
-  it('skips affix-only entries for the first slot', () => {
-    const picked = pickUnitWords('日', [word('日', 'じつ', 1, ['suf']), word('日', 'ひ', 40)]);
-    expect(picked.map((w) => w.kana)).toEqual(['ひ']);
+  it('scores useful, core, common-reading and short words, and penalises news-only ones', () => {
+    const readings = readingsOf({ on: ['ジン', 'ニン'], kun: ['ひと'] });
+    const picked = pickUnitWords(
+      '人',
+      [
+        word('人々', 'ひとびと', ['ichi1', 'news1', 'nf01']),
+        word('人', 'ひと', ['ichi1'], { core: true, coreOrder: 30 }),
+        word('一人', 'ひとり', ['ichi1', 'nf02'], { core: true, coreOrder: 60 }),
+        word('人', 'じん', ['ichi1'], { pos: ['suf'], meanings: ['-ian'] }),
+        word('人工', 'じんこう', ['news1', 'nf05']),
+      ],
+      readings,
+    );
+    // 人 ひと 9 (useful, core, common reading ひと, short), 一人 7, 人々 6, 人 じん 4; 人工 is news-only.
+    expect(picked.map((w) => `${w.written} ${w.kana}`)).toEqual(['人 ひと', '一人 ひとり', '人々 ひとびと']);
   });
 
-  it('never opens with a bare prefix or suffix, even when it is the only basic word', () => {
-    const fu = pickUnitWords('不', [word('不', 'ふ', 49, ['pref'], ['un-', 'non-']), word('不安', 'ふあん', 2)]);
-    expect(fu.map((w) => w.written)).toEqual(['不安', '不']);
-    const ta = word('多', 'た', 49, ['n', 'pref'], ['multi-']);
-    const ooi = word('多い', 'おおい', 44, ['adj-i'], ['many']);
-    const picked = pickUnitWords('多', [ta, ooi, word('多分', 'たぶん', 13, ['adv'])], new Set([ta.id, ooi.id]));
-    expect(picked.map((w) => w.written)).toEqual(['多い', '多分', '多']);
-    const teki = pickUnitWords('的', [word('的', 'てき', 3, ['suf', 'adj-na'], ['-ical']), word('目的', 'もくてき', 1)]);
-    expect(teki.map((w) => w.written)).toEqual(['目的', '的']);
+  it('breaks ties by core order, and never opens with a bare suffix while another word exists', () => {
+    const tie = pickUnitWords('人', [
+      word('一人', 'ひとり', ['ichi1', 'nf02'], { core: true, coreOrder: 60 }),
+      word('人', 'ひと', ['ichi1'], { core: true, coreOrder: 30 }),
+    ]);
+    expect(tie.map((w) => w.written)).toEqual(['人', '一人']);
+    const suffix = pickUnitWords('的', [
+      word('的', 'てき', ['ichi1', 'spec1'], { pos: ['suf', 'adj-na'], meanings: ['-ical'] }),
+      word('目的', 'もくてき', ['news1', 'nf01', 'ichi1']),
+    ]);
+    expect(suffix.map((w) => w.written)).toEqual(['目的', '的']);
   });
 
-  it('prefers the native (kun) word over derived nouns and on-reading nouns', () => {
-    const nagasa = word('長さ', 'ながさ', 7);
-    const nagai = word('長い', 'ながい', 20, ['adj-i']);
-    const core = new Set([nagasa.id, nagai.id]);
-    const picked = pickUnitWords('長', [nagasa, nagai, word('会長', 'かいちょう', 1)], core, ['なが.い']);
-    expect(picked.map((w) => w.written)).toEqual(['長い', '会長', '長さ']);
-
-    const saku = word('作', 'さく', 7);
-    const tsukuru = word('作る', 'つくる', 49, ['v5r', 'vt']);
-    const both = new Set([saku.id, tsukuru.id]);
-    expect(pickUnitWords('作', [saku, tsukuru], both, ['つく.る'])[0].written).toBe('作る');
-    expect(pickUnitWords('作', [saku, tsukuru], both)[0].written).toBe('作');
+  it('keeps a news-only word when it is a core word, and skips a spelling already picked', () => {
+    const picked = pickUnitWords('土', [
+      word('土', 'つち', ['ichi1']),
+      word('土', 'ど', ['spec1']),
+      word('土木', 'どぼく', ['news1', 'nf07'], { core: true, coreOrder: 900 }),
+    ]);
+    expect(picked.map((w) => `${w.written} ${w.kana}`)).toEqual(['土 つち', '土木 どぼく']);
   });
 
-  it('still opens with a counter when the kanji has no other basic word', () => {
-    const picked = pickUnitWords('枚', [word('一枚', 'いちまい', 10), word('枚', 'まい', 49, ['ctr'])]);
-    expect(picked.map((w) => w.written)).toEqual(['枚', '一枚']);
-  });
-
-  it('works without a basic word', () => {
-    const picked = pickUnitWords('業', [word('休業', 'きゅうぎょう', 4), word('業界', 'ぎょうかい', 2)]);
-    expect(picked.map((w) => w.written)).toEqual(['業界', '休業']);
+  it('finds the reading a kanji has inside a word, with rendaku and gemination', () => {
+    const readings = readingsOf({ on: ['ニチ', 'ジツ'], kun: ['ひ', '-び', '-か'] });
+    expect(readings).toEqual(['にち', 'じつ', 'ひ', 'び', 'か']);
+    expect(kanjiReadingIn('日', { written: '毎日', kana: 'まいにち' }, readings)).toBe('にち');
+    expect(kanjiReadingIn('日', { written: '休日', kana: 'きゅうじつ' }, readings)).toBe('じつ');
+    expect(kanjiReadingIn('日', { written: '日', kana: 'ひ' }, readings)).toBe('ひ');
+    expect(kanjiReadingIn('日', { written: '日帰り', kana: 'ひがえり' }, readings)).toBe('ひ');
+    expect(kanjiReadingIn('一', { written: '一回', kana: 'いっかい' }, ['いち', 'ひと'])).toBe('いち');
+    const all = [word('毎日', 'まいにち', []), word('日曜', 'にちよう', []), word('日', 'ひ', [])];
+    expect(commonReading('日', all, readings)).toBe('にち');
   });
 });
 
-describe('isKunWord', () => {
-  it('matches the kanji plus okurigana read with one of its kun readings', () => {
-    const kun = ['うえ', 'あ.がる', 'のぼ.る'];
-    expect(isKunWord('上', word('上', 'うえ', 49), kun)).toBe(true);
-    expect(isKunWord('上', word('上がる', 'あがる', 13), kun)).toBe(true);
-    expect(isKunWord('上', word('上', 'じょう', 49), kun)).toBe(false);
-    expect(isKunWord('上', word('上がり', 'あがり', 8), kun)).toBe(false);
-    expect(isKunWord('上', word('上々', 'じょうじょう', 13), kun)).toBe(false);
-    expect(isKunWord('上', word('川上', 'かわかみ', 13), kun)).toBe(false);
-  });
-});
+// ---------------------------------------------------------------------------------------------
+// The built curriculum
 
-describe('computePhaseEnds', () => {
-  it('ends phase 2 after the 300th kanji and phase 3 after the 800th', () => {
-    const synthetic: CurriculumUnit[] = [];
-    for (let k = 1; k <= 900; k++) {
-      if (k % 50 === 0) synthetic.push({ index: synthetic.length, type: 'radical', char: `r${k}`, words: [], phase: 0 });
-      synthetic.push({ index: synthetic.length, type: 'kanji', char: `k${k}`, words: [], phase: 0 });
+const DATA = fileURLToPath(new URL('../public/data/', import.meta.url));
+const JMDICT = fileURLToPath(new URL('../data-raw/JMdict_e.gz', import.meta.url));
+const read = <T,>(file: string): T => JSON.parse(readFileSync(DATA + file, 'utf8')) as T;
+const built = existsSync(`${DATA}curriculum.json`) && read<{ version?: number }>('curriculum.json').version === 2;
+
+describe.skipIf(!built)('public/data/curriculum.json', () => {
+  const curriculum = built ? read<Curriculum>('curriculum.json') : ({ units: [], confusables: [] } as unknown as Curriculum);
+  const kanji = built ? read<Record<string, KanjiEntry>>('kanji.json') : {};
+  const words = built ? read<WordEntry[]>('words.json') : [];
+  const core = built ? read<CoreWord[]>('content/core-words.json') : [];
+  const index = new Map(curriculum.units.map((u) => [u.char, u.index]));
+  const coreById = new Map(core.map((c) => [c.id, c]));
+  const wordById = new Map(words.map((w) => [w.id, w]));
+  const written = (ref: WordRef) => (ref.startsWith('core:') ? coreById.get(ref.slice(5))?.written : wordById.get(ref.slice(5))?.written);
+
+  it('leaves the rare components 乙 弔 丙 吏 斤 丈 巾 旦 out of the first 300', () => {
+    for (const ch of '乙弔丙吏斤丈巾旦') expect(index.get(ch)!, ch).toBeGreaterThanOrEqual(300);
+  });
+
+  it('teaches every component before its first use', () => {
+    for (const u of curriculum.units) {
+      for (const c of kanji[u.char].components) expect(index.get(c)!, `${c} in ${u.char}`).toBeLessThan(u.index);
     }
-    const ends = computePhaseEnds(synthetic);
-    expect(synthetic[ends['2'] - 1].char).toBe('k300');
-    expect(synthetic[ends['3'] - 1].char).toBe('k800');
-    expect(ends['4']).toBe(synthetic.length);
+  });
+
+  it('publishes about 60 confusable sets, with the numbers and weekdays as meaning sets (at most 3 numbers a day)', () => {
+    expect(curriculum.confusables.length).toBeGreaterThanOrEqual(50);
+    expect(curriculum.confusables.length).toBeLessThanOrEqual(80);
+    const set = (id: string) => curriculum.confusables.find((s) => s.id === id);
+    expect(set('m-numbers')).toEqual({ id: 'm-numbers', chars: [...'一二三四五六七八九十'], kind: 'meaning' });
+    expect(set('m-weekdays')).toEqual({ id: 'm-weekdays', chars: [...'日月火水木金土'], kind: 'meaning' });
+  });
+
+  it('keeps the members of each visual confusable set ≥ 10 positions apart', () => {
+    for (const set of curriculum.confusables.filter((s) => s.kind === 'visual')) {
+      const at = set.chars.map((ch) => index.get(ch)!).sort((a, b) => a - b);
+      for (let i = 1; i < at.length; i++) expect(at[i] - at[i - 1], set.id).toBeGreaterThanOrEqual(CONFUSABLE_GAP);
+    }
+  });
+
+  it('opens none of the first 150 kanji with a newspaper word (国会, 年金, 中立, 土木, 会長, 本山)', () => {
+    const anchors = curriculum.units.slice(0, 150).map((u) => (u.anchor ? written(u.anchor) : undefined));
+    for (const w of ['国会', '年金', '中立', '土木', '会長', '本山']) expect(anchors).not.toContain(w);
+  });
+
+  it('gives every kanji an anchor with ichi1/spec or a core word wherever such a candidate exists', async () => {
+    const useful = (w: WordEntry) => !!w.core || (w.pri ?? []).some((p) => /^(ichi1|spec[12])$/.test(p));
+    const used = new Set<string>();
+    const ref = (w: WordEntry): string => (w.core ? `core:${w.core}` : `word:${w.id}`);
+    const byKanji = new Map<string, WordEntry[]>();
+    for (const w of words) for (const ch of w.kanji) byKanji.set(ch, [...(byKanji.get(ch) ?? []), w]);
+    const problems: string[] = [];
+    for (const u of curriculum.units) {
+      const anchor = u.anchor;
+      const anchorUseful = anchor
+        ? anchor.startsWith('core:') || useful(wordById.get(anchor.slice(5))!)
+        : false;
+      if (!anchorUseful) {
+        const better = (byKanji.get(u.char) ?? []).find(
+          (w) => useful(w) && !used.has(ref(w)) && w.kanji.every((c) => (index.get(c) ?? Infinity) <= u.index) &&
+            !(w.core && !coreById.get(w.core)?.written),
+        );
+        if (better) problems.push(better.id);
+      }
+      for (const r of [u.anchor, ...u.staged]) if (r) used.add(r);
+    }
+    // The only excuse: JMdict marks the better-looking word derogatory, sensitive or slang (売国奴).
+    const offensive = new Set<string>();
+    const ids = new Set(problems);
+    if (ids.size > 0 && existsSync(JMDICT)) {
+      await readJMdict(JMDICT, (e) => {
+        if (ids.has(e.id) && selectWord(e, () => true)?.offensive) offensive.add(e.id);
+      });
+    }
+    expect(problems.filter((id) => !offensive.has(id)).map((id) => wordById.get(id)!.written)).toEqual([]);
+  }, 60_000);
+
+  it('offers the pre-guess for kanji built from known parts, repeated ones included (休, 明, 林), never for phonetic ones', () => {
+    const inferable = (ch: string) => curriculum.units[index.get(ch)!].inferable;
+    for (const ch of '休明林森炎') expect(inferable(ch), ch).toBe(true);
+    for (const ch of '語時晴') expect(inferable(ch), ch).toBe(false);
+  });
+
+  it('gives kanji.json the curriculum rank and parts of every kanji', () => {
+    expect(Object.keys(kanji)).toEqual(curriculum.units.map((u) => u.char));
+    for (const u of curriculum.units) expect(kanji[u.char].rank, u.char).toBe(u.index + 1);
+    expect(kanji['新'].parts).toContain('斤');
   });
 });

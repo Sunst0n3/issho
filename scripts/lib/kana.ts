@@ -1,4 +1,6 @@
 // The kana course: hiragana then katakana, each as basic rows → dakuten/handakuten → yōon.
+// The 92 basic kana are taught as items during the kana sprint (SPRINT_DAYS); voiced kana and
+// yōon are taught by the kana-rule lessons (content/kana-rules.json).
 
 import type { KanaEntry, KanaKind } from '../../src/lib/types.ts';
 
@@ -55,6 +57,15 @@ const YOON: Row[] = YOON_BASES.map(([group, base, consonant, alts]) => ({
 
 const ROWS: Row[] = [...BASIC, ...VOICED, ...YOON];
 
+/**
+ * Sprint day of each basic hiragana row: あ+か, さ+た, な+は, ま+や, ら+わ+ん. Katakana rows follow the
+ * same pattern KATAKANA_SPRINT_OFFSET days later (days 8–12), after the two hiragana rule lessons.
+ */
+export const SPRINT_DAYS: Readonly<Record<string, number>> = {
+  a: 1, ka: 1, sa: 2, ta: 2, na: 3, ha: 3, ma: 4, ya: 4, ra: 5, wa: 5, n: 5,
+};
+export const KATAKANA_SPRINT_OFFSET = 7;
+
 const HIRAGANA_TO_KATAKANA = 0x60;
 
 export function toKatakana(hiragana: string): string {
@@ -66,7 +77,7 @@ export function toKatakana(hiragana: string): string {
     .join('');
 }
 
-/** kana.json: every kana in teaching order. */
+/** kana.json: every kana in chart order; basic kana carry their sprint day. */
 export function buildKanaTable(): KanaEntry[] {
   const out: KanaEntry[] = [];
   for (const script of ['hiragana', 'katakana'] as const) {
@@ -81,6 +92,9 @@ export function buildKanaTable(): KanaEntry[] {
           order: out.length,
         };
         if (alt && alt.length > 0) entry.altRomaji = alt;
+        if (row.kind === 'basic') {
+          entry.sprintDay = SPRINT_DAYS[row.group] + (script === 'katakana' ? KATAKANA_SPRINT_OFFSET : 0);
+        }
         out.push(entry);
       }
     }

@@ -1,16 +1,34 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Switch } from '../components/home/controls.tsx';
-import { minutesForPace } from '../components/home/labels.ts';
+import { HabitStep } from '../components/home/HabitStep.tsx';
+import { DEFAULT_MINUTES } from '../components/home/labels.ts';
+import { PlacementCheck, placementText, type PlacementResult } from '../components/home/PlacementCheck.tsx';
+import {
+  completeSlots,
+  cueDraft,
+  cueFromDraft,
+  goalFromDraft,
+  MinutesOptions,
+  type CueDraft,
+  type GoalDraft,
+} from '../components/home/planControls.tsx';
+import { reminderSeed, RemindersStep } from '../components/home/RemindersStep.tsx';
+import { TogetherStep } from '../components/home/TogetherStep.tsx';
 import { ConnectServerForm } from '../components/together/ConnectServerForm.tsx';
 import { Icon, ProgressBar, Screen, type IconName } from '../components/ui.tsx';
 import { requestPersistentStorage } from '../lib/backup.ts';
-import { getSettings, updateSettings } from '../lib/db.ts';
-import { applyKnownKana } from '../srs/course.ts';
+import { dayKey, getSettings, updateSettings } from '../lib/db.ts';
+import type { DailyMinutes, KanaScript, Settings, TogetherSlot } from '../lib/types.ts';
+import { planReviewDays } from '../srs/habits.ts';
+import { getTogether, isPairedSettings } from '../sync/client.ts';
+import { postTogetherEvent, useTogetherState } from '../sync/together.ts';
 import '../components/home/home.css';
+import '../components/home/settings.css';
 
-type Step = 'welcome' | 'name' | 'kana' | 'pace' | 'connect';
-const STEPS: Step[] = ['welcome', 'name', 'kana', 'pace', 'connect'];
+type Step = 'welcome' | 'name' | 'minutes' | 'kana' | 'habit' | 'together' | 'reminders' | 'connect';
+const STEPS: Step[] = ['welcome', 'name', 'minutes', 'kana', 'habit', 'together', 'reminders', 'connect'];
+const SCRIPTS: KanaScript[] = ['hiragana', 'katakana'];
 
 /**
  * Each step is its own history entry (/welcome?step=kana), so the phone's back
@@ -35,16 +53,10 @@ function stepState(state: unknown): StepState | undefined {
   return s && typeof s.onboardingDepth === 'number' && s.from ? (s as StepState) : undefined;
 }
 
-const PACES = [
-  { value: 3, title: 'Gentle', detail: 'Slow and steady, easy to keep up' },
-  { value: 5, title: 'Steady', detail: 'A good balance for most people' },
-  { value: 8, title: 'Keen', detail: 'Faster, with more reviews to match' },
-];
-
 const METHOD: Array<{ icon: IconName; title: string; text: string }> = [
-  { icon: 'eye', title: 'Test yourself', text: 'Every card asks first and shows the answer after. Recalling is what makes it stick.' },
-  { icon: 'pen', title: 'Write by hand', text: 'Draw each kana and kanji. Your phone checks every stroke.' },
-  { icon: 'people', title: 'Use it together', text: 'Text each other in Japanese, act out role-plays, quiz each other.' },
+  { icon: 'eye', title: 'Recall, then check', text: 'Every card asks first and shows the answer after. Recalling is what makes it stick.' },
+  { icon: 'pen', title: 'Write by hand', text: 'Write each kana and kanji from memory. Your phone checks the whole character.' },
+  { icon: 'people', title: 'Use it together', text: 'Three short sessions a week: quiz each other, act out real tasks, talk about a story.' },
 ];
 
 function StepFrame({ hero, title, lead, children, footer }: {
@@ -70,37 +82,63 @@ function StepFrame({ hero, title, lead, children, footer }: {
   );
 }
 
+type KanaPhase = { kind: 'ask' } | { kind: 'check'; script: KanaScript; queue: KanaScript[] };
+
 export default function Onboarding() {
   const navigate = useNavigate();
   const location = useLocation();
   const step = stepOf(location.search);
   const entry = stepState(location.state);
   const depth = entry?.onboardingDepth ?? 0;
-  const [loaded, setLoaded] = useState(false);
+  const [saved, setSaved] = useState<Settings>();
   const [done, setDone] = useState(false);
   const [name, setName] = useState('');
-  const [knowsHiragana, setKnowsHiragana] = useState(false);
-  const [knowsKatakana, setKnowsKatakana] = useState(false);
-  const [newPerDay, setNewPerDay] = useState(5);
+  const [minutes, setMinutes] = useState<DailyMinutes>(DEFAULT_MINUTES);
+  const [knows, setKnows] = useState<Record<KanaScript, boolean>>({ hiragana: false, katakana: false });
+  const [kanaPhase, setKanaPhase] = useState<KanaPhase>({ kind: 'ask' });
+  const [placement, setPlacement] = useState<Partial<Record<KanaScript, PlacementResult>>>({});
+  const [cue, setCue] = useState<CueDraft>(cueDraft(undefined));
+  const [coping, setCoping] = useState('');
+  const [slots, setSlots] = useState<TogetherSlot[]>(completeSlots(undefined));
+  const [slotsFromPartner, setSlotsFromPartner] = useState(false);
+  const [goal, setGoal] = useState<GoalDraft>({ text: '', targetDate: '' });
   const [finishing, setFinishing] = useState(false);
   const [error, setError] = useState<string>();
   const finished = useRef(false);
   const edited = useRef(false);
+  /** The together slots were posted to the household during the together step. */
+  const posted = useRef(false);
+  const together = useTogetherState();
+  const today = dayKey();
 
   // Coming back to onboarding starts from what's saved, unless they've already started answering.
   useEffect(() => {
     let live = true;
     void getSettings().then((s) => {
       if (!live) return;
-      setLoaded(true);
+      setSaved(s);
       if (edited.current) return;
       setName(s.name);
-      setKnowsHiragana(s.knowsHiragana);
-      setKnowsKatakana(s.knowsKatakana);
-      setNewPerDay(s.newPerDay);
+      setMinutes(s.dailyMinutes);
+      setKnows({ hiragana: s.knowsHiragana, katakana: s.knowsKatakana });
+      setCue(cueDraft(s.cue));
+      setCoping(s.coping ?? '');
+      if (s.togetherSlots.length) setSlots(completeSlots(s.togetherSlots));
+      if (s.sharedGoal) setGoal(s.sharedGoal);
     });
     return () => { live = false; };
   }, []);
+
+  // A paired phone (kept through the v2 upgrade) starts from the household's slots and goal.
+  const household = together.state;
+  useEffect(() => {
+    if (!household || edited.current || !saved || saved.togetherSlots.length) return;
+    if (household.slots.length) {
+      setSlots(completeSlots(household.slots));
+      setSlotsFromPartner(true);
+    }
+    if (household.goal && !saved.sharedGoal) setGoal(household.goal);
+  }, [household, saved]);
 
   const index = STEPS.indexOf(step);
   const go = (to: Step) => {
@@ -116,22 +154,38 @@ export default function Onboarding() {
     else navigate({ search: stepSearch(previous) }, { replace: true, state: location.state });
   };
 
-  const choices = () => ({
-    name: name.trim(),
-    knowsHiragana,
-    knowsKatakana,
-    newPerDay,
-    // Romaji helps while kana are new; someone who reads both scripts can turn it back on.
-    romaji: !(knowsHiragana && knowsKatakana),
-  });
-
-  // Saved before the connect step so the pairing form can use the name.
-  const saveChoices = async (next: Step) => {
+  /** Saves this step's answers, then moves on. */
+  const saveAndGo = async (patch: Partial<Omit<Settings, 'id'>>, next: Step, after?: (s: Settings) => Promise<void>) => {
     try {
-      await updateSettings(choices());
+      const s = await updateSettings(patch);
+      setSaved(s);
+      await after?.(s);
       go(next);
     } catch {
       setError("Couldn't save that on this phone. Try again.");
+    }
+  };
+
+  const postSlots = async (s: Settings) => {
+    if (!isPairedSettings(s)) return;
+    await postTogetherEvent({ type: 'slots', slots: s.togetherSlots });
+    if (s.sharedGoal) await postTogetherEvent({ type: 'goal', goal: s.sharedGoal });
+    posted.current = true;
+  };
+
+  /**
+   * Paired at the last step: share this phone's slots and goal with the household, unless the
+   * partner set them first (then this phone takes theirs). Offline, they stay in Settings.
+   */
+  const shareWithHousehold = async (s: Settings) => {
+    if (posted.current || !isPairedSettings(s)) return;
+    try {
+      const state = await getTogether();
+      if (state.slots.length) await updateSettings({ togetherSlots: state.slots, ...(state.goal ? { sharedGoal: state.goal } : {}) });
+      else await postSlots(s);
+      if (state.slots.length && !state.goal && s.sharedGoal) await postTogetherEvent({ type: 'goal', goal: s.sharedGoal });
+    } catch {
+      // The household is out of reach: Settings → Together can share them later.
     }
   };
 
@@ -141,9 +195,8 @@ export default function Onboarding() {
     setFinishing(true);
     setError(undefined);
     try {
-      await updateSettings(choices());
-      if (knowsHiragana || knowsKatakana) await applyKnownKana();
-      await updateSettings({ onboarded: true });
+      const s = await updateSettings({ name: name.trim(), planReviewDays: planReviewDays(dayKey()), onboarded: true });
+      void shareWithHousehold(s);
       void requestPersistentStorage();
       setDone(true);
       // Back past the steps to where onboarding began, which then becomes Today
@@ -159,14 +212,41 @@ export default function Onboarding() {
 
   const submitName = (e: FormEvent) => {
     e.preventDefault();
-    if (name.trim()) void saveChoices('kana');
+    if (name.trim()) void saveAndGo({ name: name.trim() }, 'minutes');
+  };
+
+  /** A script whose check this phone already passed (an earlier run of onboarding). */
+  const passedBefore = (script: KanaScript) =>
+    Boolean(script === 'hiragana' ? saved?.knowsHiragana : saved?.knowsKatakana);
+  /** The other script is known (passed now or before): a failed check means its 7-day sprint only. */
+  const otherKnown = (script: KanaScript) => {
+    const other = SCRIPTS.find((s) => s !== script)!;
+    return placement[other]?.outcome === 'known' || passedBefore(other);
+  };
+
+  const startKanaChecks = () => {
+    edited.current = true;
+    const queue = SCRIPTS.filter((s) => knows[s] && !placement[s] && !passedBefore(s));
+    if (!queue.length) go('habit');
+    else setKanaPhase({ kind: 'check', script: queue[0], queue: queue.slice(1) });
+  };
+
+  const nextCheck = (queue: KanaScript[]) => {
+    if (queue.length) setKanaPhase({ kind: 'check', script: queue[0], queue: queue.slice(1) });
+    else {
+      setKanaPhase({ kind: 'ask' });
+      go('habit');
+    }
   };
 
   if (done && depth === 0) return <Navigate to="/" replace />;
   // Later steps need the name (pairing uses it): a reload or link there without one starts at the name.
-  if (loaded && !done && index > STEPS.indexOf('name') && !name.trim()) {
+  if (saved && !done && index > STEPS.indexOf('name') && !name.trim()) {
     return <Navigate to={{ search: stepSearch('name') }} replace />;
   }
+
+  const savedCue = cueFromDraft(cue);
+  const slotsToSave = completeSlots(slots);
 
   let body: ReactNode;
   switch (step) {
@@ -175,7 +255,7 @@ export default function Onboarding() {
         <StepFrame
           hero={<span className="welcome-seal" lang="ja" aria-hidden="true">一緒</span>}
           title="Japanese, together"
-          lead={<>Issho (<span lang="ja">一緒</span>) means “together”. A few minutes a day, side by side. Here's how it works:</>}
+          lead={<>Issho (<span lang="ja">一緒</span>) means “together”. A set time each day, side by side. Here's how it works:</>}
           footer={<button type="button" className="btn primary block" onClick={() => go('name')}>Get started</button>}
         >
           <ul className="welcome-method">
@@ -208,55 +288,126 @@ export default function Onboarding() {
       );
       break;
 
-    case 'kana':
+    case 'minutes':
       body = (
         <StepFrame
-          title="Already know some kana?"
-          lead="Hiragana and katakana are the two Japanese alphabets. Issho starts with them, unless you know them already."
-          footer={<button type="button" className="btn primary block" onClick={() => void saveChoices('pace')}>Continue</button>}
+          title="How long each day?"
+          lead="Pick a daily time. Issho fills it with reviews, new things and reading, and keeps you close to it."
+          footer={<button type="button" className="btn primary block" onClick={() => void saveAndGo({ dailyMinutes: minutes }, 'kana')}>Continue</button>}
         >
-          <div className="card onboard-switches">
-            <Switch label={<>I know hiragana <span className="hm-kana-sample" lang="ja">あいう</span></>}
-              checked={knowsHiragana} onChange={setKnowsHiragana} />
-            <Switch label={<>I know katakana <span className="hm-kana-sample" lang="ja">アイウ</span></>}
-              checked={knowsKatakana} onChange={setKnowsKatakana} />
-          </div>
-          <p className="hm-hint">Not sure? Leave them off. Kana go quickly, and you can change this in Settings.</p>
+          <MinutesOptions value={minutes} onChange={(m) => { edited.current = true; setMinutes(m); }} legend="Minutes each day" />
+          <p className="hm-hint">These are estimates from a simulated year. You can change the time any day in Settings.</p>
         </StepFrame>
       );
       break;
 
-    case 'pace':
+    case 'kana':
+      if (kanaPhase.kind === 'check') {
+        body = (
+          <StepFrame title={`Check your ${kanaPhase.script}`}>
+            <PlacementCheck key={kanaPhase.script} script={kanaPhase.script}
+              otherKnown={otherKnown(kanaPhase.script)}
+              onDone={(r) => {
+                setPlacement((p) => ({ ...p, [r.script]: r }));
+                nextCheck(kanaPhase.queue);
+              }}
+              onCancel={() => nextCheck(kanaPhase.queue)} />
+          </StepFrame>
+        );
+        break;
+      }
       body = (
         <StepFrame
-          title="How much each day?"
-          lead="New things to learn each day. Reviews of what you already know come on top."
-          footer={<button type="button" className="btn primary block" onClick={() => void saveChoices('connect')}>Continue</button>}
+          title="Do you already know kana?"
+          lead="Hiragana and katakana are the two Japanese alphabets. If you know one, a quick check lets you skip its lessons."
+          footer={<button type="button" className="btn primary block" onClick={startKanaChecks}>Continue</button>}
         >
-          <fieldset className="hm-options">
-            <legend className="visually-hidden">New items each day</legend>
-            {PACES.map((p) => (
-              <label key={p.value} className={p.value === newPerDay ? 'hm-option selected' : 'hm-option'}>
-                <input type="radio" name="pace" value={p.value} checked={p.value === newPerDay}
-                  onChange={() => setNewPerDay(p.value)} />
-                <span className="hm-option-main">
-                  <span className="hm-option-title">{p.value} new a day · {p.title}</span>
-                  <span className="hm-option-detail">About {minutesForPace(p.value)} min a day. {p.detail}.</span>
-                </span>
-                {p.value === 5 && <span className="chip ai">Suggested</span>}
-              </label>
-            ))}
-          </fieldset>
-          <p className="hm-hint">You can change this any time in Settings.</p>
+          <div className="card onboard-switches">
+            <Switch label={<>I know hiragana <span className="hm-kana-sample" lang="ja">あいう</span></>}
+              checked={knows.hiragana} onChange={(v) => { edited.current = true; setKnows((k) => ({ ...k, hiragana: v })); }} />
+            <Switch label={<>I know katakana <span className="hm-kana-sample" lang="ja">アイウ</span></>}
+              checked={knows.katakana} onChange={(v) => { edited.current = true; setKnows((k) => ({ ...k, katakana: v })); }} />
+          </div>
+          {SCRIPTS.filter((s) => placement[s]).map((s) => (
+            <p key={s} className="hm-ok" role="status">
+              {placementText(placement[s]!, otherKnown(s))}
+            </p>
+          ))}
+          {SCRIPTS.filter((s) => !placement[s] && passedBefore(s)).map((s) => (
+            <p key={s} className="hm-ok" role="status">You're past {s} already.</p>
+          ))}
+          <p className="hm-hint">Not sure? Leave them off. The kana sprint takes about two weeks.</p>
+        </StepFrame>
+      );
+      break;
+
+    case 'habit':
+      body = (
+        <StepFrame
+          title="When will you study?"
+          lead="Pick a moment you already have every day, and what you'll do on a busy one."
+          footer={
+            <button type="button" className="btn primary block"
+              onClick={() => void saveAndGo({ cue: savedCue, coping: coping.trim() || undefined }, 'together')}>
+              Continue
+            </button>
+          }
+        >
+          <HabitStep cue={cue} coping={coping}
+            onCue={(d) => { edited.current = true; setCue(d); }}
+            onCoping={(v) => { edited.current = true; setCoping(v); }} />
+        </StepFrame>
+      );
+      break;
+
+    case 'together':
+      body = (
+        <StepFrame
+          title="Time together"
+          lead="Three 15-minute sessions a week, each with its own job. Pick times that suit you both."
+          footer={
+            <button type="button" className="btn primary block"
+              onClick={() => void saveAndGo({ togetherSlots: slotsToSave, sharedGoal: goalFromDraft(goal) }, 'reminders', postSlots)}>
+              Continue
+            </button>
+          }
+        >
+          <TogetherStep slots={slotsToSave} goal={goal} today={today} fromPartner={slotsFromPartner}
+            onSlots={(s) => { edited.current = true; setSlotsFromPartner(false); setSlots(s); }}
+            onGoal={(g) => { edited.current = true; setGoal(g); }} />
+        </StepFrame>
+      );
+      break;
+
+    case 'reminders':
+      body = (
+        <StepFrame
+          title="Reminders"
+          lead="Add your daily cue and your together sessions to your phone's calendar. No notifications from Issho, no nagging."
+          footer={<button type="button" className="btn primary block" onClick={() => go('connect')}>Continue</button>}
+        >
+          <RemindersStep cue={savedCue} slots={slotsToSave}
+            input={{ cue: savedCue, slots: slotsToSave, start: today, name: name.trim(), uidSeed: reminderSeed(saved?.memberId) }} />
         </StepFrame>
       );
       break;
 
     case 'connect':
-      body = (
+      // A phone that kept its pairing through the upgrade is already connected.
+      body = saved && isPairedSettings(saved) ? (
         <StepFrame
           title="Study together"
-          lead="A small server at home lets you two see each other's progress, chat in Japanese and quiz each other. Everything else works without it."
+          lead={`This phone is still connected to ${saved.householdName ?? 'your home server'}. Your chat and your partner are where you left them.`}
+          footer={
+            <button type="button" className="btn primary block" onClick={() => void finish()} disabled={finishing}>
+              {finishing ? 'Getting things ready…' : 'Start learning'}
+            </button>
+          }
+        />
+      ) : (
+        <StepFrame
+          title="Study together"
+          lead="A small server at home lets you two see each other's progress, chat in Japanese and run your sessions together. Everything else works without it."
         >
           {finishing
             ? <p className="muted" role="status">Getting things ready…</p>

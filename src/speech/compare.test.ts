@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { editDistance, normalizeForCompare, similarity } from './compare.ts';
+import { editDistance, normalizeForCompare, similarity, spokenMatches } from './compare.ts';
 
 describe('normalizeForCompare', () => {
   it('folds katakana, width and case, and drops punctuation and spaces', () => {
@@ -70,5 +70,42 @@ describe('similarity', () => {
     const s = similarity('あ', 'ありがとうございます');
     expect(s).toBeGreaterThanOrEqual(0);
     expect(s).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('spokenMatches', () => {
+  const ocha = { written: 'お茶', readings: ['おちゃ'] };
+
+  it('accepts the written form, as the recognizer wrote it', () => {
+    expect(spokenMatches('お茶', ocha)).toBe(true);
+    expect(spokenMatches('お茶。', ocha)).toBe(true);
+    expect(spokenMatches('食べる', { written: '食べる', readings: ['たべる'] })).toBe(true);
+  });
+
+  it('accepts any reading, in hiragana or katakana, full or half width', () => {
+    expect(spokenMatches('おちゃ', ocha)).toBe(true);
+    expect(spokenMatches('オチャ', ocha)).toBe(true);
+    expect(spokenMatches('ｵﾁｬ', ocha)).toBe(true);
+    expect(spokenMatches('こーひー', { written: 'コーヒー', readings: ['こーひー', 'こおひい'] })).toBe(true);
+    expect(spokenMatches('こおひい', { written: 'コーヒー', readings: ['こーひー', 'こおひい'] })).toBe(true);
+  });
+
+  it('accepts a near miss at 0.75 similarity and refuses a different word', () => {
+    const word = { written: '図書館', readings: ['としょかん'] };
+    // One kana off in five: 0.8.
+    expect(spokenMatches('としょかに', word)).toBe(true);
+    // Two off in five: 0.6.
+    expect(spokenMatches('としかに', word)).toBe(false);
+    expect(spokenMatches('びょういん', word)).toBe(false);
+  });
+
+  it('refuses empty or punctuation-only transcripts', () => {
+    expect(spokenMatches('', ocha)).toBe(false);
+    expect(spokenMatches('。、 ', ocha)).toBe(false);
+    expect(spokenMatches('おちゃ', { readings: [] })).toBe(false);
+  });
+
+  it('reads ruby markup in the expected forms', () => {
+    expect(spokenMatches('明日', { written: '{明日|あした}', readings: ['あした'] })).toBe(true);
   });
 });

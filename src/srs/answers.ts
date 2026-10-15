@@ -2,11 +2,11 @@
 
 import { Rating, type Grade } from 'ts-fsrs';
 import { rubyToKana } from '../lib/ruby.ts';
-import type { KanaEntry } from '../lib/types.ts';
+import type { KanaEntry, ReviewLogRecord } from '../lib/types.ts';
 import { shuffle } from './random.ts';
 import { toHiragana, toKana } from './romaji.ts';
 
-export { toHiragana, toKana, toKatakana, type ToKanaOptions } from './romaji.ts';
+export { imeConvert, toHiragana, toKana, toKatakana, type ToKanaOptions } from './romaji.ts';
 export { seededRandom, shuffle } from './random.ts';
 
 // ---------------------------------------------------------------------------
@@ -225,12 +225,72 @@ export interface AnswerOutcome {
   usedHint?: boolean;
   /** Wrong attempts before the final answer. */
   retries?: number;
+  /** Answered from options: the 'Show options' hint or hands-busy mode. */
+  choice?: boolean;
 }
 
-/** Objective cards: right first try → Good; right after a hint or retry → Hard; wrong → Again. */
-export function gradeFor({ correct, usedHint = false, retries = 0 }: AnswerOutcome): Grade {
+/** Objective cards: wrong → Again; right with a choice, hint or retry → Hard; right first try → Good. Never Easy. */
+export function gradeFor({ correct, usedHint = false, retries = 0, choice = false }: AnswerOutcome): Grade {
   if (!correct) return Rating.Again;
-  return usedHint || retries > 0 ? Rating.Hard : Rating.Good;
+  return usedHint || choice || retries > 0 ? Rating.Hard : Rating.Good;
+}
+
+/** Reveal + self-grade: Missed → Again, Got it → Good. */
+export function selfGrade(gotIt: boolean): Grade {
+  return gotIt ? Rating.Good : Rating.Again;
+}
+
+/** Word read cards: Again if the reading is wrong or the meaning was unknown; Hard after a retry, hint or choice; else Good. */
+export function gradeWordRead(o: { readingCorrect: boolean; retries: number; usedHint?: boolean; choice?: boolean; knewMeaning: boolean }): Grade {
+  if (!o.readingCorrect || !o.knewMeaning) return Rating.Again;
+  return o.retries > 0 || o.usedHint || o.choice ? Rating.Hard : Rating.Good;
+}
+
+export interface RecallWritingOutcome {
+  strokeCount: number;
+  /** Expected strokes not drawn. */
+  missing: number;
+  /** Drawn strokes matching nothing. */
+  extra: number;
+  /** Expected strokes drawn badly. */
+  unmatched: number;
+  hintUsed: boolean;
+  /** 'I wrote it right' after an Again. */
+  override?: boolean;
+}
+
+/**
+ * Recall writing, judged as a whole: override → Hard. Again: a missing or extra stroke, two badly
+ * drawn strokes, or one in a character of ≤ 6 strokes. Hard: one badly drawn stroke in a character
+ * of ≥ 7 strokes, or a hint. Good otherwise. Stroke order never affects the grade.
+ */
+export function gradeForRecallWriting(o: RecallWritingOutcome): Grade {
+  if (o.override) return Rating.Hard;
+  if (o.missing + o.extra >= 1 || o.unmatched >= 2 || (o.unmatched === 1 && o.strokeCount <= 6)) return Rating.Again;
+  if (o.unmatched === 1 || o.hintUsed) return Rating.Hard;
+  return Rating.Good;
+}
+
+/**
+ * A typed sentence (grammar build, cloze): the input in kana or romaji, compared without spaces
+ * and punctuation against each accepted hiragana answer (hiragana and katakana are equal).
+ */
+export function sentenceMatches(input: string, accepted: readonly string[]): boolean {
+  return kanaMatches(input, accepted);
+}
+
+/** A surprise miss: the last answer was a fast Good (under 0.6 × the median) and now it is Again. */
+export function isSurpriseMiss(prev: Pick<ReviewLogRecord, 'grade' | 'durationMs'> | undefined, medianMs: number, grade: Grade): boolean {
+  return prev !== undefined && grade === Rating.Again && prev.grade === Rating.Good && prev.durationMs < 0.6 * medianMs;
+}
+
+export const OVERRIDE_TIP_SHARE = 0.1;
+const CALIBRATION_MIN_LOGS = 20;
+
+/** ≥ 20 write logs and overrides on more than 10 % of them: show the handwriting calibration tip. */
+export function needsCalibrationTip(writeLogs: readonly Pick<ReviewLogRecord, 'override'>[]): boolean {
+  if (writeLogs.length < CALIBRATION_MIN_LOGS) return false;
+  return writeLogs.filter((l) => l.override).length / writeLogs.length > OVERRIDE_TIP_SHARE;
 }
 
 export interface WritingOutcome {
@@ -247,8 +307,8 @@ export interface WritingOutcome {
 }
 
 /**
- * Writing cards: clean → Good; any hint or 2+ stroke retries → Hard; gave up or
- * more than half the strokes missed → Again.
+ * Free writing practice only (ungraded into FSRS): clean → Good; any hint or 2+ stroke retries →
+ * Hard; gave up or more than half the strokes missed → Again.
  */
 export function gradeForWriting({ mistakes, hintsUsed, strokeCount, gaveUp, failedStrokes }: WritingOutcome): Grade {
   const failed = failedStrokes ?? Math.min(mistakes, strokeCount);

@@ -123,6 +123,18 @@ describe('useChatMessages', () => {
     expect(result.current!.map((i) => i.writtenAt)).toEqual(['2026-10-13T21:30:00.000Z', undefined, '2026-10-14T01:00:00.000Z']);
   });
 
+  it("keeps the 'daily' tag of today's sentence, sent or pending", async () => {
+    serveHistory(0).history.push(msg(1, { tag: 'daily' }));
+    await syncMessages();
+    expect((await db.messages.get(1))?.tag).toBe('daily');
+    await (db.outbox as unknown as { put(row: PendingMessage): Promise<unknown> }).put(
+      { clientId: 'p1', createdAt: new Date('2026-10-14T01:00:00Z'), kind: 'text', text: '{今日|きょう}は', tag: 'daily', attempts: 0 },
+    );
+    const { result } = renderHook(() => useChatMessages());
+    await waitFor(() => expect(result.current).toHaveLength(2));
+    expect(result.current!.map((i) => i.tag)).toEqual(['daily', 'daily']);
+  });
+
   it('keeps writtenAt from the server in the cache', async () => {
     serveHistory(0).history.push({ ...msg(1), writtenAt: '2026-10-13T21:30:00.000Z' });
     await syncMessages();

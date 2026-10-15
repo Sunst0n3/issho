@@ -4,9 +4,11 @@ import fastifyStatic from '@fastify/static';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 const IMMUTABLE = 'public, max-age=31536000, immutable';
-// Everything without a content hash (index.html, sw.js, manifest, icons, data) is revalidated
-// with its ETag on every load, so a new deploy is picked up immediately.
+// Everything without a content hash (index.html, sw.js, manifest, icons, data, the audio manifest)
+// is revalidated with its ETag on every load, so a new deploy is picked up immediately.
 const REVALIDATE = 'no-cache';
+/** Voice clips are named by a hash of their content (public/audio/<aa>/<hash16>.m4a). */
+const CLIP_RE = /\.m4a$/i;
 
 /**
  * Serves the built PWA from `root`. Returns false (and serves nothing) when there's no build there.
@@ -20,6 +22,9 @@ export async function registerStatic(app: FastifyInstance, root: string): Promis
   }
 
   const assetsDir = path.join(root, 'assets') + path.sep;
+  const audioDir = path.join(root, 'audio') + path.sep;
+  const immutable = (filePath: string) =>
+    filePath.startsWith(assetsDir) || (filePath.startsWith(audioDir) && CLIP_RE.test(filePath));
   await app.register(fastifyStatic, {
     root,
     // `send` rejects `..` segments and paths outside `root`; dotfiles are never served.
@@ -29,22 +34,26 @@ export async function registerStatic(app: FastifyInstance, root: string): Promis
     etag: true,
     lastModified: true,
     setHeaders(reply, filePath) {
-      reply.header('cache-control', filePath.startsWith(assetsDir) ? IMMUTABLE : REVALIDATE);
+      reply.header('cache-control', immutable(filePath) ? IMMUTABLE : REVALIDATE);
     },
   });
   return true;
 }
 
+/** Paths that only ever name files: a miss there is a 404, never the app's index.html. */
+const FILE_ONLY = ['/api', '/audio', '/data'];
+
 /**
- * Unknown /api routes get a JSON 404. Other GETs without a file extension are client-side
- * routes of the single-page app, so they get index.html.
+ * Unknown /api routes and missing /audio and /data files get a JSON 404 (a service worker or
+ * the data loader must not mistake index.html for a clip or a JSON file). Other GETs without a
+ * file extension are client-side routes of the single-page app, so they get index.html.
  */
 export function notFoundHandler(hasApp: boolean) {
   return async function notFound(request: FastifyRequest, reply: FastifyReply) {
     const pathname = request.url.split('?')[0];
-    const isApi = pathname === '/api' || pathname.startsWith('/api/');
+    const fileOnly = FILE_ONLY.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
     const isPageRequest = request.method === 'GET' || request.method === 'HEAD';
-    if (hasApp && !isApi && isPageRequest && !path.posix.extname(pathname)) {
+    if (hasApp && !fileOnly && isPageRequest && !path.posix.extname(pathname)) {
       return reply.sendFile('index.html');
     }
     return reply.code(404).send({ error: 'not_found' });

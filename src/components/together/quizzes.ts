@@ -1,6 +1,6 @@
-// "Quiz each other": the latest inbox and sent quizzes, cached so the Together
-// screen and an opened quiz still show offline, plus finished results waiting
-// to be delivered when the home server couldn't be reached.
+// Quizzes between partners: the latest inbox and sent quizzes, cached so the Together
+// screen and an opened quiz still show offline, plus finished results (with the asker's
+// verdicts) waiting to be delivered when the home server couldn't be reached.
 
 import { useEffect, useSyncExternalStore } from 'react';
 import type { Quiz, QuizResultRequest, QuizzesResponse } from '../../../shared/api.ts';
@@ -64,7 +64,10 @@ function withPendingResults(data: QuizzesResponse): QuizzesResponse {
     ...data,
     inbox: data.inbox.map((q) => {
       const p = pending.get(q.id);
-      return q.result || !p ? q : { ...q, result: { correct: p.correct, total: p.total, missed: p.missed, finishedAt: p.finishedAt } };
+      if (q.result || !p) return q;
+      const result: NonNullable<Quiz['result']> = { correct: p.correct, total: p.total, missed: p.missed, finishedAt: p.finishedAt };
+      if (p.verdicts) result.verdicts = p.verdicts;
+      return { ...q, result };
     }),
   };
 }
@@ -92,7 +95,12 @@ export function flushQuizResults(): Promise<void> {
   flushing ??= (async () => {
     for (const p of pendingResults()) {
       try {
-        const saved = await submitQuizResult(p.id, { correct: p.correct, total: p.total, missed: p.missed });
+        const saved = await submitQuizResult(p.id, {
+          correct: p.correct,
+          total: p.total,
+          missed: p.missed,
+          ...(p.verdicts ? { verdicts: p.verdicts } : {}),
+        });
         settled.set(p.id, 'sent');
         savePendingResults(pendingResults().filter((x) => x.id !== p.id));
         await rememberQuiz(saved);

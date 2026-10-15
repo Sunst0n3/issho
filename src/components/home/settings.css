@@ -9,6 +9,7 @@
 
 .set-range-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .set-value { min-width: 3ch; font-size: 17px; font-weight: 700; text-align: center; font-variant-numeric: tabular-nums; }
+.set-value-wide { min-width: 5ch; }
 .set-range input[type="range"] { width: 100%; min-height: var(--tap); margin: 0; accent-color: var(--shu); }
 .set-stepper { display: flex; align-items: center; gap: 8px; }
 .set-stepper .icon-btn[disabled] { opacity: 0.4; cursor: default; }
@@ -51,3 +52,7 @@
   padding: 0 8px; color: var(--ai); white-space: nowrap;
 }
 .set-confirm-title:focus { outline: none; }
+.set-list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.set-list li { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: var(--tap); }
+.set-list li + li { border-top: 1px solid var(--line); }
+.btn.set-save { align-self: flex-start; }

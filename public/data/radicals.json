@@ -1,1 +1,1035 @@
-[{"char":"亻","name":"person (side)","meaning":"person","variantOf":"人"},{"char":"氵","name":"water (side)","meaning":"water","variantOf":"水"},{"char":"扌","name":"hand (side)","meaning":"hand","variantOf":"手"},{"char":"艹","name":"grass (top)","meaning":"grass"},{"char":"忄","name":"heart (side)","meaning":"heart","variantOf":"心"},{"char":"礻","name":"altar (side)","meaning":"altar","variantOf":"示"},{"char":"衤","name":"clothes (side)","meaning":"clothes","variantOf":"衣"},{"char":"⺨","name":"dog (side)","meaning":"dog","variantOf":"犬"},{"char":"⻖","name":"hill (left side)","meaning":"hill","variantOf":"阜"},{"char":"⻏","name":"village (right side)","meaning":"village"},{"char":"刂","name":"knife (side)","meaning":"knife","variantOf":"刀"},{"char":"灬","name":"fire (bottom)","meaning":"fire","variantOf":"火"},{"char":"氺","name":"water (bottom)","meaning":"water","variantOf":"水"},{"char":"⺌","name":"small (top)","meaning":"small","variantOf":"小"},{"char":"⺍","name":"three dots (top)","meaning":"three dots"},{"char":"⺤","name":"claw (top)","meaning":"claw","variantOf":"爪"},{"char":"𠂉","name":"reclining person","meaning":"reclining person"},{"char":"耂","name":"old (top)","meaning":"old","variantOf":"老"},{"char":"飠","name":"food (side)","meaning":"food","variantOf":"食"},{"char":"虍","name":"tiger (top)","meaning":"tiger","variantOf":"虎"},{"char":"巛","name":"river (wavy)","meaning":"river","variantOf":"川"},{"char":"罒","name":"net (top)","meaning":"net"},{"char":"覀","name":"west (top)","meaning":"west"},{"char":"⻌","name":"road (movement)","meaning":"road"},{"char":"宀","name":"roof","meaning":"roof"},{"char":"冖","name":"cover (crown)","meaning":"cover"},{"char":"亠","name":"lid (top hat)","meaning":"lid"},{"char":"广","name":"canopy (dotted cliff)","meaning":"canopy"},{"char":"厂","name":"cliff","meaning":"cliff"},{"char":"疒","name":"sickness","meaning":"sickness"},{"char":"尸","name":"corpse (body)","meaning":"corpse"},{"char":"囗","name":"enclosure","meaning":"enclosure"},{"char":"冂","name":"frame (upside-down box)","meaning":"frame"},{"char":"凵","name":"open box","meaning":"open box"},{"char":"几","name":"table (wind frame)","meaning":"table"},{"char":"匚","name":"box (open on the right)","meaning":"box"},{"char":"匸","name":"hiding enclosure","meaning":"hiding place"},{"char":"勹","name":"wrap","meaning":"wrap"},{"char":"彳","name":"step (going person)","meaning":"step"},{"char":"廴","name":"long stride","meaning":"stride"},{"char":"癶","name":"footsteps (tent)","meaning":"footsteps"},{"char":"夂","name":"walking legs","meaning":"walking legs"},{"char":"攵","name":"strike (taskmaster)","meaning":"strike"},{"char":"殳","name":"weapon (missile)","meaning":"weapon"},{"char":"弋","name":"shoot (arrow)","meaning":"shoot"},{"char":"戈","name":"spear (halberd)","meaning":"spear"},{"char":"儿","name":"legs","meaning":"legs"},{"char":"厶","name":"private (elbow)","meaning":"private"},{"char":"廾","name":"two hands","meaning":"two hands"},{"char":"卩","name":"seal (kneeling person)","meaning":"seal"},{"char":"卜","name":"divination (magic wand)","meaning":"divination"},{"char":"冫","name":"ice (two drops)","meaning":"ice"},{"char":"匕","name":"spoon","meaning":"spoon"},{"char":"勺","name":"ladle","meaning":"ladle"},{"char":"彡","name":"hair (three streaks)","meaning":"hair"},{"char":"⺕","name":"broom (snout)","meaning":"broom"},{"char":"聿","name":"brush","meaning":"brush"},{"char":"頁","name":"head (page)","meaning":"head"},{"char":"隹","name":"short-tailed bird","meaning":"bird"},{"char":"禾","name":"grain","meaning":"grain"},{"char":"耒","name":"plow","meaning":"plow"},{"char":"酉","name":"sake jar","meaning":"sake"},{"char":"豕","name":"pig","meaning":"pig"},{"char":"艮","name":"root (stopping)","meaning":"root"},{"char":"幺","name":"short thread (cocoon)","meaning":"short thread"},{"char":"勿","name":"must not","meaning":"must not"},{"char":"毋","name":"mother (do not)","meaning":"mother","variantOf":"母"},{"char":"廿","name":"twenty","meaning":"twenty"},{"char":"疋","name":"foot (bolt of cloth)","meaning":"foot"},{"char":"歹","name":"death (bones)","meaning":"death"},{"char":"辰","name":"sign of the dragon","meaning":"dragon sign"},{"char":"韋","name":"tanned leather","meaning":"tanned leather"},{"char":"禸","name":"track (footprint)","meaning":"track"},{"char":"⺦","name":"split wood (side)","meaning":"split wood"},{"char":"气","name":"steam","meaning":"steam"}]
+[
+  {
+    "char": "厶",
+    "name": "private (elbow)",
+    "meaning": "private"
+  },
+  {
+    "char": "干",
+    "name": "dry (rack)",
+    "meaning": "dry"
+  },
+  {
+    "char": "凵",
+    "name": "bowl (open box)",
+    "meaning": "open box"
+  },
+  {
+    "char": "寸",
+    "name": "measurement (inch)",
+    "meaning": "measure"
+  },
+  {
+    "char": "⺕",
+    "name": "broom (snout)",
+    "meaning": "broom"
+  },
+  {
+    "char": "彳",
+    "name": "step (going person)",
+    "meaning": "step"
+  },
+  {
+    "char": "礻",
+    "name": "shrine (altar, side)",
+    "meaning": "altar",
+    "variantOf": "示"
+  },
+  {
+    "char": "儿",
+    "name": "human legs",
+    "meaning": "legs"
+  },
+  {
+    "char": "刀",
+    "name": "sword",
+    "meaning": "sword"
+  },
+  {
+    "char": "戈",
+    "name": "spear (halberd)",
+    "meaning": "spear"
+  },
+  {
+    "char": "羊",
+    "name": "sheep",
+    "meaning": "sheep"
+  },
+  {
+    "char": "幺",
+    "name": "cocoon (short thread)",
+    "meaning": "short thread"
+  },
+  {
+    "char": "夂",
+    "name": "walking legs",
+    "meaning": "walking legs"
+  },
+  {
+    "char": "刂",
+    "name": "knife (side)",
+    "meaning": "knife",
+    "variantOf": "刀"
+  },
+  {
+    "char": "⻌",
+    "name": "road (movement)",
+    "meaning": "road"
+  },
+  {
+    "char": "卜",
+    "name": "divination (magic wand)",
+    "meaning": "divination"
+  },
+  {
+    "char": "亠",
+    "name": "lid (top hat)",
+    "meaning": "lid"
+  },
+  {
+    "char": "⻏",
+    "name": "city (right side)",
+    "meaning": "village"
+  },
+  {
+    "char": "耂",
+    "name": "old (top)",
+    "meaning": "old",
+    "variantOf": "老"
+  },
+  {
+    "char": "囗",
+    "name": "enclosure",
+    "meaning": "enclosure"
+  },
+  {
+    "char": "宀",
+    "name": "roof",
+    "meaning": "roof"
+  },
+  {
+    "char": "疋",
+    "name": "bolt (foot)",
+    "meaning": "foot"
+  },
+  {
+    "char": "斤",
+    "name": "axe",
+    "meaning": "axe"
+  },
+  {
+    "char": "貝",
+    "name": "shellfish (money)",
+    "meaning": "shellfish"
+  },
+  {
+    "char": "乙",
+    "name": "fishhook (second)",
+    "meaning": "second"
+  },
+  {
+    "char": "⺍",
+    "name": "sparks (three dots)",
+    "meaning": "three dots"
+  },
+  {
+    "char": "冖",
+    "name": "cover (crown)",
+    "meaning": "cover"
+  },
+  {
+    "char": "冂",
+    "name": "frame (upside-down box)",
+    "meaning": "frame"
+  },
+  {
+    "char": "里",
+    "name": "home village",
+    "meaning": "home village"
+  },
+  {
+    "char": "⺌",
+    "name": "little (top)",
+    "meaning": "small",
+    "variantOf": "小"
+  },
+  {
+    "char": "糸",
+    "name": "thread",
+    "meaning": "thread"
+  },
+  {
+    "char": "勺",
+    "name": "ladle",
+    "meaning": "ladle"
+  },
+  {
+    "char": "旦",
+    "name": "dawn",
+    "meaning": "daybreak"
+  },
+  {
+    "char": "勿",
+    "name": "must not",
+    "meaning": "must not"
+  },
+  {
+    "char": "亻",
+    "name": "person (side)",
+    "meaning": "person",
+    "variantOf": "人"
+  },
+  {
+    "char": "覀",
+    "name": "west cap (top)",
+    "meaning": "west"
+  },
+  {
+    "char": "广",
+    "name": "canopy (dotted cliff)",
+    "meaning": "canopy"
+  },
+  {
+    "char": "廿",
+    "name": "twenty",
+    "meaning": "twenty"
+  },
+  {
+    "char": "又",
+    "name": "hand (again)",
+    "meaning": "again"
+  },
+  {
+    "char": "弓",
+    "name": "bow",
+    "meaning": "bow"
+  },
+  {
+    "char": "虫",
+    "name": "insect",
+    "meaning": "insect"
+  },
+  {
+    "char": "气",
+    "name": "steam",
+    "meaning": "steam"
+  },
+  {
+    "char": "扌",
+    "name": "hand (side)",
+    "meaning": "hand",
+    "variantOf": "手"
+  },
+  {
+    "char": "氵",
+    "name": "water (side)",
+    "meaning": "water",
+    "variantOf": "水"
+  },
+  {
+    "char": "幾",
+    "name": "several (how many)",
+    "meaning": "how many"
+  },
+  {
+    "char": "癶",
+    "name": "footsteps (tent)",
+    "meaning": "footsteps"
+  },
+  {
+    "char": "耳",
+    "name": "ear",
+    "meaning": "ear"
+  },
+  {
+    "char": "豕",
+    "name": "pig",
+    "meaning": "pig"
+  },
+  {
+    "char": "舌",
+    "name": "tongue",
+    "meaning": "tongue"
+  },
+  {
+    "char": "己",
+    "name": "self (snake)",
+    "meaning": "self"
+  },
+  {
+    "char": "攵",
+    "name": "taskmaster (strike)",
+    "meaning": "strike"
+  },
+  {
+    "char": "⻖",
+    "name": "hill (left side)",
+    "meaning": "hill",
+    "variantOf": "阜"
+  },
+  {
+    "char": "弋",
+    "name": "shoot (arrow)",
+    "meaning": "shoot"
+  },
+  {
+    "char": "卩",
+    "name": "seal (kneeling person)",
+    "meaning": "seal"
+  },
+  {
+    "char": "聿",
+    "name": "brush",
+    "meaning": "brush"
+  },
+  {
+    "char": "尚",
+    "name": "esteem",
+    "meaning": "esteem"
+  },
+  {
+    "char": "兄",
+    "name": "big brother",
+    "meaning": "elder brother"
+  },
+  {
+    "char": "匕",
+    "name": "spoon",
+    "meaning": "spoon"
+  },
+  {
+    "char": "巾",
+    "name": "cloth (towel)",
+    "meaning": "cloth"
+  },
+  {
+    "char": "是",
+    "name": "just so",
+    "meaning": "correct"
+  },
+  {
+    "char": "頁",
+    "name": "page (head)",
+    "meaning": "head"
+  },
+  {
+    "char": "衤",
+    "name": "clothes (side)",
+    "meaning": "clothes",
+    "variantOf": "衣"
+  },
+  {
+    "char": "忄",
+    "name": "heart (side)",
+    "meaning": "heart",
+    "variantOf": "心"
+  },
+  {
+    "char": "旨",
+    "name": "tasty",
+    "meaning": "delicious"
+  },
+  {
+    "char": "矢",
+    "name": "arrow",
+    "meaning": "arrow"
+  },
+  {
+    "char": "牛",
+    "name": "cow",
+    "meaning": "cow"
+  },
+  {
+    "char": "孝",
+    "name": "filial piety",
+    "meaning": "filial piety"
+  },
+  {
+    "char": "吏",
+    "name": "official",
+    "meaning": "officer"
+  },
+  {
+    "char": "衣",
+    "name": "clothes (garment)",
+    "meaning": "clothes"
+  },
+  {
+    "char": "甲",
+    "name": "armor (shell)",
+    "meaning": "armor"
+  },
+  {
+    "char": "⺤",
+    "name": "claw (top)",
+    "meaning": "claw",
+    "variantOf": "爪"
+  },
+  {
+    "char": "隹",
+    "name": "bird (short-tailed)",
+    "meaning": "bird"
+  },
+  {
+    "char": "禾",
+    "name": "grain",
+    "meaning": "grain"
+  },
+  {
+    "char": "𠂉",
+    "name": "reclining figure (person)",
+    "meaning": "reclining person"
+  },
+  {
+    "char": "毋",
+    "name": "mother (do not)",
+    "meaning": "mother",
+    "variantOf": "母"
+  },
+  {
+    "char": "矛",
+    "name": "lance (halberd)",
+    "meaning": "halberd"
+  },
+  {
+    "char": "厂",
+    "name": "cliff",
+    "meaning": "cliff"
+  },
+  {
+    "char": "勹",
+    "name": "wrap",
+    "meaning": "wrap"
+  },
+  {
+    "char": "灬",
+    "name": "fire (bottom)",
+    "meaning": "fire",
+    "variantOf": "火"
+  },
+  {
+    "char": "甘",
+    "name": "sweet",
+    "meaning": "sweet"
+  },
+  {
+    "char": "冫",
+    "name": "ice (two drops)",
+    "meaning": "ice"
+  },
+  {
+    "char": "匸",
+    "name": "hiding place (enclosure)",
+    "meaning": "hiding place"
+  },
+  {
+    "char": "殳",
+    "name": "weapon (missile)",
+    "meaning": "weapon"
+  },
+  {
+    "char": "鳥",
+    "name": "bird",
+    "meaning": "bird"
+  },
+  {
+    "char": "斗",
+    "name": "dipper",
+    "meaning": "dipper"
+  },
+  {
+    "char": "彡",
+    "name": "hair (three streaks)",
+    "meaning": "hair"
+  },
+  {
+    "char": "且",
+    "name": "pile (moreover)",
+    "meaning": "moreover"
+  },
+  {
+    "char": "冬",
+    "name": "winter",
+    "meaning": "winter"
+  },
+  {
+    "char": "弔",
+    "name": "condolence",
+    "meaning": "condolences"
+  },
+  {
+    "char": "斉",
+    "name": "alike (in rows)",
+    "meaning": "alike"
+  },
+  {
+    "char": "罒",
+    "name": "net (top)",
+    "meaning": "net"
+  },
+  {
+    "char": "歹",
+    "name": "death (bones)",
+    "meaning": "death"
+  },
+  {
+    "char": "艹",
+    "name": "grass (top)",
+    "meaning": "grass"
+  },
+  {
+    "char": "曽",
+    "name": "formerly",
+    "meaning": "formerly"
+  },
+  {
+    "char": "祭",
+    "name": "festival",
+    "meaning": "ritual"
+  },
+  {
+    "char": "憂",
+    "name": "grief",
+    "meaning": "melancholy"
+  },
+  {
+    "char": "尸",
+    "name": "corpse (body)",
+    "meaning": "corpse"
+  },
+  {
+    "char": "句",
+    "name": "phrase",
+    "meaning": "phrase"
+  },
+  {
+    "char": "丁",
+    "name": "nail (street)",
+    "meaning": "street block"
+  },
+  {
+    "char": "韋",
+    "name": "tanned hide (leather)",
+    "meaning": "tanned leather"
+  },
+  {
+    "char": "肖",
+    "name": "likeness",
+    "meaning": "resemblance"
+  },
+  {
+    "char": "忍",
+    "name": "endure",
+    "meaning": "endure"
+  },
+  {
+    "char": "廴",
+    "name": "extended stride (long)",
+    "meaning": "stride"
+  },
+  {
+    "char": "氺",
+    "name": "water (bottom)",
+    "meaning": "water",
+    "variantOf": "水"
+  },
+  {
+    "char": "呂",
+    "name": "spine",
+    "meaning": "spine"
+  },
+  {
+    "char": "穴",
+    "name": "hole",
+    "meaning": "hole"
+  },
+  {
+    "char": "酉",
+    "name": "sake jar",
+    "meaning": "sake"
+  },
+  {
+    "char": "炎",
+    "name": "flames",
+    "meaning": "flame"
+  },
+  {
+    "char": "冊",
+    "name": "tome",
+    "meaning": "volume"
+  },
+  {
+    "char": "泉",
+    "name": "fountain (spring)",
+    "meaning": "spring"
+  },
+  {
+    "char": "疒",
+    "name": "sickness",
+    "meaning": "sickness"
+  },
+  {
+    "char": "丙",
+    "name": "third class (C grade)",
+    "meaning": "third"
+  },
+  {
+    "char": "犬",
+    "name": "dog",
+    "meaning": "dog"
+  },
+  {
+    "char": "豆",
+    "name": "beans",
+    "meaning": "beans"
+  },
+  {
+    "char": "艮",
+    "name": "root (stopping)",
+    "meaning": "root"
+  },
+  {
+    "char": "尺",
+    "name": "ruler (foot)",
+    "meaning": "old Japanese foot (a length)"
+  },
+  {
+    "char": "⺦",
+    "name": "split wood (side)",
+    "meaning": "split wood"
+  },
+  {
+    "char": "敬",
+    "name": "respect (awe)",
+    "meaning": "respect"
+  },
+  {
+    "char": "黄",
+    "name": "yellow",
+    "meaning": "yellow"
+  },
+  {
+    "char": "廾",
+    "name": "joined hands (two hands)",
+    "meaning": "two hands"
+  },
+  {
+    "char": "才",
+    "name": "talent",
+    "meaning": "talent"
+  },
+  {
+    "char": "隻",
+    "name": "one of a pair",
+    "meaning": "one of a pair"
+  },
+  {
+    "char": "魚",
+    "name": "fish",
+    "meaning": "fish"
+  },
+  {
+    "char": "⺨",
+    "name": "dog (side)",
+    "meaning": "dog",
+    "variantOf": "犬"
+  },
+  {
+    "char": "臣",
+    "name": "retainer",
+    "meaning": "retainer"
+  },
+  {
+    "char": "亜",
+    "name": "sub- (Asia)",
+    "meaning": "sub-"
+  },
+  {
+    "char": "玄",
+    "name": "mysterious",
+    "meaning": "mysterious"
+  },
+  {
+    "char": "辰",
+    "name": "zodiac sign (dragon)",
+    "meaning": "dragon sign"
+  },
+  {
+    "char": "皿",
+    "name": "dish",
+    "meaning": "dish"
+  },
+  {
+    "char": "几",
+    "name": "table (wind frame)",
+    "meaning": "table"
+  },
+  {
+    "char": "皆",
+    "name": "entire group (all)",
+    "meaning": "all"
+  },
+  {
+    "char": "斥",
+    "name": "reject",
+    "meaning": "reject"
+  },
+  {
+    "char": "皮",
+    "name": "skin (pelt)",
+    "meaning": "skin"
+  },
+  {
+    "char": "朱",
+    "name": "vermilion",
+    "meaning": "vermilion"
+  },
+  {
+    "char": "凶",
+    "name": "villain (evil)",
+    "meaning": "evil"
+  },
+  {
+    "char": "飠",
+    "name": "food (side)",
+    "meaning": "food",
+    "variantOf": "食"
+  },
+  {
+    "char": "升",
+    "name": "measuring cup (box)",
+    "meaning": "measuring box"
+  },
+  {
+    "char": "郷",
+    "name": "home town",
+    "meaning": "home town"
+  },
+  {
+    "char": "呈",
+    "name": "offer (display)",
+    "meaning": "present"
+  },
+  {
+    "char": "丘",
+    "name": "hill",
+    "meaning": "hill"
+  },
+  {
+    "char": "奇",
+    "name": "strange",
+    "meaning": "strange"
+  },
+  {
+    "char": "叔",
+    "name": "uncle",
+    "meaning": "uncle"
+  },
+  {
+    "char": "禸",
+    "name": "track (footprint)",
+    "meaning": "track"
+  },
+  {
+    "char": "厄",
+    "name": "unlucky",
+    "meaning": "unlucky"
+  },
+  {
+    "char": "辛",
+    "name": "spicy",
+    "meaning": "spicy"
+  },
+  {
+    "char": "敢",
+    "name": "daring",
+    "meaning": "daring"
+  },
+  {
+    "char": "召",
+    "name": "summon (call)",
+    "meaning": "summon"
+  },
+  {
+    "char": "采",
+    "name": "pluck (gather)",
+    "meaning": "gather"
+  },
+  {
+    "char": "亭",
+    "name": "pavilion",
+    "meaning": "pavilion"
+  },
+  {
+    "char": "舟",
+    "name": "boat",
+    "meaning": "boat"
+  },
+  {
+    "char": "壮",
+    "name": "robust",
+    "meaning": "robust"
+  },
+  {
+    "char": "虍",
+    "name": "tiger (top)",
+    "meaning": "tiger",
+    "variantOf": "虎"
+  },
+  {
+    "char": "廷",
+    "name": "courts",
+    "meaning": "courts"
+  },
+  {
+    "char": "昆",
+    "name": "descendants",
+    "meaning": "descendants"
+  },
+  {
+    "char": "倉",
+    "name": "warehouse",
+    "meaning": "warehouse"
+  },
+  {
+    "char": "帝",
+    "name": "sovereign",
+    "meaning": "sovereign"
+  },
+  {
+    "char": "奴",
+    "name": "guy",
+    "meaning": "guy"
+  },
+  {
+    "char": "歯",
+    "name": "tooth",
+    "meaning": "tooth"
+  },
+  {
+    "char": "苗",
+    "name": "seedling",
+    "meaning": "seedling"
+  },
+  {
+    "char": "到",
+    "name": "arrival",
+    "meaning": "arrival"
+  },
+  {
+    "char": "串",
+    "name": "skewer",
+    "meaning": "skewer"
+  },
+  {
+    "char": "片",
+    "name": "one-sided",
+    "meaning": "one-sided"
+  },
+  {
+    "char": "垂",
+    "name": "droop",
+    "meaning": "droop"
+  },
+  {
+    "char": "昔",
+    "name": "once upon a time",
+    "meaning": "once upon a time"
+  },
+  {
+    "char": "凡",
+    "name": "commonplace",
+    "meaning": "commonplace"
+  },
+  {
+    "char": "即",
+    "name": "instant",
+    "meaning": "instant"
+  },
+  {
+    "char": "匚",
+    "name": "box (open on the right)",
+    "meaning": "box"
+  },
+  {
+    "char": "毛",
+    "name": "fur",
+    "meaning": "fur"
+  },
+  {
+    "char": "兆",
+    "name": "portent",
+    "meaning": "portent"
+  },
+  {
+    "char": "匂",
+    "name": "fragrant",
+    "meaning": "fragrant"
+  },
+  {
+    "char": "耒",
+    "name": "plow",
+    "meaning": "plow"
+  },
+  {
+    "char": "免",
+    "name": "excuse",
+    "meaning": "excuse"
+  },
+  {
+    "char": "頃",
+    "name": "about then (time)",
+    "meaning": "about the time"
+  },
+  {
+    "char": "巛",
+    "name": "river (wavy)",
+    "meaning": "river",
+    "variantOf": "川"
+  },
+  {
+    "char": "缶",
+    "name": "tin can",
+    "meaning": "tin can"
+  },
+  {
+    "char": "屯",
+    "name": "barracks",
+    "meaning": "barracks"
+  },
+  {
+    "char": "兼",
+    "name": "concurrently",
+    "meaning": "concurrently"
+  },
+  {
+    "char": "伐",
+    "name": "fell",
+    "meaning": "fell"
+  },
+  {
+    "char": "卸",
+    "name": "wholesale",
+    "meaning": "wholesale"
+  },
+  {
+    "char": "斬",
+    "name": "beheading",
+    "meaning": "beheading"
+  },
+  {
+    "char": "宛",
+    "name": "address",
+    "meaning": "address"
+  },
+  {
+    "char": "貫",
+    "name": "pierce",
+    "meaning": "pierce"
+  },
+  {
+    "char": "呉",
+    "name": "Wu (give)",
+    "meaning": "give"
+  },
+  {
+    "char": "尉",
+    "name": "military officer",
+    "meaning": "military officer"
+  },
+  {
+    "char": "牙",
+    "name": "tusk",
+    "meaning": "tusk"
+  },
+  {
+    "char": "臼",
+    "name": "mortar",
+    "meaning": "mortar"
+  },
+  {
+    "char": "鬼",
+    "name": "ghost",
+    "meaning": "ghost"
+  },
+  {
+    "char": "屈",
+    "name": "yield",
+    "meaning": "yield"
+  },
+  {
+    "char": "畜",
+    "name": "livestock",
+    "meaning": "livestock"
+  },
+  {
+    "char": "享",
+    "name": "enjoy",
+    "meaning": "enjoy"
+  },
+  {
+    "char": "乞",
+    "name": "beg",
+    "meaning": "beg"
+  },
+  {
+    "char": "灰",
+    "name": "ashes",
+    "meaning": "ashes"
+  },
+  {
+    "char": "某",
+    "name": "so-and-so",
+    "meaning": "so-and-so"
+  },
+  {
+    "char": "唐",
+    "name": "T'ang",
+    "meaning": "T'ang"
+  },
+  {
+    "char": "甚",
+    "name": "tremendously",
+    "meaning": "tremendously"
+  },
+  {
+    "char": "奉",
+    "name": "observance",
+    "meaning": "observance"
+  },
+  {
+    "char": "瓦",
+    "name": "tile",
+    "meaning": "tile"
+  },
+  {
+    "char": "曹",
+    "name": "comrade (office)",
+    "meaning": "office"
+  },
+  {
+    "char": "尼",
+    "name": "nun",
+    "meaning": "nun"
+  },
+  {
+    "char": "刃",
+    "name": "blade",
+    "meaning": "blade"
+  },
+  {
+    "char": "卑",
+    "name": "lowly",
+    "meaning": "lowly"
+  },
+  {
+    "char": "侯",
+    "name": "marquis",
+    "meaning": "marquis"
+  },
+  {
+    "char": "朕",
+    "name": "majestic plural",
+    "meaning": "majestic plural"
+  }
+]

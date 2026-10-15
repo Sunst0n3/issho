@@ -1,13 +1,18 @@
-// Settings: the home-server connection, the household, and the AI helper.
+// Settings: the together plan (slots, shared goal, sharing accuracy), the home-server connection,
+// the household, and the AI helper.
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import type { Settings } from '../../lib/types.ts';
+import { dayKey, updateSettings } from '../../lib/db.ts';
+import type { Settings, TogetherSlot } from '../../lib/types.ts';
 import { health, isPairedSettings, unpair } from '../../sync/client.ts';
 import { useServerStatus, type ServerStatus } from '../../sync/socket.ts';
-import { refreshHousehold, resetHousehold, useHousehold } from '../../sync/stats.ts';
+import { pushStats, refreshHousehold, resetHousehold, useHousehold } from '../../sync/stats.ts';
+import { postTogetherEvent } from '../../sync/together.ts';
 import { useAiProblem, type AiProblem } from '../together/ai.ts';
 import { ConnectServerForm } from '../together/ConnectServerForm.tsx';
 import { focusLost } from '../together/focus.ts';
+import { Switch } from './controls.tsx';
 import { syncMemberName } from './nameSync.ts';
+import { completeSlots, goalFromDraft, GoalFields, PartnerRules, SlotsEditor, type GoalDraft } from './planControls.tsx';
 import { SettingsSection } from './SettingsStudy.tsx';
 
 const STATUS: Record<ServerStatus, string> = {
@@ -143,6 +148,79 @@ function Paired({ settings }: { settings: Settings }) {
   );
 }
 
+const sameSlots = (a: readonly TogetherSlot[], b: readonly TogetherSlot[]) =>
+  a.length === b.length && a.every((s, i) => s.session === b[i].session && s.weekday === b[i].weekday && s.time === b[i].time);
+
+/** The weekly slots and the shared goal. Saved on this phone, and posted to the household when paired. */
+function TogetherPlan({ settings }: { settings: Settings }) {
+  const saved = completeSlots(settings.togetherSlots);
+  const [slots, setSlots] = useState<TogetherSlot[]>(saved);
+  const [goal, setGoal] = useState<GoalDraft>(settings.sharedGoal ?? { text: '', targetDate: '' });
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<{ ok: boolean; text: string }>();
+  const edited = useRef(false);
+  // The partner changed the plan (synced into Settings): show theirs unless this phone is mid-edit.
+  useEffect(() => {
+    if (edited.current) return;
+    setSlots(completeSlots(settings.togetherSlots));
+    setGoal(settings.sharedGoal ?? { text: '', targetDate: '' });
+  }, [settings.togetherSlots, settings.sharedGoal]);
+  const paired = isPairedSettings(settings);
+  const nextGoal = goalFromDraft(goal);
+  const goalChanged = (nextGoal?.text ?? '') !== (settings.sharedGoal?.text ?? '')
+    || (nextGoal?.targetDate ?? '') !== (settings.sharedGoal?.targetDate ?? '');
+  const changed = !sameSlots(slots, saved) || !settings.togetherSlots.length || goalChanged;
+
+  const save = async () => {
+    setBusy(true);
+    setMessage(undefined);
+    try {
+      await updateSettings({ togetherSlots: slots, sharedGoal: nextGoal });
+      if (paired) {
+        // Queued while offline, sent in order when the home server is back.
+        await postTogetherEvent({ type: 'slots', slots });
+        if (nextGoal && goalChanged) await postTogetherEvent({ type: 'goal', goal: nextGoal });
+      }
+      edited.current = false;
+      setMessage({ ok: true, text: paired ? 'Saved, and shared with your partner.' : 'Saved on this phone.' });
+    } catch {
+      setMessage({ ok: false, text: "Couldn't save that. Try again." });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="set-row">
+        <p className="hm-field-label">Your sessions</p>
+        <p className="hm-hint">Three 15-minute sessions a week. Changing them changes them for both of you.</p>
+        <SlotsEditor slots={slots} onChange={(s) => { edited.current = true; setMessage(undefined); setSlots(s); }} />
+      </div>
+      <div className="set-row">
+        <GoalFields draft={goal} onChange={(g) => { edited.current = true; setMessage(undefined); setGoal(g); }} min={dayKey()} />
+      </div>
+      <div className="set-row">
+        <button type="button" className="btn secondary small set-save" onClick={() => void save()}
+          disabled={busy || !changed} aria-busy={busy}>
+          Save sessions and goal
+        </button>
+        {message && <p className={message.ok ? 'hm-ok' : 'hm-error'} role="status">{message.text}</p>}
+      </div>
+      <div className="set-row">
+        <Switch label="Share my accuracy" hint="Your partner sees how many answers you got right. Off: they see only your effort."
+          checked={settings.shareAccuracy}
+          onChange={(shareAccuracy) => {
+            void updateSettings({ shareAccuracy }).then(() => { if (paired) void pushStats({ immediate: true }); });
+          }} />
+      </div>
+      <div className="set-row">
+        <PartnerRules />
+      </div>
+    </>
+  );
+}
+
 export function TogetherSection({ settings }: { settings: Settings }) {
   const paired = isPairedSettings(settings);
   // Disconnecting replaces the confirmation with the connect form: keep focus in this section.
@@ -154,6 +232,7 @@ export function TogetherSection({ settings }: { settings: Settings }) {
   }, [paired]);
   return (
     <SettingsSection id="set-together" title="Together">
+      <TogetherPlan settings={settings} />
       {paired ? (
         <Paired settings={settings} />
       ) : (

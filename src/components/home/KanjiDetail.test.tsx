@@ -1,157 +1,140 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { db, updateSettings } from '../../lib/db.ts';
+import { db } from '../../lib/db.ts';
 import type { KanaEntry } from '../../lib/types.ts';
-import KanjiDetail from '../../screens/KanjiDetail.tsx';
-import { MNEMONIC_MAX } from '../study/learn/KanjiLesson.tsx';
+import KanjiDetail, { wordLines } from '../../screens/KanjiDetail.tsx';
 import { chartRows } from './kanaChart.ts';
-import { addLearned, renderAt, resetDb } from './test-fixtures.tsx';
+import { MNEMONIC_MAX } from './KanjiParts.tsx';
+import { partsOf } from './PartsPanel.tsx';
+import { addLearned, ACCENT, CURRICULUM, KANJI, RADICALS, renderAt, resetDb, WORDS } from './test-fixtures.tsx';
 
 vi.mock('../../lib/data.ts', async () => (await import('./test-fixtures.tsx')).dataMock);
 
+const mocks = vi.hoisted(() => ({
+  setPinned: vi.fn(async (_char: string, _pinned: boolean) => {}),
+  play: vi.fn(async () => ({ via: 'clip', ms: 300, interrupted: false })),
+}));
+
+vi.mock('../../srs/items.ts', () => ({ setPinned: mocks.setPinned }));
+vi.mock('../../speech/audio.ts', () => ({
+  usePlayback: () => ({ play: mocks.play, stop: () => {}, playing: false }),
+}));
+vi.mock('../study/PitchLine.tsx', () => ({
+  PitchLine: ({ accent, kana }: { accent: { type: string }; kana?: string }) => (
+    <span data-testid="pitch">{`${kana ?? ''} ${accent.type}`}</span>
+  ),
+}));
+
 beforeEach(resetDb);
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+});
 
 const renderKanji = (char: string) => renderAt(`/kanji/${encodeURIComponent(char)}`, '/kanji/:char', <KanjiDetail />);
 
 describe('KanjiDetail', () => {
-  it('shows meaning, readings with romaji, the memory hook and the unit words', async () => {
+  it('shows the keyword and readings in kana only (no romaji), with JLPT as a label', async () => {
     renderKanji('水');
     expect(await screen.findByRole('heading', { level: 1, name: 'water' })).toBeTruthy();
-    expect(screen.getByText('みず')).toBeTruthy();
-    expect(screen.getByText('mizu')).toBeTruthy();
-    expect(screen.getByText('Three drops running beside a stream.')).toBeTruthy();
-    expect(await screen.findByRole('heading', { name: 'Words with this kanji' })).toBeTruthy();
-    // Only learned items can keep an edited hook.
-    expect(screen.queryByRole('button', { name: 'Edit' })).toBeNull();
+    expect(screen.getAllByText('みず').length).toBeGreaterThan(0);
+    expect(screen.getByText('スイ')).toBeTruthy();
+    expect(screen.queryByText(/mizu|sui\b/)).toBeNull();
+    expect(screen.getByText('Old JLPT 4')).toBeTruthy();
+    expect(screen.getByText('Chapter 1')).toBeTruthy();
   });
 
-  it('hides romaji when the learner turned it off', async () => {
-    await updateSettings({ romaji: false });
-    renderKanji('水');
-    expect(await screen.findByText('みず')).toBeTruthy();
-    expect(screen.queryByText('mizu')).toBeNull();
+  it('names the parts: kanji components and named parts', async () => {
+    renderKanji('休');
+    const parts = (await screen.findByRole('heading', { name: 'Parts' })).closest('section')!;
+    expect(within(parts).getByRole('link', { name: '木, tree' }).getAttribute('href')).toBe(`/kanji/${encodeURIComponent('木')}`);
+    expect(within(parts).getByRole('link', { name: '亻, person (side)' })).toBeTruthy();
+    expect(parts.textContent).toContain('a form of 人');
   });
 
-  it('learns a kanji out of order, with its words, and then shows its progress', async () => {
+  it('lists the anchor and staged words, then related words with the kanji, known ones first', async () => {
+    await db.items.add({ id: 'word:w-honjitsu', kind: 'word', key: 'w-honjitsu', introducedAt: new Date() });
+    renderKanji('日');
+    const words = (await screen.findByRole('heading', { name: 'Words with this kanji' })).closest('section')!;
+    const lines = within(words).getAllByRole('listitem').map((li) => li.querySelector('.kd-word-written')?.textContent);
+    // Anchor 日, staged 日曜日, then 本日 (known) before 毎日 and 水曜日 (more frequent, not known).
+    expect(lines).toEqual(['日', '日曜日', '本日', '毎日', '水曜日']);
+    expect(words.textContent).toContain('Learned with this kanji');
+    expect(words.textContent).toContain('Comes a few days after it');
+  });
+
+  it('draws a pitch line for words with a verified accent, and plays the word clip', async () => {
+    renderKanji('日');
+    const words = (await screen.findByRole('heading', { name: 'Words with this kanji' })).closest('section')!;
+    expect(within(words).getAllByTestId('pitch').map((p) => p.textContent)).toEqual(['ひ atamadaka']);
+    fireEvent.click(within(words).getByRole('button', { name: 'Listen to 日' }));
+    expect(mocks.play).toHaveBeenCalledWith({ ref: 'word:w-hi' }, expect.objectContaining({ fallbackText: '{日|ひ}' }));
+  });
+
+  it('pins a learned kanji to keep it in handwriting, and unpins it', async () => {
+    await addLearned('水');
     renderKanji('水');
+    const pin = await screen.findByRole('switch', { name: /Keep in handwriting/ });
+    expect((pin as HTMLInputElement).checked).toBe(false);
+    fireEvent.click(pin);
+    await waitFor(() => expect(mocks.setPinned).toHaveBeenCalledWith('水', true));
+
+    cleanup();
+    await db.items.update('kanji:水', { pinned: true });
+    renderKanji('水');
+    const pinned = await screen.findByRole('switch', { name: /Keep in handwriting/ });
+    expect((pinned as HTMLInputElement).checked).toBe(true);
+    fireEvent.click(pinned);
+    await waitFor(() => expect(mocks.setPinned).toHaveBeenCalledWith('水', false));
+  });
+
+  it('offers practice writing on its own page, and no pin before the kanji is learned', async () => {
+    renderKanji('水');
+    expect((await screen.findByRole('link', { name: /Practice writing/ })).getAttribute('href')).toBe(`/write/${encodeURIComponent('水')}`);
+    expect(screen.queryByRole('switch', { name: /Keep in handwriting/ })).toBeNull();
     expect(await screen.findByText('Next up')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Learn this now' }));
-
-    expect(await screen.findByText('Next review')).toBeTruthy();
-    expect(await db.items.get('kanji:水')).toBeTruthy();
-    expect(await db.items.get('word:w-mizu')).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Learn this now' })).toBeNull();
-    // The button that had focus is gone: the progress that replaced it has it now.
-    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('region', { name: 'Your progress' })));
   });
 
-  it("doesn't move focus to the progress of a kanji that was already learned", async () => {
-    await addLearned('kanji', '水');
-    renderKanji('水');
-    expect(await screen.findByText('Next review')).toBeTruthy();
-    expect(document.activeElement).toBe(document.body);
-  });
-
-  it("learns a kanji ahead of the course without words whose other kanji aren't known yet", async () => {
-    // 日曜日 also needs 曜, which isn't learned: it must not come along as a word card.
+  it('shows the card status, with "reading only" once the write card retired', async () => {
+    await addLearned('日', { suspended: 'retired' });
     renderKanji('日');
-    fireEvent.click(await screen.findByRole('button', { name: 'Learn this now' }));
-    expect(await screen.findByText('Next review')).toBeTruthy();
-    expect(await db.items.get('kanji:日')).toBeTruthy();
-    expect(await db.items.get('word:w-nichi')).toBeUndefined();
+    const status = await screen.findByRole('region', { name: 'Your progress' });
+    expect(status.textContent).toContain('Reading only');
   });
 
-  it('brings the words along once their other kanji are known', async () => {
-    await addLearned('kanji', '曜');
-    renderKanji('日');
-    fireEvent.click(await screen.findByRole('button', { name: 'Learn this now' }));
-    expect(await screen.findByText('Next review')).toBeTruthy();
-    expect(await db.items.get('word:w-nichi')).toBeTruthy();
-  });
-
-  it('keeps focus with the memory hook while editing it', async () => {
+  it('shows the stock hook with its sound hook, and keeps a learner\'s own', async () => {
     await db.items.add({ id: 'kanji:水', kind: 'kanji', key: '水', introducedAt: new Date() });
     renderKanji('水');
-    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
+    expect(await screen.findByText('Three drops running beside a stream.')).toBeTruthy();
+    expect(screen.getByText(/me, zoo, splash/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
     expect(document.activeElement).toBe(screen.getByLabelText('Your memory hook'));
-    // One length limit for hooks, shared with the lesson's hook editor.
     expect(screen.getByLabelText('Your memory hook').getAttribute('maxlength')).toBe(String(MNEMONIC_MAX));
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Edit' }));
-  });
-
-  it("keeps focus with a learner's first memory hook on Cancel and on Save", async () => {
-    await addLearned('kanji', '火');
-    renderKanji('火');
-    const write = await screen.findByRole('button', { name: 'Write your own memory hook' });
-    fireEvent.click(write);
-    expect(document.activeElement).toBe(screen.getByLabelText('Your memory hook'));
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Write your own memory hook' }));
-
-    fireEvent.click(screen.getByRole('button', { name: 'Write your own memory hook' }));
-    fireEvent.change(screen.getByLabelText('Your memory hook'), { target: { value: 'Sparks leaping up.' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-    const edit = await screen.findByRole('button', { name: 'Edit' });
-    expect(screen.getByText('Sparks leaping up.')).toBeTruthy();
-    expect(document.activeElement).toBe(edit);
-  });
-
-  it('goes back to the library when opened directly, with the meaning as the only h1', async () => {
-    renderKanji('水');
-    expect(await screen.findByRole('heading', { level: 1, name: 'water' })).toBeTruthy();
-    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    expect(screen.getByRole('link', { name: 'Back' }).getAttribute('href')).toBe('/kanji');
-  });
-
-  it('lets a learned kanji keep its own memory hook', async () => {
-    await db.items.add({ id: 'kanji:水', kind: 'kanji', key: '水', introducedAt: new Date() });
-    renderKanji('水');
-    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
     fireEvent.change(screen.getByLabelText('Your memory hook'), { target: { value: 'A river with splashes.' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
     expect(await screen.findByText('A river with splashes.', { selector: '.kd-hook-text' })).toBeTruthy();
     expect((await db.items.get('kanji:水'))?.customMnemonic).toBe('A river with splashes.');
-
-    fireEvent.click(screen.getByRole('button', { name: 'Hide' }));
-    expect(await screen.findByRole('button', { name: 'Show memory hook' })).toBeTruthy();
-    expect((await db.items.get('kanji:水'))?.hideMnemonic).toBe(true);
   });
 
-  it('shows a part (radical) with the kanji built from it', async () => {
-    renderKanji('氵');
-    expect(await screen.findByRole('heading', { level: 1, name: 'water (side)' })).toBeTruthy();
-    expect(screen.getByText(/Means “water”/)).toBeTruthy();
-    expect(screen.getByRole('link', { name: '水' }).getAttribute('href')).toBe(`/kanji/${encodeURIComponent('水')}`);
-  });
-
-  it('handles a kanji with no memory hook, no words and no stroke data', async () => {
-    await addLearned('kanji', '火');
+  it('lets a learned kanji without a stock hook get one of the learner\'s own', async () => {
+    await addLearned('火');
     renderKanji('火');
-    expect(await screen.findByRole('heading', { level: 1, name: 'fire' })).toBeTruthy();
-    expect(await screen.findByText('No stroke order for this character yet.')).toBeTruthy();
-    expect(screen.queryByText('Memory hook')).toBeNull();
-    expect(screen.queryByRole('heading', { name: 'Words with this kanji' })).toBeNull();
-    expect(screen.queryByRole('heading', { name: 'Practice writing' })).toBeNull();
-    // A learned kanji without a stock hook can still get one of the learner's own.
     fireEvent.click(await screen.findByRole('button', { name: 'Write your own memory hook' }));
     expect(screen.getByLabelText('Your memory hook')).toBeTruthy();
   });
 
-  it("explains when a character isn't in the course", async () => {
-    renderKanji('龍');
-    expect(await screen.findByRole('heading', { name: /isn't in the course/ })).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Open the kanji library' }).getAttribute('href')).toBe('/kanji');
+  it('shows a named part with the kanji built from it', async () => {
+    renderKanji('亻');
+    expect(await screen.findByRole('heading', { level: 1, name: 'person (side)' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: '休, rest' })).toBeTruthy();
   });
 
-  it("shows a learned part's progress instead of offering to learn it", async () => {
-    await addLearned('radical', '氵');
-    renderKanji('氵');
-    expect(await screen.findByRole('heading', { level: 1, name: 'water (side)' })).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Learn this now' })).toBeNull();
-    expect(await screen.findByText('Next review')).toBeTruthy();
+  it("explains when a character isn't in the course, and goes back to the library", async () => {
+    renderKanji('龍');
+    expect(await screen.findByRole('heading', { name: /isn't in the course/ })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Open the library' }).getAttribute('href')).toBe('/library');
+    expect(screen.getByRole('link', { name: 'Back' }).getAttribute('href')).toBe('/library');
   });
 
   it("doesn't show the previous kanji's page after moving to another one", async () => {
@@ -166,14 +149,28 @@ describe('KanjiDetail', () => {
       </MemoryRouter>,
     );
     expect(await screen.findByRole('heading', { level: 1, name: 'water' })).toBeTruthy();
-    expect(await screen.findByRole('button', { name: 'Learn this now' })).toBeTruthy();
-
     fireEvent.click(screen.getByRole('button', { name: 'Go to 火' }));
-    // 水's meaning, hook and "Learn this now" (which would add 水) must not linger under 火.
     expect(screen.queryByRole('heading', { level: 1, name: 'water' })).toBeNull();
-    expect(screen.queryByText('Three drops running beside a stream.')).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Learn this now' })).toBeNull();
     expect(await screen.findByRole('heading', { level: 1, name: 'fire' })).toBeTruthy();
+  });
+});
+
+describe('kanji page helpers', () => {
+  it('orders words: anchor, staged, then known related, then by frequency (max 8 related)', () => {
+    const unit = CURRICULUM.units.find((u) => u.char === '水');
+    const info = (ref: string) => ({ ref, written: ref, kana: '', en: '', kanji: [], use: false, readings: [] }) as never;
+    const lines = wordLines(unit, '水', WORDS, info, new Set(), ACCENT);
+    expect(lines.map((l) => [l.info.ref, l.role])).toEqual([['core:cw-0005', 'anchor'], ['word:w-suiyou', 'staged']]);
+    // 水 as a JMdict entry is the core word cw-0005 (one identity per word), so it isn't listed twice.
+    expect(lines[0].accent?.type).toBe('heiban');
+  });
+
+  it('lists components before named parts, without the kanji itself', () => {
+    const radicals = new Map(RADICALS.map((r) => [r.char, r]));
+    expect(partsOf(KANJI['休'], KANJI, radicals).map((p) => [p.char, p.name, p.kanji])).toEqual([
+      ['木', 'tree', true],
+      ['亻', 'person (side)', false],
+    ]);
   });
 });
 

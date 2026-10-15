@@ -2,6 +2,9 @@ node_modules
 dist
 data-raw
 server/data
+# Audio generation: temporary WAVs and the last run's failure report (public/audio itself is committed).
+.cache/
+scripts/audio/last-run.json
 *.log
 .env
 .env.*

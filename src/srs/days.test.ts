@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { db } from '../lib/db.ts';
-import { addDays, daysBetween, emptyDay, getDay, isStudyDay, updateDay, weekStart } from './days.ts';
+import type { DayRecord } from '../lib/types.ts';
+import { addDays, dayStart, daysBetween, emptyDay, getDay, isoWeekday, isStudyDay, normalizeDay, totalNewSec, updateDay, weekStart } from './days.ts';
 import { resetDb } from './test-fixtures.ts';
 
 beforeEach(resetDb);
@@ -18,6 +19,12 @@ describe('day key arithmetic', () => {
     expect(daysBetween('2026-10-14', '2026-10-21')).toBe(7);
     expect(daysBetween('2026-10-21', '2026-10-14')).toBe(-7);
     expect(daysBetween('2026-03-01', '2026-04-01')).toBe(31);
+  });
+
+  it('knows the ISO weekday and the 4 a.m. start of a study day', () => {
+    expect(isoWeekday('2026-10-12')).toBe(1);
+    expect(isoWeekday('2026-10-18')).toBe(7);
+    expect(dayStart('2026-10-14')).toEqual(new Date(2026, 9, 14, 4));
   });
 
   it('finds the Monday of the ISO week', () => {
@@ -43,7 +50,27 @@ describe('DayRecord helpers', () => {
 
   it('only treats days with activity as study days', () => {
     expect(isStudyDay(emptyDay('2026-10-14'))).toBe(false);
-    expect(isStudyDay({ ...emptyDay('2026-10-14'), restDay: true })).toBe(false);
+    const travelDay: DayRecord = { ...emptyDay('2026-10-14'), travel: true };
+    expect(isStudyDay(travelDay)).toBe(false);
     expect(isStudyDay({ ...emptyDay('2026-10-14'), studyMs: 1 })).toBe(true);
+    expect(isStudyDay({ ...emptyDay('2026-10-14'), togetherMs: 1 })).toBe(true);
+    expect(isStudyDay({ ...emptyDay('2026-10-14'), minimumDone: true })).toBe(true);
+    expect(isStudyDay({ ...emptyDay('2026-10-14'), newItems: 1 })).toBe(true);
+  });
+
+  it('starts every v2 counter at zero', () => {
+    expect(emptyDay('2026-10-14')).toEqual({
+      date: '2026-10-14', studyMs: 0, togetherMs: 0, reviews: 0, correct: 0, reviewMs: 0, strandMs: 0, newItems: 0,
+      newSec: { sprint: 0, kanji: 0, staged: 0, core: 0, grammar: 0 }, minimumDone: false, goalMet: false, steps: [],
+    });
+  });
+
+  it('fills in fields an older row lacks', async () => {
+    const old = { date: '2026-10-13', studyMs: 5, reviews: 1, correct: 1, newItems: 0 } as unknown as Parameters<typeof normalizeDay>[0];
+    expect(normalizeDay(old, '2026-10-13')).toMatchObject({ studyMs: 5, reviewMs: 0, steps: [], newSec: { kanji: 0 } });
+    await db.days.put(old!);
+    expect((await getDay('2026-10-13')).newSec.core).toBe(0);
+    expect(totalNewSec({ sprint: 53, kanji: 188, staged: 28, core: 35, grammar: 0 })).toBe(304);
+    expect(totalNewSec(undefined)).toBe(0);
   });
 });

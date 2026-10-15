@@ -9,10 +9,15 @@
 
 import { describe, expect, it } from 'vitest';
 import { CORE_CHARACTERS, HARD_CHARACTERS, STROKE_FIXTURES } from './fixtures.ts';
+import { Rating } from 'ts-fsrs';
+import { gradeForRecallWriting } from '../srs/answers.ts';
 import {
   estimateFrame,
+  hungarian,
   IDENTITY_FRAME,
   matchCharacter,
+  matchCharacterUnordered,
+  MISSING_COST,
   matchStroke,
   matchStrokeOf,
   strokeFeatures,
@@ -465,5 +470,113 @@ describe('matchCharacter', () => {
 
     const long = matchCharacter(ki, [...clean, clean[0]]);
     expect(long).toMatchObject({ ok: false, missing: 0, extra: 1 });
+  });
+});
+
+describe('hungarian', () => {
+  it('finds the minimum-cost assignment of a known 4×4 matrix', () => {
+    const cost = [
+      [82, 83, 69, 92],
+      [77, 37, 49, 92],
+      [11, 69, 5, 86],
+      [8, 9, 98, 23],
+    ];
+    const cols = hungarian(cost);
+    expect(cols).toEqual([2, 1, 0, 3]);
+    expect(cols.reduce((sum, c, r) => sum + cost[r][c], 0)).toBe(140);
+  });
+
+  it('handles empty and 1×1 matrices, and refuses a non-square one', () => {
+    expect(hungarian([])).toEqual([]);
+    expect(hungarian([[3]])).toEqual([0]);
+    expect(() => hungarian([[1, 2]])).toThrow(RangeError);
+  });
+
+  it('agrees with brute force on random matrices', () => {
+    const rng = seededRng(99);
+    const permutations = (n: number): number[][] =>
+      n === 0 ? [[]] : permutations(n - 1).flatMap((p) => Array.from({ length: n }, (_, k) => [...p.slice(0, k), n - 1, ...p.slice(k)]));
+    for (let trial = 0; trial < 30; trial++) {
+      const n = 2 + (trial % 4);
+      const cost = Array.from({ length: n }, () => Array.from({ length: n }, () => Math.round(rng() * 20)));
+      const best = Math.min(...permutations(n).map((p) => p.reduce((s, c, r) => s + cost[r][c], 0)));
+      expect(hungarian(cost).reduce((s, c, r) => s + cost[r][c], 0)).toBe(best);
+    }
+  });
+});
+
+describe('matchCharacterUnordered', () => {
+  const written = (char: string, seed: number) => {
+    const strokes = STROKE_FIXTURES[char];
+    const rng = seededRng(seed);
+    const placement = randomPlacement(rng);
+    return { strokes, drawn: strokes.map((d) => synthStroke(d, placement, rng)) };
+  };
+  const grade = (char: string, m: ReturnType<typeof matchCharacterUnordered>) => gradeForRecallWriting({
+    strokeCount: STROKE_FIXTURES[char].length,
+    missing: m.missing.length,
+    extra: m.extra.length,
+    unmatched: m.unmatched.length,
+    hintUsed: false,
+  });
+
+  it('accepts characters written in order, with no slips', () => {
+    for (const [i, char] of [...'木日右水書'].entries()) {
+      const { strokes, drawn } = written(char, 300 + i);
+      const m = matchCharacterUnordered(strokes, drawn);
+      expect(m, char).toMatchObject({ ok: true, missing: [], extra: [], unmatched: [], orderSlips: [] });
+      expect(m.assignment).toEqual(strokes.map((_, k) => k));
+    }
+  });
+
+  it('accepts correct strokes in a shuffled order and reports the slips', () => {
+    for (const [i, char] of [...'木日右田'].entries()) {
+      const { strokes, drawn } = written(char, 400 + i);
+      // Last stroke first: every other stroke stays in order, so exactly one slip.
+      const order = [strokes.length - 1, ...strokes.slice(0, -1).map((_, k) => k)];
+      const m = matchCharacterUnordered(strokes, order.map((k) => drawn[k]));
+      expect(m.ok, char).toBe(true);
+      expect(m.assignment[strokes.length - 1], char).toBe(0);
+      expect(m.orderSlips, char).toEqual([{ expected: strokes.length - 1, drawnAt: 0 }]);
+      expect(grade(char, m)).toBe(Rating.Good);
+    }
+  });
+
+  it('calls one stroke of 木 left out missing, graded Again', () => {
+    const { strokes, drawn } = written('木', 501);
+    const m = matchCharacterUnordered(strokes, [drawn[0], drawn[1], drawn[3]]);
+    expect(m).toMatchObject({ ok: false, missing: [2], extra: [], unmatched: [] });
+    expect(m.assignment).toEqual([0, 1, null, 2]);
+    expect(grade('木', m)).toBe(Rating.Again);
+  });
+
+  it('calls one sloppy stroke in a 10-stroke kanji (書) unmatched, graded Hard', () => {
+    const { strokes, drawn } = written('書', 502);
+    expect(strokes).toHaveLength(10);
+    const sloppy = drawn.map((pts, k) => (k === 3 ? [...pts].reverse() : pts));
+    const m = matchCharacterUnordered(strokes, sloppy);
+    expect(m).toMatchObject({ ok: false, missing: [], extra: [], unmatched: [3] });
+    expect(m.assignment[3]).toBe(3);
+    expect(grade('書', m)).toBe(Rating.Hard);
+  });
+
+  it('calls one extra stroke extra, graded Again', () => {
+    const { strokes, drawn } = written('木', 503);
+    const m = matchCharacterUnordered(strokes, [...drawn, scribble(seededRng(5))]);
+    expect(m).toMatchObject({ ok: false, missing: [], extra: [4], unmatched: [] });
+    expect(grade('木', m)).toBe(Rating.Again);
+  });
+
+  it('ignores empty strokes and pads with MISSING_COST', () => {
+    const { strokes, drawn } = written('人', 504);
+    const m = matchCharacterUnordered(strokes, [drawn[0], [], drawn[1]]);
+    expect(m.ok).toBe(true);
+    expect(m.assignment).toEqual([0, 2]);
+    expect(MISSING_COST).toBeGreaterThan(2);
+  });
+
+  it('reports nothing drawn as every stroke missing', () => {
+    const m = matchCharacterUnordered(STROKE_FIXTURES['口'], []);
+    expect(m).toMatchObject({ ok: false, missing: [0, 1, 2], extra: [], unmatched: [] });
   });
 });

@@ -56,3 +56,24 @@ export function similarity(expected: RubyText | string, heard: string): number {
   const plain = normalizeForCompare(rubyToPlain(expected));
   return Math.max(score(kana, said), score(plain, said));
 }
+
+/** A spoken answer at least this similar to the word counts as said right. */
+export const SPOKEN_MATCH_THRESHOLD = 0.75;
+
+/**
+ * Whether a speech-recognition transcript says the expected word. Recognizers write words
+ * in kanji or kana as they see fit, so both the written form and every accepted reading are
+ * tried: an exact match after normalizing (NFKC, punctuation and spaces dropped, katakana
+ * folded to hiragana), or a similarity of at least 0.75 against either.
+ */
+export function spokenMatches(transcript: string, expected: { written?: string; readings: readonly string[] }): boolean {
+  const heard = normalizeForCompare(transcript);
+  if (!heard.length) return false;
+  const targets = [expected.written, ...expected.readings]
+    .filter((t): t is string => typeof t === 'string' && t.trim().length > 0)
+    .map((t) => normalizeForCompare(rubyToPlain(t)))
+    .filter((t) => t.length > 0);
+  const said = heard.join('');
+  if (targets.some((t) => t.join('') === said)) return true;
+  return targets.some((t) => score(t, heard) >= SPOKEN_MATCH_THRESHOLD);
+}

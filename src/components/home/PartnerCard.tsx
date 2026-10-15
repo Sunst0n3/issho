@@ -1,38 +1,62 @@
-// Today screen: how the partner is doing today (from the home server, cached
-// for offline), and the sync status footer.
+// Today screen: how the partner is doing (from the home server, cached for offline), and the sync
+// status footer. Effort only: days studied, minutes, together time, and this week's quest stamps (their
+// study days and the sessions done together). Accuracy shows only when the partner chose to share it.
 import { Link } from 'react-router-dom';
-import type { DayStats, MemberStats } from '../../../shared/api.ts';
+import type { CoupleQuest, DayStats, MemberStats } from '../../../shared/api.ts';
 import { dayKey } from '../../lib/db.ts';
 import { wasRemoved } from '../../sync/client.ts';
 import { useServerStatus } from '../../sync/socket.ts';
 import { useHousehold } from '../../sync/stats.ts';
 import { splitHousehold } from '../together/household.ts';
 import { Icon } from '../ui.tsx';
-import { agoText, plural, streakText } from './labels.ts';
+import { agoText, mondayOf, plural, streakText } from './labels.ts';
 import { worksOffline } from './SecureNotice.tsx';
 
 const STALE_MS = 10 * 60_000;
+/** Together sessions in a quest week (A, B and C). */
+const QUEST_SESSIONS = 3;
 
-function studied(day: DayStats | undefined): day is DayStats {
-  return Boolean(day && (day.sessionComplete || day.reviews > 0 || day.newItems > 0 || day.studyMinutes > 0));
+/** A day that counts: v2 phones send minimumDone; v1 phones only sessionComplete. */
+function counted(day: DayStats): boolean {
+  return day.minimumDone ?? day.sessionComplete;
 }
 
-function partnerLines(partner: MemberStats, today: string): { title: string; detail: string } {
+function studied(day: DayStats | undefined): day is DayStats {
+  return Boolean(day && (counted(day) || day.reviews > 0 || day.newItems > 0 || day.studyMinutes > 0 || (day.togetherMinutes ?? 0) > 0));
+}
+
+export function partnerLines(partner: MemberStats, today: string): { title: string; detail: string } {
   const name = partner.member.name || 'Your partner';
   // Household days carry their own dates; only a day dated today counts as today.
   const day = partner.days.find((d) => d.date === today);
+  const month = partner.progress?.daysThisMonth;
+  const effort = month !== undefined && month > 0
+    ? `${plural(month, 'day')} studied this month`
+    : partner.streak > 0 ? `${streakText(partner.streak)} so far` : undefined;
+
   if (!studied(day)) {
-    return {
-      title: `${name} hasn't studied yet today`,
-      detail: partner.streak > 0 ? `${streakText(partner.streak)} so far` : 'Say hi in Japanese',
-    };
+    return { title: `${name} hasn't studied yet today`, detail: effort ?? 'Say hi in Japanese' };
   }
-  const parts = [`${day.newItems} new`, plural(day.reviews, 'review')];
-  if (day.reviews > 0) parts.push(`${Math.round((day.correct / day.reviews) * 100)}% correct`);
+  const parts = [`${Math.round(day.studyMinutes)} min today`];
+  if (day.togetherMinutes) parts.push(`${Math.round(day.togetherMinutes)} min together`);
+  // Accuracy is private unless the partner turned sharing on.
+  if (day.accuracyShared && day.reviews > 0) parts.push(`${Math.round((day.correct / day.reviews) * 100)}% correct`);
+  if (effort) parts.push(effort);
   return {
-    title: day.sessionComplete ? `${name} finished today` : `${name} is studying today`,
+    title: day.sessionComplete ? `${name} met today's goal` : `${name} studied today`,
     detail: parts.join(' · '),
   };
+}
+
+/**
+ * The partner's week from the couple quest: their study days (each a stamp; a together session counts
+ * for both) and the sessions done together. None from a home server without the quest, or from a copy
+ * cached in an earlier week.
+ */
+export function partnerWeekLine(partner: MemberStats, quest: CoupleQuest | undefined, today: string): string | undefined {
+  if (!quest || quest.week !== mondayOf(today)) return undefined;
+  const days = quest.minimumDays[partner.member.id] ?? 0;
+  return `This week: ${plural(days, 'day')} studied · ${quest.togetherSessions} of ${QUEST_SESSIONS} sessions together`;
 }
 
 /**
@@ -75,15 +99,18 @@ export function PartnerCard() {
     );
   }
 
-  const { title, detail } = partnerLines(partner, dayKey());
+  const today = dayKey();
+  const { title, detail } = partnerLines(partner, today);
+  const week = partnerWeekLine(partner, data.quest, today);
   const stale = fetchedAt !== undefined && Date.now() - fetchedAt > STALE_MS;
   const staleText = stale && fetchedAt !== undefined ? `Last update ${agoText(fetchedAt)}` : undefined;
   return (
-    <Link to="/together" className="today-partner" aria-label={linkName(title, detail, staleText)}>
+    <Link to="/together" className="today-partner" aria-label={linkName(title, detail, week, staleText)}>
       <span className="today-partner-avatar" aria-hidden="true">{(partner.member.name || '?').slice(0, 1).toUpperCase()}</span>
       <span className="today-partner-text">
         <span className="today-partner-title">{title}</span>
         <span className="today-partner-detail">{detail}</span>
+        {week && <span className="today-partner-detail">{week}</span>}
         {staleText && <span className="today-partner-stale">{staleText}</span>}
       </span>
       <Icon name="forward" size={20} />

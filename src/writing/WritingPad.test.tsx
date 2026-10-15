@@ -333,3 +333,89 @@ describe('WritingPad', () => {
     }
   });
 });
+
+describe('WritingPad in recall mode', () => {
+  const KI = STROKE_FIXTURES['木'];
+
+  function setupRecall(strokes: readonly string[] = KI) {
+    const ref = createRef<WritingPadHandle>();
+    const onStrokeResult = vi.fn();
+    const onRecallDone = vi.fn();
+    const view = render(
+      <WritingPad ref={ref} strokes={strokes} mode="recall" label="the kanji for tree" onStrokeResult={onStrokeResult}
+        onRecallDone={onRecallDone} />,
+    );
+    return { ref, onStrokeResult, onRecallDone, svg: view.getByRole('img'), view };
+  }
+
+  it('draws no per-stroke marks, no model and no animation while writing', () => {
+    const { svg, onStrokeResult, view } = setupRecall();
+    draw(svg, reversed(KI[0]));
+    draw(svg, strokePoints(KI[1]));
+
+    expect(onStrokeResult).not.toHaveBeenCalled();
+    // The ink stays as drawn (raw paths), never snapped to the model.
+    const ink = view.container.querySelectorAll('.wp-ink path');
+    expect(ink).toHaveLength(2);
+    ink.forEach((p) => expect(KI).not.toContain(p.getAttribute('d')));
+    expect(view.container.querySelector('.wp-flash, .wp-ghost, .wp-hint, .wp-reveal, .wp-model, .wp-start')).toBeNull();
+    // The stroke count is never given away.
+    expect(svg.getAttribute('aria-label')).toBe('Writing pad for the kanji for tree: 2 strokes drawn');
+  });
+
+  it('undo and clear remove ink; Done reports the strokes and the whole-character match', () => {
+    const { svg, onRecallDone, view } = setupRecall();
+    expect((view.getByRole('button', { name: 'Done' }) as HTMLButtonElement).disabled).toBe(true);
+    draw(svg, strokePoints(KI[0]));
+    draw(svg, strokePoints(KI[2]));
+    fireEvent.click(view.getByRole('button', { name: 'Undo' }));
+    expect(view.container.querySelectorAll('.wp-ink path')).toHaveLength(1);
+    fireEvent.click(view.getByRole('button', { name: 'Clear' }));
+    expect(view.container.querySelectorAll('.wp-ink path')).toHaveLength(0);
+
+    for (const d of KI) draw(svg, strokePoints(d));
+    fireEvent.click(view.getByRole('button', { name: 'Done' }));
+    expect(onRecallDone).toHaveBeenCalledTimes(1);
+    const result = onRecallDone.mock.calls[0][0];
+    expect(result.strokes).toHaveLength(4);
+    expect(result.hintUsed).toBe(false);
+    expect(result.match).toMatchObject({ ok: true, missing: [], extra: [], unmatched: [], orderSlips: [] });
+  });
+
+  it('draws the model over the ink afterwards and coaches stroke-order slips, with a replay', () => {
+    const { svg, onRecallDone, view } = setupRecall();
+    // 木 with the last stroke first.
+    for (const d of [KI[3], KI[0], KI[1], KI[2]]) draw(svg, strokePoints(d));
+    expect(view.queryByTestId('recall-model')).toBeNull();
+    fireEvent.click(view.getByRole('button', { name: 'Done' }));
+
+    expect(onRecallDone.mock.calls[0][0].match.ok).toBe(true);
+    const model = view.getByTestId('recall-model');
+    expect(model.querySelectorAll('path')).toHaveLength(4);
+    expect(view.getByText('Stroke 1 usually comes before stroke 4.')).toBeTruthy();
+    // The tools are gone once judged.
+    expect(view.queryByRole('button', { name: 'Done' })).toBeNull();
+
+    fireEvent.click(view.getByRole('button', { name: 'Replay' }));
+    expect(view.getByTestId('recall-model').querySelectorAll('.wp-reveal')).toHaveLength(4);
+  });
+
+  it('reports a hint, which shows the next stroke in standard order', () => {
+    const { svg, onRecallDone, view } = setupRecall();
+    draw(svg, strokePoints(KI[0]));
+    fireEvent.click(view.getByRole('button', { name: 'Hint' }));
+    const hint = view.container.querySelector('.wp-hint');
+    expect(hint?.getAttribute('d')).toBe(KI[1]);
+    for (const d of KI.slice(1)) draw(svg, strokePoints(d));
+    fireEvent.click(view.getByRole('button', { name: 'Done' }));
+    expect(onRecallDone.mock.calls[0][0].hintUsed).toBe(true);
+  });
+
+  it('done() through the handle judges a missing stroke', () => {
+    const { svg, ref, onRecallDone } = setupRecall();
+    draw(svg, strokePoints(KI[0]));
+    draw(svg, strokePoints(KI[1]));
+    act(() => ref.current?.done());
+    expect(onRecallDone.mock.calls[0][0].match).toMatchObject({ ok: false, missing: [2, 3] });
+  });
+});

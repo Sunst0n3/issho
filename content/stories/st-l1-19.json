@@ -1,0 +1,153 @@
+{
+  "id": "st-l1-19",
+  "level": "L1",
+  "unit": 24,
+  "title": "The lost wallet",
+  "titleJp": "{財布|さいふ}の{忘|わす}れ{物|もの}",
+  "topic": "phone calls",
+  "grammar": [
+    "tokoro",
+    "keigo-verbs",
+    "embedded-questions",
+    "keigo-set-phrases",
+    "koto-ni-suru",
+    "sou-hearsay",
+    "sou-looks",
+    "kamoshirenai",
+    "te-kureru",
+    "n-desu",
+    "tara-conditional",
+    "mae-ni-ato-de"
+  ],
+  "sentences": [
+    {
+      "jp": "{日曜日|にちようび}の／{夕方|ゆうがた}、／ミキは／{買|か}い{物|もの}から／{帰|かえ}ってきました。",
+      "en": "On Sunday evening, Miki came home from shopping."
+    },
+    {
+      "jp": "{家|いえ}に／{着|つ}いたところで、／ミキは／「あれ？」と／{言|い}いました。",
+      "en": "Just as she got home, Miki said, \"Huh?\""
+    },
+    {
+      "jp": "「{財布|さいふ}が／ない！」",
+      "en": "\"My wallet's gone!\""
+    },
+    {
+      "jp": "「どこで／{落|お}としたか、／{覚|おぼ}えてる？」と／ケンが／{聞|き}きました。",
+      "en": "\"Do you remember where you dropped it?\" Ken asked."
+    },
+    {
+      "jp": "「{分|わ}からない。／{電車|でんしゃ}の／{中|なか}かもしれない。」",
+      "en": "\"I don't know. Maybe on the train.\""
+    },
+    {
+      "jp": "{二人|ふたり}は／すぐ／{駅|えき}に／{電話|でんわ}を／かけることに／しました。",
+      "en": "They decided to phone the station straight away."
+    },
+    {
+      "jp": "「はい、／さくら{駅|えき}で／ございます。」",
+      "en": "\"Hello, this is Sakura Station.\""
+    },
+    {
+      "jp": "「すみません、／{電車|でんしゃ}に／{財布|さいふ}を／{忘|わす}れたかもしれないんですが…。」",
+      "en": "\"Excuse me, I think I may have left my wallet on a train...\""
+    },
+    {
+      "jp": "「{何時|なんじ}ごろの／{電車|でんしゃ}に／お{乗|の}りに／なりましたか。」",
+      "en": "\"Around what time was the train you took?\""
+    },
+    {
+      "jp": "「{四時半|よじはん}ごろだったと／{思|おも}います。」",
+      "en": "\"Around half past four, I think.\""
+    },
+    {
+      "jp": "「どんな／お{財布|さいふ}か、／{教|おし}えて／いただけますか。」",
+      "en": "\"Could you tell me what the wallet looks like?\""
+    },
+    {
+      "jp": "「{赤|あか}くて、／{小|ちい}さい／{財布|さいふ}です。／カードと、／{五千円|ごせんえん}ぐらい／{入|はい}っています。」",
+      "en": "\"It's small and red. It's got my cards and about five thousand yen in it.\""
+    },
+    {
+      "jp": "「{少々|しょうしょう}／お{待|ま}ちください。／{今|いま}、／お{調|しら}べします。」",
+      "en": "\"One moment, please. I'll check for you now.\""
+    },
+    {
+      "jp": "ミキは／とても／{心配|しんぱい}そうでした。",
+      "en": "Miki looked very worried."
+    },
+    {
+      "jp": "ケンは／「きっと／{大丈夫|だいじょうぶ}だよ。」と／{言|い}いました。",
+      "en": "Ken said, \"I'm sure it'll be fine.\""
+    },
+    {
+      "jp": "「お{待|ま}たせいたしました。／{赤|あか}い／お{財布|さいふ}が、／{東京|とうきょう}{駅|えき}に／{届|とど}いているそうです。」",
+      "en": "\"Thank you for waiting. Apparently a red wallet has been handed in at Tokyo Station.\""
+    },
+    {
+      "jp": "「{本当|ほんとう}ですか！／よかった…。」",
+      "en": "\"Really? Thank goodness...\""
+    },
+    {
+      "jp": "「{取|と}りに／いらっしゃる／ときは、／お{名前|なまえ}が／{分|わ}かる／{物|もの}を／お{持|も}ちください。」",
+      "en": "\"When you come to collect it, please bring something with your name on it.\""
+    },
+    {
+      "jp": "{次|つぎ}の／{朝|あさ}、／ミキは／{会社|かいしゃ}に／{行|い}く／{前|まえ}に、／{東京|とうきょう}{駅|えき}へ／{行|い}きました。",
+      "en": "The next morning, before going to work, Miki went to Tokyo Station."
+    },
+    {
+      "jp": "{駅|えき}の／{人|ひと}に／{名前|なまえ}を／{言|い}うと、／すぐに／{財布|さいふ}を／{持|も}ってきてくれました。",
+      "en": "When she gave her name to the station staff, they brought her wallet out straight away."
+    },
+    {
+      "jp": "「{中|なか}を／ご{覧|らん}ください。」",
+      "en": "\"Please have a look inside.\""
+    },
+    {
+      "jp": "カードも、／お{金|かね}も、／{全部|ぜんぶ}／ありました。",
+      "en": "Her cards and her money were all there."
+    },
+    {
+      "jp": "「どなたが／{届|とど}けてくれたか、／{分|わ}かりますか。」",
+      "en": "\"Do you know who handed it in?\""
+    },
+    {
+      "jp": "「{若|わか}い／{男|おとこ}の{人|ひと}が／{届|とど}けてくれたそうですよ。」",
+      "en": "\"Apparently it was a young man.\""
+    },
+    {
+      "jp": "ミキは／お{礼|れい}を／{言|い}いたかったですが、／{名前|なまえ}は／{分|わ}かりませんでした。",
+      "en": "Miki wanted to thank him, but no one knew his name."
+    },
+    {
+      "jp": "{会社|かいしゃ}に／{着|つ}いたところで、／ケンから／メッセージが／{来|き}ました。",
+      "en": "Just as she arrived at the office, a message came from Ken."
+    },
+    {
+      "jp": "「{財布|さいふ}、／あった？」",
+      "en": "\"Did you get your wallet?\""
+    },
+    {
+      "jp": "「あったよ！／{若|わか}い／{男|おとこ}の{人|ひと}が／{届|とど}けてくれたんだって。」",
+      "en": "\"I did! Apparently a young man handed it in.\""
+    },
+    {
+      "jp": "{夜|よる}、／{家|いえ}で／ミキは／{言|い}いました。",
+      "en": "That night at home, Miki said:"
+    },
+    {
+      "jp": "「{今度|こんど}、／{誰|だれ}かの／{忘|わす}れ{物|もの}を／{見|み}つけたら、／{私|わたし}も／すぐ／{届|とど}けるね。」",
+      "en": "\"Next time I find something someone has left behind, I'll hand it in straight away too.\""
+    }
+  ],
+  "gist": {
+    "q": "Who found Miki's wallet and handed it in?",
+    "options": [
+      "Ken",
+      "A young man",
+      "The station staff at Sakura Station"
+    ],
+    "answer": 1
+  }
+}

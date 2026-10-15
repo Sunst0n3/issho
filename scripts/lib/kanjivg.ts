@@ -12,6 +12,8 @@ export interface KvgGroup {
   partial: boolean;
   /** Set when one element is split over several groups (part 1, part 2, …). */
   part?: number;
+  /** kvg:phon: the group is the character's phonetic component ('丁', or '厶/弗' for an old form). */
+  phon?: string;
   strokes: number[];
   children: KvgGroup[];
 }
@@ -34,6 +36,7 @@ function newGroup(attrs: Record<string, string>): KvgGroup {
     variant: attrs['kvg:variant'] === 'true',
     partial: attrs['kvg:partial'] === 'true',
     part: part ? Number(part) : undefined,
+    phon: attrs['kvg:phon'] || undefined,
     strokes: [],
     children: [],
   };
@@ -92,6 +95,15 @@ export function* descendants(root: KvgGroup): Generator<KvgGroup> {
 }
 
 /**
+ * Whether KanjiVG marks a phonetic component in the character (kvg:phon): its sound, not its
+ * meaning, comes from that part, so the meaning cannot be guessed from the parts (語, 時, 晴).
+ */
+export function hasPhoneticComponent(char: KvgChar): boolean {
+  for (const g of descendants(char.root)) if (g.phon) return true;
+  return false;
+}
+
+/**
  * The teachable components of a character, in document (roughly writing) order.
  * A group whose element is teachable (a jōyō kanji or a known radical) is taken
  * whole; any other group is looked through to the elements inside it. So 語
@@ -103,6 +115,17 @@ export function componentsOf(char: KvgChar, isTeachable: (element: string) => bo
     if (teachable && !out.includes(group.element!)) out.push(group.element!);
   }
   return out;
+}
+
+/**
+ * How many teachable components the character is drawn from: a repeated one counts each time
+ * (林 is 木 + 木: 2, while componentsOf lists 木 once), and an element split over several groups
+ * (part 1, part 2, …) counts once.
+ */
+export function componentCount(char: KvgChar, isTeachable: (element: string) => boolean): number {
+  let n = 0;
+  for (const { group, teachable } of elementGroups(char, isTeachable)) if (teachable && (group.part ?? 1) === 1) n++;
+  return n;
 }
 
 /**

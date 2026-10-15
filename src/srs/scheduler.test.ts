@@ -1,154 +1,168 @@
 import { Rating, State } from 'ts-fsrs';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { db, updateSettings } from '../lib/db.ts';
-import type { CardRecord } from '../lib/types.ts';
-import { DAY_MS } from './days.ts';
-import { gradeCard, MAX_COUNTED_ANSWER_MS, newCardRecord, previewDue } from './scheduler.ts';
+import type { CardRecord, CardType, ItemKind } from '../lib/types.ts';
+import { DAY_MS, getDay } from './days.ts';
+import {
+  getScheduler,
+  gradeCard,
+  inPartnerWindow,
+  MAX_COUNTED_ANSWER_MS,
+  newCardRecord,
+  PARTNER_GRADE,
+  presetOf,
+  previewDue,
+  retentionFor,
+  retrievability,
+} from './scheduler.ts';
 import { at, resetDb } from './test-fixtures.ts';
 
 beforeEach(resetDb);
-afterEach(() => vi.restoreAllMocks());
 
 const NOW = at(2026, 10, 14, 9);
+const MIN = 60_000;
 
-function reviewCard(id = 'kanji:水', stability = 10): CardRecord {
+function reviewCard(itemId: string, kind: ItemKind, type: CardType, stability = 10, dueIn = 0): CardRecord {
+  const last = new Date(NOW.getTime() - stability * DAY_MS);
   return {
-    ...newCardRecord(id, 'kanji', 'meaning', new Date(NOW.getTime() - stability * DAY_MS)),
+    ...newCardRecord(itemId, kind, type, last),
     state: State.Review,
     stability,
     difficulty: 5,
     reps: 3,
     scheduled_days: stability,
-    last_review: new Date(NOW.getTime() - stability * DAY_MS),
-    due: NOW,
+    last_review: last,
+    due: new Date(NOW.getTime() + dueIn * DAY_MS),
   };
 }
 
-describe('newCardRecord', () => {
-  it('creates a new FSRS card due now with the composite id', () => {
-    const card = newCardRecord('kana:あ', 'kana', 'write', NOW);
-    expect(card).toMatchObject({ id: 'kana:あ|write', itemId: 'kana:あ', kind: 'kana', type: 'write', state: State.New, reps: 0 });
-    expect(card.due).toBeInstanceOf(Date);
-    expect(card.due.getTime()).toBe(NOW.getTime());
+describe('presets', () => {
+  it('maps card types to the production and receptive presets', () => {
+    for (const type of ['write', 'produce', 'build', 'cloze'] as const) expect(presetOf(type)).toBe('production');
+    for (const type of ['read', 'meaning', 'listen', 'comprehend'] as const) expect(presetOf(type)).toBe('receptive');
+  });
+
+  it('keeps production at 0.90 whatever the receptive setting', () => {
+    expect(retentionFor('production', { receptiveRetention: 0.85 })).toBe(0.9);
+    expect(retentionFor('receptive', { receptiveRetention: 0.85 })).toBe(0.85);
+    expect(retentionFor('receptive', { receptiveRetention: 0.97 })).toBe(0.93);
+  });
+
+  it('refuses retentions outside 0.70–0.95', () => {
+    expect(() => getScheduler(0.96)).toThrow(RangeError);
+    expect(() => getScheduler(0.6)).toThrow(RangeError);
+    expect(getScheduler(0.9)).toBe(getScheduler(0.9));
+    expect(getScheduler(0.9, [...getScheduler(0.9).parameters.w])).not.toBe(getScheduler(0.9));
+  });
+});
+
+describe('ts-fsrs behaviour this app relies on', () => {
+  it('New + Good → Learning +10 min; next day Good → Review ≥ 1 d', async () => {
+    await db.cards.add(newCardRecord('kana:あ', 'kana', 'read', NOW));
+    const first = await gradeCard('kana:あ|read', Rating.Good, { durationMs: 3000, mode: 'typed', context: 'first-check', now: NOW });
+    expect(first.state).toBe(State.Learning);
+    expect(first.due.getTime() - NOW.getTime()).toBe(10 * MIN);
+    const tomorrow = new Date(NOW.getTime() + DAY_MS);
+    const second = await gradeCard('kana:あ|read', Rating.Good, { durationMs: 3000, mode: 'typed', now: tomorrow });
+    expect(second.state).toBe(State.Review);
+    expect(second.due.getTime() - tomorrow.getTime()).toBeGreaterThanOrEqual(DAY_MS);
+  });
+
+  it('Review + Again → Relearning; the re-ask Good → Review', async () => {
+    await db.cards.add(reviewCard('word:1', 'word', 'read'));
+    const missed = await gradeCard('word:1|read', Rating.Again, { durationMs: 5000, mode: 'typed', now: NOW });
+    expect(missed.state).toBe(State.Relearning);
+    expect(missed.due.getTime() - NOW.getTime()).toBe(10 * MIN);
+    const later = new Date(NOW.getTime() + 3 * MIN);
+    const reask = await gradeCard('word:1|read', Rating.Good, { durationMs: 4000, mode: 'typed', context: 're-ask', now: later });
+    expect(reask.state).toBe(State.Review);
   });
 });
 
 describe('gradeCard', () => {
-  it('reschedules the card, logs the review and counts it for today', async () => {
-    await db.cards.add(newCardRecord('kana:あ', 'kana', 'read', NOW));
-    const updated = await gradeCard('kana:あ|read', Rating.Good, { durationMs: 4200, mode: 'choice', now: NOW });
-
-    expect(updated.state).toBe(State.Learning);
-    expect(updated.due.getTime()).toBeGreaterThan(NOW.getTime());
-    expect(updated).toMatchObject({ id: 'kana:あ|read', itemId: 'kana:あ', kind: 'kana', type: 'read', reps: 1 });
-
-    const stored = await db.cards.get('kana:あ|read');
-    expect(stored).toEqual(updated);
-    expect(stored!.due).toBeInstanceOf(Date);
-    expect(stored!.last_review).toBeInstanceOf(Date);
-
-    const logs = await db.reviewLogs.toArray();
-    expect(logs).toHaveLength(1);
-    expect(logs[0]).toMatchObject({
-      cardId: 'kana:あ|read',
-      itemId: 'kana:あ',
-      grade: Rating.Good,
-      durationMs: 4200,
-      mode: 'choice',
-      prevState: State.New,
+  it('logs kind, type, elapsed days and context, and counts the review for today', async () => {
+    await db.cards.add(reviewCard('kanji:水', 'kanji', 'write', 7));
+    await gradeCard('kanji:水|write', Rating.Hard, { durationMs: 4200, mode: 'written', input: 'stylus', override: true, now: NOW });
+    const [log] = await db.reviewLogs.toArray();
+    expect(log).toMatchObject({
+      cardId: 'kanji:水|write', itemId: 'kanji:水', kind: 'kanji', type: 'write', grade: Rating.Hard, durationMs: 4200,
+      mode: 'written', prevState: State.Review, elapsedDays: 7, context: 'review', input: 'stylus', override: true,
     });
-    expect(logs[0].reviewedAt).toBeInstanceOf(Date);
-
-    expect(await db.days.get('2026-10-14')).toMatchObject({ reviews: 1, correct: 1, studyMs: 4200, newItems: 0 });
+    const day = await getDay('2026-10-14');
+    expect(day).toMatchObject({ reviews: 1, correct: 1, studyMs: 4200, reviewMs: 4200 });
   });
 
-  it('counts Again as reviewed but not correct, and Hard as correct', async () => {
-    await db.cards.bulkAdd([newCardRecord('kana:い', 'kana', 'read', NOW), newCardRecord('kana:う', 'kana', 'read', NOW)]);
-    await gradeCard('kana:い|read', Rating.Again, { durationMs: 1000, mode: 'typed', now: NOW });
-    await gradeCard('kana:う|read', Rating.Hard, { durationMs: 1000, mode: 'typed', now: NOW });
-    expect(await db.days.get('2026-10-14')).toMatchObject({ reviews: 2, correct: 1, studyMs: 2000 });
+  it('counts a first check in study time only, a re-ask as review time, and caps long answers', async () => {
+    await db.cards.bulkAdd([newCardRecord('kana:あ', 'kana', 'read', NOW), reviewCard('word:1', 'word', 'read')]);
+    await gradeCard('kana:あ|read', Rating.Again, { durationMs: 3000, mode: 'typed', context: 'first-check', now: NOW });
+    await gradeCard('word:1|read', Rating.Good, { durationMs: 10 * MIN, mode: 'typed', context: 're-ask', now: NOW });
+    const day = await getDay('2026-10-14');
+    expect(day.reviews).toBe(2);
+    expect(day.correct).toBe(1);
+    expect(day.studyMs).toBe(3000 + MAX_COUNTED_ANSWER_MS);
+    expect(day.reviewMs).toBe(MAX_COUNTED_ANSWER_MS);
+    expect((await db.reviewLogs.where('cardId').equals('word:1|read').first())?.durationMs).toBe(10 * MIN);
   });
 
-  it('caps the study time one answer can add, but logs the real duration', async () => {
-    await db.cards.add(newCardRecord('kana:あ', 'kana', 'read', NOW));
-    await gradeCard('kana:あ|read', Rating.Good, { durationMs: 30 * 60_000, mode: 'self', now: NOW });
-    expect((await db.days.get('2026-10-14'))!.studyMs).toBe(MAX_COUNTED_ANSWER_MS);
-    expect((await db.reviewLogs.toArray())[0].durationMs).toBe(30 * 60_000);
+  it('adds no study time for a partner grade and puts make-up time in makeupMs', async () => {
+    await db.cards.bulkAdd([reviewCard('word:1', 'word', 'read'), reviewCard('word:2', 'word', 'read')]);
+    await gradeCard('word:1|read', Rating.Good, { durationMs: 5000, mode: 'partner', context: 'partner', now: NOW });
+    await gradeCard('word:2|read', Rating.Good, { durationMs: 6000, mode: 'typed', makeup: true, now: NOW });
+    const day = await getDay('2026-10-14');
+    expect(day).toMatchObject({ reviews: 2, studyMs: 6000, reviewMs: 0, makeupMs: 6000 });
   });
 
-  it('treats a missing or broken answer time as zero instead of corrupting the day', async () => {
-    await db.cards.bulkAdd([newCardRecord('kana:あ', 'kana', 'read', NOW), newCardRecord('kana:い', 'kana', 'read', NOW)]);
-    await gradeCard('kana:あ|read', Rating.Good, { durationMs: Number.NaN, mode: 'choice', now: NOW });
-    await gradeCard('kana:い|read', Rating.Good, { durationMs: 1500, mode: 'choice', now: NOW });
-    expect(await db.days.get('2026-10-14')).toMatchObject({ reviews: 2, studyMs: 1500 });
-    expect((await db.reviewLogs.toArray()).map((l) => l.durationMs)).toEqual([0, 1500]);
+  it('uses the receptive retention for read cards and 0.90 for write cards', async () => {
+    await updateSettings({ receptiveRetention: 0.85 });
+    await db.cards.bulkAdd([reviewCard('word:1', 'word', 'read', 10), reviewCard('kanji:水', 'kanji', 'write', 10)]);
+    const read = await gradeCard('word:1|read', Rating.Good, { durationMs: 1, mode: 'typed', now: NOW });
+    const write = await gradeCard('kanji:水|write', Rating.Good, { durationMs: 1, mode: 'written', now: NOW });
+    // Same history, lower desired retention → a longer interval.
+    expect(read.scheduled_days).toBeGreaterThan(write.scheduled_days);
   });
 
-  it('books reviews done before 4 a.m. on the previous study day', async () => {
-    const lateNight = at(2026, 10, 15, 2, 30);
-    await db.cards.add(newCardRecord('kana:あ', 'kana', 'read', lateNight));
-    await gradeCard('kana:あ|read', Rating.Good, { durationMs: 1000, mode: 'choice', now: lateNight });
-    expect(await db.days.get('2026-10-14')).toMatchObject({ reviews: 1 });
-    expect(await db.days.get('2026-10-15')).toBeUndefined();
+  it('joins an enclosing transaction over its tables', async () => {
+    await db.cards.add(reviewCard('word:1', 'word', 'read'));
+    await db.transaction('rw', [db.cards, db.reviewLogs, db.days, db.settings, db.items, db.encounters], async () => {
+      await gradeCard('word:1|read', Rating.Good, { durationMs: 1000, mode: 'typed', now: NOW });
+      await gradeCard('word:1|read', Rating.Good, { durationMs: 1000, mode: 'typed', context: 're-ask', now: NOW });
+    });
+    expect(await db.reviewLogs.count()).toBe(2);
   });
 
-  it('still grades a card when the clock is behind its last review', async () => {
-    const card = reviewCard('kanji:木', 10);
-    await db.cards.add({ ...card, last_review: at(2026, 10, 20, 9), due: at(2026, 10, 30, 9) });
-    const earlier = at(2026, 10, 14, 9);
-    const next = await gradeCard(card.id, Rating.Good, { durationMs: 1, mode: 'choice', now: earlier });
-    expect(next.due.getTime()).toBeGreaterThan(at(2026, 10, 20, 9).getTime());
-    expect((await db.reviewLogs.toArray())[0].reviewedAt).toEqual(earlier);
-    expect(await db.days.get('2026-10-14')).toMatchObject({ reviews: 1 });
-  });
-
-  it('rejects an unknown card without writing anything', async () => {
-    await expect(gradeCard('kana:ぬ|read', Rating.Good, { durationMs: 1, mode: 'choice', now: NOW })).rejects.toThrow(/unknown card/);
-    expect(await db.reviewLogs.count()).toBe(0);
-    expect(await db.days.count()).toBe(0);
-  });
-
-  it('rolls back the card update when a later write fails', async () => {
-    const card = newCardRecord('kana:あ', 'kana', 'read', NOW);
-    await db.cards.add(card);
-    vi.spyOn(db.reviewLogs, 'add').mockRejectedValueOnce(new Error('disk full'));
-    await expect(gradeCard(card.id, Rating.Good, { durationMs: 1, mode: 'choice', now: NOW })).rejects.toThrow('disk full');
-    expect((await db.cards.get(card.id))!.state).toBe(State.New);
-    expect(await db.days.count()).toBe(0);
-  });
-
-  it('uses the desired retention from settings', async () => {
-    const intervalAt = async (retention: number, id: string) => {
-      await updateSettings({ desiredRetention: retention });
-      await db.cards.add(reviewCard(id, 20));
-      const next = await gradeCard(`${id}|meaning`, Rating.Good, { durationMs: 1, mode: 'choice', now: NOW });
-      return (next.due.getTime() - NOW.getTime()) / DAY_MS;
-    };
-    const relaxed = await intervalAt(0.8, 'kanji:山');
-    const strict = await intervalAt(0.97, 'kanji:川');
-    expect(relaxed).toBeGreaterThan(strict * 2);
+  it('rejects an unknown card', async () => {
+    await expect(gradeCard('kana:x|read', Rating.Good, { durationMs: 1, mode: 'typed', now: NOW })).rejects.toThrow('unknown card');
   });
 });
 
-describe('previewDue', () => {
-  it('gives a due date per grade, Again soonest and Easy latest', () => {
-    const preview = previewDue(reviewCard(), NOW);
-    expect(Object.keys(preview)).toEqual(['1', '2', '3', '4']);
-    const times = [preview[1], preview[2], preview[3], preview[4]].map((d) => d.getTime());
-    expect(times.every((t) => t > NOW.getTime())).toBe(true);
-    expect([...times].sort((a, b) => a - b)).toEqual(times);
-    expect(times[0]).toBeLessThan(times[3]);
+describe('previewDue and retrievability', () => {
+  it('previews each grade in order', () => {
+    const preview = previewDue(reviewCard('word:1', 'word', 'read'), NOW);
+    expect(preview[1].getTime()).toBeLessThan(preview[3].getTime());
+    expect(preview[3].getTime()).toBeLessThanOrEqual(preview[4].getTime());
   });
 
-  it('works when the clock is behind the last review', () => {
-    const card = { ...reviewCard(), last_review: at(2026, 10, 20, 9) };
-    const preview = previewDue(card, at(2026, 10, 14, 9));
-    expect(preview[3].getTime()).toBeGreaterThan(at(2026, 10, 20, 9).getTime());
+  it('is 1 for New cards and falls with time', () => {
+    expect(retrievability(newCardRecord('kana:あ', 'kana', 'read', NOW), NOW)).toBe(1);
+    const card = reviewCard('word:1', 'word', 'read', 10);
+    const now = retrievability(card, NOW);
+    const later = retrievability(card, new Date(NOW.getTime() + 20 * DAY_MS));
+    expect(now).toBeGreaterThan(0.85);
+    expect(now).toBeLessThan(0.95);
+    expect(later).toBeLessThan(now);
+  });
+});
+
+describe('partner window', () => {
+  it('grades only within 2 days of due, never New or suspended cards', () => {
+    expect(inPartnerWindow(reviewCard('word:1', 'word', 'read', 10, 3), NOW)).toBe(false);
+    expect(inPartnerWindow(reviewCard('word:1', 'word', 'read', 10, 1), NOW)).toBe(true);
+    expect(inPartnerWindow(reviewCard('word:1', 'word', 'read', 10, -2), NOW)).toBe(true);
+    expect(inPartnerWindow(newCardRecord('word:1', 'word', 'read', NOW), NOW)).toBe(false);
+    expect(inPartnerWindow({ ...reviewCard('kanji:水', 'kanji', 'write'), suspended: 'retired' }, NOW)).toBe(false);
   });
 
-  it('shows learning steps for a new card', () => {
-    const preview = previewDue(newCardRecord('kana:あ', 'kana', 'read', NOW), NOW);
-    expect(preview[1].getTime() - NOW.getTime()).toBeLessThan(10 * 60_000);
-    expect(preview[4].getTime() - NOW.getTime()).toBeGreaterThanOrEqual(DAY_MS);
+  it('maps verdicts to grades', () => {
+    expect(PARTNER_GRADE).toEqual({ right: Rating.Good, close: Rating.Hard, wrong: Rating.Again });
   });
 });

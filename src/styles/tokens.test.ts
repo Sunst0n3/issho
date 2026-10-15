@@ -60,6 +60,14 @@ describe('accessibility CSS', () => {
     expect(contrast(light.shu, light.ink)).toBeLessThan(3);
   });
 
+  it('draws each streak day status its own way (goal filled, done ring-filled, rest and travel dashes, repaired dot, today ring)', () => {
+    for (const status of ['goal', 'done', 'rest', 'travel', 'repaired', 'today']) {
+      expect(homeCss).toMatch(new RegExp(`\\.streak-day\\.${status} \\.streak-dot`));
+    }
+    expect(homeCss).toMatch(/\.streak-day\.goal \.streak-dot\s*{[^}]*background:\s*var\(--shu\)/);
+    expect(homeCss).toMatch(/\.streak-day\.repaired \.streak-dot::after/);
+  });
+
   it('lets a long name wrap in the Today greeting', () => {
     expect(homeCss).toMatch(/\.today-greeting\s*{[^}]*overflow-wrap:\s*anywhere/);
     expect(homeCss).toMatch(/\.today-head > div\s*{[^}]*min-width:\s*0/);

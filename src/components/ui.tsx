@@ -30,6 +30,18 @@ const ICONS = {
   plus: 'M12 5v14M5 12h14',
   eye: 'M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
   sparkle: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z',
+  /** A rest token: a crescent moon. */
+  rest: 'M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z',
+  /** Travel/sick mode: a suitcase. */
+  travel: 'M4 8h16v11H4zM9 8V5h6v3M9 12v3M15 12v3',
+  /** A repaired day: a link joined again. */
+  repair: 'M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7',
+  /** Pitch accent: a height line over moras. */
+  pitch: 'M3 16l4-7h5l4 7h5M7 9v0M12 9v0M16 16v0',
+  /** The couple quest: a flag. */
+  quest: 'M5 21V4M5 4h11l-2 4 2 4H5',
+  library: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+  calendar: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
 } as const;
 
 export type IconName = keyof typeof ICONS;
@@ -47,21 +59,24 @@ export function Icon({ name, size = 20, strokeWidth = 2, filled = false }: {
 }
 
 // ---- Ruby text: "{明日|あした}は…" ----
+/** Which readings <Ruby> shows: every one, none, or a predicate given each segment's base and reading. */
+export type RubyShow = 'all' | 'none' | ((base: string, reading?: string) => boolean);
+
 /**
  * Renders ruby markup. `show` decides which readings appear:
- * 'all' every reading, 'none' none, or a predicate deciding per base text
- * (e.g. show readings only for kanji the learner does not know yet).
+ * 'all' every reading, 'none' none, or a predicate deciding per segment from its base text and
+ * its reading (e.g. hide the reading of a word the learner reads solidly, per partner).
  */
 export function Ruby({ text, show = 'all', className }: {
   text: string;
-  show?: 'all' | 'none' | ((base: string) => boolean);
+  show?: RubyShow;
   className?: string;
 }) {
   return (
     <span lang="ja" className={className}>
       {parseRuby(text).map((seg, i) => {
         if (seg.reading === undefined) return <span key={i}>{seg.text}</span>;
-        const visible = show === 'all' || (typeof show === 'function' && show(seg.text));
+        const visible = show === 'all' || (typeof show === 'function' && show(seg.text, seg.reading));
         return visible
           ? <ruby key={i}>{seg.text}<rt>{seg.reading}</rt></ruby>
           : <span key={i}>{seg.text}</span>;
@@ -152,7 +167,7 @@ export function ProgressBar({ value, label }: { value: number; label: string }) 
 const TABS: Array<{ to: string; label: string; icon: IconName; end?: boolean }> = [
   { to: '/', label: 'Today', icon: 'home', end: true },
   { to: '/learn', label: 'Learn', icon: 'book' },
-  { to: '/write', label: 'Write', icon: 'pen' },
+  { to: '/library', label: 'Library', icon: 'library' },
   { to: '/together', label: 'Together', icon: 'people' },
 ];
 

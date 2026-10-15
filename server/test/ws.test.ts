@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { after, before, describe, it } from 'node:test';
-import type { ClientEvent, RegisterResponse, ServerEvent } from '../../shared/api.ts';
+import type { ClientEvent, RegisterResponse, ServerEvent, TogetherLiveState } from '../../shared/api.ts';
 import { WS_CLOSE_UNPAIRED } from '../src/hub.ts';
 import { bearer, createTestServer, listen, openSocket, tick, type TestServer } from './helpers.ts';
 
@@ -104,6 +104,40 @@ describe('websocket', () => {
     assert.equal(a.events.all.some((e) => e.type === 'roleplay'), false);
     // Malformed frames are ignored without dropping the connection.
     assert.equal(a.ws.readyState, WebSocket.OPEN);
+
+    await Promise.all([a.close(), a2.close(), b.close()]);
+  });
+
+  it('relays live together-session state to the other members only', async () => {
+    const a = await openSocket(base, carter.deviceToken);
+    const a2 = await openSocket(base, carter.deviceToken);
+    const b = await openSocket(base, aiko.deviceToken);
+
+    a.send({ type: 'live', state: { sessionId: 's' } });
+    const state: TogetherLiveState = {
+      sessionId: 'live-1',
+      session: 'A',
+      opener: carter.memberId,
+      plan: { conversation: { scriptId: 'rp-u01', stage: 2 }, storyId: 'st-l0-01' },
+      quizIds: { [carter.memberId]: crypto.randomUUID() },
+      step: 'quiz',
+      turn: aiko.memberId,
+      index: 3,
+      timerStartedAt: 1_760_000_000_000,
+      status: 'active',
+    };
+    a.send({ type: 'live', state } satisfies ClientEvent);
+
+    const relayed = await b.events.next((e) => e.type === 'live');
+    assert.deepEqual(relayed, { type: 'live', memberId: carter.memberId, state });
+    await tick(50);
+    assert.equal(b.events.all.filter((e) => e.type === 'live').length, 1);
+    assert.equal(a2.events.all.some((e) => e.type === 'live'), false);
+
+    // A role-play state may carry its conversation stage.
+    const roleplay = { sessionId: 's-2', scriptId: 'rp-u01', role: 'b', lineIndex: 0, status: 'waiting', stage: 3 } as const;
+    a.send({ type: 'roleplay', state: roleplay } satisfies ClientEvent);
+    assert.deepEqual(await b.events.next((e) => e.type === 'roleplay'), { type: 'roleplay', memberId: carter.memberId, state: roleplay });
 
     await Promise.all([a.close(), a2.close(), b.close()]);
   });

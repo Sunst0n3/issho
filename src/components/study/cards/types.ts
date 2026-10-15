@@ -1,83 +1,104 @@
-import type { ReactNode } from 'react';
 import type { Grade } from 'ts-fsrs';
+import type { KanaExample, WordInfo } from '../../../lib/data.ts';
 import type {
+  AccentInfo,
   AnswerMode,
   CardRecord,
-  GrammarDrill,
+  GrammarBuildItem,
+  GrammarExample,
   GrammarPoint,
   KanaEntry,
+  KanaRule,
   KanjiEntry,
-  RadicalEntry,
-  SurvivalWord,
-  WordEntry,
+  ReviewLogRecord,
+  RubyText,
+  SavedSentenceRecord,
+  SentenceEntry,
 } from '../../../lib/types.ts';
-import type { SentenceLike } from '../sentences.ts';
-
-/** One kanji of a word with its meaning, for "水 water + 曜 weekday + 日 day". */
-export interface BreakdownPart {
-  char: string;
-  meaning?: string;
-}
 
 interface Base {
   card: CardRecord;
+  /** Typed cards: the 4 choices behind "Show options" (and shown at once in hands-busy mode), the answer among them.
+   *  Empty for self-graded and written cards. */
+  options: string[];
+  /** The answer a choice is checked against (one of `options`). */
+  answer: string;
+  /** The learner's own memory hook for the item: shown after a miss, never on the question. */
+  customMnemonic?: string;
 }
 
-/** Everything a review card needs, loaded and with its options chosen. */
+/**
+ * A sentence split around the word being asked: the word itself is plain text (never ruby, never a reading), the
+ * rest is ruby markup shown with the card's furigana rule.
+ */
+export interface SplitCue {
+  before: RubyText;
+  target: string;
+  after: RubyText;
+}
+
+/**
+ * Everything a review card needs, loaded, with its options chosen. `display` is the word as the learner knows it,
+ * for the answer side: kana until a core word is spelled with kanji, then `{written|kana}`.
+ */
 export type PreparedCard =
-  | (Base & { view: 'kana-read'; kana: KanaEntry; options: string[] })
+  | (Base & { view: 'kana-read'; kana: KanaEntry; mode: 'romaji' | 'word'; word?: KanaExample })
   | (Base & {
       view: 'kana-write';
       kana: KanaEntry;
-      /** The row to name with the romaji when another kana sounds the same (ji: じ or ぢ). */
+      /** sprint: sound only (auto-play + replay); after: example word with □ */
+      prompt: 'sound' | 'word';
+      word?: KanaExample;
+      /** The example word with the kana as □ ('□さ'), for the 'word' prompt. */
+      blanked?: string;
+      /** The row named with a sound shared by two kana (を sounds like お: 'わ'). */
       row?: string;
     })
-  | (Base & { view: 'radical-meaning'; radical: RadicalEntry; options: string[] })
-  | (Base & { view: 'kanji-meaning'; kanji: KanjiEntry; options: string[]; notAccepted: string[] })
+  | (Base & { view: 'kana-rule'; rule: KanaRule; word: { kana: string; en: string }; wordIndex: number })
   | (Base & {
-      view: 'kanji-reading';
+      view: 'kanji-write';
       kanji: KanjiEntry;
-      /** The taught word the kanji is shown in; absent when none is known yet. */
-      word?: WordEntry;
-      answer: string;
-      options: string[];
-      breakdown: BreakdownPart[];
+      anchor?: WordInfo;
+      /** anchor written with the kanji as □ */
+      blanked?: string;
+      reading: string;
     })
-  | (Base & { view: 'kanji-write'; kanji: KanjiEntry; reading: string })
-  | (Base & { view: 'word-reading'; word: WordEntry; options: string[]; breakdown: BreakdownPart[] })
-  | (Base & { view: 'word-meaning'; word: WordEntry; options: string[]; breakdown: BreakdownPart[] })
-  | (Base & { view: 'vocab-meaning'; vocab: SurvivalWord; options: string[] })
-  | (Base & { view: 'vocab-recall'; vocab: SurvivalWord; options: string[] })
-  | (Base & { view: 'grammar-drill'; point: GrammarPoint; drill: GrammarDrill; options: string[] })
-  | (Base & { view: 'sentence-read'; sentence: SentenceLike });
+  | (Base & { view: 'kanji-meaning'; kanji: KanjiEntry })
+  | (Base & { view: 'word-read'; word: WordInfo; carrier?: SentenceEntry; accent?: AccentInfo; cue: SplitCue; display: RubyText })
+  | (Base & { view: 'produce'; word: WordInfo; accent?: AccentInfo; display: RubyText })
+  | (Base & { view: 'listen'; word: WordInfo; accent?: AccentInfo; display: RubyText })
+  | (Base & { view: 'grammar-comprehend'; point: GrammarPoint; example: GrammarExample; exampleIndex: number })
+  | (Base & {
+      view: 'grammar-build';
+      point: GrammarPoint;
+      item: GrammarBuildItem;
+      itemIndex: number;
+      tiles: boolean;
+      shuffledTiles: string[];
+    })
+  | (Base & { view: 'cloze'; sentence: SavedSentenceRecord; cue: SplitCue });
 
 export type CardView = PreparedCard['view'];
 
-/** What the feedback panel shows once a card is answered. */
-export interface FeedbackContent {
-  /** Overrides the "Correct" / "Not quite" headline (writing uses its own). */
-  title?: string;
-  /** The expected answer, named in "Not quite: it's …". */
-  expected: string;
-  expectedLang?: 'ja';
-  /** The other half of the answer: the meaning for a reading, the reading for a meaning. */
-  note?: ReactNode;
-  breakdown?: BreakdownPart[];
-  /** Japanese (ruby markup allowed) read aloud by Listen. */
-  speak?: string;
-}
-
+/** One answer to a card. The block grades it once and decides on feedback. */
 export interface CardAnswer {
   grade: Grade;
   mode: AnswerMode;
-  correct: boolean;
-  /** Absent for self-graded cards, which move straight on. */
-  feedback?: FeedbackContent;
+  /** Word read cards: both halves of the answer. */
+  parts?: ReviewLogRecord['parts'];
+  /** Writing cards: what the learner wrote with. */
+  input?: ReviewLogRecord['input'];
+  /** 'I wrote it right' after the pad judged Again. */
+  override?: boolean;
+  /** The answer is already on screen (a self-graded card's reveal): Got it moves straight on. */
+  revealed?: boolean;
 }
 
 export interface CardProps<V extends CardView> {
   prepared: Extract<PreparedCard, { view: V }>;
   onAnswer: (answer: CardAnswer) => void;
-  /** A practice repeat of a missed card: it is not graded again. */
-  practice?: boolean;
+  /** Settings.handsBusy: typed cards show their choices at once (logged 'choice', at most Hard). */
+  handsBusy?: boolean;
+  /** "Write on paper" is offered (false in an anywhere sitting). */
+  paperAllowed?: boolean;
 }

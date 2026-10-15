@@ -1,10 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { ChatMessage } from '../../shared/api.ts';
+import type { ChatMessage, TogetherState } from '../../shared/api.ts';
 import { db, getSettings, updateSettings } from '../lib/db.ts';
 import {
   ApiError,
+  aiCanDo,
   aiCheck,
+  aiRecap,
+  aiReport,
+  aiRolePlay,
+  fetchTts,
   forgetRevokedPairing,
+  getTogether,
   getHousehold,
   getMessages,
   health,
@@ -13,6 +19,7 @@ import {
   normalizeServerUrl,
   onServerReachable,
   pair,
+  postTogetherEventRaw,
   renameMember,
   secureContextProblem,
   sendMessage,
@@ -176,6 +183,115 @@ describe('a phone the server no longer accepts', () => {
     fetchMock.mockResolvedValueOnce(new Response('Authorization required', { status: 401 }));
     await expect(getHousehold()).rejects.toMatchObject({ status: 401, code: 'http_401' });
     expect((await getSettings()).deviceToken).toBe('tok-123');
+  });
+});
+
+describe('v2 routes', () => {
+  const state: TogetherState = {
+    slots: [], goal: null, stages: {}, smooth: {}, sessions: [], tasks: [], checkins: [], capstones: [],
+  };
+
+  it('reads the together state and posts together events', async () => {
+    fetchMock.mockResolvedValueOnce(json(state));
+    await expect(getTogether()).resolves.toEqual(state);
+    expect(lastCall().url).toBe('http://192.168.1.20:8787/api/together');
+
+    fetchMock.mockResolvedValueOnce(json(state, 201));
+    const event = { clientId: 'e1', week: '2026-10-12', event: { type: 'goal' as const, goal: { text: 'Order ramen', targetDate: '2026-12-01' } } };
+    await expect(postTogetherEventRaw(event)).resolves.toEqual(state);
+    const { url, init } = lastCall();
+    expect(url).toBe('http://192.168.1.20:8787/api/together/events');
+    expect(init.method).toBe('POST');
+    expect(JSON.parse(init.body as string)).toEqual(event);
+  });
+
+  it('posts the AI role-play, recap, can-do and report requests', async () => {
+    fetchMock.mockResolvedValueOnce(json({ reply: 'いらっしゃいませ', en: 'Welcome', done: false }));
+    await aiRolePlay({ taskId: 't1', aiRole: 'clerk', goal: 'buy a ticket', history: [] });
+    expect(lastCall().url).toBe('http://192.168.1.20:8787/api/ai/roleplay');
+
+    fetchMock.mockResolvedValueOnce(json({ points: [], praise: 'よくできました' }));
+    await aiRecap({ goal: 'buy a ticket', lines: ['きっぷをください'] });
+    expect(lastCall().url).toBe('http://192.168.1.20:8787/api/ai/recap');
+
+    fetchMock.mockResolvedValueOnce(json({ met: [true], passed: true, feedback: '' }));
+    await aiCanDo({ canDoId: 'u01-c1', kind: 'speak', rubric: ['greets'], text: 'こんにちは' });
+    expect(lastCall().url).toBe('http://192.168.1.20:8787/api/ai/cando');
+
+    fetchMock.mockResolvedValueOnce(new Response(null, { status: 204 }));
+    await expect(aiReport({ kind: 'check', text: 'すしを食べる' })).resolves.toBeUndefined();
+    expect(lastCall().url).toBe('http://192.168.1.20:8787/api/ai/report');
+    expect(JSON.parse(lastCall().init.body as string)).toEqual({ kind: 'check', text: 'すしを食べる' });
+  });
+
+  it('gives AI role-play the long timeout', async () => {
+    useTimerFakes();
+    let aborted = false;
+    fetchMock.mockImplementationOnce((_url, init) => new Promise((resolve) => {
+      init!.signal!.addEventListener('abort', () => { aborted = true; });
+      setTimeout(() => resolve(json({ reply: 'はい', en: 'Yes', done: true })), 20_000);
+    }));
+    const pending = aiRolePlay({ taskId: 't1', aiRole: 'clerk', goal: 'g', history: [] });
+    await vi.advanceTimersByTimeAsync(20_000);
+    await expect(pending).resolves.toMatchObject({ done: true });
+    expect(aborted).toBe(false);
+  });
+
+  it('fetches server speech as a Blob with the text in a JSON body, never in the URL', async () => {
+    fetchMock.mockResolvedValueOnce(new Response(new Uint8Array([82, 73, 70, 70]), { status: 200, headers: { 'Content-Type': 'audio/wav' } }));
+    const blob = await fetchTts({ text: '{今日|きょう}はいい{天気|てんき}', voice: 'f' });
+    expect(blob).toBeInstanceOf(Blob);
+    expect(blob.size).toBe(4);
+    const { url, init, headers } = lastCall();
+    expect(url).toBe('http://192.168.1.20:8787/api/tts');
+    expect(init.method).toBe('POST');
+    expect(headers.Accept).toBe('*/*');
+    expect(JSON.parse(init.body as string)).toEqual({ text: '{今日|きょう}はいい{天気|てんき}', voice: 'f' });
+    expect(url).not.toContain('天気');
+  });
+
+  it('maps a server without an engine to tts_unavailable', async () => {
+    fetchMock.mockResolvedValueOnce(json({ error: 'tts_unavailable' }, 503));
+    await expect(fetchTts({ text: 'はい' })).rejects.toMatchObject({ status: 503, code: 'tts_unavailable' });
+  });
+
+  it('gives up on server speech after 15 seconds', async () => {
+    useTimerFakes();
+    fetchMock.mockImplementationOnce((_url, init) => new Promise((_resolve, reject) => {
+      init!.signal!.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+    }));
+    const pending = fetchTts({ text: 'はい' }).catch((e: unknown) => e);
+    await vi.advanceTimersByTimeAsync(14_999);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(await pending).toMatchObject({ code: 'timeout' });
+  });
+
+  it("stops when the caller's signal aborts, as a permanent 'aborted' error", async () => {
+    fetchMock.mockImplementationOnce((_url, init) => new Promise((_resolve, reject) => {
+      init!.signal!.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+    }));
+    const controller = new AbortController();
+    const pending = fetchTts({ text: 'はい' }, { signal: controller.signal }).catch((e: unknown) => e);
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    controller.abort();
+    expect(await pending).toMatchObject({ status: 0, code: 'aborted', transient: false });
+
+    // Already aborted: nothing is sent.
+    await expect(fetchTts({ text: 'はい' }, { signal: controller.signal })).rejects.toMatchObject({ code: 'aborted' });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('honours an abort that lands while the settings are being read', async () => {
+    fetchMock.mockImplementationOnce((_url, init) => new Promise((_resolve, reject) => {
+      if (init!.signal!.aborted) reject(new DOMException('aborted', 'AbortError'));
+      init!.signal!.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+    }));
+    const controller = new AbortController();
+    const pending = fetchTts({ text: 'はい' }, { signal: controller.signal }).catch((e: unknown) => e);
+    // request() is now awaiting getSettings(); the signal aborts before its listener exists.
+    controller.abort();
+    expect(await pending).toMatchObject({ code: 'aborted' });
   });
 });
 

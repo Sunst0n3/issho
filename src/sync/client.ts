@@ -4,8 +4,15 @@
 // routes send the device token from settings as a bearer token.
 
 import type {
+  AiCanDoRequest,
+  AiCanDoResponse,
   AiCheckRequest,
   AiCheckResponse,
+  AiRecapRequest,
+  AiRecapResponse,
+  AiReportRequest,
+  AiRolePlayRequest,
+  AiRolePlayResponse,
   AiTranslateRequest,
   AiTranslateResponse,
   ChatMessage,
@@ -22,6 +29,9 @@ import type {
   SendMessageRequest,
   SendMessageResponse,
   StatsUploadRequest,
+  TogetherEventRequest,
+  TogetherState,
+  TtsQuery,
   UploadVoiceResponse,
 } from '../../shared/api.ts';
 import { db, getSettings, updateSettings } from '../lib/db.ts';
@@ -30,9 +40,9 @@ import type { LastPairing, OutboxRecord, Settings } from '../lib/types.ts';
 /**
  * A failed request. `status` is the HTTP status, or 0 when there was no response.
  * `code` is the server's `error` field, or one of the client-side codes:
- * 'network' (unreachable), 'timeout', 'unpaired' (no device token),
- * 'bad_response' (unreadable body) and 'invalid_server_url' (the server address
- * can't be one; its message says so in plain words).
+ * 'network' (unreachable), 'timeout', 'aborted' (the caller's signal), 'unpaired'
+ * (no device token), 'bad_response' (unreadable body) and 'invalid_server_url'
+ * (the server address can't be one; its message says so in plain words).
  */
 export class ApiError extends Error {
   readonly status: number;
@@ -46,7 +56,7 @@ export class ApiError extends Error {
 
   /** Worth retrying later: no response, a timeout, rate limiting or a server-side failure. */
   get transient(): boolean {
-    if (this.code === 'invalid_server_url') return false;
+    if (this.code === 'invalid_server_url' || this.code === 'aborted') return false;
     return this.status === 0 || this.status === 408 || this.status === 429 || this.status >= 500;
   }
 }
@@ -54,6 +64,8 @@ export class ApiError extends Error {
 export const DEFAULT_TIMEOUT_MS = 8_000;
 /** AI replies and voice uploads routinely take longer than the default. */
 const SLOW_TIMEOUT_MS = 45_000;
+/** Server speech: the engine synthesizes one request at a time, so a sentence can queue briefly. */
+const TTS_TIMEOUT_MS = 15_000;
 /** Disconnecting waits this long at most for the server to sign the phone out. */
 const SIGN_OUT_TIMEOUT_MS = 3_000;
 
@@ -190,10 +202,15 @@ interface RequestOptions {
   as?: 'json' | 'blob';
   /** Forget the pairing when the server says 'unauthorized' (default true). */
   forgetIfUnauthorized?: boolean;
+  /** Cancels the request: it then fails with ApiError code 'aborted'. */
+  signal?: AbortSignal;
 }
 
+const abortedError = () => new ApiError(0, 'aborted', 'The request was cancelled.');
+
 async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
-  const { method = 'GET', body, auth = true, timeoutMs = DEFAULT_TIMEOUT_MS, as = 'json', forgetIfUnauthorized = true } = opts;
+  const { method = 'GET', body, auth = true, timeoutMs = DEFAULT_TIMEOUT_MS, as = 'json', forgetIfUnauthorized = true, signal } = opts;
+  if (signal?.aborted) throw abortedError();
   const settings = await getSettings();
   const url = endpoint(opts.serverUrl ?? settings.serverUrl, path);
   const headers: Record<string, string> = { Accept: as === 'json' ? 'application/json' : '*/*' };
@@ -211,14 +228,23 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   const controller = new AbortController();
   let timedOut = false;
   const timer = setTimeout(() => { timedOut = true; controller.abort(); }, timeoutMs);
+  const onAbort = () => controller.abort();
+  signal?.addEventListener('abort', onAbort, { once: true });
+  // Cancelled while the settings were read: an aborted signal never fires 'abort' again.
+  if (signal?.aborted) controller.abort();
+  const cleanUp = () => {
+    clearTimeout(timer);
+    signal?.removeEventListener('abort', onAbort);
+  };
   let res: Response;
   try {
     res = await fetch(url, {
       method, headers, body: payload, signal: controller.signal, cache: 'no-store',
     });
   } catch (e) {
-    clearTimeout(timer);
+    cleanUp();
     if (timedOut) throw new ApiError(0, 'timeout', 'The home server took too long to answer.');
+    if (signal?.aborted) throw abortedError();
     throw new ApiError(0, 'network', e instanceof Error ? e.message : 'Could not reach the home server.');
   }
 
@@ -246,9 +272,10 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   } catch (e) {
     if (e instanceof ApiError) throw e;
     if (timedOut) throw new ApiError(0, 'timeout', 'The home server took too long to answer.');
+    if (signal?.aborted) throw abortedError();
     throw new ApiError(0, 'network', e instanceof Error ? e.message : String(e));
   } finally {
-    clearTimeout(timer);
+    cleanUp();
   }
 }
 
@@ -415,6 +442,48 @@ export function aiCheck(req: AiCheckRequest): Promise<AiCheckResponse> {
 /** POST /api/ai/translate. 503 'ai_disabled' when the server has no API key. */
 export function aiTranslate(req: AiTranslateRequest): Promise<AiTranslateResponse> {
   return request('/api/ai/translate', { method: 'POST', body: req, timeoutMs: SLOW_TIMEOUT_MS });
+}
+
+/** POST /api/ai/roleplay: the AI's next line as the task's third role. 503 'ai_disabled' without an API key. */
+export function aiRolePlay(req: AiRolePlayRequest): Promise<AiRolePlayResponse> {
+  return request('/api/ai/roleplay', { method: 'POST', body: req, timeoutMs: SLOW_TIMEOUT_MS });
+}
+
+/** POST /api/ai/recap: a private recap of one member's task lines. 503 'ai_disabled' without an API key. */
+export function aiRecap(req: AiRecapRequest): Promise<AiRecapResponse> {
+  return request('/api/ai/recap', { method: 'POST', body: req, timeoutMs: SLOW_TIMEOUT_MS });
+}
+
+/** POST /api/ai/cando: rubric check of a speak/write can-do. 503 'ai_disabled' without an API key. */
+export function aiCanDo(req: AiCanDoRequest): Promise<AiCanDoResponse> {
+  return request('/api/ai/cando', { method: 'POST', body: req, timeoutMs: SLOW_TIMEOUT_MS });
+}
+
+/** POST /api/ai/report → 204: "This tip seems wrong". */
+export async function aiReport(req: AiReportRequest): Promise<void> {
+  await request<unknown>('/api/ai/report', { method: 'POST', body: req });
+}
+
+/** GET /api/together: the couple's together routine (slots, goal, stages, sessions, tasks, check-ins). */
+export function getTogether(): Promise<TogetherState> {
+  return request('/api/together');
+}
+
+/**
+ * POST /api/together/events (idempotent by clientId). Low level: prefer postTogetherEvent() in
+ * together.ts, which queues the event so it is never lost offline.
+ */
+export function postTogetherEventRaw(req: TogetherEventRequest): Promise<TogetherState> {
+  return request('/api/together/events', { method: 'POST', body: req });
+}
+
+/**
+ * POST /api/tts → the home server's VOICEVOX reading of the text as a WAV Blob. The text goes in
+ * the JSON body, never in the URL, so it never reaches a request log. 503 'tts_unavailable' when
+ * the server has no engine (or it is down), 429 'rate_limited'.
+ */
+export function fetchTts(q: TtsQuery, opts: { signal?: AbortSignal } = {}): Promise<Blob> {
+  return request('/api/tts', { method: 'POST', body: q, as: 'blob', timeoutMs: TTS_TIMEOUT_MS, signal: opts.signal });
 }
 
 /** ws(s)://…/api/ws?token=… for the paired server, or null when unpaired. */

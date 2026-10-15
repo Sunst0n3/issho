@@ -1,8 +1,13 @@
-// The handwriting canvas. The learner writes with a finger, pen or mouse;
-// each finished stroke is checked against the next expected KanjiVG stroke.
-// A correct stroke snaps to the clean model stroke in ink; a wrong one flashes
-// shu and disappears. Buttons (undo, hint, clear, give up) live in the screen
-// and drive the pad through its imperative handle.
+// The handwriting canvas. The learner writes with a finger, pen or mouse.
+// Trace, guided and memory modes check each finished stroke against the next
+// expected KanjiVG stroke: a correct stroke snaps to the clean model stroke in
+// ink; a wrong one flashes shu and disappears. Buttons (undo, hint, clear, give
+// up) live in the screen and drive the pad through its imperative handle.
+//
+// Recall mode (review cards) judges the whole character at once: the ink stays
+// as drawn with no marks, no model and no animation until "Done"; then the
+// strokes are matched in any order (matchCharacterUnordered), the model is drawn
+// over the ink and stroke-order slips get a coaching note.
 
 import {
   forwardRef,
@@ -16,12 +21,30 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { useSettings } from '../lib/hooks.ts';
-import { mistakeMessage } from './describe.ts';
-import { estimateFrame, matchStrokeOf, STYLUS_LENIENCY, type AcceptedStroke, type StrokeAttempt } from './matcher.ts';
+import { mistakeMessage, orderNotes } from './describe.ts';
+import {
+  estimateFrame,
+  matchCharacterUnordered,
+  matchStrokeOf,
+  STYLUS_LENIENCY,
+  type AcceptedStroke,
+  type Frame,
+  type StrokeAttempt,
+  type UnorderedMatch,
+} from './matcher.ts';
 import { BOX, distance, inkWidth, pathLength, pathStart, polylineLength, smoothPath, startDirection, type Point } from './path.ts';
 import './writing.css';
 
-export type WritingMode = 'trace' | 'guided' | 'memory';
+export type WritingMode = 'trace' | 'guided' | 'memory' | 'recall';
+
+/** What a recall attempt produced, reported once by "Done". */
+export interface RecallResult {
+  /** The strokes as drawn, in the order drawn (box units). */
+  strokes: Point[][];
+  match: UnorderedMatch;
+  /** Hint was used during the attempt. */
+  hintUsed: boolean;
+}
 
 export interface WritingResult {
   /** Wrong strokes drawn, in total. */
@@ -44,8 +67,10 @@ export interface WritingPadHandle {
   clear(): void;
   /** Animates the next expected stroke (counted once per stroke). */
   hint(): void;
-  /** Reveals the remaining strokes and finishes the attempt. */
+  /** Reveals the remaining strokes and finishes the attempt (recall: the same as done). */
   giveUp(): void;
+  /** Recall mode: judges what is drawn and reports it through onRecallDone. */
+  done(): void;
 }
 
 export interface WritingPadProps {
@@ -55,11 +80,15 @@ export interface WritingPadProps {
   mode: WritingMode;
   /** Called after every checked stroke; `detail` says why a stroke was rejected. */
   onStrokeResult?: (index: number, ok: boolean, detail: StrokeAttempt) => void;
-  /** Called once, after the last stroke or on give-up. */
+  /** Called once, after the last stroke or on give-up (trace, guided and memory). */
   onComplete?: (result: WritingResult) => void;
+  /** Recall mode: called once, when the learner taps Done. */
+  onRecallDone?: (result: RecallResult) => void;
+  /** Recall mode: the Done button's text. */
+  doneLabel?: string;
   /** What is being written, for the accessible name ("水", "the kanji for water"). */
   label?: string;
-  /** Show the next stroke's start dot and direction arrow. Defaults to on, except in memory mode. */
+  /** Show the next stroke's start dot and direction arrow. Defaults to on, except in memory and recall modes. */
   showStart?: boolean;
   /**
    * Matcher tolerance multiplier (see MatchOptions.leniency). Defaults to the learner's
@@ -103,10 +132,18 @@ interface Attempt {
   flash?: { id: number; d: string };
   status: Status;
   announcement: { id: number; text: string };
+  /** Recall mode: every stroke as drawn, unchecked. */
+  ink: Point[][];
+  /** Recall mode: the judgement once Done was tapped. */
+  recall?: UnorderedMatch;
+  /** Recall mode: bumping it replays the model's stroke order over the ink. */
+  replay: number;
 }
 
 function freshAttempt(): Attempt {
   return {
+    ink: [],
+    replay: 0,
     accepted: [],
     tries: 0,
     mistakes: 0,
@@ -119,6 +156,15 @@ function freshAttempt(): Attempt {
 }
 
 const drawMs = (len: number) => Math.max(MIN_DRAW_MS, (len / DRAW_SPEED) * 1000);
+
+/** The model placed where the learner wrote it: the frame estimated from the strokes that matched. */
+function recallFrame(strokes: readonly string[], ink: readonly Point[][], match: UnorderedMatch): Frame {
+  const accepted: AcceptedStroke[] = [];
+  match.assignment.forEach((j, i) => {
+    if (j !== null && !match.unmatched.includes(i) && ink[j]) accepted.push({ points: ink[j], target: strokes[i] });
+  });
+  return estimateFrame(accepted);
+}
 
 /** Inline custom properties for the dash-offset draw animation. */
 function drawStyle(d: string, delayMs = 0): CSSProperties {
@@ -153,9 +199,10 @@ function StartMarker({ d, arrow }: { d: string; arrow: boolean }) {
 }
 
 export const WritingPad = forwardRef<WritingPadHandle, WritingPadProps>(function WritingPad(
-  { strokes, mode, onStrokeResult, onComplete, label, showStart, leniency, disabled = false, className },
+  { strokes, mode, onStrokeResult, onComplete, onRecallDone, doneLabel = 'Done', label, showStart, leniency, disabled = false, className },
   ref,
 ) {
+  const recallMode = mode === 'recall';
   const { writingHand } = useSettings();
   const effectiveLeniency = leniency ?? (writingHand === 'stylus' ? STYLUS_LENIENCY : 1);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -176,11 +223,11 @@ export const WritingPad = forwardRef<WritingPadHandle, WritingPadProps>(function
   const flashId = useRef(0);
   const announcementId = useRef(0);
 
-  const callbacks = useRef({ onStrokeResult, onComplete });
-  callbacks.current = { onStrokeResult, onComplete };
+  const callbacks = useRef({ onStrokeResult, onComplete, onRecallDone });
+  callbacks.current = { onStrokeResult, onComplete, onRecallDone };
 
   const a = attempt.current;
-  const done = a.accepted.length;
+  const done = recallMode ? Math.min(a.ink.length, strokes.length) : a.accepted.length;
   const total = strokes.length;
 
   const resultOf = (at: Attempt, gaveUp: boolean): WritingResult => {
@@ -220,8 +267,22 @@ export const WritingPad = forwardRef<WritingPadHandle, WritingPadProps>(function
   };
 
   const showHint = (at: Attempt) => {
-    at.hinted.add(at.accepted.length);
+    at.hinted.add(recallMode ? at.ink.length : at.accepted.length);
     at.hintRun++;
+  };
+
+  /** Recall: judge the whole character, draw the model over the ink and report it. */
+  const finishRecall = () => {
+    const at = attempt.current;
+    if (at.status !== 'writing') return;
+    resetStroke();
+    const match = matchCharacterUnordered(strokes, at.ink, { leniency: effectiveLeniency });
+    at.status = 'done';
+    at.recall = match;
+    at.hintRun = 0;
+    announce(at, match.ok ? 'Done. The model is drawn over your writing.' : 'Done. Compare your writing with the model.');
+    rerender();
+    callbacks.current.onRecallDone?.({ strokes: at.ink.map((pts) => [...pts]), match, hintUsed: at.hinted.size > 0 });
   };
 
   // A new node each time, so screen readers repeat a message that recurs.
@@ -266,6 +327,15 @@ export const WritingPad = forwardRef<WritingPadHandle, WritingPadProps>(function
     resetStroke();
     const at = attempt.current;
     if (at.status !== 'writing' || drawn.length === 0) return;
+
+    if (recallMode) {
+      // Kept exactly as drawn: no check, no snapping, nothing that hints at the answer.
+      at.ink.push(drawn);
+      at.hintRun = 0;
+      announce(at, `${at.ink.length} ${at.ink.length === 1 ? 'stroke' : 'strokes'} drawn.`);
+      rerender();
+      return;
+    }
 
     const index = at.accepted.length;
     const accepted: AcceptedStroke[] = at.accepted.map((pts, i) => ({ points: pts, target: strokes[i] }));
@@ -371,9 +441,19 @@ export const WritingPad = forwardRef<WritingPadHandle, WritingPadProps>(function
     if (e.pointerId === activePointer.current?.id) resetStroke();
   };
 
-  useImperativeHandle(ref, () => ({
+  const handle = useRef<WritingPadHandle | null>(null);
+  useImperativeHandle(ref, () => handle.current as WritingPadHandle);
+  handle.current = ({
     undo() {
       const at = attempt.current;
+      if (recallMode) {
+        if (at.status !== 'writing' || at.ink.length === 0) return;
+        at.ink.pop();
+        at.hintRun = 0;
+        announce(at, `Stroke ${at.ink.length + 1} removed.`);
+        rerender();
+        return;
+      }
       if (at.status !== 'writing' || at.accepted.length === 0) return;
       at.accepted.pop();
       at.tries = 0;
@@ -389,6 +469,7 @@ export const WritingPad = forwardRef<WritingPadHandle, WritingPadProps>(function
       if (at.status !== 'writing') {
         attempt.current = freshAttempt();
       } else {
+        at.ink = [];
         at.accepted = [];
         at.tries = 0;
         at.hintRun = 0;
@@ -398,13 +479,21 @@ export const WritingPad = forwardRef<WritingPadHandle, WritingPadProps>(function
     },
     hint() {
       const at = attempt.current;
-      if (at.status !== 'writing' || at.accepted.length >= strokes.length) return;
+      const drawnCount = recallMode ? at.ink.length : at.accepted.length;
+      if (at.status !== 'writing' || drawnCount >= strokes.length) return;
       showHint(at);
-      announce(at, `Showing stroke ${at.accepted.length + 1}.`);
+      announce(at, `Showing stroke ${drawnCount + 1}.`);
       rerender();
+    },
+    done() {
+      if (recallMode) finishRecall();
     },
     giveUp() {
       const at = attempt.current;
+      if (recallMode) {
+        finishRecall();
+        return;
+      }
       if (at.status !== 'writing') return;
       resetStroke();
       clearFlash();
@@ -414,21 +503,26 @@ export const WritingPad = forwardRef<WritingPadHandle, WritingPadProps>(function
       rerender();
       callbacks.current.onComplete?.(resultOf(at, true));
     },
-  }));
+  });
 
   const next = a.status === 'writing' ? strokes[done] : undefined;
   // The start marker also accompanies a hint, in every mode.
-  const markerVisible = next !== undefined && (a.hintRun > 0 || (showStart ?? mode !== 'memory'));
+  const markerVisible = next !== undefined && (a.hintRun > 0 || (showStart ?? (mode !== 'memory' && !recallMode)));
 
   const who = label ? `Writing pad for ${label}` : 'Writing pad';
-  let progress = `${done} of ${total} strokes drawn`;
-  if (a.status === 'done') progress += ', complete';
+  // Recall never says how many strokes the character has: that would be a hint.
+  let progress = recallMode ? `${a.ink.length} ${a.ink.length === 1 ? 'stroke' : 'strokes'} drawn` : `${done} of ${total} strokes drawn`;
+  if (a.status === 'done') progress += recallMode ? ', model shown' : ', complete';
   else if (a.status === 'gaveUp') progress += ', answer shown';
   else if (a.hintRun > 0) progress += `; stroke ${done + 1} hint shown`;
 
   let revealDelay = 0;
+  const recalled = recallMode && a.status === 'done' && a.recall ? a.recall : undefined;
+  const frame = recalled ? recallFrame(strokes, a.ink, recalled) : undefined;
+  const notes = recalled ? orderNotes(recalled) : [];
+  let replayDelay = 0;
 
-  return (
+  const pad = (
     <div className={className ? `writing-pad ${className}` : 'writing-pad'} aria-disabled={disabled || undefined}>
       <svg
         ref={svgRef}
@@ -453,7 +547,21 @@ export const WritingPad = forwardRef<WritingPadHandle, WritingPadProps>(function
 
         <g className="wp-stroke wp-ink">
           {a.accepted.map((_, i) => <path key={i} d={strokes[i]} />)}
+          {recallMode && a.ink.map((pts, i) => <path key={i} className="wp-raw" d={smoothPath(pts)} />)}
         </g>
+
+        {recalled && frame && (
+          <g className="wp-stroke wp-model" transform={`matrix(${frame.scale} 0 0 ${frame.scale} ${frame.dx} ${frame.dy})`}
+            data-testid="recall-model">
+            {a.replay > 0
+              ? strokes.map((d, i) => {
+                const style = drawStyle(d, replayDelay);
+                replayDelay += drawMs(pathLength(d)) + 120;
+                return <path key={`${a.replay}-${i}`} d={d} className="wp-reveal" style={style} />;
+              })
+              : strokes.map((d, i) => <path key={i} d={d} />)}
+          </g>
+        )}
 
         {a.status === 'gaveUp' && (
           <g className="wp-stroke">
@@ -477,6 +585,39 @@ export const WritingPad = forwardRef<WritingPadHandle, WritingPadProps>(function
         <path ref={liveRef} className="wp-live" d="" />
       </svg>
       <p className="visually-hidden" aria-live="polite"><span key={a.announcement.id}>{a.announcement.text}</span></p>
+    </div>
+  );
+  if (!recallMode) return pad;
+
+  return (
+    <div className="wp-recall">
+      {pad}
+      {recallMode && a.status === 'writing' && (
+        <div className="wp-recall-tools">
+          <button type="button" className="btn secondary small" disabled={disabled || a.ink.length === 0}
+            onClick={() => handle.current?.undo()}>Undo</button>
+          <button type="button" className="btn secondary small" disabled={disabled}
+            onClick={() => handle.current?.hint()}>Hint</button>
+          <button type="button" className="btn secondary small" disabled={disabled || a.ink.length === 0}
+            onClick={() => handle.current?.clear()}>Clear</button>
+          <button type="button" className="btn ink wp-done" disabled={disabled || a.ink.length === 0} onClick={finishRecall}>
+            {doneLabel}
+          </button>
+        </div>
+      )}
+      {recalled && notes.length > 0 && (
+        <ul className="wp-notes" aria-label="Stroke order">
+          {notes.map((n) => (
+            <li key={`${n.first}-${n.then}`}>
+              <span>{n.text}</span>
+              <button type="button" className="btn ghost small" onClick={() => {
+                attempt.current.replay++;
+                rerender();
+              }}>Replay</button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 });

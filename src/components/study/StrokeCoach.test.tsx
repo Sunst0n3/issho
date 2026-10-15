@@ -13,7 +13,6 @@ const capitalized = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 beforeEach(async () => {
   await resetStudyDb();
-  localStorage.setItem('issho.write.mode', 'guided');
 });
 
 afterEach(() => {
@@ -69,19 +68,15 @@ describe('stroke coach', () => {
 });
 
 describe('practice pad', () => {
-  it('names the pad by what to write once the character is hidden, and paper mode can start over', async () => {
-    render(<PracticePad char="水" ask="Write the kanji for" target="water" label={'the kanji for "water" (みず)'} />);
+  it('shows the stroke order, then a guided pad to copy it as often as you like', async () => {
+    render(<PracticePad char="水" ask="Write the kanji" target="水" label="水" />);
     expect(screen.getByRole('region', { name: 'Practice writing 水' })).toBeTruthy();
-    fireEvent.click(screen.getByRole('radio', { name: 'Trace' }));
-    expect(await screen.findByRole('img', { name: 'Writing pad for 水 (trace)' })).toBeTruthy();
-    fireEvent.click(screen.getByRole('radio', { name: 'Memory' }));
-    expect(await screen.findByRole('img', { name: 'Writing pad for the kanji for "water" (みず) (memory)' })).toBeTruthy();
-
-    fireEvent.click(screen.getByRole('radio', { name: 'Paper' }));
-    click('Show the strokes');
-    expect(screen.getByRole('img', { name: /Stroke order animation for 水/ })).toBeTruthy();
+    expect(await screen.findByRole('img', { name: /Stroke order of 水/ })).toBeTruthy();
+    expect(screen.getByRole('img', { name: 'Writing pad for 水 (guided)' })).toBeTruthy();
+    expect(screen.queryByRole('radio')).toBeNull();
+    click('Finish writing');
+    expect(coach()).toContain('Nice. Clean strokes.');
     click('Write it again');
-    expect(screen.queryByRole('img', { name: /Stroke order animation/ })).toBeNull();
-    expect(screen.getByRole('button', { name: 'Show the strokes' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Undo' })).toBeTruthy();
   });
 });

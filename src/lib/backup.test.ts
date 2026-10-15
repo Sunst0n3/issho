@@ -1,6 +1,7 @@
 import { Blob as NodeBlob } from 'node:buffer';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createEmptyCard } from 'ts-fsrs';
+import { emptyDay } from '../srs/days.ts';
 import { backupFileName, BackupError, exportBackup, importBackup } from './backup.ts';
 import { db, getSettings, updateSettings } from './db.ts';
 import type { CardRecord, OutboxRecord } from './types.ts';
@@ -8,20 +9,37 @@ import type { CardRecord, OutboxRecord } from './types.ts';
 const introduced = new Date('2026-10-01T09:00:00Z');
 const due = new Date('2026-10-20T09:00:00Z');
 
+/** One row in every v2 table. */
 async function seed() {
-  const card: CardRecord = { ...createEmptyCard(introduced), due, id: 'kanji:水|meaning', itemId: 'kanji:水', kind: 'kanji', type: 'meaning' };
-  await db.items.put({ id: 'kanji:水', kind: 'kanji', key: '水', introducedAt: introduced, customMnemonic: 'water drips' });
+  const card: CardRecord = { ...createEmptyCard(introduced), due, id: 'kanji:水|write', itemId: 'kanji:水', kind: 'kanji', type: 'write' };
+  await db.items.put({ id: 'kanji:水', kind: 'kanji', key: '水', introducedAt: introduced, customMnemonic: 'water drips', via: 'lesson' });
   await db.cards.put(card);
-  await db.reviewLogs.add({ cardId: card.id, itemId: 'kanji:水', grade: 3, reviewedAt: introduced, durationMs: 4000, mode: 'choice', prevState: 0 });
-  await db.days.put({ date: '2026-10-01', studyMs: 600_000, reviews: 10, correct: 9, newItems: 3, sessionComplete: true });
-  await db.savedSentences.put({ id: 's-0001', jp: '{水|みず}', en: 'water', savedAt: introduced });
+  await db.reviewLogs.add({
+    cardId: card.id, itemId: 'kanji:水', kind: 'kanji', type: 'write', grade: 3, reviewedAt: introduced, durationMs: 4000,
+    mode: 'written', prevState: 0, elapsedDays: 0, context: 'first-check',
+  });
+  await db.days.put({ ...emptyDay('2026-10-01'), studyMs: 600_000, reviews: 10, correct: 9, newItems: 3, minimumDone: true, goalMet: true, steps: ['read'] });
+  await db.savedSentences.put({ id: 's-0001', jp: '{水|みず}', en: 'water', savedAt: introduced, source: 'reading', blank: { surface: '水', reading: 'みず' } });
   await db.messages.put({ id: 1, clientId: 'c1', memberId: 'm1', createdAt: '2026-10-01T09:00:00Z', kind: 'text', text: 'hi' });
   const voice = new NodeBlob(['x'], { type: 'audio/mp4' }) as unknown as Blob;
   await db.outbox.bulkPut([
     { clientId: 'o-text', createdAt: introduced, kind: 'text', text: 'later', attempts: 0 },
     { clientId: 'o-voice', createdAt: introduced, kind: 'voice', text: '', audio: voice, attempts: 0 },
   ] satisfies OutboxRecord[]);
-  await updateSettings({ name: 'Carter', onboarded: true, newPerDay: 7, serverUrl: 'http://home:8787', deviceToken: 'secret-token', memberId: 'm1', householdName: 'Home' });
+  await db.encounters.add({ itemId: 'kanji:水', day: '2026-10-01', source: 'sentence', at: introduced });
+  await db.shownSentences.put({ id: 's-0001', day: '2026-10-01', count: 1 });
+  await db.staged.put({ itemId: 'word:1', kanji: '水', releaseDay: '2026-10-04', slot: 2 });
+  await db.stories.put({ storyId: 'st-l0-01', stage: 1, firstDay: '2026-10-01', nextDay: '2026-10-04', gist: [true], cpm: [] });
+  await db.restTokens.put({ date: '2026-09-30', week: '2026-09-28', usedAt: introduced });
+  await db.outputs.put({ id: 'out-1', day: '2026-10-01', target: { ref: 'kanji:水', label: '水', en: 'water' }, draft: 'x', text: 'x', check: 'pending', createdAt: introduced });
+  await db.canDos.put({ id: 'u01-cd1', unit: 1, attempts: 1, passedAt: introduced, via: 'auto' });
+  await db.milestones.put({ id: 'kana-check', reachedAt: introduced });
+  await db.togetherPlans.put({ week: '2026-09-28', plan: { week: '2026-09-28', sessions: [], settledUnit: 0, monthly: false, showcase: false }, updatedAt: introduced });
+  await db.togetherOutbox.put({ clientId: 't1', createdAt: introduced, week: '2026-09-28', event: '{"type":"goal"}', attempts: 0 });
+  await db.partnerQuizzes.put({ quizId: 'q1', role: 'answerer', createdAt: introduced, appliedAt: introduced, graded: 1, practiced: 0 });
+  await db.pitchBoxes.put({ ref: 'word:1', box: 1, nextDay: '2026-10-02', seen: 1, correct: 1 });
+  await db.fluency.add({ kind: 'reread', day: '2026-10-01', at: introduced, value: 240, ref: 'st-l0-01' });
+  await updateSettings({ name: 'Carter', onboarded: true, dailyMinutes: 30, serverUrl: 'http://home:8787', deviceToken: 'secret-token', memberId: 'm1', householdName: 'Home' });
 }
 
 const asFile = (value: unknown) => new Blob([typeof value === 'string' ? value : JSON.stringify(value)], { type: 'application/json' });
@@ -35,7 +53,7 @@ describe('exportBackup', () => {
     await seed();
     const parsed = JSON.parse(await (await exportBackup()).text());
 
-    expect(parsed).toMatchObject({ format: 'issho-backup', version: 1 });
+    expect(parsed).toMatchObject({ format: 'issho-backup', version: 2 });
     expect(Object.keys(parsed.tables).sort()).toEqual(db.tables.map((t) => t.name).sort());
     expect(parsed.tables.items[0].introducedAt).toEqual({ $date: introduced.toISOString() });
     expect(parsed.tables.cards[0].due).toEqual({ $date: due.toISOString() });
@@ -50,32 +68,62 @@ describe('exportBackup', () => {
 });
 
 describe('importBackup', () => {
-  it('validates without changing anything, then restores on apply()', async () => {
+  it('validates without changing anything, then restores every table on apply()', async () => {
     await seed();
+    const before = Object.fromEntries(await Promise.all(db.tables.map(async (t) => [t.name, await t.toArray()] as const)));
     const file = await exportBackup();
     await Promise.all(db.tables.map((t) => t.clear()));
     await updateSettings({ name: 'Someone', serverUrl: 'http://new:8787', deviceToken: 'this-device', memberId: 'm1', householdName: 'Home' });
 
     const plan = await importBackup(file);
-    expect(plan.counts).toMatchObject({ items: 1, cards: 1, reviewLogs: 1, days: 1, settings: 1, outbox: 1, messages: 1, savedSentences: 1 });
+    expect(plan.progressDropped).toBe(false);
+    expect(plan.counts).toMatchObject({ items: 1, cards: 1, reviewLogs: 1, days: 1, settings: 1, outbox: 1, messages: 1, savedSentences: 1, togetherOutbox: 1 });
     expect(plan.exportedAt).toBeInstanceOf(Date);
     expect(await db.items.count()).toBe(0);
 
     await plan.apply();
 
+    for (const table of db.tables) {
+      if (['settings', 'outbox'].includes(table.name)) continue;
+      expect(await table.toArray(), table.name).toEqual(before[table.name]);
+    }
     const item = await db.items.get('kanji:水');
     expect(item?.introducedAt).toBeInstanceOf(Date);
-    expect(item?.introducedAt.getTime()).toBe(introduced.getTime());
     expect(item?.customMnemonic).toBe('water drips');
-    const card = await db.cards.get('kanji:水|meaning');
-    expect(card?.due).toBeInstanceOf(Date);
-    expect(card?.due.getTime()).toBe(due.getTime());
-    expect(await db.reviewLogs.count()).toBe(1);
-    expect((await db.savedSentences.get('s-0001'))?.savedAt).toBeInstanceOf(Date);
+    expect((await db.cards.get('kanji:水|write'))?.due.getTime()).toBe(due.getTime());
 
     // Progress and preferences come from the backup; the pairing stays this device's own.
     const s = await getSettings();
-    expect(s).toMatchObject({ name: 'Carter', newPerDay: 7, onboarded: true, deviceToken: 'this-device', serverUrl: 'http://new:8787' });
+    expect(s).toMatchObject({ name: 'Carter', dailyMinutes: 30, onboarded: true, deviceToken: 'this-device', serverUrl: 'http://new:8787' });
+  });
+
+  it('restores only settings and chat from a v1 backup, and says so', async () => {
+    const v1 = {
+      format: 'issho-backup',
+      version: 1,
+      exportedAt: '2026-09-01T00:00:00Z',
+      tables: {
+        items: [{ id: 'vocab:sw-ai', kind: 'vocab', key: 'sw-ai', introducedAt: { $date: '2026-08-01T00:00:00Z' } }],
+        cards: [{ id: 'vocab:sw-ai|recall', itemId: 'vocab:sw-ai', kind: 'vocab', type: 'recall' }],
+        reviewLogs: [],
+        days: [{ date: '2026-08-01', studyMs: 1, reviews: 1, correct: 1, newItems: 1, sessionComplete: true }],
+        settings: [{ id: 'me', name: 'Carter', onboarded: true, newPerDay: 8, romaji: true, furigana: 'never', memberId: 'm1', serverUrl: 'http://home:8787' }],
+        messages: [{ id: 1, clientId: 'c1', memberId: 'm1', createdAt: '2026-08-01T09:00:00Z', kind: 'text', text: 'hi' }],
+        outbox: [],
+      },
+    };
+    await db.items.put({ id: 'kanji:火', kind: 'kanji', key: '火', introducedAt: new Date() });
+    await updateSettings({ deviceToken: 'this-device', memberId: 'm1', serverUrl: 'http://home:8787' });
+    const plan = await importBackup(asFile(v1));
+    expect(plan.progressDropped).toBe(true);
+    expect(Object.keys(plan.counts).sort()).toEqual(['messages', 'outbox', 'settings']);
+    await plan.apply();
+    expect(await db.items.count()).toBe(0);
+    expect(await db.days.count()).toBe(0);
+    expect((await db.messages.toArray()).map((m) => m.text)).toEqual(['hi']);
+    const s = await getSettings();
+    expect(s).toMatchObject({ name: 'Carter', onboarded: false, dailyMinutes: 30, furigana: 'never', deviceToken: 'this-device' });
+    expect(s).not.toHaveProperty('romaji');
   });
 
   it('replaces existing progress rather than merging', async () => {
@@ -155,8 +203,11 @@ describe('importBackup', () => {
   it.each([
     ['cards', 'stability', 'high'],
     ['cards', 'state', null],
+    ['cards', 'type', 'recall'],
     ['days', 'reviews', '10'],
-    ['items', 'kind', 'spell'],
+    ['items', 'kind', 'vocab'],
+    ['staged', 'releaseDay', 'soon'],
+    ['restTokens', 'week', 3],
   ])('rejects %s rows with a damaged %s', async (table, field, value) => {
     await seed();
     const parsed = JSON.parse(await (await exportBackup()).text());
@@ -168,7 +219,7 @@ describe('importBackup', () => {
     ['not JSON', 'hello', /not valid JSON/],
     ['another app', { format: 'other', version: 1, tables: {} }, /not an Issho backup/],
     ['a newer version', { format: 'issho-backup', version: 99, exportedAt: '2026-10-14T00:00:00Z', tables: {} }, /newer version/],
-    ['missing tables', { format: 'issho-backup', version: 1, exportedAt: '2026-10-14T00:00:00Z', tables: {} }, /missing/],
+    ['missing tables', { format: 'issho-backup', version: 2, exportedAt: '2026-10-14T00:00:00Z', tables: {} }, /missing/],
   ])('rejects %s', async (_name, content, message) => {
     const err = await importBackup(asFile(content)).catch((e: unknown) => e);
     expect(err).toBeInstanceOf(BackupError);

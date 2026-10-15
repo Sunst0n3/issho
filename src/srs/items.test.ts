@@ -1,148 +1,207 @@
-import { Rating, State } from 'ts-fsrs';
-import { beforeEach, describe, expect, it } from 'vitest';
-import { db } from '../lib/db.ts';
-import { DAY_MS } from './days.ts';
-import { cardTypesFor, introduceItem, isIntroduced, knownDueOffsetDays, markKnown, markKnownMany } from './items.ts';
-import { gradeCard } from './scheduler.ts';
-import { at, resetDb } from './test-fixtures.ts';
+import { State } from 'ts-fsrs';
+import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
+import { db, updateSettings } from '../lib/db.ts';
+import type { CardRecord, SuspendReason } from '../lib/types.ts';
+import {
+  cardTypesFor,
+  countsAsNew,
+  introduceItem,
+  isIntroduced,
+  markKnownMany,
+  setPinned,
+  shouldRetire,
+  syncWriteRetirement,
+  upgradeSpelling,
+} from './items.ts';
+import { at, fixtures, resetDb } from './test-fixtures.ts';
+
+vi.mock('../lib/data.ts', async () => (await import('./test-fixtures.ts')).dataMock);
 
 beforeEach(resetDb);
 
-const NOW = at(2026, 10, 14, 9);
-const newItemsToday = async () => (await db.days.get('2026-10-14'))?.newItems ?? 0;
+const NOW = at(2026, 3, 1, 9);
 
-describe('cardTypesFor', () => {
-  it('gives each kind its cards', () => {
-    expect(cardTypesFor('kana', 'あ')).toEqual(['read', 'write']);
-    expect(cardTypesFor('kana', 'ア')).toEqual(['read', 'write']);
-    expect(cardTypesFor('radical', '氵')).toEqual(['meaning']);
-    expect(cardTypesFor('kanji', '水')).toEqual(['meaning', 'reading', 'write']);
-    expect(cardTypesFor('word', '1001')).toEqual(['reading', 'meaning']);
-    expect(cardTypesFor('vocab', 'sw-hai')).toEqual(['meaning', 'recall']);
-    expect(cardTypesFor('grammar', 'wa-desu')).toEqual(['drill']);
-    expect(cardTypesFor('sentence', 's-0001')).toEqual(['read']);
+describe('card types', () => {
+  it('has only the retired suspend reason', () => {
+    expectTypeOf<SuspendReason>().toEqualTypeOf<'retired'>();
   });
 
-  it('gives yōon a read card only', () => {
-    expect(cardTypesFor('kana', 'きゃ')).toEqual(['read']);
-    expect(cardTypesFor('kana', 'ショ')).toEqual(['read']);
-    expect(cardTypesFor('kana', 'ぎゅ')).toEqual(['read']);
+  it('gives each item kind its cards', () => {
+    expect({
+      kana: cardTypesFor('kana', 'あ'),
+      kanaRule: cardTypesFor('kanaRule', 'hira-yoon'),
+      kanji: cardTypesFor('kanji', '水'),
+      kanjiZeroWord: cardTypesFor('kanji', '乙', { zeroWord: true }),
+      word: cardTypesFor('word', '1'),
+      wordUse: cardTypesFor('word', '1', { use: true }),
+      core: cardTypesFor('core', 'cw-0001'),
+      coreUse: cardTypesFor('core', 'cw-0001', { use: true }),
+      coreSpelled: cardTypesFor('core', 'cw-0001', { spelled: true }),
+      coreUseSpelled: cardTypesFor('core', 'cw-0001', { use: true, spelled: true }),
+      grammar: cardTypesFor('grammar', 'wa-desu'),
+      grammarRecognition: cardTypesFor('grammar', 'passive', { recognitionOnly: true }),
+      sentence: cardTypesFor('sentence', 's-1'),
+    }).toMatchInlineSnapshot(`
+      {
+        "core": [
+          "listen",
+        ],
+        "coreSpelled": [
+          "listen",
+          "read",
+        ],
+        "coreUse": [
+          "listen",
+          "produce",
+        ],
+        "coreUseSpelled": [
+          "listen",
+          "produce",
+          "read",
+        ],
+        "grammar": [
+          "comprehend",
+          "build",
+        ],
+        "grammarRecognition": [
+          "comprehend",
+        ],
+        "kana": [
+          "read",
+          "write",
+        ],
+        "kanaRule": [
+          "read",
+        ],
+        "kanji": [
+          "write",
+        ],
+        "kanjiZeroWord": [
+          "write",
+          "meaning",
+        ],
+        "sentence": [
+          "cloze",
+        ],
+        "word": [
+          "read",
+        ],
+        "wordUse": [
+          "read",
+          "produce",
+        ],
+      }
+    `);
+  });
+
+  it('counts every kind but saved sentences as new', () => {
+    expect(countsAsNew('kanji')).toBe(true);
+    expect(countsAsNew('core')).toBe(true);
+    expect(countsAsNew('sentence')).toBe(false);
   });
 });
 
 describe('introduceItem', () => {
-  it('creates the item and its new cards and counts it as new today', async () => {
-    const { item, cards, created } = await introduceItem('kanji', '水', NOW);
-    expect(created).toBe(true);
-    expect(item).toMatchObject({ id: 'kanji:水', kind: 'kanji', key: '水' });
-    expect(item.introducedAt).toBeInstanceOf(Date);
-    expect(cards.map((c) => c.id)).toEqual(['kanji:水|meaning', 'kanji:水|reading', 'kanji:水|write']);
-    expect(cards.every((c) => c.state === State.New && c.due.getTime() === NOW.getTime())).toBe(true);
-    expect(await db.cards.where('itemId').equals('kanji:水').count()).toBe(3);
-    expect(await newItemsToday()).toBe(1);
-  });
-
-  it('is idempotent', async () => {
-    await introduceItem('kana', 'あ', NOW);
-    await gradeCard('kana:あ|read', Rating.Good, { durationMs: 1, mode: 'choice', now: NOW });
-    const again = await introduceItem('kana', 'あ', at(2026, 10, 14, 18));
-
-    expect(again.created).toBe(false);
-    expect(again.item.introducedAt.getTime()).toBe(NOW.getTime());
-    expect(again.cards.find((c) => c.type === 'read')!.state).toBe(State.Learning);
-    expect(await db.items.count()).toBe(1);
+  it('creates the item and its cards once', async () => {
+    const first = await introduceItem('word', '1002', NOW, { ctx: { use: true } });
+    expect(first.created).toBe(true);
+    expect(first.item).toMatchObject({ id: 'word:1002', kind: 'word', key: '1002', via: 'lesson' });
+    expect(first.cards.map((c) => [c.id, c.state])).toEqual([['word:1002|read', State.New], ['word:1002|produce', State.New]]);
+    const second = await introduceItem('word', '1002', new Date(NOW.getTime() + 1000), { ctx: { use: true } });
+    expect(second.created).toBe(false);
     expect(await db.cards.count()).toBe(2);
-    expect(await newItemsToday()).toBe(1);
+    expect(await isIntroduced('word:1002')).toBe(true);
+    expect(await isIntroduced('word:9999')).toBe(false);
   });
 
-  it('is idempotent when called twice at once', async () => {
-    const results = await Promise.all([introduceItem('kana', 'い', NOW), introduceItem('kana', 'い', NOW)]);
-    expect(results.filter((r) => r.created)).toHaveLength(1);
-    expect(await db.cards.count()).toBe(2);
-    expect(await newItemsToday()).toBe(1);
-  });
-
-  it('restores missing cards of an existing item without counting it again', async () => {
-    await introduceItem('kanji', '火', NOW);
-    await db.cards.delete('kanji:火|write');
-    const { created, cards } = await introduceItem('kanji', '火', NOW);
-    expect(created).toBe(false);
-    expect(cards.map((c) => c.type)).toEqual(['meaning', 'reading', 'write']);
-    expect(await db.cards.count()).toBe(3);
-    expect(await newItemsToday()).toBe(1);
-  });
-
-  it("doesn't count words or saved sentences toward the day's new items", async () => {
-    await introduceItem('word', '1001', NOW);
-    await introduceItem('sentence', 's-0001', NOW);
-    expect(await newItemsToday()).toBe(0);
-    await introduceItem('vocab', 'sw-hai', NOW);
-    await introduceItem('radical', '氵', NOW);
-    await introduceItem('grammar', 'wa-desu', NOW);
-    expect(await newItemsToday()).toBe(3);
-  });
-
-  it('creates only a read card for yōon', async () => {
-    const { cards } = await introduceItem('kana', 'きゃ', NOW);
-    expect(cards.map((c) => c.id)).toEqual(['kana:きゃ|read']);
+  it('sets spelledAt for a core word introduced with its kanji spelling', async () => {
+    const { item } = await introduceItem('core', 'cw-0040', NOW, { ctx: { spelled: true }, via: 'staged' });
+    expect(item.spelledAt).toEqual(NOW);
+    expect(item.via).toBe('staged');
   });
 });
 
-describe('markKnown', () => {
-  it('introduces the item with review cards due within 1–14 days, not counted as new', async () => {
-    await markKnown('kanji', '山', NOW);
-    expect(await isIntroduced('kanji:山')).toBe(true);
-    const cards = await db.cards.where('itemId').equals('kanji:山').toArray();
-    expect(cards).toHaveLength(3);
+describe('upgradeSpelling', () => {
+  it('adds the read card once and sets spelledAt', async () => {
+    await introduceItem('core', 'cw-0040', at(2026, 2, 1), { ctx: { use: true } });
+    const up = await upgradeSpelling('cw-0040', NOW);
+    expect(up.created).toBe(true);
+    expect(up.cards.map((c) => c.id)).toEqual(['core:cw-0040|read']);
+    expect(up.item.spelledAt).toEqual(NOW);
+    const again = await upgradeSpelling('cw-0040', new Date(NOW.getTime() + 1000));
+    expect(again.created).toBe(false);
+    expect((await db.items.get('core:cw-0040'))?.spelledAt).toEqual(NOW);
+    expect(await db.cards.where('itemId').equals('core:cw-0040').count()).toBe(3);
+  });
+
+  it('refuses a word that was never introduced', async () => {
+    await expect(upgradeSpelling('cw-0042', NOW)).rejects.toThrow(/not introduced/);
+  });
+});
+
+describe('markKnownMany', () => {
+  it('introduces items via placement and puts their cards in Review, spread over the stability', async () => {
+    await markKnownMany([{ kind: 'kana', key: 'あ' }, { kind: 'kana', key: 'い' }, { kind: 'kana', key: 'あ' }], NOW, 10);
+    const cards = await db.cards.toArray();
+    expect(cards).toHaveLength(4);
     for (const card of cards) {
       expect(card.state).toBe(State.Review);
-      expect(card.due).toBeInstanceOf(Date);
-      const days = (card.due.getTime() - NOW.getTime()) / DAY_MS;
+      expect(card.stability).toBe(10);
+      const days = (card.due.getTime() - NOW.getTime()) / 86_400_000;
       expect(days).toBeGreaterThanOrEqual(1);
-      expect(days).toBeLessThanOrEqual(14);
-      expect(card.stability).toBeGreaterThan(0);
-      expect(card.last_review).toEqual(NOW);
+      expect(days).toBeLessThanOrEqual(10);
     }
-    expect(await newItemsToday()).toBe(0);
+    expect((await db.items.get('kana:あ'))?.via).toBe('placement');
   });
 
-  it('produces cards FSRS can keep scheduling', async () => {
-    await markKnown('kana', 'あ', NOW);
-    const card = (await db.cards.get('kana:あ|read'))!;
-    const later = new Date(card.due.getTime() + 60_000);
-    const next = await gradeCard(card.id, Rating.Good, { durationMs: 1, mode: 'choice', now: later });
-    expect(next.state).toBe(State.Review);
-    expect(next.due.getTime() - later.getTime()).toBeGreaterThan(7 * DAY_MS);
-  });
-
-  it('graduates cards still learning but leaves reviewed cards alone', async () => {
-    await introduceItem('kana', 'か', NOW);
-    await db.cards.update('kana:か|write', { state: State.Review, stability: 3, due: at(2026, 10, 16) });
-    await markKnown('kana', 'か', NOW);
-    expect((await db.cards.get('kana:か|read'))!.state).toBe(State.Review);
-    expect(await db.cards.get('kana:か|write')).toMatchObject({ stability: 3, due: at(2026, 10, 16) });
-    expect(await db.items.count()).toBe(1);
-  });
-
-  it('spreads a big batch over the coming days', async () => {
-    const chars = [...'あいうえおかきくけこさしすせそたちつてとなにぬねの'];
-    await markKnownMany([...chars.map((key) => ({ kind: 'kana' as const, key })), { kind: 'kana', key: 'あ' }], NOW);
-    expect(await db.items.count()).toBe(chars.length);
-    const offsets = (await db.cards.toArray()).map((c) => Math.round((c.due.getTime() - NOW.getTime()) / DAY_MS));
-    expect(new Set(offsets).size).toBeGreaterThanOrEqual(10);
-    expect(Math.min(...offsets)).toBeGreaterThanOrEqual(1);
-    expect(Math.max(...offsets)).toBeLessThanOrEqual(14);
-  });
-
-  it('spreads deterministically per card', () => {
-    expect(knownDueOffsetDays('kana:あ|read')).toBe(knownDueOffsetDays('kana:あ|read'));
+  it('leaves cards already in Review alone', async () => {
+    await introduceItem('kana', 'あ', NOW);
+    const review: CardRecord = { ...(await db.cards.get('kana:あ|read'))!, state: State.Review, stability: 40 };
+    await db.cards.put(review);
+    await markKnownMany([{ kind: 'kana', key: 'あ' }], NOW, 10);
+    expect((await db.cards.get('kana:あ|read'))?.stability).toBe(40);
+    expect((await db.cards.get('kana:あ|write'))?.stability).toBe(10);
   });
 });
 
-describe('isIntroduced', () => {
-  it('reports whether the item exists', async () => {
-    expect(await isIntroduced('kana:あ')).toBe(false);
-    await introduceItem('kana', 'あ', NOW);
-    expect(await isIntroduced('kana:あ')).toBe(true);
+describe('write retirement', () => {
+  const card = (stability: number) => ({ kind: 'kanji' as const, type: 'write' as const, stability });
+
+  it('retires a stable write card past the write list unless pinned', () => {
+    expect(shouldRetire(card(22), 501, 500, false)).toBe(true);
+    expect(shouldRetire(card(22), 499, 500, false)).toBe(false);
+    expect(shouldRetire(card(20), 501, 500, false)).toBe(false);
+    expect(shouldRetire(card(22), 501, 500, true)).toBe(false);
+    expect(shouldRetire({ kind: 'word', type: 'read', stability: 99 }, 501, 500, false)).toBe(false);
+  });
+
+  async function stableKanji(char: string, stability: number) {
+    await introduceItem('kanji', char, NOW);
+    const write = (await db.cards.get(`kanji:${char}|write`))!;
+    await db.cards.put({ ...write, state: State.Review, stability });
+  }
+
+  it('retires and restores cards as the write list changes, and on pinning', async () => {
+    // Fixture ranks: 日 6, 人 13.
+    await stableKanji('日', 30);
+    await stableKanji('人', 30);
+    await stableKanji('本', 5);
+    await updateSettings({ writeList: 8 });
+    expect(await syncWriteRetirement(NOW)).toEqual({ retired: 1, restored: 0 });
+    expect((await db.cards.get('kanji:人|write'))?.suspended).toBe('retired');
+    expect((await db.cards.get('kanji:日|write'))?.suspended).toBeUndefined();
+    expect((await db.cards.get('kanji:本|write'))?.suspended).toBeUndefined();
+    expect(await syncWriteRetirement(NOW)).toEqual({ retired: 0, restored: 0 });
+
+    await setPinned('人', true);
+    expect((await db.cards.get('kanji:人|write'))?.suspended).toBeUndefined();
+    expect((await db.items.get('kanji:人'))?.pinned).toBe(true);
+    await setPinned('人', false);
+    expect((await db.cards.get('kanji:人|write'))?.suspended).toBe('retired');
+
+    await updateSettings({ writeList: 500 });
+    expect(await syncWriteRetirement(NOW)).toEqual({ retired: 0, restored: 1 });
+    expect((await db.cards.get('kanji:人|write'))?.suspended).toBeUndefined();
+    expect(fixtures.curriculum.units.find((u) => u.char === '人')?.index).toBe(12);
   });
 });

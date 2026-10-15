@@ -1,36 +1,35 @@
-import { GrammarDrillCard } from './GrammarDrillCard.tsx';
+import { ClozeCard } from './ClozeCard.tsx';
+import { GrammarBuildCard } from './GrammarBuildCard.tsx';
+import { GrammarComprehendCard } from './GrammarComprehendCard.tsx';
 import { KanaReadCard } from './KanaReadCard.tsx';
+import { KanaRuleCard } from './KanaRuleCard.tsx';
 import { KanaWriteCard } from './KanaWriteCard.tsx';
 import { KanjiMeaningCard } from './KanjiMeaningCard.tsx';
-import { KanjiReadingCard } from './KanjiReadingCard.tsx';
 import { KanjiWriteCard } from './KanjiWriteCard.tsx';
-import { RadicalMeaningCard } from './RadicalMeaningCard.tsx';
-import { SentenceReadCard } from './SentenceReadCard.tsx';
+import { ListenCard } from './ListenCard.tsx';
+import { ProduceCard } from './ProduceCard.tsx';
 import type { CardAnswer, PreparedCard } from './types.ts';
-import { VocabMeaningCard } from './VocabMeaningCard.tsx';
-import { VocabRecallCard } from './VocabRecallCard.tsx';
-import { WordMeaningCard } from './WordMeaningCard.tsx';
-import { WordReadingCard } from './WordReadingCard.tsx';
+import { WordReadCard } from './WordReadCard.tsx';
 
-/** The question for one prepared card, by card type and item kind. */
-export function ReviewCard({ prepared, onAnswer, practice }: {
+/** The question for one prepared card, by view. */
+export function ReviewCard({ prepared, onAnswer, handsBusy = false, paperAllowed = true }: {
   prepared: PreparedCard;
   onAnswer: (answer: CardAnswer) => void;
-  practice?: boolean;
+  handsBusy?: boolean;
+  paperAllowed?: boolean;
 }) {
-  const props = { onAnswer, practice };
+  const props = { onAnswer, handsBusy, paperAllowed };
   switch (prepared.view) {
     case 'kana-read': return <KanaReadCard prepared={prepared} {...props} />;
     case 'kana-write': return <KanaWriteCard prepared={prepared} {...props} />;
-    case 'radical-meaning': return <RadicalMeaningCard prepared={prepared} {...props} />;
-    case 'kanji-meaning': return <KanjiMeaningCard prepared={prepared} {...props} />;
-    case 'kanji-reading': return <KanjiReadingCard prepared={prepared} {...props} />;
+    case 'kana-rule': return <KanaRuleCard prepared={prepared} {...props} />;
     case 'kanji-write': return <KanjiWriteCard prepared={prepared} {...props} />;
-    case 'word-reading': return <WordReadingCard prepared={prepared} {...props} />;
-    case 'word-meaning': return <WordMeaningCard prepared={prepared} {...props} />;
-    case 'vocab-meaning': return <VocabMeaningCard prepared={prepared} {...props} />;
-    case 'vocab-recall': return <VocabRecallCard prepared={prepared} {...props} />;
-    case 'grammar-drill': return <GrammarDrillCard prepared={prepared} {...props} />;
-    case 'sentence-read': return <SentenceReadCard prepared={prepared} {...props} />;
+    case 'kanji-meaning': return <KanjiMeaningCard prepared={prepared} {...props} />;
+    case 'word-read': return <WordReadCard prepared={prepared} {...props} />;
+    case 'produce': return <ProduceCard prepared={prepared} {...props} />;
+    case 'listen': return <ListenCard prepared={prepared} {...props} />;
+    case 'grammar-comprehend': return <GrammarComprehendCard prepared={prepared} {...props} />;
+    case 'grammar-build': return <GrammarBuildCard prepared={prepared} {...props} />;
+    case 'cloze': return <ClozeCard prepared={prepared} {...props} />;
   }
 }

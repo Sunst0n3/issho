@@ -25,6 +25,7 @@ export function toMessageRecord(m: ChatMessage): ChatMessageRecord {
   if (m.writtenAt !== undefined) rec.writtenAt = m.writtenAt;
   if (m.transcript !== undefined) rec.transcript = m.transcript;
   if (m.audioId !== undefined) rec.audioId = m.audioId;
+  if (m.tag !== undefined) rec.tag = m.tag;
   return rec;
 }
 
@@ -69,6 +70,8 @@ export interface ChatItem {
   audioId?: string;
   /** The local recording of a voice message that has not been delivered yet. */
   audio?: Blob;
+  /** 'daily' = the sender's output-step sentence of the day. */
+  tag?: 'daily';
   status: 'sent' | 'pending' | 'failed';
   /** Server error code when status is 'failed'. */
   error?: string;
@@ -122,6 +125,7 @@ export function useChatMessages(limit = 200): ChatItem[] | undefined {
       text: m.text,
       transcript: m.transcript,
       audioId: m.audioId,
+      tag: m.tag,
       status: 'sent',
       mine: m.memberId === me,
     }));
@@ -139,6 +143,7 @@ export function useChatMessages(limit = 200): ChatItem[] | undefined {
         transcript: p.transcript,
         audioId: p.audioId,
         audio: p.audio,
+        tag: p.tag,
         status: p.failed ? 'failed' : 'pending',
         error: p.failed,
         mine: true,

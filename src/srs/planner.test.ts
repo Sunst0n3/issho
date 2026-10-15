@@ -1,487 +1,359 @@
-import { Rating, State, type Grade } from 'ts-fsrs';
+import { Rating, State } from 'ts-fsrs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { cardId, db, updateSettings } from '../lib/db.ts';
-import type { CardRecord, SentenceEntry } from '../lib/types.ts';
-import { applyKnownKana, introducePlanItem } from './course.ts';
-import { DAY_MS } from './days.ts';
-import { introduceItem, markKnownMany } from './items.ts';
+import { dayKey, db } from '../lib/db.ts';
+import type { CardRecord, CardType, ItemKind, ItemRecord, SentenceEntry } from '../lib/types.ts';
+import { applyPlacement, introducePlanItem } from './course.ts';
+import { addDays, DAY_MS, emptyDay, getDay } from './days.ts';
+import { fluencySlotOpen } from './fluency.ts';
+import { strandMinutes } from './governor.ts';
+import { upgradeSpelling } from './items.ts';
 import {
-  backlogThreshold,
-  capReviews,
-  deferNewCards,
-  dueCount,
-  estimateMinutes,
-  markSentencesShown,
+  batchItems,
+  finishStep,
+  leakMask,
+  MICRO_SECONDS,
   nextStudyDayStart,
-  orderReviews,
-  pickIPlusOne,
-  pickSentences,
+  orderWarmup,
+  planMakeup,
+  planMicro,
   planToday,
-  readingCountFor,
-  resetSentencesShown,
+  siblingGroups,
+  startSitting,
+  type WarmupCard,
 } from './planner.ts';
-import { learnedToday } from './progress.ts';
 import { gradeCard, newCardRecord } from './scheduler.ts';
-import { at, BASIC_HIRAGANA, CURRICULUM, fixtures, inTimeZone, KANA, resetDb } from './test-fixtures.ts';
+import { at, BASIC_HIRAGANA, BASIC_KATAKANA, fixtures, resetDb, RULES } from './test-fixtures.ts';
 
 vi.mock('../lib/data.ts', async () => (await import('./test-fixtures.ts')).dataMock);
 
 beforeEach(resetDb);
 
-const NOW = at(2026, 10, 14, 9);
+/** Friday 2026-03-20, 9 a.m. */
+const NOW = at(2026, 3, 20, 9);
+const TODAY = dayKey(NOW);
+const daysAgo = (n: number, h = 9) => new Date(NOW.getTime() - n * DAY_MS + (h - 9) * 3_600_000);
 
-/** A review card for kanji:<n> that became due `daysAgo` days before NOW. */
-function dueCard(n: number, daysAgo: number, patch: Partial<CardRecord> = {}): CardRecord {
-  const due = new Date(NOW.getTime() - daysAgo * DAY_MS);
-  return {
-    ...newCardRecord(`kanji:k${n}`, 'kanji', 'meaning', due),
-    state: State.Review,
-    stability: 5,
+/** Today is course day n: n − 1 study days before it, the whole sprint introduced on the first. */
+async function seedCourseDay(n: number): Promise<void> {
+  await db.days.bulkPut(
+    Array.from({ length: n - 1 }, (_, i) => ({ ...emptyDay(addDays(TODAY, -(i + 1))), reviews: 5, studyMs: 1_200_000, minimumDone: true })),
+  );
+  const first = daysAgo(n - 1);
+  const items: ItemRecord[] = [
+    ...[...BASIC_HIRAGANA, ...BASIC_KATAKANA].map((c): ItemRecord => ({ id: `kana:${c}`, kind: 'kana', key: c, introducedAt: first, via: 'lesson' })),
+    ...RULES.map((r): ItemRecord => ({ id: `kanaRule:${r.id}`, kind: 'kanaRule', key: r.id, introducedAt: first, via: 'lesson' })),
+  ];
+  await db.items.bulkPut(items);
+}
+
+/** An item (introduced `introducedDaysAgo`) with one card. */
+async function addCard(
+  itemId: string,
+  type: CardType,
+  opts: { introducedDaysAgo?: number; state?: State; dueDaysAgo?: number; stability?: number } = {},
+): Promise<CardRecord> {
+  const [kind, key] = [itemId.slice(0, itemId.indexOf(':')) as ItemKind, itemId.slice(itemId.indexOf(':') + 1)];
+  const introducedAt = daysAgo(opts.introducedDaysAgo ?? 20);
+  if (!(await db.items.get(itemId))) await db.items.put({ id: itemId, kind, key, introducedAt, via: 'lesson' });
+  const state = opts.state ?? State.Review;
+  const stability = opts.stability ?? 5;
+  const due = daysAgo(opts.dueDaysAgo ?? 0);
+  const card: CardRecord = {
+    ...newCardRecord(itemId, kind, type, introducedAt),
+    state,
+    stability,
     difficulty: 5,
-    reps: 2,
-    last_review: new Date(due.getTime() - 5 * DAY_MS),
-    scheduled_days: 5,
-    ...patch,
+    reps: state === State.New ? 0 : 3,
+    last_review: state === State.New ? undefined : new Date(due.getTime() - stability * DAY_MS),
+    scheduled_days: stability,
+    due: state === State.New ? introducedAt : due,
   };
+  await db.cards.put(card);
+  return card;
 }
 
-async function addDue(count: number): Promise<void> {
-  await db.cards.bulkAdd(Array.from({ length: count }, (_, i) => dueCard(i, (i % 20) + 1)));
-}
+describe('pure helpers', () => {
+  it('groups a card with its siblings', () => {
+    expect(siblingGroups({ itemId: 'kanji:日', kind: 'kanji', type: 'write' }, [])).toEqual(['item:kanji:日', 'k:日']);
+    expect(siblingGroups({ itemId: 'word:1002', kind: 'word', type: 'read' }, ['日', '本'])).toEqual(['item:word:1002', 'k:日', 'k:本']);
+    expect(siblingGroups({ itemId: 'grammar:x', kind: 'grammar', type: 'build' }, [])).toEqual(['item:grammar:x']);
+  });
 
-describe('orderReviews', () => {
-  it('puts cards still in their first steps first, then the most overdue', () => {
+  const warm = (id: string, patch: Partial<WarmupCard>): WarmupCard => ({
+    id, itemId: id, type: 'read', state: State.Review, r: 0.9, due: NOW, introducedDay: '2026-01-01', groups: [`item:${id}`], value: 0, ...patch,
+  });
+
+  it("orders yesterday's learning cards first, then other learning cards, then reviews by retrievability", () => {
     const cards = [
-      dueCard(1, 1),
-      dueCard(2, 5),
-      dueCard(3, 0.01, { state: State.Learning }),
-      dueCard(4, 3),
-      dueCard(5, 0.5, { state: State.Relearning }),
+      warm('review-high', { r: 0.95 }),
+      warm('review-low', { r: 0.6 }),
+      warm('learning-old', { state: State.Learning, introducedDay: '2026-03-10', due: daysAgo(0.1) }),
+      warm('learning-yesterday', { state: State.Learning, introducedDay: '2026-03-19', due: daysAgo(0.05) }),
+      warm('review-tie-valuable', { r: 0.6, value: 2 }),
     ];
-    expect(orderReviews(cards).map((c) => c.itemId)).toEqual(['kanji:k5', 'kanji:k3', 'kanji:k2', 'kanji:k4', 'kanji:k1']);
+    const { order } = orderWarmup(cards, { yesterday: '2026-03-19', takenGroups: new Set(), catchUp: false });
+    expect(order).toEqual(['learning-yesterday', 'learning-old', 'review-tie-valuable', 'review-low', 'review-high']);
   });
-});
 
-describe('capReviews', () => {
-  it('caps Review-state cards only, keeping every card in its first steps', () => {
+  it('keeps cards sharing a group at least 10 apart in catch-up, burying nothing', () => {
     const cards = [
-      dueCard(1, 1),
-      dueCard(2, 5),
-      dueCard(3, 0.01, { state: State.Learning }),
-      dueCard(4, 3),
-      dueCard(5, 0.5, { state: State.Relearning }),
-      dueCard(6, 0, { state: State.New }),
+      ...Array.from({ length: 30 }, (_, i) => warm(`x${i}`, { r: 0.5 + i / 100 })),
+      warm('a', { r: 0.1, groups: ['item:a', 'k:日'] }),
+      warm('b', { r: 0.11, groups: ['item:b', 'k:日'] }),
+      warm('c', { r: 0.12, groups: ['item:c', 'k:日'] }),
     ];
-    const ids = (room: number) => capReviews(cards, room).map((c) => c.itemId);
-    expect(ids(2)).toEqual(['kanji:k5', 'kanji:k3', 'kanji:k6', 'kanji:k2', 'kanji:k4']);
-    expect(ids(0)).toEqual(['kanji:k5', 'kanji:k3', 'kanji:k6']);
-    expect(ids(-4)).toEqual(ids(0));
-  });
-});
-
-describe('planToday: reviews', () => {
-  it('lists due cards, most overdue first, leaving out future and suspended cards', async () => {
-    await db.cards.bulkAdd([
-      dueCard(1, 1),
-      dueCard(2, 3),
-      dueCard(3, -1), // due tomorrow
-      dueCard(4, 2, { suspended: true }),
-    ]);
-    const plan = await planToday(NOW);
-    expect(plan.reviews).toEqual(['kanji:k2|meaning', 'kanji:k1|meaning']);
-    expect(plan.backlog).toBe(2);
-    expect(await dueCount(NOW)).toBe(2);
+    const { order, bury } = orderWarmup(cards, { yesterday: null, takenGroups: new Set(), catchUp: true });
+    expect(bury).toEqual([]);
+    expect(order).toHaveLength(33);
+    const pos = ['a', 'b', 'c'].map((id) => order.indexOf(id));
+    expect(pos[1] - pos[0]).toBeGreaterThanOrEqual(10);
+    expect(pos[2] - pos[1]).toBeGreaterThanOrEqual(10);
   });
 
-  it('caps reviews per day across several sessions', async () => {
-    await updateSettings({ maxReviewsPerDay: 5 });
-    await addDue(8);
-
-    const morning = await planToday(NOW);
-    expect(morning.reviews).toHaveLength(5);
-    for (const id of morning.reviews.slice(0, 3)) {
-      await gradeCard(id, Rating.Good, { durationMs: 1000, mode: 'choice', now: NOW });
-    }
-
-    const noon = await planToday(at(2026, 10, 14, 12));
-    expect(noon.reviews).toHaveLength(2);
-    for (const id of noon.reviews) await gradeCard(id, Rating.Good, { durationMs: 1000, mode: 'choice', now: at(2026, 10, 14, 12) });
-
-    const evening = await planToday(at(2026, 10, 14, 21));
-    expect(evening.reviews).toEqual([]);
-    expect(evening.backlog).toBe(3);
-
-    const tomorrow = await planToday(at(2026, 10, 15, 9));
-    expect(tomorrow.reviews.length).toBeGreaterThanOrEqual(3);
-    expect(tomorrow.reviews.length).toBeLessThanOrEqual(5);
-  });
-
-  it('adds every card in its first steps on top of the cap', async () => {
-    await updateSettings({ maxReviewsPerDay: 5 });
-    await addDue(8);
-    await db.cards.bulkAdd([
-      dueCard(101, 0.01, { state: State.Learning }),
-      dueCard(102, 0.02, { state: State.Relearning }),
-      newCardRecord('kana:あ', 'kana', 'read', NOW),
-    ]);
-    const plan = await planToday(NOW);
-    expect(plan.reviews.slice(0, 3)).toEqual(['kanji:k102|meaning', 'kanji:k101|meaning', 'kana:あ|read']);
-    expect(plan.reviews).toHaveLength(8);
-    expect(plan.backlog).toBe(11);
-  });
-
-  it('only counts answers to Review-state cards toward the cap', async () => {
-    await updateSettings({ maxReviewsPerDay: 2 });
-    await addDue(4); // k3 is the most overdue, then k2
-    await db.cards.add(newCardRecord('kana:あ', 'kana', 'read', NOW));
-    const minutes = (m: number) => new Date(NOW.getTime() + m * 60_000);
-    const grade = (id: string, rating: Grade, m: number) =>
-      gradeCard(id, rating, { durationMs: 1000, mode: 'choice', now: minutes(m) });
-
-    // Learning steps, however many, leave the cap alone.
-    for (const m of [0, 2, 4]) await grade('kana:あ|read', Rating.Again, m);
-    // A lapse uses one review and comes back for relearning the same day.
-    await grade('kanji:k3|meaning', Rating.Again, 5);
-    expect((await db.days.get('2026-10-14'))!.reviews).toBe(4);
-
-    const plan = await planToday(minutes(60));
-    expect(plan.reviews.slice(0, 2).sort()).toEqual(['kana:あ|read', 'kanji:k3|meaning']);
-    expect(plan.reviews.slice(2)).toEqual(['kanji:k2|meaning']);
-  });
-
-  /** Grades the first planned review at `time`. */
-  async function reviewOne(time: Date): Promise<void> {
-    const [id] = (await planToday(time)).reviews;
-    await gradeCard(id, Rating.Good, { durationMs: 1000, mode: 'choice', now: time });
-  }
-
-  it('counts the cap per study day, rolling over at 4 a.m.', async () => {
-    await updateSettings({ maxReviewsPerDay: 2 });
-    await addDue(6);
-    await reviewOne(at(2026, 10, 14, 3, 59)); // the 13th's study day
-    await reviewOne(at(2026, 10, 14, 4, 0));
-    expect((await planToday(at(2026, 10, 14, 4, 1))).reviews).toHaveLength(1);
-    await reviewOne(at(2026, 10, 15, 3, 59));
-    expect((await planToday(at(2026, 10, 15, 3, 59))).reviews).toEqual([]);
-    expect((await planToday(at(2026, 10, 15, 4, 0))).reviews).toHaveLength(2);
-  });
-
-  it('counts the whole 25-hour study day when the clocks go back', () =>
-    inTimeZone('America/New_York', async () => {
-      // The study day of Sat 2026-10-31 runs from 04:00 EDT to Sun 04:00 EST.
-      await updateSettings({ maxReviewsPerDay: 2 });
-      await addDue(6);
-      await reviewOne(new Date(2026, 9, 31, 4, 0));
-      await reviewOne(new Date(2026, 10, 1, 3, 59)); // 24 h 59 min later
-      expect((await planToday(new Date(2026, 10, 1, 3, 59))).reviews).toEqual([]);
-      expect((await planToday(new Date(2026, 10, 1, 4, 0))).reviews).toHaveLength(2);
-    }));
-
-  it("leaves the previous day's answers out when the clocks go forward", () =>
-    inTimeZone('America/New_York', async () => {
-      // The study day of Sat 2026-03-07 is 23 hours long.
-      await updateSettings({ maxReviewsPerDay: 2 });
-      await db.cards.bulkAdd(Array.from({ length: 6 }, (_, i) => dueCard(i, 250 + i)));
-      await reviewOne(new Date(2026, 2, 7, 3, 59)); // Friday's study day
-      await reviewOne(new Date(2026, 2, 7, 4, 0));
-      expect((await planToday(new Date(2026, 2, 8, 3, 59))).reviews).toHaveLength(1);
-    }));
-});
-
-describe('planToday: new items', () => {
-  it('offers newPerDay minus what was already introduced today', async () => {
-    fixtures.survival = [];
-    let plan = await planToday(NOW);
-    expect(plan.newItems.map((p) => p.key)).toEqual([...'あいうえお']);
-    expect(plan.newBlocked).toBeUndefined();
-
-    await introduceItem('kana', 'あ', NOW);
-    await introduceItem('kana', 'い', NOW);
-    await introduceItem('word', '1001', NOW); // words don't count
-    plan = await planToday(at(2026, 10, 14, 19));
-    expect(plan.newItems.map((p) => p.key)).toEqual(['う', 'え', 'お']);
-
-    await updateSettings({ newPerDay: 2 });
-    expect((await planToday(at(2026, 10, 14, 20))).newItems).toEqual([]);
-  });
-
-  it('pauses new items while the backlog is too big, with a friendly reason', async () => {
-    await addDue(151);
-    const plan = await planToday(NOW);
-    expect(plan.backlog).toBe(151);
-    expect(plan.reviews).toHaveLength(120);
-    expect(plan.newItems).toEqual([]);
-    expect(plan.newBlocked?.reason).toMatch(/151 reviews/);
-  });
-
-  it('works through a 300-card backlog a capped day at a time', async () => {
-    await addDue(300);
-    await db.cards.add(dueCard(999, 0.01, { state: State.Relearning }));
-    const plan = await planToday(NOW);
-    expect(plan.backlog).toBe(301);
-    expect(plan.reviews).toHaveLength(121);
-    expect(plan.reviews[0]).toBe('kanji:k999|meaning');
-    const dueOf = async (id: string) => (await db.cards.get(id))!.due.getTime();
-    expect(await dueOf(plan.reviews[1])).toBeLessThanOrEqual(await dueOf(plan.reviews[120]));
-    expect(plan.newItems).toEqual([]);
-    expect(plan.newBlocked?.reason).toMatch(/301 reviews/);
-  });
-
-  it('shows 300 cards in their first steps uncapped, and pauses new items for them', async () => {
-    await db.cards.bulkAdd(
-      Array.from({ length: 300 }, (_, i) => dueCard(i, (i % 20) + 1, { state: i % 3 ? State.Learning : State.New, reps: i % 3 })),
-    );
-    let plan = await planToday(NOW);
-    expect(plan.reviews).toHaveLength(300);
-    expect(plan.backlog).toBe(300);
-    expect(plan.newItems).toEqual([]);
-    expect(plan.newBlocked?.reason).toMatch(/300 reviews/);
-
-    await db.cards.bulkAdd(Array.from({ length: 200 }, (_, i) => dueCard(1000 + i, 1)));
-    plan = await planToday(NOW);
-    expect(plan.reviews).toHaveLength(300 + 120);
-    const cards = await db.cards.bulkGet(plan.reviews);
-    expect(cards.slice(0, 300).every((c) => c!.state !== State.Review)).toBe(true);
-    expect(plan.backlog).toBe(500);
-  });
-
-  it('counts cards in their first steps toward the backlog pause', async () => {
-    await updateSettings({ maxReviewsPerDay: 20 });
-    await addDue(30);
-    await db.cards.bulkAdd(Array.from({ length: 10 }, (_, i) => dueCard(200 + i, 0.01, { state: State.Relearning })));
-    let plan = await planToday(NOW);
-    expect(plan.backlog).toBe(40);
-    expect(plan.reviews).toHaveLength(30);
-    expect(plan.newBlocked).toBeUndefined();
-
-    await db.cards.add(dueCard(300, 0.01, { state: State.Learning }));
-    plan = await planToday(NOW);
-    expect(plan.reviews).toHaveLength(31);
-    expect(plan.newItems).toEqual([]);
-    expect(plan.newBlocked?.reason).toMatch(/41 reviews/);
-  });
-
-  it("doesn't report a pause once the day's new items are done", async () => {
-    await updateSettings({ newPerDay: 2 });
-    await addDue(151);
-    expect((await planToday(NOW)).newBlocked).toBeDefined();
-    await introduceItem('kana', 'あ', NOW);
-    await introduceItem('kana', 'い', NOW);
-    const plan = await planToday(NOW);
-    expect(plan.newItems).toEqual([]);
-    expect(plan.newBlocked).toBeUndefined();
-  });
-
-  it('tops the day up to newPerDay in a later session without pushing out words or grammar', async () => {
-    await markKnownMany(BASIC_HIRAGANA.map((key) => ({ kind: 'kana' as const, key })), NOW);
-    const morning = await planToday(NOW);
-    expect(morning.newItems.map((p) => p.key)).toEqual(['が', 'ご', 'きゃ', 'sw-ai', 'g-wa']);
-    for (const item of morning.newItems.slice(0, 3)) await introducePlanItem(item, NOW);
-
-    const evening = await planToday(at(2026, 10, 14, 20));
-    expect(evening.newItems.map((p) => p.key)).toEqual(['sw-ai', 'g-wa']);
-    for (const item of evening.newItems) await introducePlanItem(item, at(2026, 10, 14, 20));
-
-    expect((await planToday(at(2026, 10, 14, 22))).newItems).toEqual([]);
-  });
-
-  it('starts on the curriculum when all kana are known from settings, and brings them back as reviews', async () => {
-    await updateSettings({ knowsHiragana: true, knowsKatakana: true, maxReviewsPerDay: 20 });
-    const fromSettings = (await planToday(NOW)).newItems.map((p) => p.key);
-    expect(fromSettings).toEqual(['亻', '一', '人', 'sw-ai', 'g-wa']);
-
-    await applyKnownKana(NOW);
-    const plan = await planToday(NOW);
-    expect(plan.reviews).toEqual([]);
-    expect(plan.newItems.map((p) => p.key)).toEqual(fromSettings);
-    expect(await learnedToday(NOW)).toEqual([]);
-
-    const kanaCards = await db.cards.where('kind').equals('kana').count();
-    const later = await planToday(new Date(NOW.getTime() + 15 * DAY_MS));
-    expect(later.backlog).toBe(kanaCards);
-    expect(later.reviews).toHaveLength(20);
-    expect(later.newBlocked?.reason).toMatch(new RegExp(`${kanaCards} reviews`));
-  });
-
-  it('reports no pause once the course has nothing new left, and says the course is complete', async () => {
-    fixtures.survival = [];
-    fixtures.grammar = [];
-    await markKnownMany([
-      ...KANA.map((k) => ({ kind: 'kana' as const, key: k.char })),
-      ...CURRICULUM.units.map((u) => ({ kind: u.type, key: u.char })),
-    ], NOW);
-    await addDue(151);
-    const plan = await planToday(NOW);
-    expect(plan.newItems).toEqual([]);
-    expect(plan.newBlocked).toBeUndefined();
-    expect(plan.courseComplete).toBe(true);
-  });
-
-  it('is not complete with every kanji met while survival words or grammar are left', async () => {
-    await markKnownMany([
-      ...KANA.map((k) => ({ kind: 'kana' as const, key: k.char })),
-      ...CURRICULUM.units.map((u) => ({ kind: u.type, key: u.char })),
-    ], NOW);
-    await addDue(151);
-    let plan = await planToday(NOW);
-    expect(plan.courseComplete).toBe(false);
-    expect(plan.newBlocked).toBeDefined();
-    // Also when today's new items are done.
-    await updateSettings({ newPerDay: 0 });
-    plan = await planToday(NOW);
-    expect(plan.courseComplete).toBe(false);
-    expect(plan.newBlocked).toBeUndefined();
-  });
-
-  it('resumes new items at the threshold', async () => {
-    await addDue(150);
-    const plan = await planToday(NOW);
-    expect(plan.newBlocked).toBeUndefined();
-    expect(plan.newItems.length).toBeGreaterThan(0);
-  });
-
-  it('uses twice the daily cap when that is lower than 150', async () => {
-    expect(backlogThreshold(120)).toBe(150);
-    expect(backlogThreshold(20)).toBe(40);
-    await updateSettings({ maxReviewsPerDay: 20 });
-    await addDue(41);
-    expect((await planToday(NOW)).newBlocked).toBeDefined();
-  });
-
-  it('estimates the session length', async () => {
-    await addDue(10);
-    const plan = await planToday(NOW);
-    expect(plan.estimateMinutes).toBe(estimateMinutes(10, plan.newItems, plan.reading.length));
-    expect(plan.estimateMinutes).toBeGreaterThanOrEqual(5);
-  });
-});
-
-describe('deferNewCards', () => {
-  it('moves new cards left out of the first check to the next study day, leaving answered ones alone', async () => {
-    await introduceItem('kanji', '一', NOW);
-    const [reading, meaning] = [cardId('kanji:一', 'reading'), cardId('kanji:一', 'meaning')];
-    await gradeCard(meaning, Rating.Good, { durationMs: 1000, mode: 'choice', now: NOW });
-    const answeredDue = (await db.cards.get(meaning))!.due;
-    await deferNewCards([reading, meaning], NOW);
-    expect((await db.cards.get(reading))!.due).toEqual(at(2026, 10, 15, 4));
-    expect((await db.cards.get(meaning))!.due).toEqual(answeredDue);
-    expect((await planToday(NOW)).reviews).not.toContain(reading);
-    expect((await planToday(at(2026, 10, 15, 4))).reviews).toContain(reading);
+  it('batches sprint kana in fives, a rule alone, and everything else in fours with grammar last', () => {
+    const plan = (kind: 'kana' | 'kanaRule' | 'kanji' | 'core' | 'grammar' | 'staged', n: number) =>
+      ({ itemId: `${kind}:${n}`, kind, key: String(n), priceSec: 1, stream: 'kanji' as const });
+    const batches = batchItems([...Array.from({ length: 7 }, (_, i) => plan('kana', i)), plan('kanaRule', 0)]);
+    expect(batches.map((b) => b.items.length)).toEqual([5, 2, 1]);
+    const mixed = batchItems([plan('grammar', 1), plan('core', 1), plan('kanji', 1), plan('staged', 1), plan('kanji', 2), plan('core', 2)]);
+    expect(mixed.map((b) => b.items.map((i) => i.kind))).toEqual([['kanji', 'kanji', 'staged', 'core'], ['core', 'grammar']]);
   });
 
   it('starts the next study day at 4 a.m.', () => {
-    expect(nextStudyDayStart(at(2026, 10, 14, 9))).toEqual(at(2026, 10, 15, 4));
-    expect(nextStudyDayStart(at(2026, 10, 15, 2))).toEqual(at(2026, 10, 15, 4));
-  });
-});
-
-describe('estimateMinutes', () => {
-  it('rounds up and counts kanji words', () => {
-    expect(estimateMinutes(0, [], 0)).toBe(0);
-    expect(estimateMinutes(5, [], 0)).toBe(1);
-    expect(estimateMinutes(0, [{ itemId: 'kanji:一', kind: 'kanji', key: '一', words: ['1', '2'] }], 0)).toBe(3);
-  });
-});
-
-describe('pickIPlusOne', () => {
-  const s = (id: string, jp: string): SentenceEntry => ({ id, jp, en: id });
-  const sentences = [
-    s('none', 'あおい'),
-    s('known', '{一|いち}'),
-    s('one-new', '{一|ひと}り{人|ひと}'),
-    s('two-new', '{大|おお}きい{水|みず}'),
-    s('recent', '{山|やま}'),
-  ];
-
-  it('keeps sentences with at most one unknown kanji', () => {
-    const ids = pickIPlusOne(sentences, new Set(['一']), [], { allowKanaOnly: true }).map((x) => x.id);
-    expect(ids).toContain('known');
-    expect(ids).toContain('one-new');
-    expect(ids).toContain('recent');
-    expect(ids).toContain('none');
-    expect(ids).not.toContain('two-new');
+    expect(nextStudyDayStart(at(2026, 3, 20, 9))).toEqual(at(2026, 3, 21, 4));
+    expect(nextStudyDayStart(at(2026, 3, 20, 2))).toEqual(at(2026, 3, 20, 4));
   });
 
-  it('allows kana-only sentences only when asked (phase 1)', () => {
-    expect(pickIPlusOne(sentences, new Set(), []).map((x) => x.id)).not.toContain('none');
-    expect(pickIPlusOne(sentences, new Set(), [], { allowKanaOnly: true }).map((x) => x.id)).toContain('none');
-  });
-
-  it('prefers recently learned kanji, then a new kanji to stretch toward', () => {
-    const known = new Set(['一', '山', '大']);
-    const ids = pickIPlusOne(sentences, known, ['山', '一'], { allowKanaOnly: true }).map((x) => x.id);
-    expect(ids).toEqual(['recent', 'one-new', 'known', 'two-new', 'none']);
-  });
-
-  it('counts unknown kana (furigana included) as new things in phase 1', () => {
-    const course = new Set([...'あいうえおかきくけこちとひまみやりず']);
-    const pick = (kanji: string[], kana: string) =>
-      pickIPlusOne(sentences, new Set(kanji), [], { allowKanaOnly: true, kana: { course, known: new Set([...kana]) } }).map(
-        (x) => x.id,
-      );
-    expect(pick([], 'あいうえお')).toEqual(['none']);
-    expect(pick([], 'あいうえおち')).toEqual(['known', 'none']);
-    expect(pick(['一'], 'あいうえおちひとり')).toEqual(['one-new', 'none', 'known']);
-  });
-
-  it('leaves out excluded sentences', () => {
-    const ids = pickIPlusOne(sentences, new Set(['一']), [], { exclude: new Set(['known']) }).map((x) => x.id);
-    expect(ids).not.toContain('known');
-  });
-});
-
-describe('pickSentences', () => {
-  it('needs the kana of a sentence to be known in phase 1', async () => {
-    expect(await pickSentences(4, { now: NOW })).toEqual([]);
-    for (const ch of 'あいうえお') await introduceItem('kana', ch, NOW);
-    expect((await pickSentences(4, { now: NOW })).map((x) => x.id)).toEqual(['s-ichi', 's-kana']);
-  });
-
-  it('drops kana-only sentences after phase 1 and follows the kanji learned', async () => {
-    await updateSettings({ knowsHiragana: true, knowsKatakana: true });
-    await applyKnownKana(NOW);
-    expect((await pickSentences(4, { now: NOW })).map((x) => x.id)).toEqual(['s-ichi']);
-    await introduceItem('kanji', '一', NOW);
-    expect((await pickSentences(4, { now: NOW })).map((x) => x.id)).toEqual(['s-hito', 's-ichi']);
-  });
-
-  it('rests sentences for a week after they are shown', async () => {
-    await updateSettings({ knowsHiragana: true, knowsKatakana: true });
-    await introduceItem('kanji', '一', NOW);
-    markSentencesShown(['s-hito'], NOW);
-    expect((await pickSentences(4, { now: at(2026, 10, 20, 9) })).map((x) => x.id)).toEqual(['s-ichi']);
-    expect((await pickSentences(4, { now: at(2026, 10, 21, 9) })).map((x) => x.id)).toEqual(['s-hito', 's-ichi']);
-  });
-
-  it('keeps the history in memory while storage refuses writes', async () => {
-    await updateSettings({ knowsHiragana: true, knowsKatakana: true });
-    await introduceItem('kanji', '一', NOW);
-    const setItem = vi.spyOn(localStorage, 'setItem').mockImplementation(() => {
-      throw new DOMException('full', 'QuotaExceededError');
-    });
-    try {
-      markSentencesShown(['s-hito'], NOW);
-      expect((await pickSentences(4, { now: NOW })).map((x) => x.id)).toEqual(['s-ichi']);
-    } finally {
-      setItem.mockRestore();
-      resetSentencesShown();
+  it('leaves the read block at least 3 minutes on days 15–60 at 25 min, and no fluency slot', () => {
+    for (let day = 15; day <= 60; day++) {
+      const strand = strandMinutes(day, 500, 25);
+      expect(fluencySlotOpen(strand, 'normal', 2)).toBe(false);
+      expect(strand - 1).toBeGreaterThanOrEqual(3);
     }
+    expect(fluencySlotOpen(4, 'normal', 1)).toBe(false);
+    expect(fluencySlotOpen(6, 'normal', 1)).toBe(true);
+    expect(fluencySlotOpen(6, 'catch-up', 1)).toBe(false);
+    expect(fluencySlotOpen(6, 'micro', 1)).toBe(false);
   });
+});
 
-  it('forgets shown sentences when the history is reset', async () => {
-    await updateSettings({ knowsHiragana: true, knowsKatakana: true });
-    await introduceItem('kanji', '一', NOW);
-    markSentencesShown(['s-hito'], NOW);
-    resetSentencesShown();
-    expect((await pickSentences(4, { now: NOW })).map((x) => x.id)).toEqual(['s-hito', 's-ichi']);
-  });
-
-  it('feeds planToday with a phase-sized reading list', async () => {
-    await updateSettings({ knowsHiragana: true, knowsKatakana: true });
-    fixtures.sentences = Array.from({ length: 6 }, (_, i) => ({ id: `s-${i}`, jp: '{一|いち}', en: '' }));
+describe('planToday', () => {
+  it('buries a sibling until the next study day; startSitting is idempotent', async () => {
+    await seedCourseDay(20);
+    await addCard('kanji:日', 'write', { dueDaysAgo: 6 });
+    await addCard('word:1002', 'read', { dueDaysAgo: 1 });
     const plan = await planToday(NOW);
-    expect(plan.reading).toEqual(['s-0', 's-1', 's-2']);
-    expect(readingCountFor(1)).toBe(2);
-    expect(readingCountFor(3)).toBe(4);
+    expect(plan.warmup).toEqual(['kanji:日|write']);
+    expect(plan.bury).toEqual(['word:1002|read']);
+    await startSitting(plan, NOW);
+    const until = nextStudyDayStart(NOW);
+    expect((await db.cards.get('word:1002|read'))?.due).toEqual(until);
+    await startSitting(plan, new Date(NOW.getTime() + 60_000));
+    expect((await db.cards.get('word:1002|read'))?.due).toEqual(until);
+  });
+
+  it('buries a card whose group was reviewed earlier today', async () => {
+    await seedCourseDay(20);
+    await addCard('kanji:日', 'write', { dueDaysAgo: 1 });
+    await gradeCard('kanji:日|write', Rating.Good, { durationMs: 5000, mode: 'written', now: daysAgo(0, 7) });
+    await addCard('word:1002', 'read', { dueDaysAgo: 1 });
+    const plan = await planToday(NOW);
+    expect(plan.warmup).toEqual([]);
+    expect(plan.bury).toEqual(['word:1002|read']);
+  });
+
+  it('never puts New cards or cards of items introduced today in the warm-up; every New card is checked', async () => {
+    await seedCourseDay(20);
+    await addCard('core:cw-0040', 'listen', { introducedDaysAgo: 7, dueDaysAgo: -3 });
+    await upgradeSpelling('cw-0040', daysAgo(0, 8));
+    await addCard('word:1001', 'read', { introducedDaysAgo: 0, dueDaysAgo: 0, state: State.Learning });
+    await addCard('grammar:wa-desu', 'comprehend', { introducedDaysAgo: 1, state: State.New });
+    const plan = await planToday(NOW);
+    expect(plan.warmup).toEqual([]);
+    expect(plan.pendingCheck).toEqual(expect.arrayContaining(['core:cw-0040|read', 'grammar:wa-desu|comprehend']));
+    expect(plan.pendingCheck).toHaveLength(2);
+  });
+
+  it('gives an anywhere sitting the whole warm-up, write cards included, and nothing else', async () => {
+    await seedCourseDay(20);
+    await addCard('kanji:日', 'write', { dueDaysAgo: 1 });
+    await addCard('word:1004', 'read', { dueDaysAgo: 1 });
+    await addCard('grammar:wa-desu', 'comprehend', { introducedDaysAgo: 1, state: State.New });
+    const plan = await planToday(NOW, { sitting: 'anywhere' });
+    expect(plan.warmup).toEqual(expect.arrayContaining(['kanji:日|write', 'word:1004|read']));
+    expect(plan).toMatchObject({ paperAllowed: false, teach: [], pendingCheck: [], read: null, output: null, fluency: null });
+  });
+
+  it('after an anywhere sitting, a desk plan still has the unreviewed write cards plus teach, read, check and output', async () => {
+    await seedCourseDay(20);
+    fixtures.sentences = [{
+      id: 's-1', jp: '{日本|にほん}', en: 'Japan', grammar: [], unit: 1, refs: ['word:1002'],
+      tokens: [{ s: '日本', r: 'にほん', ref: 'word:1002', k: 'c' }],
+    } satisfies SentenceEntry];
+    await addCard('kanji:日', 'write', { dueDaysAgo: 1 });
+    await addCard('word:1002', 'produce', { introducedDaysAgo: 3, dueDaysAgo: -5 });
+    await addCard('grammar:wa-desu', 'comprehend', { introducedDaysAgo: 1, state: State.New });
+    const anywhere = await planToday(NOW, { sitting: 'anywhere' });
+    await startSitting(anywhere, NOW);
+    const desk = await planToday(daysAgo(0, 19), { sitting: 'desk' });
+    expect(desk.warmup).toContain('kanji:日|write');
+    expect(desk.paperAllowed).toBe(true);
+    expect(desk.teach.length).toBeGreaterThan(0);
+    expect(desk.pendingCheck).toContain('grammar:wa-desu|comprehend');
+    expect(desk.read?.sentences).toEqual([{ id: 's-1', target: 'word:1002' }]);
+    expect(desk.output?.target.ref).toBe('word:1002');
+  });
+
+  it('teaches only what is not yet introduced in a later sitting; steps are recorded once', async () => {
+    await seedCourseDay(20);
+    const morning = await planToday(NOW);
+    const firstBatch = morning.teach[0].items;
+    for (const item of firstBatch) await introducePlanItem(item, NOW);
+    const evening = await planToday(daysAgo(0, 19));
+    const later = evening.teach.flatMap((b) => b.items.map((i) => i.itemId));
+    for (const item of firstBatch) expect(later).not.toContain(item.itemId);
+    expect(evening.partOfDayDone).toBe(true);
+
+    await finishStep('read', NOW);
+    await finishStep('read', NOW);
+    expect((await getDay(TODAY)).steps).toEqual(['read']);
+    expect((await planToday(NOW)).doneSteps).toEqual(['read']);
+    expect((await planToday(NOW)).read).toBeNull();
+  });
+
+  it('in catch-up buries nothing, spaces siblings and shows no counts', async () => {
+    await seedCourseDay(40);
+    for (let i = 0; i < 120; i++) await addCard(`kanji:${String.fromCodePoint(0x5000 + i)}`, 'write', { dueDaysAgo: 3 + (i % 5) });
+    await addCard('kanji:日', 'write', { dueDaysAgo: 20 });
+    await addCard('word:1002', 'read', { dueDaysAgo: 20 });
+    await addCard('word:1008', 'read', { dueDaysAgo: 20 });
+    const plan = await planToday(NOW);
+    expect(plan.mode).toBe('catch-up');
+    expect(plan.counts).toBeUndefined();
+    expect(plan.bury).toEqual([]);
+    expect(plan.teach).toEqual([]);
+    const pos = ['kanji:日|write', 'word:1002|read', 'word:1008|read'].map((id) => plan.warmup.indexOf(id)).filter((p) => p >= 0).sort((a, b) => a - b);
+    expect(pos.length).toBeGreaterThanOrEqual(2);
+    for (let i = 1; i < pos.length; i++) expect(pos[i] - pos[i - 1]).toBeGreaterThanOrEqual(10);
+    await startSitting(plan, NOW);
+    expect((await getDay(TODAY)).catchUp).toBe(true);
+  });
+
+  it('plans the normal day after missed days (the welcome-back is only on request)', async () => {
+    await seedCourseDay(20);
+    await db.days.bulkDelete([addDays(TODAY, -1), addDays(TODAY, -2), addDays(TODAY, -3)]);
+    const plan = await planToday(NOW);
+    expect(['normal', 'catch-up']).toContain(plan.mode);
+  });
+
+  it('gives the same plan when re-planned with nothing changed', async () => {
+    await seedCourseDay(20);
+    await addCard('kanji:日', 'write', { dueDaysAgo: 2 });
+    await addCard('word:1004', 'read', { dueDaysAgo: 1 });
+    expect(await planToday(NOW)).toEqual(await planToday(NOW));
+  });
+
+  it('estimates today and tomorrow in minutes', async () => {
+    await seedCourseDay(20);
+    const plan = await planToday(NOW);
+    expect(plan.estimateMin).toBeGreaterThan(0);
+    expect(plan.estimateMin).toBeLessThanOrEqual(28);
+    expect(plan.tomorrowMin).toBeGreaterThan(0);
+    expect(plan.counts?.newItems).toBe(plan.teach.reduce((s, b) => s + b.items.length, 0));
+  });
+
+  it('leaves the unused strand reserve out of the estimate once no read, output or fluency step is left', async () => {
+    await seedCourseDay(20);
+    fixtures.sentences = [{
+      id: 's-1', jp: '{日本|にほん}', en: 'Japan', grammar: [], unit: 1, refs: ['word:1002'],
+      tokens: [{ s: '日本', r: 'にほん', ref: 'word:1002', k: 'c' }],
+    } satisfies SentenceEntry];
+    await addCard('word:1002', 'produce', { introducedDaysAgo: 3, dueDaysAgo: -5 });
+    // The morning sitting read for 90 s of the 4-minute reserve.
+    await db.days.put({ ...emptyDay(TODAY), strandMs: 90_000 });
+    const open = await planToday(daysAgo(0, 19));
+    expect(open.warmup).toEqual([]);
+    expect(open.read).not.toBeNull();
+    expect(open.output).not.toBeNull();
+    const newSec = open.teach.flatMap((b) => b.items).reduce((s, i) => s + i.priceSec, 0);
+    expect(open.estimateMin).toBe(Math.ceil((newSec + 4 * 60 - 90) / 60));
+
+    await finishStep('read', NOW);
+    await finishStep('output', NOW);
+    const done = await planToday(daysAgo(0, 19));
+    expect(done).toMatchObject({ read: null, output: null, fluency: null });
+    expect(done.estimateMin).toBe(Math.ceil(newSec / 60));
+  });
+
+  it('runs the sprint on day 1: two batches of five kana and the kana words', async () => {
+    fixtures.kanaExamples = { あ: { kana: 'あい', en: 'love' }, か: { kana: 'かお', en: 'face' }, さ: { kana: 'さけ', en: 'salmon' } };
+    const plan = await planToday(NOW);
+    expect(plan.mode).toBe('sprint');
+    expect(plan.courseDay).toBe(1);
+    expect(plan.teach.map((b) => b.items.map((i) => i.key).join(''))).toEqual(['あいうえお', 'かきくけこ']);
+    expect(plan.estimateMin).toBe(11);
+    expect(plan.read?.kind).toBe('kana-words');
+    expect(plan.read?.kanaWords.map((w) => w.ref)).toEqual(['kanaEx:あ', 'kanaEx:か']);
+    expect(plan.output).toBeNull();
+  });
+
+  it('teaches the other script on day 1 right after a same-day placement check', async () => {
+    fixtures.kanaExamples = {
+      あ: { kana: 'あい', en: 'love' }, か: { kana: 'かお', en: 'face' }, さ: { kana: 'さけ', en: 'salmon' },
+      た: { kana: 'たこ', en: 'octopus' }, な: { kana: 'なし', en: 'pear' }, は: { kana: 'はな', en: 'flower' },
+      ま: { kana: 'まめ', en: 'bean' }, や: { kana: 'やま', en: 'mountain' }, ら: { kana: 'らく', en: 'ease' },
+      ア: { kana: 'アイ', en: 'eye (loan)' }, カ: { kana: 'カオ', en: 'face (kana)' },
+    };
+    await applyPlacement('hiragana', 20, daysAgo(0, 8));
+    const plan = await planToday(NOW);
+    expect(plan.mode).toBe('sprint');
+    const kana = plan.teach.flatMap((b) => b.items).filter((i) => i.kind === 'kana').map((i) => i.key);
+    expect(kana.join('')).toBe('アイウエオカキクケコ');
+    // The read block covers today's two katakana lessons (3 words each, today's kana first), not 46 more hiragana.
+    expect(plan.read?.kanaWords).toHaveLength(6);
+    expect(plan.read?.kanaWords.slice(0, 2).map((w) => w.ref)).toEqual(['kanaEx:ア', 'kanaEx:カ']);
+  });
+});
+
+describe('micro and make-up plans', () => {
+  it('plans 3 minutes of the most overdue non-write cards, nothing new', async () => {
+    await seedCourseDay(20);
+    for (let i = 0; i < 40; i++) await addCard(`word:${5000 + i}`, 'read', { dueDaysAgo: 1 + i });
+    await addCard('kanji:日', 'write', { dueDaysAgo: 30 });
+    const plan = await planMicro(NOW, { welcomeBack: true });
+    expect(plan.mode).toBe('welcome-back');
+    expect(plan.warmup).not.toContain('kanji:日|write');
+    expect(plan.warmup.length).toBeGreaterThan(0);
+    expect(plan.warmup[0]).toBe('word:5039|read');
+    expect(plan.estimateMin * 60).toBeLessThanOrEqual(MICRO_SECONDS);
+    expect(plan).toMatchObject({ teach: [], pendingCheck: [], read: null, output: null, fluency: null });
+    expect((await planMicro(NOW)).mode).toBe('micro');
+  });
+
+  it('plans a make-up of review-ahead without today’s items', async () => {
+    await seedCourseDay(20);
+    await addCard('word:1004', 'read', { dueDaysAgo: -1 });
+    await addCard('word:1005', 'read', { dueDaysAgo: -5 });
+    await addCard('word:1001', 'read', { introducedDaysAgo: 0, dueDaysAgo: -1, state: State.Learning });
+    const plan = await planMakeup(NOW);
+    expect(plan.mode).toBe('makeup');
+    expect(plan.warmup).toEqual(['word:1004|read']);
+    expect(plan.estimateMin).toBe(10);
+  });
+});
+
+describe('leakMask', () => {
+  it('lists what is due before the rollover and not yet answered today', async () => {
+    await seedCourseDay(20);
+    await addCard('word:1002', 'read', { dueDaysAgo: 0 });
+    await addCard('core:cw-0040', 'listen', { dueDaysAgo: -0.5 });
+    await addCard('kanji:日', 'write', { dueDaysAgo: 1 });
+    await addCard('word:1004', 'read', { dueDaysAgo: -3 });
+    await addCard('word:1005', 'read', { dueDaysAgo: 1 });
+    await gradeCard('word:1005|read', Rating.Good, { durationMs: 1000, mode: 'typed', now: daysAgo(0, 8) });
+    const mask = await leakMask(NOW);
+    expect([...mask.readings]).toEqual(['word:1002']);
+    expect([...mask.meanings]).toEqual(['core:cw-0040']);
+    expect([...mask.kanji]).toEqual(['日']);
   });
 });

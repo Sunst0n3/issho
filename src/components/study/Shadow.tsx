@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { similarity } from '../../speech/compare.ts';
 import { listen, recognitionAvailable, type Listening } from '../../speech/recognition.ts';
 import { micAvailable, RecorderError, startRecording, type Recording } from '../../speech/recorder.ts';
-import { speak, stopSpeaking, ttsAvailable } from '../../speech/tts.ts';
+import { play, stopAudio, type AudioSource } from '../../speech/audio.ts';
 import { Icon } from '../ui.tsx';
 
 /** Shadowing a sentence takes a few seconds; stop long before the recorder's own limit. */
@@ -25,7 +25,12 @@ function recorderMessage(e: unknown): string {
   return "Recording didn't work. Try again.";
 }
 
-export function Shadow({ text }: { text: string }) {
+export function Shadow({ text, source }: {
+  /** The sentence (ruby markup allowed): compared with what was heard, and spoken when there is no clip. */
+  text: string;
+  /** The model voice: a clip ref (the sentence's own clip), else the text. */
+  source?: AudioSource;
+}) {
   const [phase, setPhase] = useState<Phase>('idle');
   const [audioUrl, setAudioUrl] = useState<string>();
   const [score, setScore] = useState<number | null>(null);
@@ -72,7 +77,7 @@ export function Shadow({ text }: { text: string }) {
   const start = async () => {
     setError(undefined);
     setScore(null);
-    stopSpeaking();
+    stopAudio();
     player.current?.pause();
     setPhase('starting');
     // Recognition must start inside the tap on iOS, so before awaiting the mic.
@@ -110,7 +115,7 @@ export function Shadow({ text }: { text: string }) {
 
   const playMine = () => {
     if (!audioUrl) return;
-    stopSpeaking();
+    stopAudio();
     player.current?.pause();
     player.current = new Audio(audioUrl);
     void player.current.play().catch(() => setError("Your recording couldn't play here."));
@@ -118,7 +123,7 @@ export function Shadow({ text }: { text: string }) {
 
   const playModel = () => {
     player.current?.pause();
-    void speak(text);
+    void play(source ?? { text }, source && 'ref' in source ? { fallbackText: text } : {});
   };
 
   return (
@@ -142,11 +147,9 @@ export function Shadow({ text }: { text: string }) {
           <button type="button" className="btn secondary small st-grow" onClick={playMine}>
             <Icon name="play" size={16} />Yours
           </button>
-          {ttsAvailable() && (
-            <button type="button" className="btn secondary small st-grow" onClick={playModel}>
-              <Icon name="speaker" size={16} />Model
-            </button>
-          )}
+          <button type="button" className="btn secondary small st-grow" onClick={playModel}>
+            <Icon name="speaker" size={16} />Model
+          </button>
         </div>
       )}
       {phase === 'recorded' && score !== null && (

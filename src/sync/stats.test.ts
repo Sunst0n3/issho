@@ -1,26 +1,43 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { HouseholdResponse, StatsUploadRequest } from '../../shared/api.ts';
+import type { HouseholdResponse, MemberProgress, StatsUploadRequest } from '../../shared/api.ts';
 import { db, updateSettings } from '../lib/db.ts';
 import { connectSocket, disconnectSocket } from './socket.ts';
 import { flushPendingStats, pushStats, refreshHousehold, resetHousehold, startHousehold, useHousehold } from './stats.ts';
 import { FakeSocket, installFakeSocket } from './testSocket.ts';
 
+const progress = vi.hoisted((): MemberProgress => ({
+  unit: 2, chapter: 3, kanjiCanWrite: 20, kanjiCanRead: 25, wordsKnown: 180, grammarKnown: 12, hoursTotal: 14.5,
+  daysThisMonth: 9, longestStreak: 11, readyStories: ['st-l0-01'], recentKanji: ['水'], recentItems: ['kanji:水'],
+  settledUnit: 1, coreReached: 90, grammarReached: 10,
+}));
+
 vi.mock('../srs/progress.ts', () => ({
   knownKanji: async () => ['一', '二', '三'],
-  streak: async () => ({ current: 6, best: 9, todayDone: true, week: [] }),
   weekStats: async () => [
-    { date: '2026-10-13', studyMs: 600_000, reviews: 50, correct: 45, newItems: 4, sessionComplete: true },
-    { date: '2026-10-14', studyMs: 120_000, reviews: 10, correct: 9, newItems: 0, sessionComplete: false },
+    {
+      date: '2026-10-13', studyMs: 600_000, togetherMs: 900_000, reviews: 50, correct: 45, reviewMs: 0, strandMs: 0, newItems: 4,
+      newSec: { sprint: 0, kanji: 0, staged: 0, core: 0, grammar: 0 }, minimumDone: true, goalMet: true, steps: [],
+    },
+    {
+      date: '2026-10-14', studyMs: 120_000, togetherMs: 0, reviews: 10, correct: 9, reviewMs: 0, strandMs: 0, newItems: 0,
+      newSec: { sprint: 0, kanji: 0, staged: 0, core: 0, grammar: 0 }, minimumDone: false, goalMet: false, steps: [],
+    },
   ],
 }));
-vi.mock('../srs/course.ts', () => ({ currentPhase: async () => 2 }));
+vi.mock('../srs/habits.ts', () => ({ streak: async () => ({ current: 6, alive: true, longest: 9 }) }));
+vi.mock('../srs/memberProgress.ts', () => ({ memberProgress: async () => progress }));
 
 const household: HouseholdResponse = {
   householdName: 'Our home',
   me: 'me',
   members: [],
   sharedStreak: 3,
+  quest: {
+    week: '2026-10-12', minimumDays: {}, togetherSessions: 0, shortfall: 13, met: false,
+    reserveUsed: false, reserveLeft: true, daysLeft: 5,
+  },
+  questStreakWeeks: 0,
 };
 
 /** Fakes timeouts only: fake-indexeddb runs on setImmediate, which must stay real or Dexie stalls. */
@@ -76,18 +93,31 @@ afterEach(() => {
 });
 
 describe('pushStats', () => {
-  it('uploads the last days, streak, kanji and phase', async () => {
+  it('uploads the last days, streak, kanji and progress, with accuracy private and rest tokens marked', async () => {
+    await db.restTokens.put({ date: '2026-10-14', week: '2026-10-12', usedAt: new Date('2026-10-15T08:00:00') });
     await expect(pushStats({ immediate: true })).resolves.toBe(true);
     expect(uploads).toEqual([{
       days: [
-        { date: '2026-10-13', studyMinutes: 10, reviews: 50, correct: 45, newItems: 4, sessionComplete: true },
-        { date: '2026-10-14', studyMinutes: 2, reviews: 10, correct: 9, newItems: 0, sessionComplete: false },
+        {
+          date: '2026-10-13', studyMinutes: 10, reviews: 50, correct: 0, newItems: 4, sessionComplete: true,
+          minimumDone: true, togetherMinutes: 15, restToken: false, accuracyShared: false,
+        },
+        {
+          date: '2026-10-14', studyMinutes: 2, reviews: 10, correct: 0, newItems: 0, sessionComplete: false,
+          minimumDone: false, togetherMinutes: 0, restToken: true, accuracyShared: false,
+        },
       ],
       streak: 6,
       kanjiKnown: 3,
       knownKanji: ['一', '二', '三'],
-      phase: 2,
+      progress,
     }]);
+  });
+
+  it('shares right answers only when the member allows it', async () => {
+    await updateSettings({ shareAccuracy: true });
+    await pushStats({ immediate: true });
+    expect(uploads[0].days.map((d) => [d.correct, d.accuracyShared])).toEqual([[45, true], [9, true]]);
   });
 
   it('debounces a burst of calls into one upload', async () => {
@@ -135,7 +165,7 @@ describe('household', () => {
     const { result } = renderHook(() => useHousehold());
     await waitFor(() => expect(result.current.data).toEqual(household));
     expect(result.current.loading).toBe(false);
-    expect(JSON.parse(localStorage.getItem('issho.household.v1')!).data).toEqual(household);
+    expect(JSON.parse(localStorage.getItem('issho.household.v2')!).data).toEqual(household);
   });
 
   it('keeps showing the last data when a refresh fails', async () => {
@@ -164,6 +194,6 @@ describe('household', () => {
     await refreshHousehold();
     const { result } = renderHook(() => useHousehold());
     expect(result.current.data).toBeUndefined();
-    expect(localStorage.getItem('issho.household.v1')).toBeNull();
+    expect(localStorage.getItem('issho.household.v2')).toBeNull();
   });
 });

@@ -4,6 +4,17 @@ import type { DayStats, HouseholdResponse, RegisterResponse, StatsUploadRequest 
 import { addDays, dayKey, emptyDay, fillDays, isDayKey, lastDays, sharedStreak } from '../src/days.ts';
 import { bearer, createTestServer, type TestServer } from './helpers.ts';
 
+/** How the server returns a day a v1 phone sent: the v2 fields filled in (a completed session was a minimum day). */
+function stored(day: DayStats): DayStats {
+  return {
+    minimumDone: day.sessionComplete,
+    togetherMinutes: 0,
+    restToken: false,
+    accuracyShared: false,
+    ...day,
+  };
+}
+
 describe('day helpers', () => {
   it('rolls the study day over at 4 a.m. local time', () => {
     assert.equal(dayKey(new Date(2026, 9, 14, 3, 59)), '2026-10-13');
@@ -51,6 +62,10 @@ describe('day helpers', () => {
       correct: 0,
       newItems: 0,
       sessionComplete: false,
+      minimumDone: false,
+      togetherMinutes: 0,
+      restToken: false,
+      accuracyShared: false,
     });
   });
 
@@ -144,7 +159,7 @@ describe('stats and household', () => {
     assert.equal(carterStats.phase, 2);
     assert.deepEqual(carterStats.knownKanji, ['日', '月', '水']);
     assert.equal(carterStats.updatedAt, now.toISOString());
-    assert.deepEqual(carterStats.days[6], day('2026-10-14', true));
+    assert.deepEqual(carterStats.days[6], stored(day('2026-10-14', true)));
     assert.deepEqual(carterStats.days[2], emptyDay('2026-10-10'));
 
     // Aiko finishes today; re-uploading a day updates it.
@@ -216,6 +231,7 @@ describe('stats and household', () => {
         newItems,
         sessionComplete,
       });
+      const merged = (date: string, numbers: Numbers) => stored(studied(date, numbers));
 
       await send(phone, {
         days: [studied('2026-10-13', [20, 40, 35, 5, true]), studied('2026-10-14', [10, 15, 12, 0, false])],
@@ -234,8 +250,8 @@ describe('stats and household', () => {
       });
 
       let carter = await stats();
-      assert.deepEqual(carter.day('2026-10-13'), studied('2026-10-13', [20, 50, 35, 5, true]));
-      assert.deepEqual(carter.day('2026-10-14'), studied('2026-10-14', [12, 15, 12, 3, true]));
+      assert.deepEqual(carter.day('2026-10-13'), merged('2026-10-13', [20, 50, 35, 5, true]));
+      assert.deepEqual(carter.day('2026-10-14'), merged('2026-10-14', [12, 15, 12, 3, true]));
       assert.equal(carter.streak, 5);
       assert.deepEqual(carter.knownKanji, ['日', '月', '水', '火']);
       // The count agrees with the merged list, which neither device had on its own.
@@ -271,8 +287,8 @@ describe('stats and household', () => {
         phase: 1,
       });
       carter = await stats();
-      assert.deepEqual(carter.day('2026-10-13'), studied('2026-10-13', [20, 40, 35, 5, true]));
-      assert.deepEqual(carter.day('2026-10-14'), studied('2026-10-14', [10, 15, 12, 0, false]));
+      assert.deepEqual(carter.day('2026-10-13'), merged('2026-10-13', [20, 40, 35, 5, true]));
+      assert.deepEqual(carter.day('2026-10-14'), merged('2026-10-14', [10, 15, 12, 0, false]));
       assert.deepEqual(carter.knownKanji, phoneKanji);
       assert.equal(carter.kanjiKnown, 3);
     } finally {

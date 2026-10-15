@@ -1,7 +1,7 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { HouseholdResponse, Quiz } from '../../../shared/api.ts';
+import type { CoupleQuest, HouseholdResponse, MemberStats, PartnerQuizItem, Quiz } from '../../../shared/api.ts';
 import { db, updateSettings } from '../../lib/db.ts';
 import type { KanjiEntry, WordEntry } from '../../lib/types.ts';
 import QuizRun from '../../screens/QuizRun.tsx';
@@ -9,7 +9,7 @@ import type { WritingResult } from '../../writing/WritingPad.tsx';
 import { flushQuizResults, refreshQuizzes, resetQuizzes } from './quizzes.ts';
 
 const kanji = (char: string, meaning: string, kun: string[], on: string[], freq: number): KanjiEntry => ({
-  char, meanings: [meaning], kun, on, freq, strokeCount: 4, components: [],
+  char, meanings: [meaning], kun, on, freq, strokeCount: 4, components: [], parts: [],
 });
 const KANJI: Record<string, KanjiEntry> = Object.fromEntries([
   kanji('水', 'water', ['みず'], ['スイ'], 223),
@@ -32,18 +32,32 @@ const WORDS: WordEntry[] = [
 ];
 
 const QUIZ: Quiz = {
-  id: 'q1', fromMemberId: 'ken', toMemberId: 'me', createdAt: '2026-10-14T08:00:00Z',
+  id: 'q1', kind: 'kanji', fromMemberId: 'ken', toMemberId: 'me', createdAt: '2026-10-14T08:00:00Z',
   items: [{ char: '水' }, { char: '火' }, { char: '曜' }],
 };
 
+const PARTNER_ITEMS: PartnerQuizItem[] = [
+  { key: 'kanji:水|write', kind: 'write', prompt: 'Write the kanji for "water" · □ みず', answer: '水' },
+  { key: 'core:cw-0007|produce', kind: 'produce', prompt: 'Say: "Good morning" (casual)', answer: 'おはよう' },
+];
+/** Ken answered from his cards; this phone (Aiko) asks. */
+const PARTNER_QUIZ: Quiz = {
+  id: 'q2', kind: 'partner', fromMemberId: 'ken', toMemberId: 'me', createdAt: '2026-10-14T08:00:00Z', items: PARTNER_ITEMS,
+};
+
+const QUEST: CoupleQuest = {
+  week: '2026-10-12', minimumDays: {}, togetherSessions: 0, shortfall: 13, met: false, reserveUsed: false, reserveLeft: true, daysLeft: 4,
+};
+const stats = (id: string, name: string): MemberStats => ({
+  member: { id, name, joinedAt: '', lastSeenAt: null }, days: [], streak: 0, kanjiKnown: 0, knownKanji: [], phase: 1, progress: null, updatedAt: null,
+});
 const HOUSEHOLD: HouseholdResponse = {
   householdName: 'Home',
   me: 'me',
   sharedStreak: 0,
-  members: [
-    { member: { id: 'me', name: 'Aiko', joinedAt: '', lastSeenAt: null }, days: [], streak: 0, kanjiKnown: 0, knownKanji: [], phase: 2, updatedAt: null },
-    { member: { id: 'ken', name: 'Ken', joinedAt: '', lastSeenAt: null }, days: [], streak: 0, kanjiKnown: 0, knownKanji: [], phase: 2, updatedAt: null },
-  ],
+  quest: QUEST,
+  questStreakWeeks: 0,
+  members: [stats('me', 'Aiko'), stats('ken', 'Ken')],
 };
 
 const mocks = vi.hoisted(() => ({
@@ -86,9 +100,9 @@ vi.mock('../../writing/WritingPad.tsx', async () => {
   return { WritingPad };
 });
 
-function renderQuiz() {
+function renderQuiz(id = 'q1') {
   return render(
-    <MemoryRouter initialEntries={['/quiz/q1']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <MemoryRouter initialEntries={[`/quiz/${id}`]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes><Route path="/quiz/:id" element={<QuizRun />} /></Routes>
     </MemoryRouter>,
   );
@@ -124,6 +138,8 @@ describe('QuizRun', () => {
     expect(screen.getAllByRole('button').filter((b) => b.className.startsWith('choice'))).toHaveLength(4);
     click('water');
     expect(screen.getByText('Right')).toBeTruthy();
+    // The pad needs the stroke data first.
+    await waitFor(() => expect((screen.getByRole('button', { name: 'Now write it' }) as HTMLButtonElement).disabled).toBe(false));
     click('Now write it');
     expect(await screen.findByRole('heading', { name: 'Write it from memory' })).toBeTruthy();
     click('Write the kanji for water cleanly');
@@ -148,7 +164,8 @@ describe('QuizRun', () => {
     expect(await screen.findByRole('heading', { name: '1 / 2' })).toBeTruthy();
     await waitFor(() => expect(mocks.submitQuizResult).toHaveBeenCalledWith('q1', { correct: 1, total: 2, missed: ['火'] }));
     expect(await screen.findByText(/Ken can see your score now/)).toBeTruthy();
-    expect(screen.getByRole('heading', { name: 'Send back a quiz' })).toBeTruthy();
+    // The v1 "send your hardest kanji" sender is gone: the partner quiz replaced it.
+    expect(screen.queryByRole('heading', { name: 'Send back a quiz' })).toBeNull();
   });
 
   it('keeps the same choices when the quiz list refreshes mid-question', async () => {
@@ -320,5 +337,56 @@ describe('QuizRun', () => {
     mocks.getQuizzes.mockResolvedValue({ inbox: [], sent: [] });
     renderQuiz();
     expect(await screen.findByText("This quiz isn't here anymore")).toBeTruthy();
+  });
+
+  describe('together quizzes', () => {
+    it('shows the asker each prompt with its answer and posts one verdict per item', async () => {
+      mocks.getQuizzes.mockResolvedValue({ inbox: [PARTNER_QUIZ], sent: [] });
+      mocks.submitQuizResult.mockImplementation(async (id: string, r) => ({ ...PARTNER_QUIZ, id, result: { ...r, finishedAt: 'now' } }));
+      renderQuiz('q2');
+
+      expect(await screen.findByText(/You ask Ken · 1 of 2/)).toBeTruthy();
+      expect(screen.getByText('Write the kanji for "water" · □ みず')).toBeTruthy();
+      expect(screen.getByText('Answer')).toBeTruthy();
+      for (const name of ['Right', 'Close', 'Not yet']) expect(screen.getByRole('button', { name })).toBeTruthy();
+      // Two taps before the screen updates give one verdict: the second item is still asked.
+      const close = screen.getByRole('button', { name: 'Close' });
+      act(() => { close.click(); close.click(); });
+      expect(await screen.findByText(/You ask Ken · 2 of 2/)).toBeTruthy();
+      expect(screen.getByText('おはよう')).toBeTruthy();
+      click('Right');
+
+      expect(await screen.findByRole('heading', { name: '1 / 2' })).toBeTruthy();
+      await waitFor(() => expect(mocks.submitQuizResult).toHaveBeenCalledWith('q2', {
+        correct: 1,
+        total: 2,
+        missed: ['kanji:水|write'],
+        verdicts: [
+          { key: 'kanji:水|write', verdict: 'close' },
+          { key: 'core:cw-0007|produce', verdict: 'right' },
+        ],
+      }));
+    });
+
+    it('never shows the answerer the answers', async () => {
+      const mine: Quiz = { ...PARTNER_QUIZ, id: 'q3', fromMemberId: 'me', toMemberId: 'ken' };
+      mocks.getQuizzes.mockResolvedValue({ inbox: [], sent: [mine] });
+      renderQuiz('q3');
+
+      expect(await screen.findByRole('heading', { name: 'Your turn: answer out loud or write' })).toBeTruthy();
+      expect(screen.queryByText('Answer')).toBeNull();
+      expect(screen.queryByText('水', { exact: true })).toBeNull();
+      click('Next');
+      expect(await screen.findByText('2 of 2')).toBeTruthy();
+      expect(screen.queryByText('おはよう')).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Right' })).toBeNull();
+    });
+
+    it('still runs a kanji quiz cached without a kind by a v1 phone', async () => {
+      const { kind: _kind, ...old } = QUIZ;
+      mocks.getQuizzes.mockResolvedValue({ inbox: [old], sent: [] });
+      renderQuiz();
+      expect(await screen.findByRole('heading', { name: 'What does this kanji mean?' })).toBeTruthy();
+    });
   });
 });

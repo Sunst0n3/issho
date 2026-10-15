@@ -1,0 +1,165 @@
+{
+  "engine": "0.25.2",
+  "speaker": 30,
+  "text": "元気ですか？はい、元気です。",
+  "phrases": [
+    "{元気|げんき}ですか？",
+    "はい、",
+    "{元気|げんき}です。"
+  ],
+  "wavMs": 2869,
+  "query": {
+    "accent_phrases": [
+      {
+        "moras": [
+          {
+            "text": "ゲ",
+            "consonant": "g",
+            "consonant_length": 0.04440847784280777,
+            "vowel": "e",
+            "vowel_length": 0.09418534487485886,
+            "pitch": 5.622591018676758
+          },
+          {
+            "text": "ン",
+            "consonant": null,
+            "consonant_length": null,
+            "vowel": "N",
+            "vowel_length": 0.07345785945653915,
+            "pitch": 5.773659706115723
+          },
+          {
+            "text": "キ",
+            "consonant": "k",
+            "consonant_length": 0.06920605897903442,
+            "vowel": "i",
+            "vowel_length": 0.03703475743532181,
+            "pitch": 5.371671676635742
+          },
+          {
+            "text": "デ",
+            "consonant": "d",
+            "consonant_length": 0.036046430468559265,
+            "vowel": "e",
+            "vowel_length": 0.06394388526678085,
+            "pitch": 5.176481246948242
+          },
+          {
+            "text": "ス",
+            "consonant": "s",
+            "consonant_length": 0.09896126389503479,
+            "vowel": "U",
+            "vowel_length": 0.03929148614406586,
+            "pitch": 0
+          },
+          {
+            "text": "カ",
+            "consonant": "k",
+            "consonant_length": 0.06248248741030693,
+            "vowel": "a",
+            "vowel_length": 0.1590154469013214,
+            "pitch": 5.027464389801025
+          }
+        ],
+        "accent": 1,
+        "pause_mora": {
+          "text": "、",
+          "consonant": null,
+          "consonant_length": null,
+          "vowel": "pau",
+          "vowel_length": 0.39303478598594666,
+          "pitch": 0
+        },
+        "is_interrogative": true
+      },
+      {
+        "moras": [
+          {
+            "text": "ハ",
+            "consonant": "h",
+            "consonant_length": 0.0815417468547821,
+            "vowel": "a",
+            "vowel_length": 0.08030703663825989,
+            "pitch": 5.395337104797363
+          },
+          {
+            "text": "イ",
+            "consonant": null,
+            "consonant_length": null,
+            "vowel": "i",
+            "vowel_length": 0.16442324221134186,
+            "pitch": 5.221222400665283
+          }
+        ],
+        "accent": 1,
+        "pause_mora": {
+          "text": "、",
+          "consonant": null,
+          "consonant_length": null,
+          "vowel": "pau",
+          "vowel_length": 0.3755559027194977,
+          "pitch": 0
+        },
+        "is_interrogative": false
+      },
+      {
+        "moras": [
+          {
+            "text": "ゲ",
+            "consonant": "g",
+            "consonant_length": 0.04624410346150398,
+            "vowel": "e",
+            "vowel_length": 0.09172197431325912,
+            "pitch": 5.477377414703369
+          },
+          {
+            "text": "ン",
+            "consonant": null,
+            "consonant_length": null,
+            "vowel": "N",
+            "vowel_length": 0.07233347743749619,
+            "pitch": 5.664719581604004
+          },
+          {
+            "text": "キ",
+            "consonant": "k",
+            "consonant_length": 0.06881904602050781,
+            "vowel": "i",
+            "vowel_length": 0.03736288845539093,
+            "pitch": 5.274356365203857
+          },
+          {
+            "text": "デ",
+            "consonant": "d",
+            "consonant_length": 0.037461601197719574,
+            "vowel": "e",
+            "vowel_length": 0.08577703684568405,
+            "pitch": 5.069745063781738
+          },
+          {
+            "text": "ス",
+            "consonant": "s",
+            "consonant_length": 0.16013407707214355,
+            "vowel": "U",
+            "vowel_length": 0.05037824437022209,
+            "pitch": 0
+          }
+        ],
+        "accent": 1,
+        "pause_mora": null,
+        "is_interrogative": false
+      }
+    ],
+    "speedScale": 1,
+    "pitchScale": 0,
+    "intonationScale": 1,
+    "volumeScale": 1,
+    "prePhonemeLength": 0.1,
+    "postPhonemeLength": 0.1,
+    "pauseLength": null,
+    "pauseLengthScale": 1,
+    "outputSamplingRate": 24000,
+    "outputStereo": false,
+    "kana": "ゲ'ンキデ_スカ？、ハ'イ、ゲ'ンキデ_ス"
+  }
+}

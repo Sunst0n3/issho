@@ -1,5 +1,5 @@
 // One WebSocket to the home server for live events (chat, stats, quizzes,
-// presence, role-play). Reconnects with exponential backoff; reconnects at once
+// presence, role-play, together state and live together sessions). Reconnects with exponential backoff; reconnects at once
 // when the network comes back or the app returns to the foreground, because iOS
 // silently kills sockets of backgrounded PWAs and leaves them looking open.
 // Presence is tracked here from app start: the server lists who is online only
@@ -62,8 +62,8 @@ function trackPresence(ev: ServerEvent) {
   if (ev.type === 'presence') {
     presence.set(ev.memberId, ev.online);
     presenceSettled = true;
-  } else if (ev.type === 'roleplay') {
-    // Only a connected phone can send its role-play state.
+  } else if (ev.type === 'roleplay' || ev.type === 'live') {
+    // Only a connected phone can send its role-play or together-session state.
     presence.set(ev.memberId, true);
   } else {
     return;

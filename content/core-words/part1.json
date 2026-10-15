@@ -533,7 +533,7 @@
     "kana": "よろしくおねがいします",
     "written": "よろしくお願いします",
     "jmdict": "2133750",
-    "en": "nice to meet you; thanks in advance",
+    "en": "please treat me well; thanks in advance",
     "pos": "expression",
     "register": "polite",
     "topic": "greetings",
@@ -571,7 +571,7 @@
     "order": 46,
     "kana": "じゃあね",
     "jmdict": "2186610",
-    "en": "bye; see you",
+    "en": "see you; later (casual)",
     "pos": "expression",
     "register": "plain",
     "topic": "greetings",
@@ -634,7 +634,7 @@
     "order": 51,
     "kana": "いってらっしゃい",
     "jmdict": "2088750",
-    "en": "see you; have a good day",
+    "en": "have a good day (to someone leaving)",
     "pos": "interjection",
     "register": "both",
     "topic": "greetings",
@@ -2023,7 +2023,7 @@
     "kana": "だいすき",
     "written": "大好き",
     "jmdict": "1413660",
-    "en": "love; really like",
+    "en": "really like; love (everyday)",
     "pos": "adj-na",
     "register": "both",
     "topic": "feelings",
@@ -3805,8 +3805,21 @@
     "note": "にじかん = two hours"
   },
   {
-    "id": "cw-0305",
+    "id": "cw-1578",
     "order": 305,
+    "kana": "ひ",
+    "written": "日",
+    "jmdict": "1463770",
+    "en": "day; sun",
+    "pos": "noun",
+    "register": "both",
+    "topic": "time",
+    "use": true,
+    "note": "やすみのひ = day off; そのひ = that day; dates use にち"
+  },
+  {
+    "id": "cw-0305",
+    "order": 306,
     "kana": "ちょうど",
     "jmdict": "1427340",
     "en": "exactly; just",
@@ -3818,7 +3831,7 @@
   },
   {
     "id": "cw-0306",
-    "order": 306,
+    "order": 307,
     "kana": "ごろ",
     "jmdict": "1579080",
     "en": "around (a time)",
@@ -3830,7 +3843,7 @@
   },
   {
     "id": "cw-0307",
-    "order": 307,
+    "order": 308,
     "kana": "ぐらい",
     "jmdict": "1154340",
     "en": "about (an amount)",
@@ -3842,7 +3855,7 @@
   },
   {
     "id": "cw-0308",
-    "order": 308,
+    "order": 309,
     "kana": "まえ",
     "written": "前",
     "jmdict": "1392580",
@@ -3855,7 +3868,7 @@
   },
   {
     "id": "cw-0309",
-    "order": 309,
+    "order": 310,
     "kana": "あとで",
     "written": "後で",
     "jmdict": "1269350",
@@ -3868,7 +3881,7 @@
   },
   {
     "id": "cw-0310",
-    "order": 310,
+    "order": 311,
     "kana": "あと",
     "jmdict": "1269320",
     "en": "after; still to go, more",
@@ -3880,7 +3893,7 @@
   },
   {
     "id": "cw-0311",
-    "order": 311,
+    "order": 312,
     "kana": "さっき",
     "jmdict": "1005180",
     "en": "a moment ago",
@@ -3891,7 +3904,7 @@
   },
   {
     "id": "cw-0312",
-    "order": 312,
+    "order": 313,
     "kana": "こんど",
     "written": "今度",
     "jmdict": "1289370",
@@ -3903,7 +3916,7 @@
   },
   {
     "id": "cw-0313",
-    "order": 313,
+    "order": 314,
     "kana": "こんしゅう",
     "written": "今週",
     "jmdict": "1289220",
@@ -3915,7 +3928,7 @@
   },
   {
     "id": "cw-0314",
-    "order": 314,
+    "order": 315,
     "kana": "らいしゅう",
     "written": "来週",
     "jmdict": "1548010",
@@ -3927,7 +3940,7 @@
   },
   {
     "id": "cw-0315",
-    "order": 315,
+    "order": 316,
     "kana": "せんしゅう",
     "written": "先週",
     "jmdict": "1387870",
@@ -3939,7 +3952,7 @@
   },
   {
     "id": "cw-0316",
-    "order": 316,
+    "order": 317,
     "kana": "げつようび",
     "written": "月曜日",
     "jmdict": "1255890",
@@ -3951,7 +3964,7 @@
   },
   {
     "id": "cw-0317",
-    "order": 317,
+    "order": 318,
     "kana": "かようび",
     "written": "火曜日",
     "jmdict": "1194290",
@@ -3963,7 +3976,7 @@
   },
   {
     "id": "cw-0318",
-    "order": 318,
+    "order": 319,
     "kana": "すいようび",
     "written": "水曜日",
     "jmdict": "1372190",
@@ -3975,7 +3988,7 @@
   },
   {
     "id": "cw-0319",
-    "order": 319,
+    "order": 320,
     "kana": "もくようび",
     "written": "木曜日",
     "jmdict": "1534890",
@@ -3987,7 +4000,7 @@
   },
   {
     "id": "cw-0320",
-    "order": 320,
+    "order": 321,
     "kana": "きんようび",
     "written": "金曜日",
     "jmdict": "1243320",
@@ -3999,7 +4012,7 @@
   },
   {
     "id": "cw-0321",
-    "order": 321,
+    "order": 322,
     "kana": "どようび",
     "written": "土曜日",
     "jmdict": "1445590",
@@ -4011,7 +4024,7 @@
   },
   {
     "id": "cw-0322",
-    "order": 322,
+    "order": 323,
     "kana": "にちようび",
     "written": "日曜日",
     "jmdict": "1464900",
@@ -4023,7 +4036,7 @@
   },
   {
     "id": "cw-0323",
-    "order": 323,
+    "order": 324,
     "kana": "なんようび",
     "written": "何曜日",
     "jmdict": "1189400",
@@ -4035,7 +4048,7 @@
   },
   {
     "id": "cw-0324",
-    "order": 324,
+    "order": 325,
     "kana": "へいじつ",
     "written": "平日",
     "jmdict": "1507720",
@@ -4047,7 +4060,7 @@
   },
   {
     "id": "cw-0325",
-    "order": 325,
+    "order": 326,
     "kana": "よっつ",
     "written": "四つ",
     "jmdict": "1307040",
@@ -4059,7 +4072,7 @@
   },
   {
     "id": "cw-0326",
-    "order": 326,
+    "order": 327,
     "kana": "いつつ",
     "written": "五つ",
     "jmdict": "1268070",
@@ -4071,7 +4084,7 @@
   },
   {
     "id": "cw-0327",
-    "order": 327,
+    "order": 328,
     "kana": "むっつ",
     "written": "六つ",
     "jmdict": "1585315",
@@ -4083,7 +4096,7 @@
   },
   {
     "id": "cw-0328",
-    "order": 328,
+    "order": 329,
     "kana": "ななつ",
     "written": "七つ",
     "jmdict": "1319220",
@@ -4095,7 +4108,7 @@
   },
   {
     "id": "cw-0329",
-    "order": 329,
+    "order": 330,
     "kana": "やっつ",
     "written": "八つ",
     "jmdict": "1583095",
@@ -4107,7 +4120,7 @@
   },
   {
     "id": "cw-0330",
-    "order": 330,
+    "order": 331,
     "kana": "ここのつ",
     "written": "九つ",
     "jmdict": "1243600",
@@ -4119,7 +4132,7 @@
   },
   {
     "id": "cw-0331",
-    "order": 331,
+    "order": 332,
     "kana": "とお",
     "written": "十",
     "jmdict": "1579840",
@@ -4132,7 +4145,7 @@
   },
   {
     "id": "cw-0332",
-    "order": 332,
+    "order": 333,
     "kana": "りんご",
     "jmdict": "1555480",
     "en": "apple",
@@ -4144,7 +4157,7 @@
   },
   {
     "id": "cw-0333",
-    "order": 333,
+    "order": 334,
     "kana": "みかん",
     "jmdict": "1528410",
     "en": "mandarin orange",
@@ -4156,7 +4169,7 @@
   },
   {
     "id": "cw-0334",
-    "order": 334,
+    "order": 335,
     "kana": "おにぎり",
     "jmdict": "1001620",
     "en": "rice ball",
@@ -4167,7 +4180,7 @@
   },
   {
     "id": "cw-0335",
-    "order": 335,
+    "order": 336,
     "kana": "メニュー",
     "jmdict": "1133790",
     "en": "menu",
@@ -4178,7 +4191,7 @@
   },
   {
     "id": "cw-0336",
-    "order": 336,
+    "order": 337,
     "kana": "おかいけい",
     "written": "お会計",
     "jmdict": "2513640",
@@ -4191,7 +4204,7 @@
   },
   {
     "id": "cw-0337",
-    "order": 337,
+    "order": 338,
     "kana": "ふくろ",
     "written": "袋",
     "jmdict": "1411070",
@@ -4203,7 +4216,7 @@
   },
   {
     "id": "cw-0338",
-    "order": 338,
+    "order": 339,
     "kana": "はし",
     "written": "箸",
     "jmdict": "1476410",
@@ -4216,7 +4229,7 @@
   },
   {
     "id": "cw-0339",
-    "order": 339,
+    "order": 340,
     "kana": "ことし",
     "written": "今年",
     "jmdict": "1579130",
@@ -4228,7 +4241,7 @@
   },
   {
     "id": "cw-0340",
-    "order": 340,
+    "order": 341,
     "kana": "らいねん",
     "written": "来年",
     "jmdict": "1548220",
@@ -4240,7 +4253,7 @@
   },
   {
     "id": "cw-0341",
-    "order": 341,
+    "order": 342,
     "kana": "きょねん",
     "written": "去年",
     "jmdict": "1231690",
@@ -4252,7 +4265,7 @@
   },
   {
     "id": "cw-0342",
-    "order": 342,
+    "order": 343,
     "kana": "すし",
     "written": "寿司",
     "jmdict": "1595650",
@@ -4264,7 +4277,7 @@
   },
   {
     "id": "cw-0343",
-    "order": 343,
+    "order": 344,
     "kana": "カレー",
     "jmdict": "1039140",
     "en": "curry",
@@ -4275,7 +4288,7 @@
   },
   {
     "id": "cw-0344",
-    "order": 344,
+    "order": 345,
     "kana": "おべんとう",
     "written": "お弁当",
     "jmdict": "1513065",
@@ -4287,7 +4300,7 @@
   },
   {
     "id": "cw-0345",
-    "order": 345,
+    "order": 346,
     "kana": "にく",
     "written": "肉",
     "jmdict": "1463520",
@@ -4300,7 +4313,7 @@
   },
   {
     "id": "cw-0346",
-    "order": 346,
+    "order": 347,
     "kana": "さかな",
     "written": "魚",
     "jmdict": "1578010",
@@ -4313,7 +4326,7 @@
   },
   {
     "id": "cw-0347",
-    "order": 347,
+    "order": 348,
     "kana": "やさい",
     "written": "野菜",
     "jmdict": "1537370",
@@ -4326,7 +4339,7 @@
   },
   {
     "id": "cw-0348",
-    "order": 348,
+    "order": 349,
     "kana": "くだもの",
     "written": "果物",
     "jmdict": "1193060",
@@ -4339,7 +4352,7 @@
   },
   {
     "id": "cw-0349",
-    "order": 349,
+    "order": 350,
     "kana": "サラダ",
     "jmdict": "1057850",
     "en": "salad",
@@ -4350,7 +4363,7 @@
   },
   {
     "id": "cw-0350",
-    "order": 350,
+    "order": 351,
     "kana": "スープ",
     "jmdict": "1067040",
     "en": "soup",
@@ -4361,7 +4374,7 @@
   },
   {
     "id": "cw-0351",
-    "order": 351,
+    "order": 352,
     "kana": "おかし",
     "written": "お菓子",
     "jmdict": "1001710",
@@ -4373,7 +4386,7 @@
   },
   {
     "id": "cw-0352",
-    "order": 352,
+    "order": 353,
     "kana": "アイス",
     "jmdict": "1013970",
     "en": "ice cream",
@@ -4385,7 +4398,7 @@
   },
   {
     "id": "cw-0353",
-    "order": 353,
+    "order": 354,
     "kana": "チョコレート",
     "jmdict": "1078270",
     "en": "chocolate",
@@ -4397,7 +4410,7 @@
   },
   {
     "id": "cw-0354",
-    "order": 354,
+    "order": 355,
     "kana": "バナナ",
     "jmdict": "1099420",
     "en": "banana",
@@ -4409,7 +4422,7 @@
   },
   {
     "id": "cw-0355",
-    "order": 355,
+    "order": 356,
     "kana": "あまい",
     "written": "甘い",
     "jmdict": "1213400",
@@ -4421,7 +4434,7 @@
   },
   {
     "id": "cw-0356",
-    "order": 356,
+    "order": 357,
     "kana": "からい",
     "written": "辛い",
     "jmdict": "1365850",
@@ -4433,7 +4446,7 @@
   },
   {
     "id": "cw-0357",
-    "order": 357,
+    "order": 358,
     "kana": "まずい",
     "jmdict": "1495000",
     "en": "tastes bad",
@@ -4445,7 +4458,7 @@
   },
   {
     "id": "cw-0358",
-    "order": 358,
+    "order": 359,
     "kana": "おなかがすく",
     "written": "お腹がすく",
     "jmdict": "2021520",
@@ -4458,7 +4471,7 @@
   },
   {
     "id": "cw-0359",
-    "order": 359,
+    "order": 360,
     "kana": "おなかいっぱい",
     "written": "お腹いっぱい",
     "jmdict": "2407280",
@@ -4471,7 +4484,7 @@
   },
   {
     "id": "cw-0360",
-    "order": 360,
+    "order": 361,
     "kana": "あめ",
     "written": "雨",
     "jmdict": "1171900",
@@ -4483,7 +4496,7 @@
   },
   {
     "id": "cw-0361",
-    "order": 361,
+    "order": 362,
     "kana": "ゆき",
     "written": "雪",
     "jmdict": "1386500",
@@ -4495,7 +4508,7 @@
   },
   {
     "id": "cw-0362",
-    "order": 362,
+    "order": 363,
     "kana": "はれ",
     "written": "晴れ",
     "jmdict": "1376460",
@@ -4507,7 +4520,7 @@
   },
   {
     "id": "cw-0363",
-    "order": 363,
+    "order": 364,
     "kana": "くもり",
     "written": "曇り",
     "jmdict": "1592340",
@@ -4519,7 +4532,7 @@
   },
   {
     "id": "cw-0364",
-    "order": 364,
+    "order": 365,
     "kana": "あたたかい",
     "written": "暖かい",
     "jmdict": "1586420",
@@ -4532,7 +4545,7 @@
   },
   {
     "id": "cw-0365",
-    "order": 365,
+    "order": 366,
     "kana": "すずしい",
     "written": "涼しい",
     "jmdict": "1554370",
@@ -4544,7 +4557,7 @@
   },
   {
     "id": "cw-0366",
-    "order": 366,
+    "order": 367,
     "kana": "あたま",
     "written": "頭",
     "jmdict": "1582310",
@@ -4556,7 +4569,7 @@
   },
   {
     "id": "cw-0367",
-    "order": 367,
+    "order": 368,
     "kana": "おなか",
     "written": "お腹",
     "jmdict": "1002610",
@@ -4568,7 +4581,7 @@
   },
   {
     "id": "cw-0368",
-    "order": 368,
+    "order": 369,
     "kana": "いたい",
     "written": "痛い",
     "jmdict": "1432680",
@@ -4581,7 +4594,7 @@
   },
   {
     "id": "cw-0369",
-    "order": 369,
+    "order": 370,
     "kana": "かぜ",
     "written": "風邪",
     "jmdict": "1583720",
@@ -4594,7 +4607,7 @@
   },
   {
     "id": "cw-0370",
-    "order": 370,
+    "order": 371,
     "kana": "くすり",
     "written": "薬",
     "jmdict": "1538160",
@@ -4607,7 +4620,7 @@
   },
   {
     "id": "cw-0371",
-    "order": 371,
+    "order": 372,
     "kana": "びょうき",
     "written": "病気",
     "jmdict": "1490230",
@@ -4619,7 +4632,7 @@
   },
   {
     "id": "cw-0372",
-    "order": 372,
+    "order": 373,
     "kana": "ねつ",
     "written": "熱",
     "jmdict": "1467710",
@@ -4631,7 +4644,7 @@
   },
   {
     "id": "cw-0373",
-    "order": 373,
+    "order": 374,
     "kana": "カード",
     "jmdict": "1036400",
     "en": "card; credit card",
@@ -4642,7 +4655,7 @@
   },
   {
     "id": "cw-0374",
-    "order": 374,
+    "order": 375,
     "kana": "げんきん",
     "written": "現金",
     "jmdict": "1263550",
@@ -4654,7 +4667,7 @@
   },
   {
     "id": "cw-0375",
-    "order": 375,
+    "order": 376,
     "kana": "おとこのひと",
     "written": "男の人",
     "jmdict": "1420020",
@@ -4666,7 +4679,7 @@
   },
   {
     "id": "cw-0376",
-    "order": 376,
+    "order": 377,
     "kana": "おんなのひと",
     "written": "女の人",
     "jmdict": "1344980",
@@ -4678,7 +4691,7 @@
   },
   {
     "id": "cw-0377",
-    "order": 377,
+    "order": 378,
     "kana": "あかちゃん",
     "written": "赤ちゃん",
     "jmdict": "1383260",
@@ -4690,7 +4703,7 @@
   },
   {
     "id": "cw-0378",
-    "order": 378,
+    "order": 379,
     "kana": "みんな",
     "jmdict": "1202150",
     "en": "everyone",
@@ -4702,7 +4715,7 @@
   },
   {
     "id": "cw-0379",
-    "order": 379,
+    "order": 380,
     "kana": "かぞく",
     "written": "家族",
     "jmdict": "1192150",
@@ -4715,7 +4728,7 @@
   },
   {
     "id": "cw-0380",
-    "order": 380,
+    "order": 381,
     "kana": "はは",
     "written": "母",
     "jmdict": "1514990",
@@ -4729,7 +4742,7 @@
   },
   {
     "id": "cw-0381",
-    "order": 381,
+    "order": 382,
     "kana": "ちち",
     "written": "父",
     "jmdict": "1497610",
@@ -4743,7 +4756,7 @@
   },
   {
     "id": "cw-0382",
-    "order": 382,
+    "order": 383,
     "kana": "こども",
     "written": "子ども",
     "jmdict": "1307850",
@@ -4756,7 +4769,7 @@
   },
   {
     "id": "cw-0383",
-    "order": 383,
+    "order": 384,
     "kana": "おにいさん",
     "written": "お兄さん",
     "jmdict": "1001830",
@@ -4769,7 +4782,7 @@
   },
   {
     "id": "cw-0384",
-    "order": 384,
+    "order": 385,
     "kana": "おねえさん",
     "written": "お姉さん",
     "jmdict": "1001990",
@@ -4782,7 +4795,7 @@
   },
   {
     "id": "cw-0385",
-    "order": 385,
+    "order": 386,
     "kana": "おとうと",
     "written": "弟",
     "jmdict": "1581930",
@@ -4794,7 +4807,7 @@
   },
   {
     "id": "cw-0386",
-    "order": 386,
+    "order": 387,
     "kana": "いもうと",
     "written": "妹",
     "jmdict": "1524590",
@@ -4806,7 +4819,7 @@
   },
   {
     "id": "cw-0387",
-    "order": 387,
+    "order": 388,
     "kana": "きょうだい",
     "written": "兄弟",
     "jmdict": "1249960",
@@ -4818,7 +4831,7 @@
   },
   {
     "id": "cw-0388",
-    "order": 388,
+    "order": 389,
     "kana": "ゲーム",
     "jmdict": "1048400",
     "en": "game; video game",
@@ -4829,7 +4842,7 @@
   },
   {
     "id": "cw-0389",
-    "order": 389,
+    "order": 390,
     "kana": "りょこう",
     "written": "旅行",
     "jmdict": "1553170",
@@ -4842,7 +4855,7 @@
   },
   {
     "id": "cw-0390",
-    "order": 390,
+    "order": 391,
     "kana": "さんぽ",
     "written": "散歩",
     "jmdict": "1303620",
@@ -4855,7 +4868,7 @@
   },
   {
     "id": "cw-0391",
-    "order": 391,
+    "order": 392,
     "kana": "しゃしん",
     "written": "写真",
     "jmdict": "1321900",
@@ -4868,7 +4881,7 @@
   },
   {
     "id": "cw-0392",
-    "order": 392,
+    "order": 393,
     "kana": "でんしゃ",
     "written": "電車",
     "jmdict": "1443530",
@@ -4880,7 +4893,7 @@
   },
   {
     "id": "cw-0393",
-    "order": 393,
+    "order": 394,
     "kana": "バス",
     "jmdict": "1098390",
     "en": "bus",
@@ -4891,7 +4904,7 @@
   },
   {
     "id": "cw-0394",
-    "order": 394,
+    "order": 395,
     "kana": "タクシー",
     "jmdict": "1076190",
     "en": "taxi",
@@ -4902,7 +4915,7 @@
   },
   {
     "id": "cw-0395",
-    "order": 395,
+    "order": 396,
     "kana": "じてんしゃ",
     "written": "自転車",
     "jmdict": "1318290",
@@ -4914,7 +4927,7 @@
   },
   {
     "id": "cw-0396",
-    "order": 396,
+    "order": 397,
     "kana": "レストラン",
     "jmdict": "1145310",
     "en": "restaurant",
@@ -4925,7 +4938,7 @@
   },
   {
     "id": "cw-0397",
-    "order": 397,
+    "order": 398,
     "kana": "いらっしゃいませ",
     "jmdict": "1000930",
     "en": "welcome (in shops)",
@@ -4937,7 +4950,7 @@
   },
   {
     "id": "cw-0398",
-    "order": 398,
+    "order": 399,
     "kana": "なんにん",
     "written": "何人",
     "jmdict": "1189100",
@@ -4949,7 +4962,7 @@
   },
   {
     "id": "cw-0399",
-    "order": 399,
+    "order": 400,
     "kana": "めい",
     "written": "名",
     "jmdict": "2153790",
@@ -4962,7 +4975,7 @@
   },
   {
     "id": "cw-0400",
-    "order": 400,
+    "order": 401,
     "kana": "さま",
     "written": "様",
     "jmdict": "1545790",
@@ -4975,7 +4988,7 @@
   },
   {
     "id": "cw-0401",
-    "order": 401,
+    "order": 402,
     "kana": "ちゅうもんする",
     "written": "注文する",
     "jmdict": "1426650",
@@ -4988,7 +5001,7 @@
   },
   {
     "id": "cw-0402",
-    "order": 402,
+    "order": 403,
     "kana": "おすすめ",
     "jmdict": "1002150",
     "en": "recommendation",
@@ -5000,7 +5013,7 @@
   },
   {
     "id": "cw-0403",
-    "order": 403,
+    "order": 404,
     "kana": "きまる",
     "written": "決まる",
     "jmdict": "1591420",
@@ -5013,7 +5026,7 @@
   },
   {
     "id": "cw-0404",
-    "order": 404,
+    "order": 405,
     "kana": "かしこまりました",
     "jmdict": "1002790",
     "en": "certainly (staff reply)",
@@ -5025,7 +5038,7 @@
   },
   {
     "id": "cw-0405",
-    "order": 405,
+    "order": 406,
     "kana": "しょうしょう",
     "written": "少々",
     "jmdict": "1594930",
@@ -5038,7 +5051,7 @@
   },
   {
     "id": "cw-0406",
-    "order": 406,
+    "order": 407,
     "kana": "ごゆっくり",
     "jmdict": "2827483",
     "en": "take your time; enjoy",
@@ -5050,7 +5063,7 @@
   },
   {
     "id": "cw-0407",
-    "order": 407,
+    "order": 408,
     "kana": "あつい",
     "written": "熱い",
     "jmdict": "1467720",
@@ -5063,7 +5076,7 @@
   },
   {
     "id": "cw-0408",
-    "order": 408,
+    "order": 409,
     "kana": "つめたい",
     "written": "冷たい",
     "jmdict": "1556730",
@@ -5076,7 +5089,7 @@
   },
   {
     "id": "cw-0409",
-    "order": 409,
+    "order": 410,
     "kana": "こうえん",
     "written": "公園",
     "jmdict": "1273270",
@@ -5088,7 +5101,7 @@
   },
   {
     "id": "cw-0410",
-    "order": 410,
+    "order": 411,
     "kana": "とる",
     "written": "撮る",
     "jmdict": "1298790",
@@ -5101,7 +5114,7 @@
   },
   {
     "id": "cw-0411",
-    "order": 411,
+    "order": 412,
     "kana": "さい",
     "written": "歳",
     "jmdict": "1294940",
@@ -5114,7 +5127,7 @@
   },
   {
     "id": "cw-0412",
-    "order": 412,
+    "order": 413,
     "kana": "はたち",
     "written": "二十歳",
     "jmdict": "1600790",
@@ -5127,7 +5140,7 @@
   },
   {
     "id": "cw-0413",
-    "order": 413,
+    "order": 414,
     "kana": "むすこ",
     "written": "息子",
     "jmdict": "1404390",
@@ -5140,7 +5153,7 @@
   },
   {
     "id": "cw-0414",
-    "order": 414,
+    "order": 415,
     "kana": "むすめ",
     "written": "娘",
     "jmdict": "1531190",
@@ -5153,7 +5166,7 @@
   },
   {
     "id": "cw-0415",
-    "order": 415,
+    "order": 416,
     "kana": "クラス",
     "jmdict": "1044070",
     "en": "class (group of students)",
@@ -5164,7 +5177,7 @@
   },
   {
     "id": "cw-0416",
-    "order": 416,
+    "order": 417,
     "kana": "ひこうき",
     "written": "飛行機",
     "jmdict": "1485470",
@@ -5176,7 +5189,7 @@
   },
   {
     "id": "cw-0417",
-    "order": 417,
+    "order": 418,
     "kana": "ちかく",
     "written": "近く",
     "jmdict": "1242160",
@@ -5188,7 +5201,7 @@
   },
   {
     "id": "cw-0418",
-    "order": 418,
+    "order": 419,
     "kana": "うえ",
     "written": "上",
     "jmdict": "1352130",
@@ -5200,7 +5213,7 @@
   },
   {
     "id": "cw-0419",
-    "order": 419,
+    "order": 420,
     "kana": "した",
     "written": "下",
     "jmdict": "1184140",
@@ -5212,7 +5225,7 @@
   },
   {
     "id": "cw-0420",
-    "order": 420,
+    "order": 421,
     "kana": "なか",
     "written": "中",
     "jmdict": "1423310",
@@ -5224,7 +5237,7 @@
   },
   {
     "id": "cw-0421",
-    "order": 421,
+    "order": 422,
     "kana": "そと",
     "written": "外",
     "jmdict": "1203250",
@@ -5236,7 +5249,7 @@
   },
   {
     "id": "cw-0422",
-    "order": 422,
+    "order": 423,
     "kana": "みぎ",
     "written": "右",
     "jmdict": "1171010",
@@ -5248,7 +5261,7 @@
   },
   {
     "id": "cw-0423",
-    "order": 423,
+    "order": 424,
     "kana": "ひだり",
     "written": "左",
     "jmdict": "1290800",
@@ -5260,7 +5273,7 @@
   },
   {
     "id": "cw-0424",
-    "order": 424,
+    "order": 425,
     "kana": "ながい",
     "written": "長い",
     "jmdict": "1429750",
@@ -5272,7 +5285,7 @@
   },
   {
     "id": "cw-0425",
-    "order": 425,
+    "order": 426,
     "kana": "みじかい",
     "written": "短い",
     "jmdict": "1418620",
@@ -5284,7 +5297,7 @@
   },
   {
     "id": "cw-0426",
-    "order": 426,
+    "order": 427,
     "kana": "おそい",
     "written": "遅い",
     "jmdict": "1421970",
@@ -5296,7 +5309,7 @@
   },
   {
     "id": "cw-0427",
-    "order": 427,
+    "order": 428,
     "kana": "ちかい",
     "written": "近い",
     "jmdict": "1242130",
@@ -5308,7 +5321,7 @@
   },
   {
     "id": "cw-0428",
-    "order": 428,
+    "order": 429,
     "kana": "とおい",
     "written": "遠い",
     "jmdict": "1177800",
@@ -5320,7 +5333,7 @@
   },
   {
     "id": "cw-0429",
-    "order": 429,
+    "order": 430,
     "kana": "しずか",
     "written": "静か",
     "jmdict": "1381820",
@@ -5332,7 +5345,7 @@
   },
   {
     "id": "cw-0430",
-    "order": 430,
+    "order": 431,
     "kana": "うるさい",
     "jmdict": "1481920",
     "en": "noisy; annoying",
@@ -5343,7 +5356,7 @@
   },
   {
     "id": "cw-0431",
-    "order": 431,
+    "order": 432,
     "kana": "べんり",
     "written": "便利",
     "jmdict": "1512610",
@@ -5355,7 +5368,7 @@
   },
   {
     "id": "cw-0432",
-    "order": 432,
+    "order": 433,
     "kana": "じょうず",
     "written": "上手",
     "jmdict": "1353320",
@@ -5368,7 +5381,7 @@
   },
   {
     "id": "cw-0433",
-    "order": 433,
+    "order": 434,
     "kana": "へた",
     "written": "下手",
     "jmdict": "1185200",
@@ -5380,7 +5393,7 @@
   },
   {
     "id": "cw-0434",
-    "order": 434,
+    "order": 435,
     "kana": "すてき",
     "written": "素敵",
     "jmdict": "1397350",
@@ -5392,7 +5405,7 @@
   },
   {
     "id": "cw-0435",
-    "order": 435,
+    "order": 436,
     "kana": "かっこいい",
     "jmdict": "1577490",
     "en": "cool; good-looking",
@@ -5403,7 +5416,7 @@
   },
   {
     "id": "cw-0436",
-    "order": 436,
+    "order": 437,
     "kana": "やさしい",
     "written": "優しい",
     "jmdict": "1539040",
@@ -5415,7 +5428,7 @@
   },
   {
     "id": "cw-0437",
-    "order": 437,
+    "order": 438,
     "kana": "だめ",
     "jmdict": "1409110",
     "en": "no good; not allowed",
@@ -5427,7 +5440,7 @@
   },
   {
     "id": "cw-0438",
-    "order": 438,
+    "order": 439,
     "kana": "いや",
     "written": "嫌",
     "jmdict": "1587610",
@@ -5440,7 +5453,7 @@
   },
   {
     "id": "cw-0439",
-    "order": 439,
+    "order": 440,
     "kana": "やる",
     "jmdict": "1012980",
     "en": "to do (casual)",
@@ -5452,7 +5465,7 @@
   },
   {
     "id": "cw-0440",
-    "order": 440,
+    "order": 441,
     "kana": "はなし",
     "written": "話",
     "jmdict": "1600900",
@@ -5465,7 +5478,7 @@
   },
   {
     "id": "cw-0441",
-    "order": 441,
+    "order": 442,
     "kana": "つよい",
     "written": "強い",
     "jmdict": "1236070",
@@ -5477,7 +5490,7 @@
   },
   {
     "id": "cw-0442",
-    "order": 442,
+    "order": 443,
     "kana": "よわい",
     "written": "弱い",
     "jmdict": "1324520",
@@ -5489,7 +5502,7 @@
   },
   {
     "id": "cw-0443",
-    "order": 443,
+    "order": 444,
     "kana": "ゆっくり",
     "jmdict": "1013050",
     "en": "slowly; take your time",
@@ -5502,7 +5515,7 @@
   },
   {
     "id": "cw-0444",
-    "order": 444,
+    "order": 445,
     "kana": "しあわせ",
     "written": "幸せ",
     "jmdict": "1594060",
@@ -5515,7 +5528,7 @@
   },
   {
     "id": "cw-0445",
-    "order": 445,
+    "order": 446,
     "kana": "しんぱいする",
     "written": "心配する",
     "jmdict": "1360930",
@@ -5528,7 +5541,7 @@
   },
   {
     "id": "cw-0446",
-    "order": 446,
+    "order": 447,
     "kana": "きもち",
     "written": "気持ち",
     "jmdict": "1591430",
@@ -5541,7 +5554,7 @@
   },
   {
     "id": "cw-0447",
-    "order": 447,
+    "order": 448,
     "kana": "たのしみ",
     "written": "楽しみ",
     "jmdict": "1207250",
@@ -5554,7 +5567,7 @@
   },
   {
     "id": "cw-0448",
-    "order": 448,
+    "order": 449,
     "kana": "よかった",
     "en": "I'm glad; that's good",
     "pos": "expression",
@@ -5565,7 +5578,7 @@
   },
   {
     "id": "cw-0449",
-    "order": 449,
+    "order": 450,
     "kana": "あいたい",
     "written": "会いたい",
     "en": "I want to see you; I miss you",
@@ -5577,7 +5590,7 @@
   },
   {
     "id": "cw-0450",
-    "order": 450,
+    "order": 451,
     "kana": "きをつける",
     "written": "気をつける",
     "jmdict": "1591990",
@@ -5590,7 +5603,7 @@
   },
   {
     "id": "cw-0451",
-    "order": 451,
+    "order": 452,
     "kana": "むり",
     "written": "無理",
     "jmdict": "1530970",
@@ -5603,7 +5616,7 @@
   },
   {
     "id": "cw-0452",
-    "order": 452,
+    "order": 453,
     "kana": "まい",
     "written": "枚",
     "jmdict": "1524610",
@@ -5616,7 +5629,7 @@
   },
   {
     "id": "cw-0453",
-    "order": 453,
+    "order": 454,
     "kana": "いっぽん",
     "written": "一本",
     "jmdict": "1166600",
@@ -5629,7 +5642,7 @@
   },
   {
     "id": "cw-0454",
-    "order": 454,
+    "order": 455,
     "kana": "こ",
     "written": "個",
     "jmdict": "1264740",
@@ -5642,7 +5655,7 @@
   },
   {
     "id": "cw-0455",
-    "order": 455,
+    "order": 456,
     "kana": "かい",
     "written": "回",
     "jmdict": "1199330",
@@ -5655,7 +5668,7 @@
   },
   {
     "id": "cw-0456",
-    "order": 456,
+    "order": 457,
     "kana": "はい",
     "written": "杯",
     "jmdict": "2019640",
@@ -5668,7 +5681,7 @@
   },
   {
     "id": "cw-0457",
-    "order": 457,
+    "order": 458,
     "kana": "ひき",
     "written": "匹",
     "jmdict": "1583370",
@@ -5681,7 +5694,7 @@
   },
   {
     "id": "cw-0458",
-    "order": 458,
+    "order": 459,
     "kana": "さつ",
     "written": "冊",
     "jmdict": "1298520",
@@ -5694,7 +5707,7 @@
   },
   {
     "id": "cw-0459",
-    "order": 459,
+    "order": 460,
     "kana": "だい",
     "written": "台",
     "jmdict": "1412560",
@@ -5706,7 +5719,7 @@
   },
   {
     "id": "cw-0460",
-    "order": 460,
+    "order": 461,
     "kana": "ばん",
     "written": "番",
     "jmdict": "2022640",
@@ -5719,7 +5732,7 @@
   },
   {
     "id": "cw-0461",
-    "order": 461,
+    "order": 462,
     "kana": "たんじょうび",
     "written": "誕生日",
     "jmdict": "1419110",
@@ -5732,7 +5745,7 @@
   },
   {
     "id": "cw-0462",
-    "order": 462,
+    "order": 463,
     "kana": "きねんび",
     "written": "記念日",
     "jmdict": "1223380",
@@ -5744,7 +5757,7 @@
   },
   {
     "id": "cw-0463",
-    "order": 463,
+    "order": 464,
     "kana": "やくそく",
     "written": "約束",
     "jmdict": "1538130",
@@ -5757,7 +5770,7 @@
   },
   {
     "id": "cw-0464",
-    "order": 464,
+    "order": 465,
     "kana": "よてい",
     "written": "予定",
     "jmdict": "1543240",
@@ -5770,7 +5783,7 @@
   },
   {
     "id": "cw-0465",
-    "order": 465,
+    "order": 466,
     "kana": "いつか",
     "jmdict": "1188790",
     "en": "someday; sometime",
@@ -5782,7 +5795,7 @@
   },
   {
     "id": "cw-0466",
-    "order": 466,
+    "order": 467,
     "kana": "けっこんする",
     "written": "結婚する",
     "jmdict": "1254790",
@@ -5795,7 +5808,7 @@
   },
   {
     "id": "cw-0467",
-    "order": 467,
+    "order": 468,
     "kana": "ペット",
     "jmdict": "1120990",
     "en": "pet",
@@ -5806,7 +5819,7 @@
   },
   {
     "id": "cw-0468",
-    "order": 468,
+    "order": 469,
     "kana": "いぬ",
     "written": "犬",
     "jmdict": "1258330",
@@ -5818,7 +5831,7 @@
   },
   {
     "id": "cw-0469",
-    "order": 469,
+    "order": 470,
     "kana": "ねこ",
     "written": "猫",
     "jmdict": "1467640",
@@ -5830,7 +5843,7 @@
   },
   {
     "id": "cw-0470",
-    "order": 470,
+    "order": 471,
     "kana": "にもつ",
     "written": "荷物",
     "jmdict": "1195430",
@@ -5842,7 +5855,7 @@
   },
   {
     "id": "cw-0471",
-    "order": 471,
+    "order": 472,
     "kana": "れいぞうこ",
     "written": "冷蔵庫",
     "jmdict": "1557110",
@@ -5854,7 +5867,7 @@
   },
   {
     "id": "cw-0472",
-    "order": 472,
+    "order": 473,
     "kana": "まど",
     "written": "窓",
     "jmdict": "1401400",
@@ -5866,7 +5879,7 @@
   },
   {
     "id": "cw-0473",
-    "order": 473,
+    "order": 474,
     "kana": "がつ",
     "written": "月",
     "jmdict": "2871532",
@@ -5879,7 +5892,7 @@
   },
   {
     "id": "cw-0474",
-    "order": 474,
+    "order": 475,
     "kana": "にち",
     "written": "日",
     "jmdict": "2083100",
@@ -5892,7 +5905,7 @@
   },
   {
     "id": "cw-0475",
-    "order": 475,
+    "order": 476,
     "kana": "ねん",
     "written": "年",
     "jmdict": "2084840",
@@ -5905,7 +5918,7 @@
   },
   {
     "id": "cw-0476",
-    "order": 476,
+    "order": 477,
     "kana": "ついたち",
     "written": "一日",
     "jmdict": "2225040",
@@ -5918,7 +5931,7 @@
   },
   {
     "id": "cw-0477",
-    "order": 477,
+    "order": 478,
     "kana": "ふつか",
     "written": "二日",
     "jmdict": "1462900",
@@ -5930,7 +5943,7 @@
   },
   {
     "id": "cw-0478",
-    "order": 478,
+    "order": 479,
     "kana": "みっか",
     "written": "三日",
     "jmdict": "1301330",
@@ -5942,7 +5955,7 @@
   },
   {
     "id": "cw-0479",
-    "order": 479,
+    "order": 480,
     "kana": "よっか",
     "written": "四日",
     "jmdict": "1307320",
@@ -5954,7 +5967,7 @@
   },
   {
     "id": "cw-0480",
-    "order": 480,
+    "order": 481,
     "kana": "いつか",
     "written": "五日",
     "jmdict": "1268570",
@@ -5966,7 +5979,7 @@
   },
   {
     "id": "cw-0481",
-    "order": 481,
+    "order": 482,
     "kana": "むいか",
     "written": "六日",
     "jmdict": "1561470",
@@ -5978,7 +5991,7 @@
   },
   {
     "id": "cw-0482",
-    "order": 482,
+    "order": 483,
     "kana": "なのか",
     "written": "七日",
     "jmdict": "1579630",
@@ -5990,7 +6003,7 @@
   },
   {
     "id": "cw-0483",
-    "order": 483,
+    "order": 484,
     "kana": "ようか",
     "written": "八日",
     "jmdict": "1476920",
@@ -6002,7 +6015,7 @@
   },
   {
     "id": "cw-0484",
-    "order": 484,
+    "order": 485,
     "kana": "ここのか",
     "written": "九日",
     "jmdict": "1243850",
@@ -6014,7 +6027,7 @@
   },
   {
     "id": "cw-0485",
-    "order": 485,
+    "order": 486,
     "kana": "とおか",
     "written": "十日",
     "jmdict": "1335000",
@@ -6026,7 +6039,7 @@
   },
   {
     "id": "cw-0486",
-    "order": 486,
+    "order": 487,
     "kana": "はつか",
     "written": "二十日",
     "jmdict": "1600850",
@@ -6038,7 +6051,7 @@
   },
   {
     "id": "cw-0487",
-    "order": 487,
+    "order": 488,
     "kana": "なんにち",
     "written": "何日",
     "jmdict": "1189240",
@@ -6050,7 +6063,7 @@
   },
   {
     "id": "cw-0488",
-    "order": 488,
+    "order": 489,
     "kana": "なんがつ",
     "written": "何月",
     "jmdict": "1188700",
@@ -6062,7 +6075,7 @@
   },
   {
     "id": "cw-0489",
-    "order": 489,
+    "order": 490,
     "kana": "なんさい",
     "written": "何歳",
     "jmdict": "1188730",
@@ -6075,7 +6088,7 @@
   },
   {
     "id": "cw-0490",
-    "order": 490,
+    "order": 491,
     "kana": "はる",
     "written": "春",
     "jmdict": "1341000",
@@ -6087,7 +6100,7 @@
   },
   {
     "id": "cw-0491",
-    "order": 491,
+    "order": 492,
     "kana": "なつ",
     "written": "夏",
     "jmdict": "1191320",
@@ -6099,7 +6112,7 @@
   },
   {
     "id": "cw-0492",
-    "order": 492,
+    "order": 493,
     "kana": "あき",
     "written": "秋",
     "jmdict": "1332650",
@@ -6111,7 +6124,7 @@
   },
   {
     "id": "cw-0493",
-    "order": 493,
+    "order": 494,
     "kana": "ふゆ",
     "written": "冬",
     "jmdict": "1446070",
@@ -6123,7 +6136,7 @@
   },
   {
     "id": "cw-0494",
-    "order": 494,
+    "order": 495,
     "kana": "かえす",
     "written": "返す",
     "jmdict": "1512130",
@@ -6136,7 +6149,7 @@
   },
   {
     "id": "cw-0495",
-    "order": 495,
+    "order": 496,
     "kana": "かす",
     "written": "貸す",
     "jmdict": "1411160",
@@ -6149,7 +6162,7 @@
   },
   {
     "id": "cw-0496",
-    "order": 496,
+    "order": 497,
     "kana": "かりる",
     "written": "借りる",
     "jmdict": "1323560",
@@ -6162,7 +6175,7 @@
   },
   {
     "id": "cw-0497",
-    "order": 497,
+    "order": 498,
     "kana": "おくる",
     "written": "送る",
     "jmdict": "1402730",
@@ -6175,7 +6188,7 @@
   },
   {
     "id": "cw-0498",
-    "order": 498,
+    "order": 499,
     "kana": "よぶ",
     "written": "呼ぶ",
     "jmdict": "1266440",
@@ -6188,7 +6201,7 @@
   },
   {
     "id": "cw-0499",
-    "order": 499,
+    "order": 500,
     "kana": "たのむ",
     "written": "頼む",
     "jmdict": "1548370",
@@ -6198,18 +6211,5 @@
     "topic": "actions",
     "use": false,
     "note": "polite: たのみます"
-  },
-  {
-    "id": "cw-0500",
-    "order": 500,
-    "kana": "おしえる",
-    "written": "教える",
-    "jmdict": "1236900",
-    "en": "to teach; to tell",
-    "pos": "verb-ru",
-    "register": "both",
-    "topic": "school",
-    "use": false,
-    "note": "polite: おしえます. おしえて = tell me"
   }
 ]

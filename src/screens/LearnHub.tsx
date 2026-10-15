@@ -1,56 +1,59 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  PHASE_NAMES,
-  phaseDetail,
-  phaseFraction,
-  phaseKanjiTargets,
-  phaseProgressText,
-  plural,
-  type KanjiTargets,
-} from '../components/home/labels.ts';
+import { CanDoList } from '../components/home/CanDoList.tsx';
+import { ChapterCard } from '../components/home/ChapterCard.tsx';
+import { CoverageCard } from '../components/home/CoverageCard.tsx';
+import { HoursCard } from '../components/home/HoursCard.tsx';
+import { plural } from '../components/home/labels.ts';
+import { MilestonesCard } from '../components/home/MilestonesCard.tsx';
+import { RetentionCard } from '../components/home/RetentionCard.tsx';
+import { SeasonCard } from '../components/home/SeasonCard.tsx';
+import { SpeedCard } from '../components/home/SpeedCard.tsx';
 import { useLive } from '../components/home/useLive.ts';
-import { Icon, ProgressBar, Screen } from '../components/ui.tsx';
-import { loadCurriculum, loadGrammar, loadRolePlays } from '../lib/data.ts';
-import { db } from '../lib/db.ts';
-import { courseProgress, type CourseProgress, type Phase } from '../srs/course.ts';
+import { Icon, Screen } from '../components/ui.tsx';
+import { loadUnits } from '../lib/data.ts';
+import { dayKey, db, getSettings } from '../lib/db.ts';
+import { canDoStatus } from '../srs/candos.ts';
+import { courseProgress, currentUnit } from '../srs/course.ts';
+import { firstStudyDay } from '../srs/habits.ts';
+import { chapterInfo, seasonFinaleDue } from '../srs/milestones.ts';
+import { hoursTotal, learnedCounts, readingSpeed, retention } from '../srs/progress.ts';
+import { isPairedSettings } from '../sync/client.ts';
 import '../components/home/home.css';
+import '../components/home/library.css';
 
-const ALL_PHASES: Phase[] = [1, 2, 3, 4];
-
-function PhaseCard({ progress, targets }: { progress: CourseProgress; targets: KanjiTargets }) {
-  const current = progress.phase;
-  return (
-    <section className="card learn-phase" aria-labelledby="phase-title">
-      <div>
-        <p className="label">Your path</p>
-        <h2 id="phase-title" className="hm-notice-title">Phase {current} of 4</h2>
-      </div>
-      <ol className="roadmap">
-        {ALL_PHASES.map((n) => {
-          const state = n < current ? 'done' : n === current ? 'current' : 'later';
-          return (
-            <li key={n} className={state} aria-current={n === current ? 'step' : undefined}>
-              <span className="roadmap-num" aria-hidden="true">{n < current ? <Icon name="check" size={14} strokeWidth={3} /> : n}</span>
-              <div className="roadmap-body">
-                <span className="roadmap-name">
-                  {PHASE_NAMES[n]}
-                  {n < current && <span className="visually-hidden"> (done)</span>}
-                </span>
-                <span className="roadmap-detail">{phaseDetail(n, targets)}</span>
-                {n === current && (
-                  <div className="roadmap-progress">
-                    <ProgressBar value={phaseFraction(progress)} label={`Progress in phase ${n}`} />
-                    <span>{phaseProgressText(progress)}</span>
-                  </div>
-                )}
-              </div>
-            </li>
-          );
-        })}
-      </ol>
-    </section>
-  );
+async function loadHub(now: Date = new Date()) {
+  const [progress, learned, units, unitId, status, grammarIds, stats, hours, speed, firstDay, milestones, settings] = await Promise.all([
+    courseProgress(now),
+    learnedCounts(now),
+    loadUnits(),
+    currentUnit(now),
+    canDoStatus(),
+    db.items.where('kind').equals('grammar').primaryKeys(),
+    retention(now),
+    hoursTotal(),
+    readingSpeed(),
+    firstStudyDay(now),
+    db.milestones.toArray(),
+    getSettings(),
+  ]);
+  const today = dayKey(now);
+  const seen = new Set(milestones.filter((m) => m.seenAt).map((m) => m.id));
+  const passed = [...status.values()].filter((r) => r.passedAt).sort((a, b) => b.passedAt!.getTime() - a.passedAt!.getTime());
+  return {
+    progress,
+    learned,
+    chapter: chapterInfo(progress.kanjiIntroduced, progress.kanaIntroduced, progress.kanaTotal),
+    unit: units.find((u) => u.id === unitId),
+    status,
+    grammarIntroduced: new Set(grammarIds.map((id) => String(id).slice('grammar:'.length))),
+    retention: stats,
+    hours,
+    speed,
+    season: seasonFinaleDue(firstDay, today, seen),
+    passedCanDo: passed[0]?.id,
+    paired: isPairedSettings(settings),
+  };
 }
 
 function HubTile({ to, mark, title, sub, wide }: { to: string; mark: ReactNode; title: string; sub?: string; wide?: boolean }) {
@@ -68,16 +71,7 @@ function HubTile({ to, mark, title, sub, wide }: { to: string; mark: ReactNode; 
 }
 
 export default function LearnHub() {
-  const hub = useLive(async () => {
-    const [progress, curriculum, grammar, rolePlays, grammarDone] = await Promise.all([
-      courseProgress(),
-      loadCurriculum(),
-      loadGrammar(),
-      loadRolePlays(),
-      db.items.where('kind').equals('grammar').count(),
-    ]);
-    return { progress, targets: phaseKanjiTargets(curriculum), grammarTotal: grammar.length, grammarDone, rolePlays: rolePlays.length };
-  }, []);
+  const hub = useLive(() => loadHub(), []);
   const h = hub.status === 'ready' ? hub.value : undefined;
 
   return (
@@ -95,19 +89,29 @@ export default function LearnHub() {
           <button type="button" className="btn secondary small" onClick={hub.retry}>Try again</button>
         </section>
       )}
-      {h && <PhaseCard progress={h.progress} targets={h.targets} />}
+
+      {h && h.season !== null && (
+        <SeasonCard season={h.season} counts={h.learned} hours={h.hours} paired={h.paired} passedCanDo={h.passedCanDo} />
+      )}
+      {h && <ChapterCard info={h.chapter} theme={h.unit?.title} />}
+      {h?.unit && <CanDoList unit={h.unit} status={h.status} grammarIntroduced={h.grammarIntroduced} />}
 
       <nav className="hub-tiles" aria-label="Study areas">
-        <HubTile to="/kanji" mark="漢" title="Kanji library" wide
-          sub={h ? `${plural(h.progress.kanjiIntroduced, 'kanji', 'kanji')} learned · ${h.targets[4].toLocaleString()} in all` : undefined} />
+        <HubTile to="/library" mark="漢" title="Library" wide
+          sub={h ? `${plural(h.progress.kanjiIntroduced, 'kanji', 'kanji')} and ${plural(h.learned.wordsIntroduced, 'word')} so far` : undefined} />
         <HubTile to="/kana" mark="あ" title="Kana chart"
           sub={h ? `${h.progress.kanaIntroduced} of ${h.progress.kanaTotal} kana learned` : undefined} />
         <HubTile to="/grammar" mark="は" title="Grammar"
-          sub={h ? `${h.grammarDone} of ${h.grammarTotal} learned` : undefined} />
-        <HubTile to="/read" mark="読" title="Read & shadow" sub="Listen, read, say it back" />
-        <HubTile to="/roleplay" mark="話" title="Role-plays"
-          sub={h ? `${plural(h.rolePlays, 'scene')} to act out` : 'Scenes to act out'} />
+          sub={h ? `${plural(h.progress.grammarIntroduced, 'point')} learned` : undefined} />
+        <HubTile to="/library/stories" mark="読" title="Stories" sub="Read and listen" />
+        <HubTile to="/roleplay" mark="話" title="Role-plays" sub="Scenes to act out" />
       </nav>
+
+      {h && <CoverageCard kanjiCanRead={h.learned.kanjiCanRead} wordsKnown={h.learned.wordsLearned} />}
+      {h && <RetentionCard stats={h.retention} />}
+      {h && <HoursCard hours={h.hours} />}
+      {h && <SpeedCard latest={h.speed.latest} best={h.speed.best} />}
+      {h && <MilestonesCard counts={{ ...h.learned, kanaIntroduced: h.progress.kanaIntroduced, kanaTotal: h.progress.kanaTotal }} />}
     </Screen>
   );
 }

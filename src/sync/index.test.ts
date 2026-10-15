@@ -6,10 +6,26 @@ import { FakeSocket, installFakeSocket } from './testSocket.ts';
 
 vi.mock('../srs/progress.ts', () => ({
   knownKanji: async () => ['一'],
-  streak: async () => ({ current: 1, best: 1, todayDone: false, week: [] }),
   weekStats: async () => [],
 }));
-vi.mock('../srs/course.ts', () => ({ currentPhase: async () => 2 }));
+vi.mock('../srs/habits.ts', () => ({
+  streak: async () => ({ current: 1, alive: true, longest: 1 }),
+  creditTogetherSession: async () => false,
+}));
+vi.mock('../srs/memberProgress.ts', () => ({
+  memberProgress: async () => ({
+    unit: 1, chapter: 0, kanjiCanWrite: 0, kanjiCanRead: 0, wordsKnown: 0, grammarKnown: 0, hoursTotal: 0, daysThisMonth: 1,
+    longestStreak: 1, readyStories: [], recentKanji: [], recentItems: [], settledUnit: 0, coreReached: 0, grammarReached: 0,
+  }),
+}));
+vi.mock('../srs/output.ts', () => ({
+  pendingOutputChecks: async () => [],
+  completeOutputCheck: async () => ({}),
+  learnerAiContext: async () => ({}),
+}));
+vi.mock('../srs/together.ts', () => ({ applyPartnerVerdicts: async () => ({ graded: 0, practiced: 0 }) }));
+
+const together = { slots: [], goal: null, stages: {}, smooth: {}, sessions: [], tasks: [], checkins: [], capstones: [] };
 
 const json = (body: unknown) => new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
 
@@ -19,6 +35,8 @@ const fetchMock = vi.fn<typeof fetch>(async (input, init) => {
   requests.push(`${init?.method ?? 'GET'} ${path}`);
   if (path === '/api/messages') return json([]);
   if (path === '/api/household') return json({ householdName: 'Home', me: 'me', members: [], sharedStreak: 0 });
+  if (path === '/api/together') return json(together);
+  if (path === '/api/quizzes') return json({ inbox: [], sent: [] });
   return json({ ok: true });
 });
 
@@ -56,6 +74,7 @@ describe('startSync', () => {
     await vi.waitFor(() => {
       expect(requests).toContain('GET /api/messages');
       expect(requests).toContain('GET /api/household');
+      expect(requests).toContain('GET /api/together');
       expect(requests).toContain('POST /api/stats');
     });
 
@@ -72,14 +91,21 @@ describe('startSync', () => {
     expect(FakeSocket.latest().url).toBe(`ws://${location.host}/api/ws?token=tok`);
   });
 
-  it('shares stats right away when a session is completed', async () => {
+  it('shares stats right away when the day becomes a minimum day, and again when its goal is met', async () => {
     await updateSettings({ serverUrl: 'https://home.example', deviceToken: 'tok', memberId: 'me' });
     const today = dayKey();
-    await db.days.put({ date: today, studyMs: 0, reviews: 3, correct: 3, newItems: 0, sessionComplete: false });
+    await db.days.put({
+      date: today, studyMs: 0, togetherMs: 0, reviews: 3, correct: 3, reviewMs: 60_000, strandMs: 0, newItems: 0,
+      newSec: { sprint: 0, kanji: 0, staged: 0, core: 0, grammar: 0 }, minimumDone: false, goalMet: false, steps: [],
+    });
     stop = startSync();
-    await vi.waitFor(() => expect(requests.filter((r) => r === 'POST /api/stats')).toHaveLength(1));
+    const statsPosts = () => requests.filter((r) => r === 'POST /api/stats');
+    await vi.waitFor(() => expect(statsPosts()).toHaveLength(1));
 
-    await db.days.update(today, { sessionComplete: true });
-    await vi.waitFor(() => expect(requests.filter((r) => r === 'POST /api/stats')).toHaveLength(2), { timeout: 2000 });
+    await db.days.update(today, { minimumDone: true });
+    await vi.waitFor(() => expect(statsPosts()).toHaveLength(2), { timeout: 2000 });
+
+    await db.days.update(today, { goalMet: true });
+    await vi.waitFor(() => expect(statsPosts()).toHaveLength(3), { timeout: 2000 });
   });
 });

@@ -33,15 +33,29 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // manifest.webmanifest is added by the plugin itself.
+        // manifest.webmanifest is added by the plugin itself. This includes audio/manifest.json
+        // (precompressed by the server) but no voice clip: those are cached at runtime, below.
         globPatterns: ['**/*.{js,css,html,svg,png,json}'],
         // On first install the new service worker takes over the open page, so the app works
         // offline without a reload. Updates still wait for "Reload" (no skipWaiting).
         clientsClaim: true,
         maximumFileSizeToCacheInBytes: 12 * 1024 * 1024,
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/api\//],
+        navigateFallbackDenylist: [/^\/api\//, /^\/audio\//],
         runtimeCaching: [
+          // Voice clips (about 9,700, 70–80 MB in all) are fetched as they are first played, and in
+          // packs per unit and kanji chapter by prefetchPacks() (src/speech/audio.ts), so a phone
+          // keeps only what its learner has reached. Their names are content hashes, so a cached
+          // clip never goes stale. The cache name is AUDIO_CACHE in audio.ts.
+          {
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith('/audio/') && url.pathname.endsWith('.m4a'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'issho-audio-v1',
+              expiration: { maxEntries: 15000 },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
           {
             urlPattern: ({ url }) => url.origin === 'https://fonts.googleapis.com' || url.origin === 'https://fonts.gstatic.com',
             handler: 'CacheFirst',
@@ -65,5 +79,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test-setup.ts'],
     include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'],
+    // The home server runs in process for the app's integration tests (src/sync/test-server.ts): Node loads it
+    // as it does in production, so its import.meta.url is a file URL and its own dependencies resolve.
+    server: { deps: { external: [/\/server\/src\//] } },
   },
 });

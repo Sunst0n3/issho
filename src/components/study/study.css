@@ -130,6 +130,8 @@
 
 .st-selfgrade { display: flex; flex-direction: column; gap: 8px; }
 .st-selfgrade-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.st-selfgrade-row.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.st-grade:disabled { opacity: 0.6; cursor: default; }
 .st-grade {
   min-height: 60px; padding: 6px 4px; border-radius: 14px; border: 1px solid var(--line);
   background: var(--card); color: var(--ink); font-weight: 700; cursor: pointer;
@@ -303,6 +305,144 @@
 .st-grammar-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .st-grammar-pattern { font-family: var(--font-display); font-size: 18px; }
 .st-grammar-title { font-size: 13px; color: var(--muted); }
+
+/* ---- v2 cards ---- */
+.st-kana-input { font-family: var(--font-display); font-size: 22px; }
+.st-kanatext ruby rt, .st-romaji-ruby rt { font-family: var(--font-body); font-size: 0.42em; color: var(--muted); letter-spacing: 0.02em; }
+.st-mark { color: var(--shu); text-decoration: underline 3px var(--shu); text-underline-offset: 0.2em; }
+.st-reveal { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.st-reveal-kana, .st-reveal-word { font-family: var(--font-display); font-size: 26px; line-height: 1.6; }
+.st-write-cue { gap: 6px 10px; }
+.st-write-keyword { font-family: var(--font-body); font-size: 24px; }
+.st-write-blanked { font-family: var(--font-display); font-size: 26px; }
+.st-write-en { font-family: var(--font-body); font-size: 17px; font-weight: 400; color: var(--muted); }
+.st-verdict { font-weight: 700; text-align: center; }
+.st-verdict.good { color: var(--ai-ink); }
+.st-verdict.bad { color: var(--shu-ink); }
+.st-speak { display: flex; flex-direction: column; gap: 6px; }
+.st-model { display: flex; justify-content: center; color: var(--ink); }
+
+/* Tiles for building a sentence */
+.st-tiles { display: flex; flex-direction: column; gap: 10px; }
+.st-built {
+  min-height: 60px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0;
+  padding: 8px 10px; border-radius: var(--r-md); border: 1.5px dashed var(--line-strong); background: var(--card);
+}
+.st-built.good { border-style: solid; border-color: var(--good); background: var(--ai-tint); }
+.st-built.bad { border-style: solid; border-color: var(--shu); background: var(--shu-tint); }
+.st-built-empty { color: var(--muted); font-size: 14px; }
+.st-tile-tray { display: flex; flex-wrap: wrap; gap: 8px; }
+.st-tile {
+  min-height: var(--tap); padding: 6px 14px; border-radius: 12px; border: 1px solid var(--line-strong);
+  background: var(--card); color: var(--ink); font-family: var(--font-display); font-size: 20px; cursor: pointer;
+}
+.st-tile:disabled { opacity: 0.35; cursor: default; }
+.st-tile.placed { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.st-tile.placed:disabled { opacity: 1; }
+
+/* Feedback v2 */
+.st-fb-answer { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0; }
+.st-fb-jp { font-family: var(--font-display); font-size: 24px; line-height: 1.7; }
+.st-fb-text { font-weight: 700; }
+.st-fb-en { font-size: 15px; }
+.st-fb-fast { cursor: pointer; }
+.st-fb-teach { display: flex; flex-direction: column; gap: 12px; }
+.st-fb-section { display: flex; flex-direction: column; gap: 6px; }
+.st-fb-sentence { font-family: var(--font-display); font-size: 22px; line-height: 1.8; }
+.st-fb-parts, .st-parts-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.st-fb-parts li, .st-parts-list li {
+  display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: var(--r-md);
+  background: var(--paper); border: 1px solid var(--line); font-size: 14px;
+}
+.st-fb-related { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.st-fb-related li { display: flex; align-items: baseline; gap: 10px; }
+.st-fb-tip { padding: 10px 14px; border-radius: var(--r-md); background: var(--ai-tint); color: var(--ai-ink); }
+
+/* Pitch lines: dots joined by a line, high or low per mora; the particle dot hollow */
+.st-pitch { display: block; margin: 0 auto; overflow: visible; }
+.st-pitch-line { fill: none; stroke: var(--ai); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.st-pitch-dot { fill: var(--ai); }
+.st-pitch-dot.particle { fill: var(--card); stroke: var(--ai); stroke-width: 1.6; }
+.st-pitch-mora { font-family: var(--font-display); font-size: 13px; fill: var(--ink); }
+.st-pitch-md .st-pitch-mora { font-size: 16px; }
+.st-pitch-mora.particle { fill: var(--muted); }
+.st-phrase-pitch { max-width: 100%; overflow-x: auto; display: flex; justify-content: center; }
+.st-pitch-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.st-pitch-option { min-height: 72px; display: flex; align-items: center; justify-content: center; padding: 8px; }
+
+/* Lessons v2 */
+.st-kana-hook { font-size: 16px; text-align: center; color: var(--shu-ink); }
+.st-lesson-word { font-family: var(--font-display); }
+.st-listen-first { color: var(--muted); font-size: 18px; min-height: 64px; display: grid; place-items: center; }
+.st-upgrade { color: var(--muted); }
+.st-timer { height: 6px; border-radius: 3px; background: var(--paper-deep); overflow: hidden; width: 100%; }
+.st-timer > span { display: block; height: 100%; background: var(--shu); transform-origin: left; animation: st-timer linear both; }
+@keyframes st-timer { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+.st-parts { gap: 6px; }
+.st-part-name { color: var(--muted); }
+.st-anchor { display: flex; align-items: center; gap: 12px; }
+.st-anchor-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.st-pairs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+.st-pair {
+  width: 100%; min-height: 56px; display: flex; align-items: center; justify-content: center; gap: 6px;
+  border-radius: var(--r-md); border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer;
+}
+.st-pair-from { font-family: var(--font-display); font-size: 18px; color: var(--muted); }
+.st-pair-to { font-family: var(--font-display); font-size: 24px; }
+.st-pair-arrow { color: var(--muted); font-size: 13px; }
+.st-milestone { align-items: center; text-align: center; }
+
+/* Stories */
+.st-story-head { display: flex; flex-direction: column; gap: 2px; }
+.st-story-title { font-family: var(--font-display); font-size: 22px; }
+.st-story { display: flex; flex-direction: column; gap: 10px; }
+.st-story-sentence { font-family: var(--font-display); font-size: clamp(20px, 5.6vw, 24px); line-height: 2; line-break: strict; margin: 0; }
+.st-phrase { border-radius: 6px; transition: background-color 120ms ease-out; }
+.st-phrase.current { background: var(--ai-tint); color: var(--ai-ink); }
+.st-token {
+  padding: 0; margin: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer;
+  text-decoration: underline dotted var(--line-strong); text-underline-offset: 0.25em;
+}
+.st-listen-only { text-align: center; }
+.st-gloss { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+
+/* Today's sentence */
+.st-output { flex: 1 0 auto; display: flex; flex-direction: column; gap: 14px; }
+.st-output-result { display: flex; flex-direction: column; gap: 8px; }
+.st-output-target { font-family: var(--font-display); color: var(--shu-ink); }
+.st-output-text { font-family: var(--font-display); font-size: 22px; line-height: 1.8; margin: 0; }
+.st-issue { background: var(--shu-tint); color: var(--shu-ink); border-bottom: 2px solid var(--shu); border-radius: 3px; }
+.st-issue.maybe { border-bottom-style: dashed; }
+.st-issues { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.st-issues li { display: flex; align-items: baseline; gap: 8px; font-size: 15px; }
+.st-diff del { color: var(--shu-ink); text-decoration: line-through 2px; }
+.st-diff ins { color: var(--shu); text-decoration: none; border-bottom: 2px solid var(--shu); }
+.st-reveal-box { background: var(--card); border: 1px solid var(--line); color: var(--ink); }
+
+/* Fluency */
+.st-speed-head { display: flex; justify-content: space-between; }
+
+/* Summary v2 and the sitting choice */
+.st-can-now { font-family: var(--font-display); font-size: 20px; line-height: 1.6; }
+.st-stats.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.st-retention ul { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.st-retention li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; font-size: 14px; }
+.st-retention-family { font-weight: 700; }
+.st-sittings { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
+.st-sitting { width: 100%; text-align: left; border: 1px solid var(--line); cursor: pointer; font: inherit; }
+.st-sitting.default { border-color: var(--ink); border-width: 2px; }
+.st-sitting:disabled { opacity: 0.6; cursor: default; }
+
+/* Can-do checks */
+.st-material { font-family: var(--font-display); font-size: 20px; line-height: 1.9; white-space: pre-line; }
+.st-rubric { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; font-size: 15px; }
+.st-rubric li.met { color: var(--ai-ink); }
+.st-rubric li.unmet { color: var(--shu-ink); }
+.choice.selected { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  .st-timer > span, .st-phrase { animation: none; transition: none; }
+}
 
 /* Headings take focus when the content changes; the ring is only for keyboards. */
 .st-ask:focus:not(:focus-visible), .st-summary-title:focus:not(:focus-visible) { outline: none; }

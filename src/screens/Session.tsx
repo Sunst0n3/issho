@@ -1,36 +1,50 @@
-// Today's session: reviews first, then new items (lesson + writing), a first
-// check of the new cards, reading & shadowing, and a summary. The plan is
-// taken once when the screen opens; only the reading sentences are picked
-// again after the new items, so they can use the kanji just learned.
+// Today's sitting. The learner picks where they are (anywhere, at a desk, or all of it); the day is planned again
+// from progress for what is left, and the sitting runs its steps: warm-up → (teach, memory) per batch → read & listen
+// → first check → today's sentence → fluency → summary. Reopening re-plans, so stopping part-way loses nothing.
+// Short sessions from Today (?mode=micro|welcome|makeup) skip the choice.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { State } from 'ts-fsrs';
+import { loadStudyDisplay, StudyDisplayProvider } from '../components/study/DisplayProvider.tsx';
+import type { StudyDisplay } from '../components/study/display.ts';
 import { useScrollToTop } from '../components/study/focus.ts';
-import { learnedLabels, type LearnedLabel } from '../components/study/learn/data.ts';
-import { NewItemFlow, type LearnedItem } from '../components/study/learn/NewItemFlow.tsx';
-import { ReadingDrill } from '../components/study/ReadingDrill.tsx';
+import { FluencySprint } from '../components/study/FluencySprint.tsx';
+import { youCanNow } from '../components/study/learn/data.ts';
+import { MemoryPass, SPACED_RECALL_LINE } from '../components/study/learn/MemoryPass.tsx';
+import { NewItemFlow } from '../components/study/learn/NewItemFlow.tsx';
+import { markOutputResultsSeen, OutputResults, unseenOutputResults } from '../components/study/OutputResults.tsx';
+import { OutputStep } from '../components/study/OutputStep.tsx';
+import { ReadBlock } from '../components/study/ReadBlock.tsx';
 import { ReviewBlock, type BlockProgress } from '../components/study/ReviewBlock.tsx';
-import { sentencesById, type SentenceLike } from '../components/study/sentences.ts';
+import {
+  canRetrieve,
+  firstCheckIds,
+  initialSession,
+  sessionReducer,
+  stepLabel,
+  type LearnedItem,
+  type SessionEvent,
+  type SessionState,
+  type SessionStep,
+} from '../components/study/session/machine.ts';
 import { SessionHeader, StopDialog } from '../components/study/SessionChrome.tsx';
-import { SessionEmpty, SessionSummary, type SessionStats } from '../components/study/SessionSummary.tsx';
-import { useStudyTimer } from '../components/study/time.ts';
-import { Screen } from '../components/ui.tsx';
-import { shuffle } from '../srs/answers.ts';
-import { cardTypesFor } from '../srs/items.ts';
-import { deferNewCards, planReading, planToday, type SessionPlan } from '../srs/planner.ts';
-import { completeSession, learnedToday, type StreakInfo } from '../srs/progress.ts';
-import { pushStats } from '../sync/stats.ts';
+import { SessionEmpty, SessionSummary, type SummaryData } from '../components/study/SessionSummary.tsx';
+import { useStudyTimer, type StudyTimeKind } from '../components/study/time.ts';
+import { Icon, Screen } from '../components/ui.tsx';
+import { dayKey, db, getSettings } from '../lib/db.ts';
+import type { OutputSentenceRecord } from '../lib/types.ts';
+import { currentUnit } from '../srs/course.ts';
+import { weekStart } from '../srs/days.ts';
+import { completeDay, completeMakeup, completeMicro, streak, type StreakV2 } from '../srs/habits.ts';
+import { finishStep, planMakeup, planMicro, planToday, startSitting, type DayPlan, type Sitting } from '../srs/planner.ts';
+import { learnedToday, retention } from '../srs/progress.ts';
+import { packsFor, prefetchPacks, setDefaultAudioRate } from '../speech/audio.ts';
+import { pushStats, useHousehold } from '../sync/stats.ts';
 import '../components/study/study.css';
 
-type Step = 'review' | 'learn' | 'check' | 'read' | 'summary';
+type ShortMode = 'micro' | 'welcome' | 'makeup';
 
-interface Loaded {
-  plan: SessionPlan;
-  sentences: SentenceLike[];
-}
-
-const NO_PROGRESS: BlockProgress = { done: 0, position: 1, total: 0, practice: false };
+const NO_PROGRESS: BlockProgress = { done: 0, position: 1, total: 0, reask: false };
 
 /**
  * History state of the extra entry the session adds on top of its own, so the
@@ -38,157 +52,267 @@ const NO_PROGRESS: BlockProgress = { done: 0, position: 1, total: 0, practice: f
  * leaving it.
  */
 const BACK_GUARD = 'issho.sessionGuard';
+/** The ISO week whose retention card was last shown on this device (the first sitting of each week shows it). */
+const RETENTION_WEEK_KEY = 'issho.retention.week';
+const KANJI_PER_CHAPTER = 15;
+
+/** Plans whose finished steps complete the day (goal met). */
+const FULL_MODES: ReadonlySet<DayPlan['mode']> = new Set(['sprint', 'normal', 'catch-up', 'travel']);
+
+const SITTINGS: { sitting: Sitting; label: string; note: string }[] = [
+  { sitting: 'any', label: 'All of it', note: 'Everything planned for today' },
+  { sitting: 'desk', label: 'At my desk', note: 'Lessons, reading, the first check and your sentence' },
+  { sitting: 'anywhere', label: 'Anywhere (no pen)', note: 'Reviews only, handwriting with a finger' },
+];
+
+/** How time in a step is booked: reading, output and fluency count against the strand reserve. */
+function timeKindOf(step: SessionStep | undefined, mode: DayPlan['mode']): StudyTimeKind {
+  if (mode === 'makeup') return 'makeup';
+  return step && (step.id === 'read' || step.id === 'output' || step.id === 'fluency') ? 'strand' : 'lesson';
+}
+
+function shortModeOf(search: string): ShortMode | null {
+  const mode = new URLSearchParams(search).get('mode');
+  return mode === 'micro' || mode === 'welcome' || mode === 'makeup' ? mode : null;
+}
+
+function planFor(mode: ShortMode | null, sitting: Sitting, extraKanji: boolean): Promise<DayPlan> {
+  const now = new Date();
+  if (mode === 'micro') return planMicro(now);
+  if (mode === 'welcome') return planMicro(now, { welcomeBack: true });
+  if (mode === 'makeup') return planMakeup(now);
+  return planToday(now, { sitting, ...(extraKanji ? { extraKanji: true } : {}) });
+}
+
+/** The first sitting of this ISO week on this device shows the retention card; later ones don't. */
+function firstSittingOfWeek(): boolean {
+  const week = weekStart(dayKey());
+  try {
+    if (localStorage.getItem(RETENTION_WEEK_KEY) === week) return false;
+    localStorage.setItem(RETENTION_WEEK_KEY, week);
+  } catch {
+    // Storage blocked: show it; the card is harmless to repeat.
+  }
+  return true;
+}
+
+async function summaryData(plan: DayPlan, learned: readonly LearnedItem[], streakNow: StreakV2 | undefined): Promise<SummaryData> {
+  const [day, todayIds] = await Promise.all([db.days.get(dayKey()), learnedToday().catch(() => [] as string[])]);
+  const ids = todayIds.length ? todayIds : learned.flatMap((l) => l.itemIds);
+  const kanaWords = plan.read?.kind === 'kana-words' ? plan.read.kanaWords.map((w) => w.kana) : [];
+  const [canNow, stats] = await Promise.all([
+    youCanNow(ids, kanaWords).catch(() => undefined),
+    firstSittingOfWeek() ? retention().catch(() => undefined) : Promise.resolve(undefined),
+  ]);
+  return {
+    ...(canNow ? { canNow } : {}),
+    minutesToday: Math.max(day?.studyMs ? 1 : 0, Math.round((day?.studyMs ?? 0) / 60_000)),
+    tomorrowMin: plan.tomorrowMin,
+    ...(stats ? { retention: stats } : {}),
+    ...(streakNow ? { streak: streakNow } : {}),
+  };
+}
+
+function SittingChoice({ busy, onChoose, onClose }: { busy: boolean; onChoose: (s: Sitting) => void; onClose: () => void }) {
+  return (
+    <Screen label="Today's session">
+      <SessionHeader progress={0} label="" onClose={onClose} />
+      <section className="st-sittings" aria-labelledby="st-sitting-title" aria-busy={busy || undefined}>
+        <h1 id="st-sitting-title" className="st-summary-title">Where are you?</h1>
+        <p className="muted">Each sitting plans what is left of today.</p>
+        <div className="st-links">
+          {SITTINGS.map((s) => (
+            <button key={s.sitting} type="button" className={s.sitting === 'any' ? 'card st-link st-sitting default' : 'card st-link st-sitting'}
+              disabled={busy} onClick={() => onChoose(s.sitting)}>
+              <span><strong>{s.label}</strong><span className="muted">{s.note}</span></span>
+              <Icon name="forward" size={18} />
+            </button>
+          ))}
+        </div>
+      </section>
+    </Screen>
+  );
+}
+
+interface Loaded {
+  plan: DayPlan;
+  display: StudyDisplay;
+  /** Checks of earlier sentences that came back after they were sent: shown once, before the first step. */
+  results: OutputSentenceRecord[];
+}
 
 /**
- * The first check, from the new items just learned: each item's own cards and
- * each new word's reading card. Left for tomorrow's reviews: a kanji's reading
- * card when it brought new words (their reading cards ask it, in the same
- * word) and the words' meaning cards (each reading card's feedback shows the
- * meaning). That keeps the check quick.
+ * Each opening is its own session: a new mode from Today, or the summary's make-up offer (same route, another
+ * search), gets a fresh plan, timer and start-up guard instead of the finished session's state.
  */
-export function splitFirstCheck(learned: readonly Pick<LearnedItem, 'results'>[]): { check: string[]; later: string[] } {
-  const check: string[] = [];
-  const later: string[] = [];
-  for (const { results } of learned) {
-    const [main, ...words] = results;
-    const newWords = words.some((w) => w.cards.some((c) => c.state === State.New));
-    for (const result of results) {
-      for (const card of result.cards) {
-        if (card.state !== State.New) continue;
-        const askedByWords = result === main && card.kind === 'kanji' && card.type === 'reading' && newWords;
-        const wordMeaning = result !== main && card.type === 'meaning';
-        (askedByWords || wordMeaning ? later : check).push(card.id);
-      }
-    }
-  }
-  return { check, later };
-}
-
-/** Cards the first check will ask (see splitFirstCheck), for sizing the progress bar before they exist. */
-function expectedChecks(plan: SessionPlan): number {
-  return plan.newItems.reduce((n, item) => {
-    const words = item.words?.length ?? 0;
-    const own = cardTypesFor(item.kind, item.key).length - (item.kind === 'kanji' && words ? 1 : 0);
-    return n + own + words;
-  }, 0);
-}
-
-function firstStep(l: Loaded): Step | null {
-  if (l.plan.reviews.length) return 'review';
-  if (l.plan.newItems.length) return 'learn';
-  return null;
-}
-
 export default function Session() {
+  const { search } = useLocation();
+  return <SessionRun key={search} />;
+}
+
+function SessionRun() {
   const navigate = useNavigate();
   const location = useLocation();
-  const timer = useStudyTimer();
+  const shortMode = shortModeOf(location.search);
+  const extraKanji = new URLSearchParams(location.search).get('extra') === '1';
+  const timer = useStudyTimer(shortMode === 'makeup' ? 'makeup' : 'lesson');
+  const household = useHousehold();
   const [loaded, setLoaded] = useState<Loaded | null>(null);
+  const [planning, setPlanning] = useState(false);
   const [loadError, setLoadError] = useState(false);
-  const [step, setStep] = useState<Step>('review');
+  const [state, setState] = useState<SessionState | null>(null);
+  const [blockProgress, setBlockProgress] = useState(NO_PROGRESS);
+  const [summary, setSummary] = useState<SummaryData>();
   /** Why "Stop for now?" is open: the close button, or the back gesture. */
   const [confirming, setConfirming] = useState<false | 'close' | 'back'>(false);
-
-  const [reviewProgress, setReviewProgress] = useState(NO_PROGRESS);
-  const [learnIndex, setLearnIndex] = useState(0);
-  const [learned, setLearned] = useState<LearnedItem[]>([]);
-  const [checkIds, setCheckIds] = useState<string[] | null>(null);
-  const [checkProgress, setCheckProgress] = useState(NO_PROGRESS);
-  /** The sentences to read; null while they are picked again after the new items. */
-  const [reading, setReading] = useState<SentenceLike[] | null>([]);
-  const [readIndex, setReadIndex] = useState(0);
-  const [tally, setTally] = useState({ reviews: 0, correct: 0 });
-  const [streak, setStreak] = useState<StreakInfo>();
-  const [sessionMs, setSessionMs] = useState(0);
-  /** Everything introduced today, this sitting or earlier ones, once the summary has looked it up. */
-  const [learnedTodayLabels, setLearnedTodayLabels] = useState<LearnedLabel[]>();
-
-  useScrollToTop(`${step}:${learnIndex}`);
-
+  /** Day-0 retrievals, mirrored synchronously so a re-ask can be checked against the cap at once. */
+  const retrievals = useRef<Record<string, number>>({});
   const started = useRef(false);
-  /** Marking the day complete; stats go up once it has landed. */
   const completion = useRef<Promise<void> | null>(null);
-  const load = useCallback(async () => {
-    setLoadError(false);
-    try {
-      const plan = await planToday();
-      const sentences = await sentencesById(plan.reading);
-      const next = { plan, sentences };
-      setLoaded(next);
-      setReading(sentences);
-      setStep(firstStep(next) ?? 'review');
-    } catch (e) {
-      console.error('could not plan the session', e);
-      setLoadError(true);
-    }
-  }, []);
+  /** The step index last left: a second "done" from the same step (a late callback) is ignored. */
+  const advancedFrom = useRef(-1);
 
-  useEffect(() => {
+  const dispatch = useCallback((e: SessionEvent) => setState((s) => (s ? sessionReducer(s, e) : s)), []);
+
+  // ---- Planning: once per opening (StrictMode and double taps included) ----
+  const start = useCallback(async (sitting: Sitting) => {
     if (started.current) return;
     started.current = true;
-    void load();
-  }, [load]);
-
-  const answered = useCallback((correct: boolean) => {
-    setTally((t) => ({ reviews: t.reviews + 1, correct: t.correct + (correct ? 1 : 0) }));
-  }, []);
-
-  const goTo = (next: Step) => {
-    void timer.flush();
-    if (next === 'summary') {
-      setSessionMs(timer.elapsed());
-      completion.current = completeSession().then(setStreak, (e: unknown) => console.error('could not complete the session', e));
-      void learnedToday().then(learnedLabels).then(setLearnedTodayLabels, (e: unknown) => console.error('could not list what was learned today', e));
+    setPlanning(true);
+    setLoadError(false);
+    try {
+      const plan = await planFor(shortMode, sitting, extraKanji);
+      await startSitting(plan);
+      const [settings, display, results] = await Promise.all([
+        getSettings(),
+        loadStudyDisplay(),
+        unseenOutputResults().catch((e: unknown) => {
+          console.warn('could not load checked sentences', e);
+          return [];
+        }),
+      ]);
+      setDefaultAudioRate(plan.courseDay, settings.audioRate);
+      setLoaded({ plan, display, results });
+      setState(initialSession(plan));
+    } catch (e) {
+      console.error('could not plan the session', e);
+      started.current = false;
+      setLoadError(true);
+    } finally {
+      setPlanning(false);
     }
-    setStep(next);
-  };
+  }, [shortMode, extraKanji]);
+
+  useEffect(() => {
+    if (shortMode) void start('any');
+  }, [shortMode, start]);
+
+  const plan = loaded?.plan;
+  const step = state ? state.steps[state.index] : undefined;
+  // The checked sentences' screen comes before the first step: leaving it starts that step at the top too.
+  useScrollToTop(state ? `${state.index}:${loaded?.results.length ? 'results' : 'steps'}` : 'choice');
+
+  // ---- Step changes: book the time, record once-a-day steps, set up the check ----
+  const leaveStep = useCallback((s: SessionStep | undefined) => {
+    if (!plan || !s) return;
+    if ((s.id === 'read' || s.id === 'output' || s.id === 'fluency') && plan.mode !== 'makeup') {
+      void finishStep(s.id).catch((e: unknown) => console.error('could not record the step', e));
+    }
+  }, [plan]);
+
+  const next = useCallback(() => {
+    if (!state || !plan || advancedFrom.current === state.index) return;
+    advancedFrom.current = state.index;
+    leaveStep(step);
+    const upcoming = state.steps[state.index + 1];
+    void timer.setKind(timeKindOf(upcoming, plan.mode));
+    setBlockProgress(NO_PROGRESS);
+    dispatch({ type: 'next' });
+  }, [state, plan, step, leaveStep, timer, dispatch]);
+
+  useEffect(() => {
+    if (plan && step) void timer.setKind(timeKindOf(step, plan.mode));
+  }, [plan, step, timer]);
+
+  useEffect(() => {
+    if (!state || !plan || step?.id !== 'check' || state.checkIds) return;
+    const ids = firstCheckIds(state.learned, plan.pendingCheck, Math.random);
+    if (ids.length) dispatch({ type: 'start-check', ids });
+    else next();
+  }, [state, plan, step, dispatch, next]);
+
+  const retrieved = useCallback((cardId: string) => {
+    if (!canRetrieve({ retrievals: retrievals.current }, cardId)) return;
+    retrievals.current = { ...retrievals.current, [cardId]: (retrievals.current[cardId] ?? 0) + 1 };
+    dispatch({ type: 'retrieved', cardId });
+  }, [dispatch]);
+  const mayRetrieve = useCallback((cardId: string) => canRetrieve({ retrievals: retrievals.current }, cardId), []);
+
+  // ---- The summary: complete the day once, then stats and what to show ----
+  useEffect(() => {
+    if (!plan || !state || step?.id !== 'summary' || completion.current) return;
+    completion.current = (async () => {
+      await timer.flush();
+      let after: StreakV2 | undefined;
+      try {
+        if (plan.mode === 'makeup') await completeMakeup();
+        else if (plan.mode === 'micro' || plan.mode === 'welcome-back') await completeMicro();
+        else if (plan.sitting !== 'anywhere' && FULL_MODES.has(plan.mode)) after = await completeDay();
+        after ??= await streak();
+      } catch (e) {
+        console.error('could not complete the session', e);
+      }
+      void pushStats({ immediate: true });
+      setSummary(await summaryData(plan, state.learned, after).catch(() => ({ minutesToday: 0 })));
+      // Keep the next days' audio close at hand.
+      void (async () => {
+        const [unit, kanji] = await Promise.all([currentUnit(), db.items.where('kind').equals('kanji').count()]);
+        await prefetchPacks(packsFor({ sprint: loaded!.display.inSprint, unit, chapter: Math.floor(kanji / KANJI_PER_CHAPTER) + 1 }));
+      })().catch((e: unknown) => console.warn('could not prefetch audio', e));
+    })();
+  }, [plan, state, step, timer, loaded]);
 
   // ---- The back gesture asks before stopping, like the close button ----
-  const inSession = loaded !== null && firstStep(loaded) !== null;
+  const inSession = Boolean(state && state.steps.length > 1);
   const guarded = (location.state as Record<string, unknown> | null)?.[BACK_GUARD] === true;
   /** The guard entry is on top of the session's own. */
   const armed = useRef(false);
   const arming = useRef(false);
-  /** Leaving for Today: the guard entry is being taken off first. */
-  const leaving = useRef(false);
+  /** Leaving (for Today, or the make-up): the guard entry is being taken off first. */
+  const leavingTo = useRef<string | null>(null);
 
   /**
-   * To Today, replacing the session's history entry so back from Today doesn't
-   * land in the stopped session. The guard entry on top goes first (back); the
-   * effect below then replaces the session's own entry.
+   * To Today (or `to`), replacing the session's history entry so back from there
+   * doesn't land in the stopped session. The guard entry on top goes first
+   * (back); the effect below then replaces the session's own entry.
    */
-  const exit = () => {
+  const exit = (to = '/') => {
     if (armed.current) {
-      leaving.current = true;
+      leavingTo.current = to;
       navigate(-1);
       return;
     }
-    navigate('/', { replace: true });
+    navigate(to, { replace: true });
   };
 
+  /** Stopping keeps what was done: the next sitting re-plans from it. */
   const leave = () => {
     void timer.flush();
-    if (step === 'read') {
-      // Reviews and new items are done; reading is the optional last part, so stopping here still
-      // completes the day. (Reopened, the session would only have reading left and show "all caught up".)
-      void completeSession().then(() => pushStats({ immediate: true }), (e: unknown) => console.error('could not complete the session', e));
-    } else {
-      void pushStats();
-    }
+    void pushStats();
     exit();
   };
 
-  const finish = () => {
+  const finish = (to?: string) => {
     void Promise.resolve(completion.current).then(() => pushStats({ immediate: true }));
-    exit();
+    exit(to);
   };
 
   const latest = useRef({ step, finish, navigate });
   latest.current = { step, finish, navigate };
   const arm = useCallback(() => {
     arming.current = true;
-    navigate(location.pathname, { state: { [BACK_GUARD]: true } });
-  }, [navigate, location.pathname]);
+    navigate(location.pathname + location.search, { state: { [BACK_GUARD]: true } });
+  }, [navigate, location.pathname, location.search]);
 
   useEffect(() => {
     if (!inSession) return;
@@ -204,8 +328,8 @@ export default function Session() {
     }
     // The guard entry was popped: the session is leaving, or back was pressed.
     armed.current = false;
-    if (leaving.current) latest.current.navigate('/', { replace: true });
-    else if (latest.current.step === 'summary') latest.current.finish();
+    if (leavingTo.current) latest.current.navigate(leavingTo.current, { replace: true });
+    else if (latest.current.step?.id === 'summary') latest.current.finish();
     else setConfirming('back');
   }, [inSession, guarded, arm]);
 
@@ -215,12 +339,15 @@ export default function Session() {
         <SessionHeader progress={0} label="" onClose={() => navigate('/')} title="Today's session" />
         <div className="card st-error" role="alert">
           <p>Today's session couldn't load. If this is the first time on this phone, connect to the internet once so the lessons can download.</p>
-          <button type="button" className="btn ink" onClick={() => void load()}>Try again</button>
+          <button type="button" className="btn ink" onClick={() => (shortMode ? void start('any') : setLoadError(false))}>Try again</button>
         </div>
       </Screen>
     );
   }
-  if (!loaded) {
+  if (!shortMode && !loaded) {
+    return <SittingChoice busy={planning} onChoose={(s) => void start(s)} onClose={() => navigate('/')} />;
+  }
+  if (!loaded || !state || !plan || !step) {
     return (
       <Screen label="Today's session">
         <SessionHeader progress={0} label="" onClose={() => navigate('/')} title="Today's session" />
@@ -228,84 +355,47 @@ export default function Session() {
       </Screen>
     );
   }
+  if (loaded.results.length) {
+    const results = loaded.results;
+    return (
+      <StudyDisplayProvider value={loaded.display}>
+        <Screen label="Today's session">
+          <SessionHeader progress={0} label="" title="Today's session" onClose={() => setConfirming('close')} />
+          <OutputResults results={results}
+            onDone={() => {
+              void markOutputResultsSeen(results.map((r) => r.id)).catch((e: unknown) => console.warn('could not mark the checks seen', e));
+              setLoaded({ ...loaded, results: [] });
+            }} />
+          {confirming && (
+            <StopDialog onStop={leave} onKeepGoing={() => {
+              if (confirming === 'back') arm();
+              setConfirming(false);
+            }} />
+          )}
+        </Screen>
+      </StudyDisplayProvider>
+    );
+  }
 
-  const { plan } = loaded;
-  if (!firstStep(loaded)) {
+  if (state.steps.length === 1) {
     return (
       <Screen label="Today's session">
         <SessionHeader progress={1} label="" onClose={() => navigate('/')} />
-        <SessionEmpty limitReached={plan.backlog > 0} newBlocked={plan.newBlocked?.reason} />
+        <SessionEmpty />
       </Screen>
     );
   }
 
-  const sentences = reading ?? [];
-
-  /** Reading, with sentences picked again when new items were just learned; else straight to the summary. */
-  const toReading = (afterLearning: boolean) => {
-    if (!afterLearning) {
-      goTo(sentences.length ? 'read' : 'summary');
-      return;
-    }
-    const planned = sentences;
-    setReading(null);
-    goTo('read');
-    void planReading().then(sentencesById).then(
-      (fresh) => {
-        setReading(fresh);
-        if (!fresh.length) goTo('summary');
-      },
-      (e: unknown) => {
-        console.error('could not pick the reading again', e);
-        setReading(planned);
-        if (!planned.length) goTo('summary');
-      },
-    );
-  };
-  const afterReview = () => (plan.newItems.length ? goTo('learn') : toReading(false));
-
-  const learnDone = (item: LearnedItem) => {
-    const all = [...learned, item];
-    setLearned(all);
-    if (learnIndex + 1 < plan.newItems.length) {
-      setLearnIndex(learnIndex + 1);
-      return;
-    }
-    // The first check covers the new cards in a mixed order; the rest come with tomorrow's reviews.
-    const { check, later } = splitFirstCheck(all);
-    void deferNewCards(later).catch((e: unknown) => console.error('could not schedule the new cards', e));
-    setCheckIds(shuffle(check));
-    if (check.length) goTo('check');
-    else toReading(true);
-  };
-
-  // Progress over every step; the check's size is estimated until it is known.
-  const checkTotal = checkIds?.length ?? expectedChecks(plan);
-  const total = plan.reviews.length + plan.newItems.length + checkTotal + sentences.length;
-  const order: Step[] = ['review', 'learn', 'check', 'read', 'summary'];
-  const past = (s: Step) => order.indexOf(step) > order.indexOf(s);
-  const done =
-    (past('review') ? plan.reviews.length : step === 'review' ? reviewProgress.done : 0)
-    + (past('learn') ? plan.newItems.length : step === 'learn' ? learnIndex : 0)
-    + (past('check') ? checkTotal : step === 'check' ? checkProgress.done : 0)
-    + (past('read') ? sentences.length : step === 'read' ? readIndex : 0);
-
-  const blockLabel = (name: string, p: BlockProgress) =>
-    p.practice ? `Once more ${p.position} / ${p.total}` : `${name} ${Math.min(p.position, p.total)} / ${p.total}`;
-  const label = {
-    review: blockLabel('Review', reviewProgress),
-    learn: `New ${learnIndex + 1} / ${plan.newItems.length}`,
-    check: blockLabel('Check', checkProgress),
-    read: reading ? `Read ${readIndex + 1} / ${sentences.length}` : 'Read',
-    summary: 'Done',
-  }[step];
-
-  const stats: SessionStats = {
-    ms: sessionMs,
-    reviews: tally.reviews,
-    correct: tally.correct,
-    learned: learnedTodayLabels ?? learned.map((l) => l.label).filter((l) => l.text),
-  };
+  // ---- Header: step names; during catch-up never a card count, only a time bar ----
+  const catchUp = plan.mode === 'catch-up' || plan.counts === undefined;
+  const blockFraction = blockProgress.total ? Math.min(1, blockProgress.done / blockProgress.total) : 0;
+  const timeFraction = Math.min(1, timer.elapsed() / Math.max(60_000, plan.estimateMin * 60_000));
+  const progress = catchUp
+    ? (step.id === 'summary' ? 1 : timeFraction)
+    : (state.index + (step.id === 'warmup' || step.id === 'check' ? blockFraction : 0)) / Math.max(1, state.steps.length - 1);
+  let label = stepLabel(step, plan);
+  if (catchUp && step.id !== 'summary') label = 'Catching up';
+  else if ((step.id === 'warmup' || step.id === 'check') && blockProgress.total) label = `${label} ${Math.min(blockProgress.position, blockProgress.total)} / ${blockProgress.total}`;
 
   const keepGoing = () => {
     // Back from the dialog put the guard entry away; put it back for next time.
@@ -313,38 +403,48 @@ export default function Session() {
     setConfirming(false);
   };
 
+  const partner = household.data?.members.find((m) => m.member.id !== household.data?.me)?.member.name ?? '';
+  const batch = step.batch !== undefined ? plan.teach[step.batch] : undefined;
+  const batchIds = new Set(batch?.items.map((i) => i.itemId) ?? []);
+  const todayReadCards = new Set(state.learned.filter((l) => l.plan.kind === 'kana').map((l) => `${l.plan.itemId}|read`));
+
   return (
-    <Screen label="Today's session">
-      <SessionHeader progress={total ? done / total : 1} label={label}
-        title={step === 'summary' ? undefined : "Today's session"}
-        onClose={() => (step === 'summary' ? finish() : setConfirming('close'))} />
+    <StudyDisplayProvider value={loaded.display}>
+      <Screen label="Today's session">
+        <SessionHeader progress={progress} label={label} title={step.id === 'summary' ? undefined : "Today's session"}
+          onClose={() => (step.id === 'summary' ? finish() : setConfirming('close'))} />
 
-      {step === 'review' && (
-        <ReviewBlock key="review" cardIds={plan.reviews} timer={timer} onProgress={setReviewProgress}
-          onAnswered={answered} onDone={afterReview} />
-      )}
-      {step === 'learn' && plan.newItems[learnIndex] && (
-        <NewItemFlow key={plan.newItems[learnIndex].itemId} plan={plan.newItems[learnIndex]} onDone={learnDone} />
-      )}
-      {step === 'check' && checkIds && (
-        <>
-          {checkProgress.done === 0 && !checkProgress.practice && (
-            <p className="st-intro">A quick first check of what you just learned.</p>
-          )}
-          <ReviewBlock key="check" cardIds={checkIds} timer={timer} onProgress={setCheckProgress}
-            onAnswered={answered} onDone={() => toReading(true)} />
-        </>
-      )}
-      {step === 'read' && (reading ? (
-        <ReadingDrill sentences={reading} onProgress={setReadIndex} onDone={() => goTo('summary')} doneLabel="Finish" />
-      ) : (
-        <div className="st-skeleton st-skeleton-card" aria-busy="true" aria-label="Finding sentences to read" />
-      ))}
-      {step === 'summary' && (
-        <SessionSummary stats={stats} streak={streak} newBlocked={plan.newBlocked?.reason} onDone={finish} />
-      )}
+        {step.id === 'warmup' && (
+          <ReviewBlock key="warmup" cardIds={plan.warmup} timer={timer} context="review" hideCounts={catchUp}
+            makeup={plan.mode === 'makeup'} paperAllowed={plan.paperAllowed} onProgress={setBlockProgress} onDone={next} />
+        )}
+        {step.id === 'teach' && batch && (
+          <NewItemFlow key={`teach-${step.batch}`} batch={batch} onTaught={(item) => dispatch({ type: 'taught', item })} onDone={next} />
+        )}
+        {step.id === 'memory' && (
+          <MemoryPass key={`memory-${step.batch}`} items={state.learned.filter((l) => batchIds.has(l.plan.itemId))}
+            onRetrieved={retrieved} mayRetrieve={mayRetrieve} onDone={next} />
+        )}
+        {step.id === 'read' && plan.read && (
+          <ReadBlock key="read" plan={plan.read} todayReadCards={todayReadCards} onRetrieved={retrieved} mayRetrieve={mayRetrieve} onDone={next} />
+        )}
+        {step.id === 'check' && state.checkIds && (
+          <>
+            {blockProgress.done === 0 && <p className="st-intro">{SPACED_RECALL_LINE}</p>}
+            <ReviewBlock key="check" cardIds={state.checkIds} timer={timer} context="first-check" hideCounts={catchUp}
+              paperAllowed={plan.paperAllowed} onProgress={setBlockProgress} onRetrieved={retrieved} mayRetrieve={mayRetrieve} onDone={next} />
+          </>
+        )}
+        {step.id === 'output' && plan.output && (
+          <OutputStep key="output" target={plan.output.target} partnerName={partner} onDone={next} />
+        )}
+        {step.id === 'fluency' && plan.fluency && <FluencySprint key="fluency" plan={plan.fluency} onDone={next} />}
+        {step.id === 'summary' && (
+          <SessionSummary data={summary} onDone={() => finish()} onMakeup={() => finish('/session?mode=makeup')} />
+        )}
 
-      {confirming && <StopDialog onKeepGoing={keepGoing} onStop={leave} />}
-    </Screen>
+        {confirming && <StopDialog onKeepGoing={keepGoing} onStop={leave} />}
+      </Screen>
+    </StudyDisplayProvider>
   );
 }

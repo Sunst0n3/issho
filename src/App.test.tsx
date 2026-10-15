@@ -24,6 +24,9 @@ vi.mock('./screens/Today.tsx', async () => {
 vi.mock('./screens/Onboarding.tsx', () => ({ default: () => <h1>Welcome screen</h1> }));
 vi.mock('./screens/Settings.tsx', () => ({ default: () => <h1>Settings screen</h1> }));
 vi.mock('./screens/LearnHub.tsx', () => ({ default: () => <h1>Learn screen</h1> }));
+vi.mock('./screens/WritePractice.tsx', () => ({ default: () => <h1>Write screen</h1> }));
+vi.mock('./screens/CanDoCheck.tsx', () => ({ default: () => <h1>Can-do screen</h1> }));
+vi.mock('./screens/TogetherSession.tsx', () => ({ default: () => <h1>Together session screen</h1> }));
 
 // The Together screen fails with the browser's "couldn't download the code" error
 // while `offline` is set. (An error thrown by a vi.mock factory reaches the app
@@ -81,7 +84,7 @@ afterEach(() => {
 
 describe('App', () => {
   it('opens a new page at the top and leaves back navigation to the browser', async () => {
-    renderApp('/kanji');
+    renderApp('/library');
     const link = await screen.findByRole('link', { name: '水' });
 
     document.documentElement.scrollTop = 800;
@@ -135,6 +138,39 @@ describe('App', () => {
     renderApp(`/kanji/${encodeURIComponent('水')}`);
     await screen.findByRole('button', { name: 'Back' });
     expect(document.title).toBe('Kanji 水 · Issho');
+  });
+
+  it('names the writing page with its character', async () => {
+    renderApp(`/write/${encodeURIComponent('あ')}`);
+    await screen.findByRole('heading', { name: 'Write screen' });
+    expect(document.title).toBe('Write あ · Issho');
+  });
+
+  it('has the v2 tabs: Today, Learn, Library and Together', async () => {
+    renderApp('/');
+    await screen.findByRole('heading', { name: 'Today screen' });
+    const tabs = screen.getByRole('navigation', { name: 'Main' });
+    expect([...tabs.querySelectorAll('a')].map((a) => [a.textContent, a.getAttribute('href')])).toEqual([
+      ['Today', '/'], ['Learn', '/learn'], ['Library', '/library'], ['Together', '/together'],
+    ]);
+  });
+
+  it('sends the old kanji library address to the library', async () => {
+    renderApp('/kanji');
+    await screen.findByRole('link', { name: '水' });
+    expect(where()).toBe('/library/kanji');
+    // A library section keeps the tab bar.
+    expect(screen.getByRole('navigation', { name: 'Main' })).toBeTruthy();
+  });
+
+  it('routes can-do checks and together sessions to their screens, without the tab bar', async () => {
+    renderApp('/cando/u01-cd1');
+    expect(await screen.findByRole('heading', { name: 'Can-do screen' })).toBeTruthy();
+    expect(document.title).toBe('Can-do check · Issho');
+    expect(screen.queryByRole('navigation', { name: 'Main' })).toBeNull();
+    cleanup();
+    renderApp('/together/session/A');
+    expect(await screen.findByRole('heading', { name: 'Together session screen' })).toBeTruthy();
   });
 
   it("keeps the app (and the tab bar) when a screen's code can't be loaded, and reloads once the app can be reached", async () => {

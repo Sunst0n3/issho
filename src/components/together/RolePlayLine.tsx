@@ -7,6 +7,7 @@ import { parseRuby } from '../../lib/ruby.ts';
 import type { RolePlay, RolePlayLine as Line } from '../../lib/types.ts';
 import { SpeakButton } from '../SpeakButton.tsx';
 import { Icon, Ruby } from '../ui.tsx';
+import type { lineClip } from './rolePlay.ts';
 import { SayIt, type Verdict } from './SayIt.tsx';
 
 /** The ref is the line's <article>, for moving focus to it when the line changes. */
@@ -18,13 +19,18 @@ export const RolePlayLine = forwardRef<HTMLElement, {
   readingBoth: boolean;
   /** Who says the other lines: "your partner" on one phone, their name on two. */
   partnerLabel: string;
+  /** The line's pre-generated clip (role b in the second voice); without it the text is synthesized. */
+  clip?: ReturnType<typeof lineClip>;
   onVerdict(verdict: Verdict): void;
-}>(function RolePlayLine({ line, roles, mine, readingBoth, partnerLabel, onVerdict }, ref) {
+}>(function RolePlayLine({ line, roles, mine, readingBoth, partnerLabel, clip, onVerdict }, ref) {
   const rubyShow = useRubyShow();
   const [showReading, setShowReading] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const speaker = roles[line.role];
   const hasReadings = parseRuby(line.jp).some((s) => s.reading !== undefined);
+  const audio = clip
+    ? { source: { ref: clip.ref }, fallbackText: clip.text, voice: clip.voice }
+    : { text: line.jp };
 
   if (mine) {
     return (
@@ -36,7 +42,7 @@ export const RolePlayLine = forwardRef<HTMLElement, {
         <p className="tg-rp-en">{line.en}</p>
         {line.hint && <p className="tg-rp-hint"><Icon name="bulb" size={16} /><span>{line.hint}</span></p>}
         <div className="tg-rp-tools">
-          <SpeakButton text={line.jp} />
+          <SpeakButton {...audio} />
           {hasReadings && (
             <button type="button" className="btn secondary small" aria-pressed={showReading}
               onClick={() => setShowReading((v) => !v)}>
@@ -67,7 +73,7 @@ export const RolePlayLine = forwardRef<HTMLElement, {
             <Icon name="eye" size={18} />Show line
           </button>
         )}
-        <SpeakButton text={line.jp} label="Hear it" />
+        <SpeakButton {...audio} label="Hear it" />
       </div>
     </article>
   );

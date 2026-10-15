@@ -1,15 +1,22 @@
-// A quiz from your partner: their hardest kanji. For each one you've learned,
-// pick its meaning, then write it from memory. Ones you haven't met yet are
-// shown as a preview and skipped. This is a game: it never touches your reviews.
+// A quiz between partners.
+//
+// kanji (v1, kept for old inbox items): your partner's hardest kanji. For each one you've
+// learned, pick its meaning, then write it from memory; ones you haven't met yet are shown as a
+// preview and skipped. This is a game: it never touches your reviews.
+//
+// partner, dictation and monthly (the together sessions): the sender answered from their own
+// cards and this phone asks. The asker sees each prompt with its answer and gives the verdict;
+// the answerer's phone applies the verdicts to its reviews (only for cards near their due date)
+// and never shows the answers.
 
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import type { Quiz } from '../../shared/api.ts';
+import type { PartnerQuizItem, Quiz, QuizVerdict } from '../../shared/api.ts';
 import { Glyph } from '../components/Glyph.tsx';
 import { ConnectServerForm } from '../components/together/ConnectServerForm.tsx';
 import { useFocusWhenLost } from '../components/together/focus.ts';
-import { QuizSender } from '../components/together/QuizSender.tsx';
 import { memberName, midSentence } from '../components/together/household.ts';
+import { QuizAnswerer, QuizAsker, resultOf } from '../components/together/PartnerQuiz.tsx';
 import { readingFor } from '../components/together/kanjiReading.ts';
 import { finishQuiz, useQuizzes, useResultDelivery, type ResultDelivery } from '../components/together/quizzes.ts';
 import '../components/together/together.css';
@@ -50,6 +57,7 @@ export default function QuizRun() {
   // Keep playing once started, even after the finished result lands in the cache.
   const [playing, setPlaying] = useState<string>();
   if (quiz && !quiz.result && quiz.toMemberId === settings.memberId && playing !== quiz.id) setPlaying(quiz.id);
+  // The hooks above run on every render; the views below may return early.
 
   if (!loaded) return <Screen label="Quiz"><div className="tg-skeleton-block tg-tall" aria-busy="true" /></Screen>;
 
@@ -84,6 +92,13 @@ export default function QuizRun() {
         )}
       </Screen>
     );
+  }
+
+  // A quiz cached by a v1 phone has no kind: it is a kanji quiz.
+  if ((quiz.kind ?? 'kanji') !== 'kanji') {
+    if (playing === quiz.id) return <AskQuiz quiz={quiz} answererName={nameOf(quiz.fromMemberId)} />;
+    return <TogetherQuizSummary quiz={quiz} answeredByMe={quiz.fromMemberId === settings.memberId}
+      otherName={nameOf(quiz.fromMemberId === settings.memberId ? quiz.toMemberId : quiz.fromMemberId)} />;
   }
 
   if (playing === quiz.id) return <QuizPlay quiz={quiz} fromName={nameOf(quiz.fromMemberId)} />;
@@ -124,7 +139,6 @@ function QuizSummary({ quiz, sentByMe, otherName }: { quiz: Quiz; sentByMe: bool
           </p>
         )}
       </section>
-      {!sentByMe && <QuizSender partnerId={quiz.fromMemberId} partnerName={otherName} heading="Send back a quiz" />}
       <Link className="btn secondary block" to="/together">Back to Together</Link>
     </Screen>
   );
@@ -185,7 +199,102 @@ function QuizPlay({ quiz, fromName }: { quiz: Quiz; fromName: string }) {
 
 /** The quiz's kanji, each once (an older server accepted repeats). */
 function quizChars(quiz: Quiz): string[] {
-  return [...new Set(quiz.items.map((i) => i.char))];
+  return [...new Set(quiz.items.map((i) => ('char' in i ? i.char : i.key)))];
+}
+
+const KIND_NAME: Record<Exclude<Quiz['kind'], 'kanji'>, string> = {
+  partner: 'quiz',
+  dictation: 'dictation',
+  monthly: 'monthly quiz',
+};
+
+/** This phone asks a together quiz outside a session: prompt and answer, then the verdict. */
+function AskQuiz({ quiz, answererName }: { quiz: Quiz; answererName: string }) {
+  const items = quiz.items as PartnerQuizItem[];
+  const [verdicts, setVerdicts] = useState<{ key: string; verdict: QuizVerdict }[]>([]);
+  const [sending, setSending] = useState<'sending' | ResultDelivery>();
+  const submitted = useRef(false);
+  const later = useResultDelivery(quiz.id);
+  const index = verdicts.length;
+  const done = index >= items.length;
+
+  useEffect(() => {
+    if (!done || submitted.current) return;
+    submitted.current = true;
+    setSending('sending');
+    finishQuiz(quiz, resultOf(items, verdicts)).then(setSending, () => setSending('failed'));
+  }, [done]);
+
+  if (!done) {
+    // One verdict per item (the guard in onVerdict): a double tap must not skip the next item.
+    return (
+      <Screen label="Quiz">
+        <TopBar close="/together" title={`${answererName}'s ${KIND_NAME[quiz.kind as keyof typeof KIND_NAME]}`} heading={false} />
+        <h1 className="visually-hidden">Ask {answererName}</h1>
+        <QuizAsker items={items} index={index} answererName={answererName} kind={quiz.kind as 'partner'}
+          onVerdict={(verdict) => setVerdicts((v) => (v.length === index ? [...v, { key: items[index].key, verdict }] : v))} />
+      </Screen>
+    );
+  }
+  const result = resultOf(items, verdicts);
+  const status = sending === 'queued' && later && later !== 'queued' ? later : sending;
+  return (
+    <Screen label="Quiz finished">
+      <TopBar close="/together" title="Quiz" heading={false} />
+      <section className="tg-quiz-end" aria-labelledby="quiz-score">
+        <p className="tg-eyebrow">You asked {midSentence(answererName)}</p>
+        <h1 id="quiz-score" className="tg-quiz-score">{result.correct} <span>/ {result.total}</span></h1>
+        <p className="tg-sync-status" role="status">
+          {status === 'sending' && 'Sending the verdicts…'}
+          {status === 'sent' && <><Icon name="check" size={16} />The verdicts reach {midSentence(answererName)}'s reviews when their phone syncs.</>}
+          {status === 'queued' && <><Icon name="cloudOff" size={16} />The verdicts go to {midSentence(answererName)} when you reconnect.</>}
+          {status === 'failed' && "The verdicts couldn't be sent. The quiz may have been removed."}
+        </p>
+      </section>
+      <Link className="btn secondary block" to="/together">Back to Together</Link>
+    </Screen>
+  );
+}
+
+/** A together quiz seen from the answerer's side (never its answers), or a finished one. */
+function TogetherQuizSummary({ quiz, answeredByMe, otherName }: { quiz: Quiz; answeredByMe: boolean; otherName: string }) {
+  const items = quiz.items as PartnerQuizItem[];
+  const [index, setIndex] = useState(0);
+  const result = quiz.result;
+  const what = KIND_NAME[quiz.kind as keyof typeof KIND_NAME];
+  if (answeredByMe && !result) {
+    return (
+      <Screen label="Quiz">
+        <TopBar back="/together" title={`Your ${what}`} heading={false} />
+        <h1 className="visually-hidden">Your {what}</h1>
+        <QuizAnswerer item={items[index]} index={index} total={items.length} askerName={otherName} />
+        <div className="tg-button-row">
+          <button type="button" className="btn secondary small" disabled={index === 0} onClick={() => setIndex(index - 1)}>Back</button>
+          <button type="button" className="btn secondary small" disabled={index + 1 >= items.length} onClick={() => setIndex(index + 1)}>Next</button>
+        </div>
+        <p className="muted tg-small">{otherName} asks these on their phone and gives the verdicts.</p>
+      </Screen>
+    );
+  }
+  return (
+    <Screen label="Quiz">
+      <TopBar back="/together" title="Quiz" heading={false} />
+      <section className="card tg-quiz-summary" aria-labelledby="quiz-summary-title">
+        <h1 id="quiz-summary-title" className="label">
+          {answeredByMe ? `Your ${what}, asked by ${midSentence(otherName)}` : `${otherName}'s ${what}`}
+        </h1>
+        {!result ? (
+          <p className="muted">Not asked yet.</p>
+        ) : (
+          <p>
+            {answeredByMe ? 'You got' : `${otherName} got`} <strong>{result.correct} / {result.total}</strong>
+            {answeredByMe && <span className="muted"> · cards near their due date count in your reviews</span>}
+          </p>
+        )}
+      </section>
+      <Link className="btn secondary block" to="/together">Back to Together</Link>
+    </Screen>
+  );
 }
 
 /** Looks up each kanji and whether this learner has met it, and builds meaning choices. */
@@ -408,7 +517,6 @@ function QuizEnd({ quiz, items, outcomes, fromName }: {
           {status === 'failed' && "Your score couldn't be sent. The quiz may have been removed."}
         </p>
       </section>
-      <QuizSender partnerId={quiz.fromMemberId} partnerName={fromName} heading="Send back a quiz" />
       <Link className="btn secondary block" to="/together">Back to Together</Link>
     </Screen>
   );

@@ -10,6 +10,9 @@ ARG NODE_IMAGE=node:24-slim
 # are git-ignored, so a fresh clone couldn't rebuild it, and the files you built and tested are the
 # reproducible choice. Only a checkout without public/data/ but with data-raw/ builds it here.
 # After changing content/ or data-raw/, run `npm run build:data` and commit public/data/.
+# The voice clips in public/audio/ are committed the same way (`npm run build:audio` needs a local
+# VOICEVOX engine, which this build doesn't have). Without them the image still works: the app then
+# reads Japanese with the server's VOICEVOX service, or the phone's own voice.
 FROM ${NODE_IMAGE} AS web
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -29,6 +32,9 @@ RUN if [ -s public/data/curriculum.json ]; then \
         exit 1; \
       }; \
     done \
+ && if [ ! -s public/audio/manifest.json ]; then \
+      echo "warning: public/audio/manifest.json is missing, so the app has no voice clips: it will use server speech or the phone's voice. Run 'npm run build:audio' and commit public/audio/." >&2; \
+    fi \
  && npm run build \
  && node server/src/precompress.ts dist
 

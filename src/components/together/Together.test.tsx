@@ -1,25 +1,37 @@
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { DayStats, HouseholdResponse, MemberStats, Quiz } from '../../../shared/api.ts';
-import { db, updateSettings } from '../../lib/db.ts';
-import type { RolePlay } from '../../lib/types.ts';
+import type {
+  DayStats,
+  HouseholdResponse,
+  MemberStats,
+  PartnerQuizItem,
+  Quiz,
+  TogetherLiveState,
+  TogetherState,
+} from '../../../shared/api.ts';
+import { dayKey, db, updateSettings } from '../../lib/db.ts';
+import type { StoryEntry, TogetherWeekPlan } from '../../lib/types.ts';
 import Together from '../../screens/Together.tsx';
+import { addDays } from '../../srs/days.ts';
 import type { PendingMessage } from '../../sync/outbox.ts';
 import { resetQuizzes } from './quizzes.ts';
+import { resetLiveInvites } from './session.ts';
 
-const day = (date: string, studyMinutes: number): DayStats => ({
-  date, studyMinutes, reviews: 0, correct: 0, newItems: 0, sessionComplete: studyMinutes > 0,
-});
 const DATES = ['2026-10-08', '2026-10-09', '2026-10-10', '2026-10-11', '2026-10-12', '2026-10-13', '2026-10-14'];
+const day = (date: string, studyMinutes: number, patch: Partial<DayStats> = {}): DayStats => ({
+  date, studyMinutes, reviews: 10, correct: 0, newItems: 0, sessionComplete: false, minimumDone: studyMinutes > 0,
+  togetherMinutes: 0, restToken: false, accuracyShared: false, ...patch,
+});
 
-const member = (id: string, name: string, minutes: number[], knownKanji: string[]): MemberStats => ({
+const member = (id: string, name: string, minutes: number[], patch: Partial<DayStats> = {}): MemberStats => ({
   member: { id, name, joinedAt: '2026-09-01T00:00:00Z', lastSeenAt: null },
-  days: DATES.map((d, i) => day(d, minutes[i])),
+  days: DATES.map((d, i) => day(d, minutes[i], patch)),
   streak: 3,
-  kanjiKnown: knownKanji.length,
-  knownKanji,
-  phase: 2,
+  kanjiKnown: 2,
+  knownKanji: ['水', '火'],
+  phase: 1,
+  progress: null,
   updatedAt: '2026-10-14T08:00:00Z',
 });
 
@@ -27,30 +39,62 @@ const HOUSEHOLD: HouseholdResponse = {
   householdName: 'Home',
   me: 'me',
   sharedStreak: 4,
+  quest: {
+    week: '2026-10-12', minimumDays: { me: 4, ken: 5 }, togetherSessions: 2, shortfall: 2, met: false,
+    reserveUsed: false, reserveLeft: true, daysLeft: 3,
+  },
+  questStreakWeeks: 3,
   members: [
-    member('me', 'Aiko', [10, 0, 15, 20, 5, 0, 12], ['水', '火']),
-    member('ken', 'Ken', [8, 12, 0, 30, 10, 6, 0], ['水', '木', '金']),
+    member('me', 'Aiko', [10, 0, 15, 20, 5, 0, 12]),
+    member('ken', 'Ken', [8, 12, 0, 30, 10, 6, 0]),
   ],
 };
 
+const today = dayKey();
+const PLAN: TogetherWeekPlan = {
+  week: '2026-10-12',
+  sessions: [
+    { id: 'A', day: addDays(today, -1), time: '20:00', doneAt: addDays(today, -1), minutes: 15 },
+    { id: 'B', day: today, time: '20:00' },
+    { id: 'C', day: addDays(today, 2), time: '19:30' },
+  ],
+  settledUnit: 2,
+  storyId: 'st-1',
+  monthly: false,
+  showcase: false,
+};
+
+const STATE: TogetherState = {
+  slots: [], goal: null, stages: {}, smooth: {},
+  sessions: [
+    { week: '2026-10-12', session: 'A', date: '2026-10-13', minutes: 15, memberId: 'ken' },
+    { week: '2026-10-12', session: 'B', date: '2026-10-14', minutes: 15, memberId: 'me' },
+  ],
+  tasks: [],
+  checkins: [
+    { week: '2026-10-05', memberId: 'me', checkin: { counts: { kanji: 3, words: 12, grammar: 1, minutes: 140 }, note: 'Good week' } },
+    { week: '2026-10-05', memberId: 'ken', checkin: { counts: { kanji: 4, words: 9, grammar: 2, minutes: 120 } } },
+  ],
+  capstones: [],
+};
+
+const STORIES = [{ id: 'st-1', title: 'The cat next door' }] as StoryEntry[];
+
+const PARTNER_ITEMS: PartnerQuizItem[] = [{ key: 'kanji:水|write', kind: 'write', prompt: 'Write "water"', answer: '水' }];
 const quiz = (id: string, patch: Partial<Quiz>): Quiz => ({
-  id, fromMemberId: 'ken', toMemberId: 'me', createdAt: '2026-10-14T08:00:00Z',
+  id, kind: 'kanji', fromMemberId: 'ken', toMemberId: 'me', createdAt: '2026-10-14T08:00:00Z',
   items: ['日', '曜', '水', '火', '木'].map((char) => ({ char })), ...patch,
 });
-
-const SCRIPTS: RolePlay[] = [
-  { id: 'rp-1', title: 'Good morning', titleJp: 'おはよう', level: 1, setting: 'Morning.', roles: { a: { name: 'A', nameJp: 'え' }, b: { name: 'B', nameJp: 'び' } }, lines: [] },
-  { id: 'rp-2', title: 'At the station', titleJp: '{駅|えき}で', level: 2, setting: 'Buying a ticket.', roles: { a: { name: 'A', nameJp: 'え' }, b: { name: 'B', nameJp: 'び' } }, lines: [] },
-];
 
 const mocks = vi.hoisted(() => ({
   status: 'online' as 'online' | 'offline' | 'connecting',
   household: {} as { data?: HouseholdResponse; fetchedAt?: number; loading: boolean; error?: unknown },
+  together: { state: null as TogetherState | null, offline: false },
+  plan: undefined as TogetherWeekPlan | undefined,
   refresh: vi.fn(async () => {}),
   getQuizzes: vi.fn(),
-  createQuiz: vi.fn(),
-  hardestKanji: vi.fn(),
   reconnectNow: vi.fn(),
+  live: undefined as ((memberId: string, state: TogetherLiveState) => void) | undefined,
 }));
 
 vi.mock('../../sync/stats.ts', () => ({
@@ -67,11 +111,26 @@ vi.mock('../../sync/socket.ts', () => ({
 vi.mock('../../sync/client.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../sync/client.ts')>()),
   getQuizzes: mocks.getQuizzes,
-  createQuiz: mocks.createQuiz,
 }));
-vi.mock('../../srs/course.ts', () => ({ currentPhase: async () => 2 }));
-vi.mock('../../srs/progress.ts', () => ({ hardestKanji: mocks.hardestKanji }));
-vi.mock('../../lib/data.ts', () => ({ loadRolePlays: async () => SCRIPTS }));
+vi.mock('../../sync/together.ts', () => ({
+  useTogetherState: () => ({ ...mocks.together, refresh: async () => {} }),
+  onLive: (cb: (memberId: string, state: TogetherLiveState) => void) => {
+    mocks.live = cb;
+    return () => {};
+  },
+  sendLive: () => true,
+  postTogetherEvent: async () => {},
+}));
+vi.mock('../../srs/together.ts', () => ({
+  loadWeekPlan: async () => {
+    if (!mocks.plan) throw new Error('no plan');
+    return mocks.plan;
+  },
+}));
+vi.mock('../../lib/data.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../lib/data.ts')>()),
+  loadStories: async () => STORIES,
+}));
 
 function renderTogether() {
   return render(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><Together /></MemoryRouter>);
@@ -81,14 +140,14 @@ beforeEach(async () => {
   await Promise.all(db.tables.map((t) => t.clear()));
   localStorage.clear();
   resetQuizzes();
+  resetLiveInvites();
   mocks.status = 'online';
   mocks.household = { data: HOUSEHOLD, fetchedAt: Date.now() - 2 * 60_000, loading: false };
+  mocks.together = { state: STATE, offline: false };
+  mocks.plan = PLAN;
   mocks.getQuizzes.mockResolvedValue({
-    inbox: [quiz('q-in', {})],
-    sent: [quiz('q-out', {
-      fromMemberId: 'me', toMemberId: 'ken',
-      result: { correct: 3, total: 4, missed: ['曜'], finishedAt: '2026-10-14T09:00:00Z' },
-    })],
+    inbox: [quiz('q-in', {}), quiz('q-ask', { kind: 'partner', items: PARTNER_ITEMS })],
+    sent: [],
   });
 });
 
@@ -102,6 +161,7 @@ describe('Together, not paired', () => {
     await updateSettings({ name: 'Aiko' });
     renderTogether();
     expect(await screen.findByText('Practice with your partner')).toBeTruthy();
+    expect(screen.getByText(/Three short sessions a week/)).toBeTruthy();
     expect(screen.getByLabelText('Household code')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Connect' })).toBeTruthy();
     expect(mocks.getQuizzes).not.toHaveBeenCalled();
@@ -111,35 +171,65 @@ describe('Together, not paired', () => {
 describe('Together, paired', () => {
   beforeEach(async () => {
     await updateSettings({ name: 'Aiko', deviceToken: 'token', memberId: 'me' });
-    await db.items.bulkPut([
-      { id: 'kanji:水', kind: 'kanji', key: '水', introducedAt: new Date() },
-      { id: 'kanji:火', kind: 'kanji', key: '火', introducedAt: new Date() },
-    ]);
   });
 
-  it('shows both weeks side by side with shared stats', async () => {
+  it("shows this week's sessions with their status, each opening the session", async () => {
     renderTogether();
-    expect(await screen.findByText('This week')).toBeTruthy();
-    expect(screen.getByText('Synced 2 min ago')).toBeTruthy();
-
-    // The table behind the bars, labelled by the server's dates. It sits in a clipped
-    // box: a table can't shrink to 1 px, and a long partner name would widen the page.
-    const table = screen.getByRole('table');
-    expect(table.className).toBe('');
-    expect(table.parentElement?.className).toBe('visually-hidden');
-    const rows = within(table).getAllByRole('row');
-    expect(rows).toHaveLength(8);
-    expect(within(rows[1]).getByRole('rowheader').textContent).toBe('Thursday');
-    expect(rows[4].textContent).toContain('20 min');
-    expect(rows[4].textContent).toContain('30 min');
-
-    const stats = screen.getByText('Shared streak').closest('dl')!;
-    expect(stats.textContent).toContain('4 days');
-    expect(within(stats).getByText('You both know').nextSibling?.textContent).toBe('1');
-    expect(stats.textContent).toContain('2 · 3');
+    const week = (await screen.findByRole('heading', { name: 'This week' })).closest('section')!;
+    await waitFor(() => expect(within(week).getAllByRole('link')).toHaveLength(3));
+    const [a, b, c] = within(week).getAllByRole('link');
+    expect(a.getAttribute('href')).toBe('/together/session/A');
+    expect(a.textContent).toContain('Done');
+    expect(b.textContent).toContain('Session B');
+    expect(b.textContent).toContain('Today');
+    expect(b.textContent).toContain('20:00');
+    expect(c.textContent).toContain('Planned');
+    expect(c.getAttribute('href')).toBe('/together/session/C');
   });
 
-  it("offers chat, tonight's role-play and the quizzes", async () => {
+  it('shows the couple quest and its streak, never the v1 shared streak', async () => {
+    renderTogether();
+    const quest = (await screen.findByRole('heading', { name: 'Couple quest' })).closest('section')!;
+    expect(quest.textContent).toContain('You 4 of 5 days · Ken 5 of 5 days');
+    expect(quest.textContent).toContain('sessions A and B done, C left · reserve available');
+    expect(quest.textContent).toContain('3 days left this week.');
+    expect(quest.textContent).toContain('Quest met 3 weeks running');
+    expect(screen.queryByText('Shared streak')).toBeNull();
+    expect(document.body.textContent).not.toContain('4 days');
+  });
+
+  it('links the shared weekly story', async () => {
+    renderTogether();
+    const story = await screen.findByRole('link', { name: /Read during the week: The cat next door/ });
+    expect(story.getAttribute('href')).toBe('/read/st-1');
+  });
+
+  it("shows the partner's effort, and accuracy only when they share it", async () => {
+    renderTogether();
+    const effort = (await screen.findByRole('heading', { name: 'Your week' })).closest('section')!;
+    const stat = (label: string) => [...effort.querySelectorAll('dt')].find((dt) => dt.textContent?.startsWith(label))?.nextSibling?.textContent;
+    expect(stat('Days studied')).toBe('5 · 5');
+    expect(stat('Minutes')).toBe('62 · 66');
+    expect(within(effort).queryByText("Ken's accuracy")).toBeNull();
+    cleanup();
+
+    mocks.household = {
+      ...mocks.household,
+      data: { ...HOUSEHOLD, members: [HOUSEHOLD.members[0], member('ken', 'Ken', [8, 12, 0, 30, 10, 6, 0], { correct: 8, accuracyShared: true })] },
+    };
+    renderTogether();
+    expect((await screen.findByText("Ken's accuracy")).nextSibling?.textContent).toBe('80 %');
+  });
+
+  it('lists the check-in history', async () => {
+    renderTogether();
+    const history = (await screen.findByRole('heading', { name: 'Check-ins' })).closest('section')!;
+    expect(history.textContent).toContain('Week of 5 Oct');
+    expect(history.textContent).toContain('You 3 kanji · 12 words · 1 grammar · 140 min · Good week');
+    expect(history.textContent).toContain('Ken 4 kanji');
+  });
+
+  it('offers chat, the free role-plays and the quizzes waiting for this phone', async () => {
     await db.messages.bulkPut([
       { id: 1, clientId: 'a', memberId: 'ken', createdAt: '2026-10-14T09:00:00Z', kind: 'text', text: 'おはよう' },
       { id: 2, clientId: 'b', memberId: 'ken', createdAt: '2026-10-14T09:05:00Z', kind: 'text', text: 'げんき？' },
@@ -149,21 +239,15 @@ describe('Together, paired', () => {
 
     const chat = await screen.findByRole('link', { name: /Chat in Japanese/ });
     expect(chat.getAttribute('href')).toBe('/chat');
-    await waitFor(() => expect(chat.textContent).toContain('げんき？'));
-    expect(chat.textContent).toContain('1 unread');
-    // Its parts are read with pauses, not run together ("Chat in Japaneseげんき？").
     await waitFor(() => expect(screen.getByRole('link', { name: 'Chat in Japanese げんき？ 1 unread' })).toBe(chat));
-
-    // Phase 2 → a level 2 script.
-    expect(await screen.findByText('At the station')).toBeTruthy();
-    expect(screen.getByRole('link', { name: /Start role-play/ }).getAttribute('href')).toBe('/roleplay/rp-2');
+    expect(screen.getByRole('link', { name: /Free role-plays/ }).getAttribute('href')).toBe('/roleplay');
 
     const take = await screen.findByRole('link', { name: 'Ken sent you 5 kanji Take the quiz' });
     expect(take.getAttribute('href')).toBe('/quiz/q-in');
-    expect(take.textContent).toContain('Ken sent you 5 kanji');
-    const sent = screen.getByText(/Ken got 3\/4/);
-    expect(sent.textContent).toContain('missed 曜');
-    expect(sent.textContent).toContain('1 new to them');
+    const ask = screen.getByRole('link', { name: "Ken's quiz is waiting for you to ask it Open" });
+    expect(ask.getAttribute('href')).toBe('/quiz/q-ask');
+    // The v1 "send your hardest kanji" card is gone.
+    expect(screen.queryByRole('button', { name: 'Send' })).toBeNull();
   });
 
   it("doesn't call a rejected message one that is waiting to send", async () => {
@@ -179,61 +263,47 @@ describe('Together, paired', () => {
     await waitFor(() => expect(chat.textContent).toContain('1 waiting to send'));
   });
 
-  it('sends the hardest kanji after confirming them', async () => {
-    mocks.hardestKanji.mockResolvedValue([{ char: '曜', lapses: 3, stability: 1 }, { char: '週', lapses: 2, stability: 2 }]);
-    mocks.createQuiz.mockImplementation(async (req) => ({ ...quiz('q-new', {}), fromMemberId: 'me', toMemberId: 'ken', items: req.items }));
+  it('offers to join a session the partner just started', async () => {
     renderTogether();
-
-    fireEvent.click(await screen.findByRole('button', { name: 'Send' }));
-    const list = await screen.findByRole('list', { name: 'Kanji in the quiz' });
-    expect(list.textContent).toBe('曜週');
-    expect(screen.getByText('Send these 2 kanji to Ken?')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Send quiz' }));
-
-    expect(await screen.findByText(/Sent to Ken/)).toBeTruthy();
-    expect(mocks.createQuiz).toHaveBeenCalledWith({ toMemberId: 'ken', items: [{ char: '曜' }, { char: '週' }] });
+    await screen.findByRole('heading', { name: 'This week' });
+    act(() => mocks.live?.('ken', { sessionId: 's-1', session: 'B', opener: 'ken', step: 'task', status: 'waiting' }));
+    const join = await screen.findByRole('link', { name: /Ken started Session B/ });
+    expect(join.getAttribute('href')).toBe('/together/session/B');
   });
 
-  it('makes no shared claims before the partner joins', async () => {
-    mocks.household = { ...mocks.household, data: { ...HOUSEHOLD, sharedStreak: 3, members: [HOUSEHOLD.members[0]] } };
+  it('makes no partner claims before the partner joins', async () => {
+    mocks.household = { ...mocks.household, data: { ...HOUSEHOLD, members: [HOUSEHOLD.members[0]] } };
     renderTogether();
     expect(await screen.findByText(/Waiting for your partner to join/)).toBeTruthy();
-    const stats = screen.getByText('Shared streak').closest('dl')!;
-    expect(within(stats).getByText('Shared streak').nextSibling?.textContent).toBe('–');
-    expect(within(stats).getByText('You both know').nextSibling?.textContent).toBe('–');
-    expect(screen.getByText('Once your partner joins, you can send them the kanji you miss most.')).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Send' })).toHaveProperty('disabled', true);
+    expect(screen.queryByText(/Ken/)).toBeNull();
   });
 
   it('treats the most recently active other member as the partner', async () => {
     // A leftover member who joined first (say, a test) must not hide the real partner.
-    const ghost = { ...member('old', 'Test', [0, 0, 0, 0, 0, 0, 0], []), updatedAt: '2026-09-02T08:00:00Z' };
+    const ghost = { ...member('old', 'Test', [0, 0, 0, 0, 0, 0, 0]), updatedAt: '2026-09-02T08:00:00Z' };
     ghost.member.lastSeenAt = '2026-09-02T08:00:00Z';
     mocks.household = { ...mocks.household, data: { ...HOUSEHOLD, members: [HOUSEHOLD.members[0], ghost, HOUSEHOLD.members[1]] } };
-    mocks.hardestKanji.mockResolvedValue([{ char: '曜', lapses: 3, stability: 1 }]);
-    mocks.createQuiz.mockImplementation(async (req) => ({ ...quiz('q-new', {}), fromMemberId: 'me', toMemberId: req.toMemberId, items: req.items }));
     renderTogether();
-
-    const legend = (await screen.findByText('This week')).closest('section')!;
-    expect(within(legend).getByRole('list').textContent).toBe('YouKen');
-    expect(screen.getByText('Send Ken the 5 kanji you miss most.')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Send' }));
-    fireEvent.click(await screen.findByRole('button', { name: 'Send quiz' }));
-    await waitFor(() => expect(mocks.createQuiz).toHaveBeenCalledWith({ toMemberId: 'ken', items: [{ char: '曜' }] }));
+    const effort = (await screen.findByRole('heading', { name: 'Your week' })).closest('section')!;
+    expect(within(effort).getAllByRole('list')[0].textContent).toBe('YouKen');
   });
 
-  it("says the home server can't be reached, and Try again reconnects as well as refetching", async () => {
+  it("says the home server can't be reached, keeps the plan, and Try again reconnects as well as refetching", async () => {
     mocks.status = 'offline';
     mocks.household = { loading: false, error: new Error('network') };
+    mocks.together = { state: STATE, offline: true };
     renderTogether();
-    // The phone itself is online: it's the home server that isn't answering.
     expect(await screen.findByRole('heading', { name: "Couldn't reach your home server" })).toBeTruthy();
+    expect(screen.getByText(/The couple quest and your partner's week need the home server/)).toBeTruthy();
+    // The plan comes from the cached state.
+    expect(await screen.findByText('From the last sync')).toBeTruthy();
+    expect(screen.getAllByRole('link', { name: /Session B/ }).length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
     expect(mocks.reconnectNow).toHaveBeenCalled();
     expect(mocks.refresh).toHaveBeenCalled();
   });
 
-  it('moves focus to the week when Try again brings it in', async () => {
+  it('moves focus to the quest when Try again brings it in', async () => {
     mocks.status = 'offline';
     mocks.household = { loading: false, error: new Error('network') };
     const view = renderTogether();
@@ -242,46 +312,20 @@ describe('Together, paired', () => {
     fireEvent.click(retry);
     mocks.household = { data: HOUSEHOLD, fetchedAt: Date.now(), loading: false };
     view.rerender(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><Together /></MemoryRouter>);
-    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('heading', { name: 'This week' })));
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('heading', { name: 'Couple quest' }).closest('.tg-focus-target')));
   });
 
-  it('keeps focus in the quiz card as its buttons change', async () => {
-    mocks.hardestKanji.mockResolvedValue([{ char: '曜', lapses: 3, stability: 1 }, { char: '週', lapses: 2, stability: 2 }]);
+  it("says when this week's plan can't be worked out", async () => {
+    mocks.plan = undefined;
     renderTogether();
-    const send = await screen.findByRole('button', { name: 'Send' });
-    send.focus();
-    fireEvent.click(send);
-    const question = await screen.findByText('Send these 2 kanji to Ken?');
-    await waitFor(() => expect(document.activeElement).toBe(question));
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Send' })));
-  });
-
-  it("writes the partner fallback in lower case mid-sentence while the household hasn't loaded", async () => {
-    mocks.status = 'offline';
-    mocks.household = { loading: false, error: new Error('network') };
-    mocks.getQuizzes.mockResolvedValue({
-      inbox: [],
-      sent: [{ ...quiz('q-sent', {}), fromMemberId: 'me', toMemberId: 'ken', result: { correct: 0, total: 0, missed: [], finishedAt: '2026-10-14T09:00:00Z' } }],
-    });
-    renderTogether();
-    expect(await screen.findByText('All 5 kanji were new to your partner')).toBeTruthy();
-  });
-
-  it("doesn't say the partner hasn't joined when the household just hasn't loaded", async () => {
-    mocks.status = 'offline';
-    mocks.household = { loading: false, error: new Error('network') };
-    renderTogether();
-    expect(await screen.findByText('Quizzes need your home server. You can send one once this phone connects.')).toBeTruthy();
-    expect(screen.queryByText(/Once your partner joins/)).toBeNull();
-    expect(screen.getByRole('button', { name: 'Send' })).toHaveProperty('disabled', true);
+    expect(await screen.findByText("This week's plan couldn't be worked out on this phone.")).toBeTruthy();
   });
 
   it('shows the cached view with an offline note', async () => {
     mocks.status = 'offline';
     renderTogether();
     expect(await screen.findByText('Offline — showing what we had')).toBeTruthy();
-    expect(screen.getByText('This week')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Couple quest' })).toBeTruthy();
   });
 
   it('asks to reconnect when this phone was removed', async () => {

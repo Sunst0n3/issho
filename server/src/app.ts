@@ -7,7 +7,7 @@ import Fastify, {
   type FastifyRequest,
   type FastifyServerOptions,
 } from 'fastify';
-import { AiError, describeAiFailure, type AiService } from './ai.ts';
+import { AiError, describeAiFailure, grammarTitlesLoader, type AiService } from './ai.ts';
 import { authHook, bearerToken } from './auth.ts';
 import { dataPaths, type Config } from './config.ts';
 import type { AppContext } from './context.ts';
@@ -22,9 +22,12 @@ import { messageRoutes } from './routes/messages.ts';
 import { quizRoutes } from './routes/quizzes.ts';
 import { registerRoutes } from './routes/register.ts';
 import { statsRoutes } from './routes/stats.ts';
+import { togetherRoutes } from './routes/together.ts';
 import { voiceRoutes } from './routes/voice.ts';
 import { precompressStatic, removeStaleCopies } from './precompress.ts';
 import { notFoundHandler, registerStatic } from './static.ts';
+import type { TtsService } from './tts.ts';
+import { ttsRoutes } from './tts-routes.ts';
 import { startVoiceCleanup } from './voice-cleanup.ts';
 import { websocketRoutes, WS_MAX_PAYLOAD, WS_PATH } from './ws.ts';
 
@@ -44,6 +47,8 @@ export interface BuildAppOptions {
   store: Store;
   /** null or omitted: AI routes answer 503 ai_disabled. */
   ai?: AiService | null;
+  /** null or omitted: POST /api/tts answers 503 tts_unavailable and health reports ttsEnabled false. */
+  tts?: TtsService | null;
   now?: () => Date;
   logger?: FastifyServerOptions['logger'];
   /** WebSocket ping interval; tests shorten it. */
@@ -88,8 +93,10 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
     store,
     hub: new Hub({ isPaired: (tokenHash) => store.memberForTokenHash(tokenHash) !== undefined }),
     ai: options.ai ?? null,
+    tts: options.tts ?? null,
     now: options.now ?? (() => new Date()),
     householdName: () => store.householdName() ?? config.householdName,
+    grammarTitles: grammarTitlesLoader(config.staticDir),
     voiceDir: dataPaths(config.dataDir).voice,
     version: VERSION,
     limits: {
@@ -150,7 +157,9 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
     messageRoutes(api, ctx);
     voiceRoutes(api, ctx);
     quizRoutes(api, ctx);
+    togetherRoutes(api, ctx);
     aiRoutes(api, ctx);
+    ttsRoutes(api, ctx);
   });
   await app.register(async (sockets) => websocketRoutes(sockets, ctx));
 
@@ -160,7 +169,10 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
 
   ctx.hub.startHeartbeat(options.heartbeatMs, options.pairingCheckMs);
   const voiceCleanup = await startVoiceCleanup({ store, voiceDir: ctx.voiceDir, now: ctx.now, log: app.log });
-  app.addHook('onClose', async () => voiceCleanup.stop());
+  app.addHook('onClose', async () => {
+    voiceCleanup.stop();
+    ctx.tts?.close();
+  });
   return app;
 }
 

@@ -11,6 +11,7 @@ import {
   initialRun,
   isMyLine,
   LEVEL_NAMES,
+  lineClip,
   other,
   runReducer,
   syncStateOf,
@@ -153,7 +154,8 @@ function Run({ script }: { script: RolePlay }) {
   useEffect(() => {
     if (run.step !== 'done') return;
     recordRolePlayDone(script.id);
-    if (startedAt.current) void addStudyTime(Math.min(MAX_RUN_MS, Date.now() - startedAt.current)).catch(() => {});
+    // Speaking practice counts as strand time (it shares the day's budget with reading and output).
+    if (startedAt.current) void addStudyTime(Math.min(MAX_RUN_MS, Date.now() - startedAt.current), 'strand').catch(() => {});
     startedAt.current = 0;
   }, [run.step, run.round, script.id]);
 
@@ -265,7 +267,7 @@ function Run({ script }: { script: RolePlay }) {
       )}
 
       <RolePlayLine ref={lineRef} key={lineKey} line={line} roles={script.roles} mine={mine} readingBoth={run.part === 'both'}
-        partnerLabel={duo ? partnerName : 'your partner'} onVerdict={onVerdict} />
+        partnerLabel={duo ? partnerName : 'your partner'} clip={lineClip(script.id, run.lineIndex, line)} onVerdict={onVerdict} />
 
       <div className="tg-rp-bottom">
         {mine ? (

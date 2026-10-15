@@ -1,20 +1,41 @@
-import { useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Glyph } from '../components/Glyph.tsx';
 import { SpeakButton } from '../components/SpeakButton.tsx';
-import { CardStatus, ComingUp, MemoryHook, ReadingRow, spokenReading } from '../components/home/KanjiParts.tsx';
-import { NEXT_UP, unitMeaning } from '../components/home/library.ts';
-import { PracticePad } from '../components/home/PracticePad.tsx';
-import { kanaToRomaji } from '../components/home/romaji.ts';
+import { CardStatus, MemoryHook, PinToggle, ReadingRow, spokenReading } from '../components/home/KanjiParts.tsx';
+import { NEXT_UP, wordSpeechText } from '../components/home/library.ts';
+import { PartsPanel, partsOf, type PartView } from '../components/home/PartsPanel.tsx';
 import { useLive } from '../components/home/useLive.ts';
-import { Screen, TopBar } from '../components/ui.tsx';
-import { loadCurriculum, loadKanji, loadMnemonics, loadRadicals, loadWordIndex } from '../lib/data.ts';
+import { AudioButton } from '../components/study/AudioButton.tsx';
+import { PitchLine } from '../components/study/PitchLine.tsx';
+import { Icon, Screen, TopBar } from '../components/ui.tsx';
+import {
+  loadAccent,
+  loadCurriculum,
+  loadKanji,
+  loadMnemonics,
+  loadRadicals,
+  loadWords,
+  loadWordInfo,
+  type WordInfo,
+} from '../lib/data.ts';
 import { db, itemId } from '../lib/db.ts';
-import { useSettings } from '../lib/hooks.ts';
-import type { CurriculumUnit, KanjiEntry, MnemonicsFile, RadicalEntry, WordEntry } from '../lib/types.ts';
+import type { AccentFile, AccentInfo, CurriculumUnit, KanjiEntry, MnemonicEntry, MnemonicsFile, RadicalEntry, WordEntry, WordRef } from '../lib/types.ts';
 import { StrokeAnimation, StrokeOrderStrip, useStrokes } from '../writing/index.ts';
 import '../components/home/home.css';
 import '../components/home/library.css';
+
+/** Related words shown besides the anchor and staged words. */
+const RELATED_MAX = 8;
+const USED_IN_SHOWN = 12;
+
+type WordRole = 'anchor' | 'staged' | 'related';
+
+interface WordLine {
+  info: WordInfo;
+  role: WordRole;
+  known: boolean;
+  accent?: AccentInfo;
+}
 
 interface Related {
   char: string;
@@ -27,48 +48,83 @@ interface Detail {
   kanji?: KanjiEntry;
   radical?: RadicalEntry;
   unit?: CurriculumUnit;
-  /** Parts this kanji is built from, each with its own page. */
-  components: Related[];
-  /** For a part: kanji built with it, in teaching order. */
+  parts: PartView[];
+  /** For a named part: kanji built with it, in teaching order. */
   usedIn: Related[];
   usedInCount: number;
-  mnemonic?: string;
-  /** Not yet learned and among the next few units of the course. */
+  words: WordLine[];
+  mnemonic?: MnemonicEntry;
+  /** Not yet learned and among the next few kanji of the course. */
   nextUp: boolean;
 }
 
-const USED_IN_SHOWN = 12;
+/** The ref a JMdict entry is learned under: its core word when it is one (one identity per word). */
+const refOf = (w: WordEntry): WordRef => (w.core ? `core:${w.core}` : `word:${w.id}`);
+
+/** pure: anchor, then staged words, then other words with the kanji — known ones first, then by frequency. */
+export function wordLines(
+  unit: CurriculumUnit | undefined,
+  char: string,
+  words: readonly WordEntry[],
+  info: (ref: string) => WordInfo | undefined,
+  known: ReadonlySet<string>,
+  accent: AccentFile,
+): WordLine[] {
+  const lines: WordLine[] = [];
+  const seen = new Set<string>();
+  const add = (ref: string, role: WordRole) => {
+    const w = info(ref);
+    if (!w || seen.has(ref)) return;
+    seen.add(ref);
+    lines.push({ info: w, role, known: known.has(ref), accent: accent[ref] });
+  };
+  if (unit?.anchor) add(unit.anchor, 'anchor');
+  for (const ref of unit?.staged ?? []) add(ref, 'staged');
+  const related = words
+    .filter((w) => w.kanji.includes(char) && !seen.has(refOf(w)))
+    .sort((a, b) => Number(known.has(refOf(b))) - Number(known.has(refOf(a))) || a.freqRank - b.freqRank)
+    .slice(0, RELATED_MAX);
+  for (const w of related) add(refOf(w), 'related');
+  return lines;
+}
+
+/** Old mnemonics files hold plain strings; v2 ones hold { meaning, sound }. */
+function mnemonicOf(file: MnemonicsFile, char: string): MnemonicEntry | undefined {
+  const value = file[char] as MnemonicEntry | string | undefined;
+  if (!value) return undefined;
+  return typeof value === 'string' ? { meaning: value } : value;
+}
 
 async function loadDetail(char: string): Promise<Detail> {
-  const [kanjiMap, radicalList, curriculum, mnemonics] = await Promise.all([
+  const [kanjiMap, radicalList, curriculum, mnemonics, words, info, accent] = await Promise.all([
     loadKanji(),
     loadRadicals(),
     loadCurriculum(),
-    // Hooks are a nice-to-have: a missing file must not hide the page.
+    // Hooks, words and accents are extras: a missing file must not hide the page.
     loadMnemonics().catch((): MnemonicsFile => ({})),
+    loadWords().catch((): WordEntry[] => []),
+    loadWordInfo().catch(() => () => undefined),
+    loadAccent().catch((): AccentFile => ({})),
   ]);
   const radicals = new Map(radicalList.map((r) => [r.char, r]));
   const kanji = kanjiMap[char];
   const radical = kanji ? undefined : radicals.get(char);
-  const type = kanji ? 'kanji' : 'radical';
-  const unit = curriculum.units.find((u) => u.char === char && u.type === type);
-  const related = (u: CurriculumUnit): Related => ({ char: u.char, meaning: unitMeaning(u, kanjiMap, radicals) });
-  const unitOf = new Map(curriculum.units.map((u) => [u.char, u]));
+  const unit = curriculum.units.find((u) => u.char === char);
 
-  const components = (kanji?.components ?? []).flatMap((c) => {
-    const u = unitOf.get(c);
-    return u ? [related(u)] : [];
-  });
-  const users = radical || kanji
-    ? curriculum.units.filter((u) => u.type === 'kanji' && kanjiMap[u.char]?.components.includes(char))
-    : [];
+  const users = curriculum.units
+    .filter((u) => {
+      const k = kanjiMap[u.char];
+      return k && u.char !== char && (k.components.includes(char) || k.parts.includes(char));
+    })
+    .sort((a, b) => a.index - b.index);
 
+  const introduced = await db.items.where('kind').anyOf('kanji', 'core', 'word').primaryKeys();
+  const known = new Set(introduced.map(String));
   let nextUp = false;
-  if (unit) {
-    const introduced = new Set((await db.items.where('kind').anyOf('kanji', 'radical').primaryKeys()).map(String));
-    const upcoming = curriculum.units
-      .filter((u) => !introduced.has(itemId(u.type, u.char)))
+  if (unit && !known.has(itemId('kanji', char))) {
+    const upcoming = [...curriculum.units]
       .sort((a, b) => a.index - b.index)
+      .filter((u) => !known.has(itemId('kanji', u.char)))
       .slice(0, NEXT_UP);
     nextUp = upcoming.includes(unit);
   }
@@ -78,10 +134,11 @@ async function loadDetail(char: string): Promise<Detail> {
     kanji,
     radical,
     unit,
-    components,
-    usedIn: users.slice(0, USED_IN_SHOWN).map(related),
+    parts: kanji ? partsOf(kanji, kanjiMap, radicals) : [],
+    usedIn: users.slice(0, USED_IN_SHOWN).map((u) => ({ char: u.char, meaning: kanjiMap[u.char]?.meanings[0] ?? '' })),
     usedInCount: users.length,
-    mnemonic: mnemonics[char],
+    words: kanji ? wordLines(unit, char, words, info, known, accent) : [],
+    mnemonic: mnemonicOf(mnemonics, char),
     nextUp,
   };
 }
@@ -101,33 +158,33 @@ function RelatedGrid({ items }: { items: readonly Related[] }) {
   );
 }
 
-function Words({ ids, romaji }: { ids: readonly string[]; romaji: boolean }) {
-  const words = useLive(async () => {
-    const index = await loadWordIndex();
-    return ids.flatMap((id) => index.get(id) ?? []);
-  }, [ids.join(',')]);
-  if (!ids.length) return null;
+const ROLE_TEXT: Record<WordRole, string> = {
+  anchor: 'Learned with this kanji',
+  staged: 'Comes a few days after it',
+  related: '',
+};
+
+function Words({ lines }: { lines: readonly WordLine[] }) {
+  if (!lines.length) return null;
   return (
     <section className="kd-section" aria-labelledby="kd-words-title">
       <h2 id="kd-words-title" className="hm-section-title">Words with this kanji</h2>
-      {words.status === 'loading' && <div className="hm-skeleton kd-words-skeleton" aria-hidden="true" />}
-      {words.status === 'error' && <p className="muted">The word list didn't load. It'll show once the app has finished downloading.</p>}
-      {words.status === 'ready' && (
-        <ul className="card kd-words">
-          {words.value.map((w: WordEntry) => (
-            <li key={w.id}>
-              <div className="kd-word-text">
-                <span className="kd-word-written" lang="ja">{w.written}</span>
-                <span className="kd-word-kana" lang="ja">
-                  {w.kana}{romaji && <span className="kd-romaji"> {kanaToRomaji(w.kana)}</span>}
-                </span>
-                <span className="kd-word-meaning">{w.meanings.slice(0, 2).join(', ')}</span>
-              </div>
-              <SpeakButton text={w.kana} compact label={`Listen to ${w.written}`} />
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul className="card kd-words">
+        {lines.map(({ info, role, known, accent }) => (
+          <li key={info.ref} className={known ? 'known' : undefined}>
+            <div className="kd-word-text">
+              <span className="kd-word-written" lang="ja">{info.written}</span>
+              <span className="kd-word-kana" lang="ja">{info.kana}</span>
+              {accent && <PitchLine accent={accent} kana={info.kana} size="sm" />}
+              <span className="kd-word-meaning">{info.en}</span>
+              {(role !== 'related' || known) && (
+                <span className="kd-word-role">{[ROLE_TEXT[role], known ? 'known' : ''].filter(Boolean).join(' · ')}</span>
+              )}
+            </div>
+            <AudioButton source={{ ref: info.ref }} fallbackText={wordSpeechText(info)} compact label={`Listen to ${info.written}`} />
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
@@ -147,39 +204,23 @@ function StrokeOrder({ char }: { char: string }) {
   );
 }
 
-function Practice({ char }: { char: string }) {
-  const { strokes } = useStrokes(char);
-  if (!strokes) return null;
-  return (
-    <section className="kd-section" aria-labelledby="kd-practice-title">
-      <h2 id="kd-practice-title" className="hm-section-title">Practice writing</h2>
-      <p className="hm-hint">Just practice: nothing here is graded.</p>
-      <PracticePad key={char} strokes={strokes} label={char} />
-    </section>
-  );
-}
-
 export default function KanjiDetail() {
   const char = useParams().char ?? '';
-  const settings = useSettings();
   const detail = useLive(() => loadDetail(char), [char]);
   // A live query keeps its last result until the next one arrives, so moving
-  // from one kanji to another must not show (or "Learn this now") the old one.
+  // from one kanji to another must not show the old one.
   const d = detail.status === 'ready' && detail.value.char === char ? detail.value : undefined;
-  const kind = d?.radical ? 'radical' : 'kanji';
-  const id = itemId(kind, char);
+  const id = itemId('kanji', char);
   const mineLive = useLive(async () => ({
     id,
     item: await db.items.get(id),
     cards: await db.cards.where('itemId').equals(id).toArray(),
   }), [id]);
   const mine = mineLive.status === 'ready' && mineLive.value.id === id ? mineLive.value : undefined;
-  // The kanji this page offered "Learn this now" for: once learned, its status takes the focus.
-  const offered = useRef<string>();
   const item = mine?.item;
 
   // Opened from inside the app, Back goes back where we came from; opened directly, to the library.
-  const back = '/kanji';
+  const back = '/library';
 
   if (detail.status === 'loading' || (detail.status === 'ready' && !d)) {
     return (
@@ -203,8 +244,8 @@ export default function KanjiDetail() {
           ) : (
             <>
               <h1 className="hm-notice-title"><span lang="ja">{char}</span> isn't in the course</h1>
-              <p className="muted">Issho teaches the 2,136 everyday (jōyō) kanji and the parts they're built from.</p>
-              <Link to="/kanji" className="btn secondary small">Open the kanji library</Link>
+              <p className="muted">Issho teaches the 2,136 everyday (jōyō) kanji and names the parts they're built from.</p>
+              <Link to="/library" className="btn secondary small">Open the library</Link>
             </>
           )}
         </section>
@@ -219,7 +260,7 @@ export default function KanjiDetail() {
 
   return (
     <Screen label={`${char}, ${title}`}>
-      <TopBar back={back} heading={false} title={<span className="kd-topbar">{kanji ? 'Kanji' : 'Part (radical)'}</span>} />
+      <TopBar back={back} heading={false} title={<span className="kd-topbar">{kanji ? 'Kanji' : 'Part'}</span>} />
 
       <section className="card kd-hero">
         <div className="kd-glyph"><Glyph char={char} size={104} /></div>
@@ -230,7 +271,7 @@ export default function KanjiDetail() {
             <p className="muted kd-also">
               Means “{radical.meaning}”
               {radical.variantOf && (
-                <> · a short form of{' '}
+                <> · a form of{' '}
                   <Link to={`/kanji/${encodeURIComponent(radical.variantOf)}`} className="kd-variant" lang="ja">
                     {radical.variantOf}
                   </Link>
@@ -240,30 +281,45 @@ export default function KanjiDetail() {
           )}
           {kanji && (
             <dl className="kd-readings">
-              <ReadingRow label="KUN" readings={kanji.kun.slice(0, 4)} romaji={settings.romaji} />
-              <ReadingRow label="ON" readings={kanji.on.slice(0, 3)} romaji={settings.romaji} />
+              <ReadingRow label="KUN" readings={kanji.kun.slice(0, 4)} />
+              <ReadingRow label="ON" readings={kanji.on.slice(0, 3)} />
             </dl>
           )}
+          <div className="kd-hero-tags">
+            {kanji?.jlptOld !== undefined && <span className="chip ai">Old JLPT {kanji.jlptOld}</span>}
+            {unit && <span className="chip shu">Chapter {unit.chapter}</span>}
+          </div>
           {listen && <SpeakButton text={listen} />}
         </div>
       </section>
 
-      {mine && (item
-        ? <CardStatus item={item} cards={mine.cards} justLearned={offered.current === id} />
-        : unit && <ComingUp unit={unit} nextUp={d.nextUp} onShow={() => { offered.current = id; }} />)}
+      {kanji && mine && (item
+        ? <CardStatus item={item} cards={mine.cards} />
+        : unit && (
+          <section className="card kd-coming">
+            <p>
+              <strong>{d.nextUp ? 'Next up' : `Coming in chapter ${unit.chapter}`}</strong>
+              <span className="muted"> · It arrives in a session, with its first word.</span>
+            </p>
+          </section>
+        ))}
 
-      <StrokeOrder char={char} />
+      {kanji && (
+        <div className="kd-actions">
+          <Link to={`/write/${encodeURIComponent(char)}`} className="btn secondary small">
+            <Icon name="pen" size={18} />Practice writing
+          </Link>
+        </div>
+      )}
+      {kanji && item && <PinToggle item={item} />}
+
+      {kanji && <PartsPanel parts={d.parts} />}
 
       {mine && <MemoryHook key={char} item={item} stock={d.mnemonic} />}
 
-      {d.components.length > 0 && (
-        <section className="kd-section" aria-labelledby="kd-parts-title">
-          <h2 id="kd-parts-title" className="hm-section-title">Built from</h2>
-          <RelatedGrid items={d.components} />
-        </section>
-      )}
+      <Words lines={d.words} />
 
-      {unit && unit.type === 'kanji' && <Words ids={unit.words} romaji={settings.romaji} />}
+      <StrokeOrder char={char} />
 
       {d.usedInCount > 0 && (
         <section className="kd-section" aria-labelledby="kd-used-title">
@@ -274,8 +330,6 @@ export default function KanjiDetail() {
           <RelatedGrid items={d.usedIn} />
         </section>
       )}
-
-      <Practice char={char} />
     </Screen>
   );
 }

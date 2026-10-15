@@ -1,6 +1,8 @@
 // Visible study time. Time only runs while the page is visible, and it is added
 // to today's DayRecord in chunks: when the page is hidden, when a study step
-// ends and when the screen closes.
+// ends and when the screen closes. Each chunk is booked as the kind of study it
+// was: lessons and reviews ('lesson'), reading, output and fluency ('strand'),
+// or a make-up session ('makeup').
 
 import { useEffect, useState } from 'react';
 import { countableMs } from '../../srs/days.ts';
@@ -13,14 +15,31 @@ const pageVisible = () => typeof document === 'undefined' || document.visibility
 /** Chunks shorter than this wait for the next flush. */
 const MIN_FLUSH_MS = 1000;
 
+export type StudyTimeKind = 'lesson' | 'strand' | 'makeup';
+
 export class StudyTimer {
   private startedAt: number | null;
   private total = 0;
   private flushedAt = 0;
   private credited = 0;
+  private current: StudyTimeKind;
 
-  constructor(visible = pageVisible()) {
+  constructor(visible = pageVisible(), kind: StudyTimeKind = 'lesson') {
     this.startedAt = visible ? now() : null;
+    this.current = kind;
+  }
+
+  /** What the time running now is booked as. */
+  get kind(): StudyTimeKind {
+    return this.current;
+  }
+
+  /** Books the time so far as the current kind, then counts on as `kind`. */
+  setKind(kind: StudyTimeKind): Promise<void> {
+    if (kind === this.current) return Promise.resolve();
+    const flushed = this.flush();
+    this.current = kind;
+    return flushed;
   }
 
   /** Visible milliseconds since the timer was created. */
@@ -46,14 +65,14 @@ export class StudyTimer {
     this.credited += Math.min(countableMs(durationMs), MAX_COUNTED_ANSWER_MS);
   }
 
-  /** Adds the visible time since the last flush (minus credited answers) to today's study time. */
+  /** Adds the visible time since the last flush (minus credited answers) to today's study time, as the current kind. */
   flush(): Promise<void> {
     const at = this.elapsed();
     const ms = at - this.flushedAt - this.credited;
     if (ms < MIN_FLUSH_MS) return Promise.resolve();
     this.flushedAt = at;
     this.credited = 0;
-    return addStudyTime(ms).catch((e: unknown) => console.warn('could not record study time', e));
+    return addStudyTime(ms, this.current).catch((e: unknown) => console.warn('could not record study time', e));
   }
 }
 
@@ -61,8 +80,8 @@ export class StudyTimer {
  * A StudyTimer for the life of a screen: pauses while the page is hidden and
  * records what it has whenever the page hides or the screen unmounts.
  */
-export function useStudyTimer(): StudyTimer {
-  const [timer] = useState(() => new StudyTimer());
+export function useStudyTimer(kind: StudyTimeKind = 'lesson'): StudyTimer {
+  const [timer] = useState(() => new StudyTimer(pageVisible(), kind));
   useEffect(() => {
     timer.resume();
     const stop = () => {

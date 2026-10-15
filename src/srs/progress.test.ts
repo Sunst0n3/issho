@@ -1,304 +1,188 @@
 import { Rating, State } from 'ts-fsrs';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { db } from '../lib/db.ts';
-import type { CardRecord, ReviewLogRecord } from '../lib/types.ts';
-import { DAY_MS } from './days.ts';
-import { introduceItem, markKnownMany } from './items.ts';
+import type { CardRecord, CardType, ItemKind, ReviewContext, ReviewLogRecord } from '../lib/types.ts';
+import { DAY_MS, emptyDay, getDay } from './days.ts';
+import { introduceItem } from './items.ts';
 import {
   addStudyTime,
-  completeSession,
+  charsPerMinute,
+  familyOf,
   hardestKanji,
+  hoursTotal,
+  isLearned,
   knownKanji,
+  learnedCounts,
   learnedToday,
   rankHardKanji,
-  streak,
-  streakFromDays,
-  summary,
+  readingSpeed,
+  retentionFrom,
   weekStats,
 } from './progress.ts';
-import { gradeCard, newCardRecord } from './scheduler.ts';
-import { at, inTimeZone, resetDb } from './test-fixtures.ts';
+import { newCardRecord } from './scheduler.ts';
+import { at, resetDb } from './test-fixtures.ts';
+
+vi.mock('../lib/data.ts', async () => (await import('./test-fixtures.ts')).dataMock);
 
 beforeEach(resetDb);
 
-// Week of Mon 2026-10-12 … Sun 2026-10-18.
-const statuses = (info: ReturnType<typeof streakFromDays>) => info.week.map((d) => d.status);
+const day = (d: number, h = 9) => at(2026, 3, d, h);
+const pass = (d: number) => ({ grade: Rating.Good as const, reviewedAt: day(d) });
 
-describe('streakFromDays', () => {
-  it('is empty for a new learner', () => {
-    const info = streakFromDays([], '2026-10-14');
-    expect(info).toMatchObject({ current: 0, best: 0, todayDone: false });
-    expect(info.week.map((d) => d.date)).toEqual([
-      '2026-10-12', '2026-10-13', '2026-10-14', '2026-10-15', '2026-10-16', '2026-10-17', '2026-10-18',
-    ]);
-    expect(statuses(info)).toEqual(['missed', 'missed', 'today', 'future', 'future', 'future', 'future']);
-  });
-
-  it("counts consecutive days and doesn't break on a today that isn't over", () => {
-    const info = streakFromDays(['2026-10-10', '2026-10-11', '2026-10-12', '2026-10-13'], '2026-10-14');
-    expect(info).toMatchObject({ current: 4, best: 4, todayDone: false });
-    expect(statuses(info).slice(0, 3)).toEqual(['done', 'done', 'today']);
-
-    const done = streakFromDays(['2026-10-12', '2026-10-13', '2026-10-14'], '2026-10-14');
-    expect(done).toMatchObject({ current: 3, todayDone: true });
-    expect(statuses(done).slice(0, 3)).toEqual(['done', 'done', 'done']);
-  });
-
-  it('covers one missed day per ISO week with a rest day', () => {
-    const info = streakFromDays(['2026-10-11', '2026-10-12', '2026-10-14'], '2026-10-14');
-    expect(info.current).toBe(3);
-    expect(statuses(info).slice(0, 3)).toEqual(['done', 'rest', 'done']);
-  });
-
-  it('breaks on a second missed day in the same week', () => {
-    // Mon done, Tue missed (the week's rest day), Wed done, Thu missed: the streak ends on Thu.
-    const info = streakFromDays(['2026-10-12', '2026-10-14', '2026-10-16'], '2026-10-16');
-    expect(info).toMatchObject({ current: 1, best: 2 });
-    expect(statuses(info).slice(0, 5)).toEqual(['done', 'missed', 'done', 'missed', 'done']);
-
-    expect(streakFromDays(['2026-10-12'], '2026-10-15').current).toBe(0);
-  });
-
-  it('keeps the rest day where it was taken, so a later miss that week breaks the streak', () => {
-    const done = ['2026-10-12', '2026-10-14', '2026-10-15'];
-    // Thursday: Tue is the rest day.
-    const thursday = streakFromDays(done, '2026-10-15');
-    expect(thursday.current).toBe(3);
-    expect(statuses(thursday).slice(0, 4)).toEqual(['done', 'rest', 'done', 'done']);
-    // Friday isn't over yet, so it doesn't break anything.
-    expect(streakFromDays(done, '2026-10-16').current).toBe(3);
-    // Saturday: Friday was the week's second miss.
-    const saturday = streakFromDays(done, '2026-10-17');
-    expect(saturday).toMatchObject({ current: 0, best: 3 });
-    expect(statuses(saturday).slice(0, 6)).toEqual(['done', 'missed', 'done', 'done', 'missed', 'today']);
-    expect(streakFromDays([...done, '2026-10-17'], '2026-10-17').current).toBe(1);
-  });
-
-  it('allows one rest day per week, even across a broken streak', () => {
-    // Mon done, Tue missed (rest), Wed missed (streak over), Thu done, Fri missed, Sat done.
-    const info = streakFromDays(['2026-10-12', '2026-10-15', '2026-10-17'], '2026-10-17');
-    expect(info.current).toBe(1);
-    expect(statuses(info).slice(0, 6)).toEqual(['done', 'missed', 'missed', 'done', 'missed', 'done']);
-  });
-
-  it('does not spend a rest day while there is no streak to keep', () => {
-    // Fri 10-09 done; Sat rest, Sun missed: over. Mon 10-12 missed with no streak, Tue done, Wed rest, Thu done.
-    const info = streakFromDays(['2026-10-09', '2026-10-13', '2026-10-15'], '2026-10-15');
-    expect(info.current).toBe(2);
-    expect(statuses(info).slice(0, 4)).toEqual(['missed', 'done', 'rest', 'done']);
-  });
-
-  it('allows rest days in two different weeks, even back to back', () => {
-    // Sat 10-10 done, Sun 10-11 missed (week 1), Mon 10-12 missed (week 2), Tue 10-13 done.
-    const info = streakFromDays(['2026-10-09', '2026-10-10', '2026-10-13'], '2026-10-13');
-    expect(info.current).toBe(3);
-    expect(statuses(info)[0]).toBe('rest');
-  });
-
-  it("doesn't treat days before the streak began as rest days", () => {
-    const info = streakFromDays(['2026-10-14'], '2026-10-14');
-    expect(info.current).toBe(1);
-    expect(statuses(info).slice(0, 3)).toEqual(['missed', 'missed', 'done']);
-  });
-
-  it('remembers the best streak', () => {
-    const early = ['2026-09-01', '2026-09-02', '2026-09-03', '2026-09-04', '2026-09-05'];
-    const info = streakFromDays([...early, '2026-10-13', '2026-10-14'], '2026-10-14');
-    expect(info).toMatchObject({ current: 2, best: 5 });
-  });
-
-  it('counts a rest-bridged streak toward the best', () => {
-    // Sep 7 (Mon) – Sep 13 (Sun): one missed Wednesday keeps the 6 days together.
-    const run = ['2026-09-07', '2026-09-08', '2026-09-10', '2026-09-11', '2026-09-12', '2026-09-13'];
-    expect(streakFromDays(run, '2026-10-14')).toMatchObject({ current: 0, best: 6 });
-  });
-
-  it('ignores days after today', () => {
-    expect(streakFromDays(['2026-10-15'], '2026-10-14')).toMatchObject({ current: 0, best: 0 });
+describe('isLearned', () => {
+  it('needs 3 successes on 3 distinct days after the introduction day', () => {
+    expect(isLearned([pass(1), pass(1), pass(3)], '2026-02-28')).toBe(false);
+    expect(isLearned([pass(1), pass(3), pass(9)], '2026-02-28')).toBe(true);
+    expect(isLearned([pass(1), pass(3), pass(9)], '2026-03-01')).toBe(false);
+    expect(isLearned([pass(2), pass(3), { grade: Rating.Again as const, reviewedAt: day(9) }], '2026-03-01')).toBe(false);
   });
 });
 
-describe('completeSession and streak', () => {
-  it('rolls the study day over at 4 a.m.', async () => {
-    await completeSession(at(2026, 10, 14, 21));
-    const info = await completeSession(at(2026, 10, 16, 1, 30)); // still Thursday 10-15's study day
-    expect(await db.days.get('2026-10-15')).toMatchObject({ sessionComplete: true });
-    expect(await db.days.get('2026-10-16')).toBeUndefined();
-    expect(info).toMatchObject({ current: 2, todayDone: true });
-
-    expect(await streak(at(2026, 10, 16, 3, 59))).toMatchObject({ current: 2, todayDone: true });
-    expect(await streak(at(2026, 10, 16, 4, 0))).toMatchObject({ current: 2, todayDone: false });
-  });
-
-  it('records the rest day the streak relies on', async () => {
-    await completeSession(at(2026, 10, 12, 9));
-    await completeSession(at(2026, 10, 14, 9));
-    expect(await db.days.get('2026-10-13')).toMatchObject({ restDay: true, sessionComplete: false, reviews: 0 });
-    expect((await streak(at(2026, 10, 14, 22))).current).toBe(2);
-  });
-
-  it('never records two rest days in one week', async () => {
-    for (const d of [12, 14, 16]) await completeSession(at(2026, 10, d, 9));
-    const rests = (await db.days.toArray()).filter((d) => d.restDay).map((d) => d.date);
-    expect(rests).toEqual(['2026-10-13']);
-    expect((await streak(at(2026, 10, 16, 22))).current).toBe(1);
-  });
-
-  it('counts calendar days across a daylight-saving change', async () => {
-    const tz = process.env.TZ;
-    process.env.TZ = 'America/New_York'; // clocks go back on Sun 2026-11-01
-    try {
-      for (let d = 29; d <= 31; d++) await completeSession(new Date(2026, 9, d, 21));
-      for (let d = 1; d <= 3; d++) await completeSession(new Date(2026, 10, d, 21));
-      expect(await streak(new Date(2026, 10, 3, 22))).toMatchObject({ current: 6, todayDone: true });
-      expect((await db.days.toArray()).map((d) => d.date)).toEqual([
-        '2026-10-29', '2026-10-30', '2026-10-31', '2026-11-01', '2026-11-02', '2026-11-03',
-      ]);
-    } finally {
-      if (tz === undefined) delete process.env.TZ;
-      else process.env.TZ = tz;
-    }
-  });
-});
-
-describe('addStudyTime', () => {
-  it("adds to today's study time", async () => {
-    await addStudyTime(90_000, at(2026, 10, 14, 9));
-    await addStudyTime(30_400, at(2026, 10, 14, 10));
-    await addStudyTime(-5, at(2026, 10, 14, 10));
-    await addStudyTime(Number.NaN, at(2026, 10, 14, 10));
-    await addStudyTime(Infinity, at(2026, 10, 14, 10));
-    expect(await db.days.get('2026-10-14')).toMatchObject({ studyMs: 120_400, reviews: 0, sessionComplete: false });
-  });
-});
-
-function kanjiCard(char: string, type: CardRecord['type'], patch: Partial<CardRecord>): CardRecord {
-  return { ...newCardRecord(`kanji:${char}`, 'kanji', type, at(2026, 10, 1)), state: State.Review, reps: 3, ...patch };
+function log(kind: ItemKind, type: CardType, elapsedDays: number, grade: number, patch: Partial<ReviewLogRecord> = {}): ReviewLogRecord {
+  return {
+    cardId: `${kind}:x|${type}`, itemId: `${kind}:x`, kind, type, grade: grade as ReviewLogRecord['grade'], reviewedAt: day(15),
+    durationMs: 5000, mode: 'typed', prevState: State.Review, elapsedDays, context: 'review' as ReviewContext, ...patch,
+  };
 }
 
-describe('hardestKanji', () => {
-  it('ranks reviewed kanji by lapses, then by lowest stability', async () => {
-    await db.cards.bulkAdd([
-      kanjiCard('水', 'meaning', { lapses: 1, stability: 20 }),
-      kanjiCard('水', 'write', { lapses: 2, stability: 4 }),
-      kanjiCard('火', 'meaning', { lapses: 3, stability: 30 }),
-      kanjiCard('木', 'meaning', { lapses: 0, stability: 2 }),
-      kanjiCard('金', 'meaning', { lapses: 0, stability: 9 }),
-      kanjiCard('土', 'meaning', { lapses: 5, stability: 1, suspended: true }),
-      { ...newCardRecord('kanji:日', 'kanji', 'meaning', at(2026, 10, 1)) }, // never reviewed
-      { ...newCardRecord('kana:あ', 'kana', 'read', at(2026, 10, 1)), lapses: 9, reps: 9 },
-    ]);
-    expect(await hardestKanji(10)).toEqual([
-      { char: '水', lapses: 3, stability: 4 },
-      { char: '火', lapses: 3, stability: 30 },
-      { char: '木', lapses: 0, stability: 2 },
-      { char: '金', lapses: 0, stability: 9 },
-    ]);
-    expect((await hardestKanji(2)).map((k) => k.char)).toEqual(['水', '火']);
+describe('retentionFrom', () => {
+  const now = day(20);
+
+  it('buckets review logs by elapsed days and family', () => {
+    const logs = [
+      ...Array.from({ length: 10 }, (_, i) => log('kanji', 'write', 7, i < 9 ? 3 : 1)),
+      ...Array.from({ length: 12 }, (_, i) => log('word', 'read', 30, i < 6 ? 3 : 1)),
+      ...Array.from({ length: 5 }, () => log('core', 'listen', 7, 3)),
+      log('kanji', 'write', 7, 1, { context: 'first-check' }),
+      log('kanji', 'write', 7, 1, { prevState: State.Learning }),
+      log('kanji', 'write', 7, 1, { reviewedAt: at(2026, 1, 1) }),
+      log('kanji', 'write', 15, 1),
+      log('grammar', 'comprehend', 7, 3, { context: 'partner' }),
+    ];
+    const stats = retentionFrom(logs, now);
+    const of = (family: string) => stats.find((s) => s.family === family)!;
+    expect(of('write').week).toEqual({ n: 10, rate: 0.9 });
+    expect(of('write').month).toEqual({ n: 0, rate: null });
+    expect(of('read').month).toEqual({ n: 12, rate: 0.5 });
+    expect(of('listen').week).toEqual({ n: 5, rate: null });
+    expect(of('grammar').week).toEqual({ n: 1, rate: null });
+    expect(stats.map((s) => s.family)).toEqual(['write', 'read', 'listen', 'produce', 'grammar']);
   });
 
-  it('returns nothing without reviewed kanji', () => {
-    expect(rankHardKanji([], 5)).toEqual([]);
+  it('maps card types to families', () => {
+    expect(familyOf('kana', 'write')).toBe('write');
+    expect(familyOf('kanaRule', 'read')).toBe('read');
+    expect(familyOf('kanji', 'meaning')).toBe('read');
+    expect(familyOf('core', 'listen')).toBe('listen');
+    expect(familyOf('sentence', 'cloze')).toBe('produce');
+    expect(familyOf('word', 'produce')).toBe('produce');
+    expect(familyOf('grammar', 'build')).toBe('grammar');
   });
 });
 
-describe('summary', () => {
-  const NOW = at(2026, 10, 14, 9);
-  const log = (grade: ReviewLogRecord['grade'], prevState: State, daysAgo: number): ReviewLogRecord => ({
-    cardId: 'kanji:水|meaning',
-    itemId: 'kanji:水',
-    grade,
-    prevState,
-    reviewedAt: new Date(NOW.getTime() - daysAgo * DAY_MS),
-    durationMs: 1000,
-    mode: 'choice',
+describe('time and speed', () => {
+  it('computes characters per minute', () => {
+    expect(charsPerMinute(300, 60_000)).toBe(300);
+    expect(charsPerMinute(300, 90_000)).toBe(200);
+    expect(charsPerMinute(300, 0)).toBe(0);
   });
 
-  it('counts known items and true retention over 30 days', async () => {
-    await introduceItem('kana', 'あ', NOW);
-    await introduceItem('kana', 'い', NOW);
-    await introduceItem('kanji', '水', NOW);
-    await introduceItem('word', '1001', NOW);
-    await introduceItem('vocab', 'sw-hai', NOW);
-    await db.reviewLogs.bulkAdd([
-      log(Rating.Good, State.Review, 1),
-      log(Rating.Hard, State.Review, 2),
-      log(Rating.Easy, State.Review, 3),
-      log(Rating.Again, State.Review, 29),
-      log(Rating.Again, State.Review, 40), // too old
-      log(Rating.Again, State.Learning, 1), // not a mature review
+  it('adds lesson, strand and make-up time', async () => {
+    const now = day(20);
+    await addStudyTime(60_000, 'lesson', now);
+    await addStudyTime(30_000, 'strand', now);
+    await addStudyTime(20_000, 'makeup', now);
+    await addStudyTime(Number.NaN, 'strand', now);
+    expect(await getDay('2026-03-20')).toMatchObject({ studyMs: 110_000, strandMs: 30_000, makeupMs: 20_000, reviewMs: 0 });
+  });
+
+  it('totals solo and together hours', async () => {
+    await db.days.bulkPut([
+      { ...emptyDay('2026-03-01'), studyMs: 3_600_000, togetherMs: 1_800_000 },
+      { ...emptyDay('2026-03-02'), studyMs: 1_800_000 },
     ]);
-    expect(await summary(NOW)).toEqual({
-      kanaKnown: 2,
-      kanjiKnown: 1,
-      wordsKnown: 2,
-      reviewsTotal: 6,
-      retention30d: 0.75,
+    expect(await hoursTotal()).toBe(2);
+  });
+
+  it('reports the latest and best re-read speed', async () => {
+    expect(await readingSpeed()).toEqual({ latest: null, best: null });
+    await db.fluency.bulkAdd([
+      { kind: 'reread', day: '2026-03-01', at: day(1), value: 200 },
+      { kind: 'reread', day: '2026-03-08', at: day(8), value: 260 },
+      { kind: 'reread', day: '2026-03-15', at: day(15), value: 240 },
+      { kind: 'speed', day: '2026-03-15', at: day(15), value: 30 },
+    ]);
+    expect(await readingSpeed()).toEqual({ latest: 240, best: 260 });
+  });
+
+  it('lists the last 14 days, oldest first', async () => {
+    await db.days.put({ ...emptyDay('2026-03-20'), reviews: 4 });
+    const days = await weekStats(day(20));
+    expect(days).toHaveLength(14);
+    expect(days[0].date).toBe('2026-03-07');
+    expect(days[13]).toMatchObject({ date: '2026-03-20', reviews: 4 });
+  });
+});
+
+describe('learned counts', () => {
+  async function addLogs(cardId: string, days: number[], grade: Rating.Good | Rating.Again = Rating.Good) {
+    const [itemId, type] = cardId.split('|');
+    const kind = itemId.slice(0, itemId.indexOf(':')) as ItemKind;
+    await db.reviewLogs.bulkAdd(days.map((d) => log(kind, type as CardType, 1, grade, { cardId, itemId, reviewedAt: day(d) })));
+  }
+
+  it('counts what is learned, never the first check', async () => {
+    await introduceItem('kanji', '日', day(1));
+    await introduceItem('kanji', '人', day(1));
+    await introduceItem('word', '1002', day(1), { ctx: { use: true } });
+    await introduceItem('core', 'cw-0001', day(1));
+    await introduceItem('grammar', 'wa-desu', day(1));
+    await introduceItem('kana', 'あ', day(1), { via: 'placement' });
+    await addLogs('kanji:日|write', [1, 2, 4, 8]);
+    await addLogs('kanji:人|write', [1, 2, 4]);
+    await addLogs('word:1002|read', [2, 4, 8]);
+    await addLogs('core:cw-0001|listen', [2, 4, 8]);
+    await addLogs('grammar:wa-desu|comprehend', [2, 4]);
+    expect(await learnedCounts(day(20))).toEqual({
+      kanaLearned: 1,
+      kanjiCanWrite: 1,
+      kanjiCanRead: 1, // 日 through 日本; 本 is not introduced
+      wordsLearned: 2,
+      grammarLearned: 0,
+      kanjiIntroduced: 2,
+      wordsIntroduced: 2,
+      grammarIntroduced: 1,
     });
   });
 
-  it('has no retention figure before any mature review', async () => {
-    expect((await summary()).retention30d).toBeNull();
+  it('lists known kanji oldest first and today’s items without placement', async () => {
+    await introduceItem('kanji', '人', day(2));
+    await introduceItem('kanji', '日', day(1));
+    await introduceItem('word', '1002', day(20, 10));
+    await introduceItem('kana', 'あ', day(20, 9), { via: 'placement' });
+    await introduceItem('core', 'cw-0001', day(20, 11));
+    expect(await knownKanji()).toEqual(['日', '人']);
+    expect(await learnedToday(day(20, 12))).toEqual(['word:1002', 'core:cw-0001']);
   });
 });
 
-describe('weekStats', () => {
-  it('returns the last 7 days oldest first, with zeros for days without study', async () => {
-    await addStudyTime(60_000, at(2026, 10, 14, 9));
-    await addStudyTime(30_000, at(2026, 10, 9, 9));
-    await addStudyTime(99_000, at(2026, 10, 7, 9)); // 8 days back: outside the window
-    const week = await weekStats(at(2026, 10, 15, 2)); // before 4 a.m.: still the 14th
-    expect(week.map((d) => d.date)).toEqual([
-      '2026-10-08', '2026-10-09', '2026-10-10', '2026-10-11', '2026-10-12', '2026-10-13', '2026-10-14',
-    ]);
-    expect(week.map((d) => d.studyMs)).toEqual([0, 30_000, 0, 0, 0, 0, 60_000]);
-    expect(week[2]).toEqual({ date: '2026-10-10', studyMs: 0, reviews: 0, correct: 0, newItems: 0, sessionComplete: false });
-  });
-});
-
-describe('knownKanji', () => {
-  it('lists introduced kanji, oldest first', async () => {
-    await introduceItem('kanji', '人', at(2026, 10, 14, 9));
-    await introduceItem('kanji', '一', at(2026, 10, 13, 9));
-    await introduceItem('radical', '亻', at(2026, 10, 12, 9));
-    expect(await knownKanji()).toEqual(['一', '人']);
-  });
-});
-
-describe('learnedToday', () => {
-  it('lists the items introduced this study day, in the order they came', async () => {
-    await introduceItem('kana', 'い', at(2026, 10, 14, 3)); // still the 13th
-    await introduceItem('kana', 'あ', at(2026, 10, 14, 4));
-    await introduceItem('kanji', '一', at(2026, 10, 14, 9));
-    await introduceItem('word', '1001', at(2026, 10, 14, 9));
-    await introduceItem('kana', 'う', at(2026, 10, 15, 2)); // still the 14th
-    await introduceItem('kana', 'え', at(2026, 10, 15, 4));
-
-    const day = ['kana:あ', 'kanji:一', 'word:1001', 'kana:う'];
-    expect(await learnedToday(at(2026, 10, 14, 12))).toEqual(day);
-    expect(await learnedToday(at(2026, 10, 15, 3, 59))).toEqual(day);
-    expect(await learnedToday(at(2026, 10, 15, 9))).toEqual(['kana:え']);
-    expect(await learnedToday(at(2026, 10, 16, 9))).toEqual([]);
+describe('hardest kanji', () => {
+  const card = (char: string, type: CardType, lapses: number, stability: number, patch: Partial<CardRecord> = {}): CardRecord => ({
+    ...newCardRecord(`kanji:${char}`, 'kanji', type, day(1)), state: State.Review, reps: 4, lapses, stability, ...patch,
   });
 
-  it('covers a 25-hour study day when the clocks go back', () =>
-    inTimeZone('America/New_York', async () => {
-      // The study day of Sat 2026-10-31 runs from 04:00 EDT to Sun 04:00 EST.
-      await introduceItem('kana', 'い', new Date(2026, 9, 31, 3, 59));
-      await introduceItem('kana', 'あ', new Date(2026, 9, 31, 4, 0));
-      await introduceItem('kana', 'う', new Date(2026, 10, 1, 3, 0));
-      expect(await learnedToday(new Date(2026, 10, 1, 3, 59))).toEqual(['kana:あ', 'kana:う']);
-      expect(await learnedToday(new Date(2026, 10, 1, 4, 0))).toEqual([]);
-    }));
-
-  it('leaves out items marked as already known', async () => {
-    const now = at(2026, 10, 14, 9);
-    await markKnownMany([{ kind: 'kana', key: 'あ' }, { kind: 'kana', key: 'い' }], now);
-    await introduceItem('kana', 'う', now);
-    await introduceItem('kana', 'え', now);
-    for (const id of ['kana:え|read', 'kana:え|write']) {
-      await gradeCard(id, Rating.Good, { durationMs: 1, mode: 'choice', now });
-    }
-    expect(await learnedToday(now)).toEqual(['kana:う', 'kana:え']);
+  it('ranks write cards by lapses, then stability', async () => {
+    const cards = [
+      card('日', 'write', 2, 5),
+      card('人', 'write', 3, 9),
+      card('本', 'write', 2, 2),
+      card('乙', 'meaning', 9, 1),
+      card('元', 'write', 9, 1, { suspended: 'retired' }),
+      card('気', 'write', 0, 1, { reps: 0 }),
+    ];
+    expect(rankHardKanji(cards, 3).map((k) => k.char)).toEqual(['人', '本', '日']);
+    await db.cards.bulkPut(cards);
+    expect((await hardestKanji(1))[0]).toEqual({ char: '人', lapses: 3, stability: 9 });
+    expect(DAY_MS).toBe(86_400_000);
   });
 });

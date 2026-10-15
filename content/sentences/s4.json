@@ -46,7 +46,8 @@
     "jp": "{予約|よやく}の{内容|ないよう}を{確認|かくにん}しました。",
     "en": "I checked the details of the reservation.",
     "grammar": [
-      "masu-forms"
+      "masu-forms",
+      "masu-past"
     ]
   },
   {
@@ -71,7 +72,8 @@
     "jp": "{丸|まる}いテーブルを{部屋|へや}の{真|ま}ん{中|なか}に{置|お}きました。",
     "en": "I put a round table in the middle of the room.",
     "grammar": [
-      "wo-object"
+      "wo-object",
+      "masu-past"
     ]
   },
   {
@@ -88,7 +90,8 @@
     "jp": "{雨|あめ}だったので、{結局|けっきょく}{家|いえ}で{映画|えいが}を{見|み}ました。",
     "en": "It was raining, so in the end we watched a movie at home.",
     "grammar": [
-      "masu-forms"
+      "masu-forms",
+      "masu-past"
     ]
   },
   {
@@ -197,7 +200,8 @@
     "jp": "{父|ちち}の{手術|しゅじゅつ}は{無事|ぶじ}に{終|お}わりました。",
     "en": "My father's surgery went fine.",
     "grammar": [
-      "masu-forms"
+      "masu-forms",
+      "masu-past"
     ]
   },
   {
@@ -236,7 +240,11 @@
   {
     "id": "s-s4-029",
     "jp": "{残業|ざんぎょう}があるので、{飲|の}み{会|かい}は{断|ことわ}りました。",
-    "en": "I had to work late, so I turned down the drinking party."
+    "en": "I had to work late, so I turned down the drinking party.",
+    "grammar": [
+      "node",
+      "masu-past"
+    ]
   },
   {
     "id": "s-s4-030",
@@ -266,7 +274,11 @@
   {
     "id": "s-s4-033",
     "jp": "この{地域|ちいき}は{環境|かんきょう}がよくて{住|す}みやすいです。",
-    "en": "This area has a good environment and is easy to live in."
+    "en": "This area has a good environment and is easy to live in.",
+    "grammar": [
+      "wa-ga-description",
+      "adjectives-te"
+    ]
   },
   {
     "id": "s-s4-034",
@@ -314,7 +326,8 @@
     "jp": "{姉|あね}の{写真|しゃしん}が{賞|しょう}を{取|と}りました。",
     "en": "My older sister's photo won a prize.",
     "grammar": [
-      "no-possession"
+      "no-possession",
+      "masu-past"
     ]
   },
   {
@@ -406,7 +419,11 @@
   {
     "id": "s-s4-050",
     "jp": "はじめまして。{営業|えいぎょう}の{佐藤|さとう}と{申|もう}します。",
-    "en": "Nice to meet you. I'm Sato from sales."
+    "en": "Nice to meet you. I'm Sato from sales.",
+    "grammar": [
+      "to-iu",
+      "keigo-verbs"
+    ]
   },
   {
     "id": "s-s4-051",
@@ -453,14 +470,18 @@
   {
     "id": "s-s4-056",
     "jp": "このカメラは{日本製|にほんせい}で、{技術|ぎじゅつ}の{高|たか}さを{感|かん}じます。",
-    "en": "This camera is made in Japan, and you can feel the quality of the engineering."
+    "en": "This camera is made in Japan, and you can feel the quality of the engineering.",
+    "grammar": [
+      "adjectives-te"
+    ]
   },
   {
     "id": "s-s4-057",
     "jp": "{選挙|せんきょ}の{日|ひ}、{二人|ふたり}で{投票|とうひょう}に{行|い}きました。",
     "en": "On election day, the two of us went to vote.",
     "grammar": [
-      "ni-time-place"
+      "ni-time-place",
+      "masu-past"
     ]
   },
   {
@@ -476,7 +497,8 @@
     "jp": "{友達|ともだち}の{影響|えいきょう}で、{夫|おっと}は{武道|ぶどう}を{始|はじ}めました。",
     "en": "My husband took up a martial art because of a friend.",
     "grammar": [
-      "masu-forms"
+      "masu-forms",
+      "masu-past"
     ]
   },
   {
@@ -738,7 +760,8 @@
     "jp": "{花|はな}の{模様|もよう}の{食器|しょっき}を{買|か}いました。",
     "en": "I bought dishes with a flower pattern.",
     "grammar": [
-      "no-possession"
+      "no-possession",
+      "masu-past"
     ]
   },
   {
@@ -822,7 +845,8 @@
     "jp": "{妻|つま}の{三十歳|さんじゅっさい}の{記念|きねん}に{指輪|ゆびわ}を{買|か}いました。",
     "en": "I bought my wife a ring to mark her thirtieth birthday.",
     "grammar": [
-      "no-possession"
+      "no-possession",
+      "masu-past"
     ]
   }
 ]

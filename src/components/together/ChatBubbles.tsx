@@ -1,6 +1,8 @@
-// Chat message bubbles: text (with optional readings), voice, delivery state.
+// Chat message bubbles: text (with optional readings), voice, delivery state, and the
+// "Today's sentence" label on output-step messages (with Reply on the partner's).
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { dayKey } from '../../lib/db.ts';
 import { discardMessage, retryMessage } from '../../sync/outbox.ts';
 import type { ChatItem } from '../../sync/chat.ts';
 import { OTHER_HOUSEHOLD } from '../../sync/client.ts';
@@ -158,8 +160,15 @@ function Delivery({ item, online }: { item: ChatItem; online: boolean }) {
   );
 }
 
-export function MessageBubble({ item, dict, show, online, showTime, withDate = false, senderName }: {
+/** The partner's "today's sentence" of today: replying to it can count as your own. */
+export function isPartnersDailyToday(item: Pick<ChatItem, 'tag' | 'mine' | 'createdAt' | 'writtenAt'>, now: Date = new Date()): boolean {
+  return item.tag === 'daily' && !item.mine && dayKey(new Date(shownAt(item))) === dayKey(now);
+}
+
+export function MessageBubble({ item, dict, show, online, showTime, withDate = false, senderName, onReply }: {
   item: ChatItem;
+  /** Reply to the partner's daily sentence (offered on those only). */
+  onReply?(item: ChatItem): void;
   dict?: FuriganaDict;
   show: Show;
   online: boolean;
@@ -176,12 +185,16 @@ export function MessageBubble({ item, dict, show, online, showTime, withDate = f
     <div className={`tg-bubble-row tg-${side}${item.status === 'sent' ? '' : ` tg-${item.status}`}`}>
       <div className={`tg-bubble tg-${side}${item.kind === 'voice' ? ' tg-voice-bubble' : ''}`}>
         <span className="visually-hidden">{item.mine ? 'You' : senderName}: </span>
+        {item.tag === 'daily' && <span className="tg-daily-label">Today's sentence</span>}
         {item.kind === 'voice' && <VoiceBody item={item} />}
         {item.text && <FuriganaText text={item.text} dict={dict} show={show} />}
         {item.kind === 'voice' && item.transcript && (
           <FuriganaText text={item.transcript} dict={dict} show={show} className="tg-voice-transcript" />
         )}
       </div>
+      {onReply && isPartnersDailyToday(item) && (
+        <button type="button" className="tg-link-btn tg-reply-btn" onClick={() => onReply(item)}>Reply</button>
+      )}
       {item.status !== 'sent'
         ? <Delivery item={item} online={online} />
         : (showTime || withDate) && (
@@ -202,12 +215,13 @@ function startOfDay(iso: string): number {
 }
 
 /** The conversation: bubbles in delivery order, with day separators and grouped times. */
-export function MessageList({ messages, dict, show, online, senderName }: {
+export function MessageList({ messages, dict, show, online, senderName, onReply }: {
   messages: ChatItem[];
   dict?: FuriganaDict;
   show: Show;
   online: boolean;
   senderName: (memberId: string) => string;
+  onReply?(item: ChatItem): void;
 }) {
   const rows = [];
   // The day of the last separator. Messages stay in delivery order, so one written
@@ -231,7 +245,7 @@ export function MessageList({ messages, dict, show, online, senderName }: {
       || Math.abs(Date.parse(nextAt) - Date.parse(at)) > GROUP_GAP_MS;
     rows.push(
       <MessageBubble key={m.key} item={m} dict={dict} show={show} online={online} showTime={showTime}
-        withDate={d !== day} senderName={senderName(m.memberId)} />,
+        withDate={d !== day} senderName={senderName(m.memberId)} onReply={onReply} />,
     );
   }
   return <>{rows}</>;

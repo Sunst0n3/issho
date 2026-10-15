@@ -1,6 +1,4 @@
-import { useSettings } from '../../../lib/hooks.ts';
 import type { KanaEntry } from '../../../lib/types.ts';
-import { kanaToRomaji } from '../format.ts';
 
 /** 'た.べる' with the okurigana after the dot set apart. */
 function Reading({ reading }: { reading: string }) {
@@ -10,14 +8,14 @@ function Reading({ reading }: { reading: string }) {
   return <>{clean.slice(0, dot)}<span className="st-okuri">{clean.slice(dot + 1)}</span></>;
 }
 
-/** KUN / ON rows: kana, with romaji when the learner wants it. */
-export function Readings({ kun, on, kana, max = 3 }: {
+/** KUN / ON rows in kana (kanji are taught after the kana sprint, so never with romaji). */
+export function Readings({ kun, on, max = 3 }: {
   kun: readonly string[];
   on: readonly string[];
-  kana: readonly KanaEntry[];
+  /** Kept for callers that pass the kana table; readings are shown in kana only. */
+  kana?: readonly KanaEntry[];
   max?: number;
 }) {
-  const { romaji } = useSettings();
   const rows = [
     { label: 'KUN', name: 'Japanese readings', list: kun.slice(0, max) },
     { label: 'ON', name: 'Chinese-derived readings', list: on.slice(0, max) },
@@ -33,7 +31,6 @@ export function Readings({ kun, on, kana, max = 3 }: {
               <span key={r} className="st-kanji-reading">
                 {i > 0 && <span aria-hidden="true">、</span>}
                 <span lang="ja"><Reading reading={r} /></span>
-                {romaji && <span className="st-romaji">{kanaToRomaji(r, kana)}</span>}
               </span>
             ))}
           </dd>

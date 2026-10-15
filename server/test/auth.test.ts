@@ -34,8 +34,27 @@ describe('health and registration', () => {
     const body = res.json<HealthResponse>();
     assert.equal(body.ok, true);
     assert.equal(body.aiEnabled, false);
+    assert.equal(body.ttsEnabled, false);
     assert.match(body.version, /^\d+\.\d+\.\d+/);
     assert.equal(res.headers['x-content-type-options'], 'nosniff');
+  });
+
+  it('reports TTS from the service’s last check', async () => {
+    let available = true;
+    const tts = {
+      available: () => available,
+      synthesize: async () => ({ wav: Buffer.alloc(0), cached: false }),
+      close: () => {},
+    };
+    const own = await createTestServer({ tts });
+    try {
+      const health = async () => (await own.app.inject({ method: 'GET', url: '/api/health' })).json<HealthResponse>();
+      assert.equal((await health()).ttsEnabled, true);
+      available = false;
+      assert.equal((await health()).ttsEnabled, false);
+    } finally {
+      await own.close();
+    }
   });
 
   it('rejects a wrong household code', async () => {

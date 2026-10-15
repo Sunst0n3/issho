@@ -2,30 +2,46 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { version } from '../../../package.json';
 import { BackupError, backupFileName, exportBackup, importBackup, type BackupImport } from '../../lib/backup.ts';
-import { db, getSettings } from '../../lib/db.ts';
-import { applyKnownKana } from '../../srs/course.ts';
-import { resetSentencesShown } from '../../srs/planner.ts';
+import { loadAudioManifest } from '../../lib/data.ts';
+import { db, updateSettings, type IsshoDB } from '../../lib/db.ts';
+import type { KanaScript } from '../../lib/types.ts';
+import { applyPlacement, PLACEMENT_ITEMS } from '../../srs/course.ts';
 import { pushStats } from '../../sync/stats.ts';
+import { useLive } from './useLive.ts';
 import { SettingsSection } from './SettingsStudy.tsx';
 import { plural } from './labels.ts';
 
 type Message = { ok: boolean; text: string };
 
+/** Every table of learning progress. Settings, chat (messages, outbox) and queued together events stay. */
+export const RESET_TABLES = [
+  'items', 'cards', 'reviewLogs', 'days', 'savedSentences', 'encounters', 'shownSentences', 'staged', 'stories',
+  'restTokens', 'outputs', 'canDos', 'milestones', 'pitchBoxes', 'fluency', 'partnerQuizzes', 'togetherPlans',
+] as const satisfies readonly (keyof IsshoDB & string)[];
+
 /**
- * Deletes every learned item, card, review and day on this phone, and the list
- * of reading sentences shown lately. Settings, the home-server pairing and chat
- * stay. Kana the learner said they already know are marked known again, as
- * onboarding did.
+ * Deletes everything learned on this phone: items, cards, reviews, days, reading and story progress,
+ * rest tokens, sentences, can-dos, milestones, pitch and fluency records, partner quizzes and the cached
+ * together plans. Settings, the home-server pairing, chat and queued together events stay. A script the
+ * learner passed the placement check for starts as known again, as it did after onboarding.
  */
 export async function resetProgress(): Promise<void> {
-  await db.transaction('rw', [db.items, db.cards, db.reviewLogs, db.days, db.savedSentences], async () => {
-    await Promise.all([db.items.clear(), db.cards.clear(), db.reviewLogs.clear(), db.days.clear(), db.savedSentences.clear()]);
+  const tables = RESET_TABLES.map((name) => db.table(name));
+  await db.transaction('rw', tables, async () => {
+    await Promise.all(tables.map((t) => t.clear()));
   });
-  resetSentencesShown();
-  const s = await getSettings();
-  if (s.knowsHiragana || s.knowsKatakana) await applyKnownKana();
+  // A fresh start chosen for the old progress means nothing now.
+  const s = await updateSettings({ freshStart: undefined });
+  const known: KanaScript[] = [
+    ...(s.knowsHiragana ? ['hiragana' as const] : []),
+    ...(s.knowsKatakana ? ['katakana' as const] : []),
+  ];
+  for (const script of known) await applyPlacement(script, PLACEMENT_ITEMS);
   void pushStats({ immediate: true });
 }
+
+/** Read when the audio manifest has none (not generated yet). */
+export const VOICE_CREDITS_FALLBACK = ['VOICEVOX:No.7', 'VOICEVOX:青山龍星'];
 
 function download(blob: Blob, fileName: string) {
   const url = URL.createObjectURL(blob);
@@ -98,7 +114,12 @@ export function DataSection() {
   const onRestore = (backup: BackupImport) => run(async () => {
     await backup.apply();
     setRestore(undefined);
-    return { ok: true, text: 'Backup restored.' };
+    return {
+      ok: true,
+      text: backup.progressDropped
+        ? "Settings and chat restored. The backup's progress was from the earlier course, so it wasn't brought over."
+        : 'Backup restored.',
+    };
   });
 
   const onReset = () => run(async () => {
@@ -133,14 +154,21 @@ export function DataSection() {
           <p id="set-restore-title" ref={restoreTitle} tabIndex={-1} className="hm-field-label set-confirm-title">
             Restore the backup from {DATE.format(restore.exportedAt)}?
           </p>
-          <p className="hm-hint">
-            This replaces all progress on this phone with the backup
-            ({plural(restore.counts.items ?? 0, 'item')}, {plural(restore.counts.reviewLogs ?? 0, 'review')}).
-            Your home server connection stays as it is.
-          </p>
+          {restore.progressDropped ? (
+            <p className="hm-hint">
+              This backup is from the earlier version of Issho. Its settings and chat come back, but its learning
+              progress can't carry over to the new course.
+            </p>
+          ) : (
+            <p className="hm-hint">
+              This replaces all progress on this phone with the backup
+              ({plural(restore.counts.items ?? 0, 'item')}, {plural(restore.counts.reviewLogs ?? 0, 'review')}).
+              Your home server connection stays as it is.
+            </p>
+          )}
           <div className="set-confirm-actions">
             <button type="button" className="btn primary small" onClick={() => void onRestore(restore)} disabled={busy}>
-              Replace my progress
+              {restore.progressDropped ? 'Restore settings and chat' : 'Replace my progress'}
             </button>
             <button type="button" className="btn secondary small" onClick={() => { setRestore(undefined); setMessage(undefined); }} disabled={busy}>
               Cancel
@@ -154,8 +182,8 @@ export function DataSection() {
           <div className="set-confirm" role="group" aria-labelledby="set-reset-title">
             <p id="set-reset-title" className="hm-field-label">Reset all progress?</p>
             <p className="hm-hint">
-              This deletes everything you've learned on this phone, with its reviews and streak. It can't be undone,
-              so export a backup first if you might want it back.
+              This deletes everything you've learned on this phone: reviews, streak, rest days, stories, can-dos and
+              milestones. Settings and chat stay. It can't be undone, so export a backup first if you might want it back.
             </p>
             <div className="hm-field">
               <label className="hm-field-label" htmlFor="set-reset-word">Type “reset” to confirm</label>
@@ -184,8 +212,15 @@ export function DataSection() {
   );
 }
 
+function useVoiceCredits(): string[] {
+  const manifest = useLive(() => loadAudioManifest(), []);
+  const credits = manifest.status === 'ready' ? manifest.value.credits : [];
+  return credits.length ? credits : VOICE_CREDITS_FALLBACK;
+}
+
 export function AboutSection() {
   const ext = { target: '_blank', rel: 'noopener noreferrer' } as const;
+  const voices = useVoiceCredits();
   return (
     <SettingsSection id="set-about" title="About">
       <div className="set-row">
@@ -195,7 +230,7 @@ export function AboutSection() {
           just before you'd forget (FSRS).
         </p>
         <p className="hm-hint">
-          Write every character by hand, learn parts before whole kanji, meet kanji inside real words, and use it together.
+          Write every character from memory, meet kanji inside real words, read and listen every day, and use it together.
         </p>
       </div>
       <div className="set-row">
@@ -215,6 +250,12 @@ export function AboutSection() {
               <a href="https://www.edrdg.org/jmdict/j_jmdict.html" {...ext}>JMdict</a>
               <a href="https://www.edrdg.org/" {...ext}>EDRDG</a>
               <a href="https://creativecommons.org/licenses/by-sa/4.0/" {...ext}>CC BY-SA 4.0</a>
+            </p>
+          </li>
+          <li>
+            <p>Voices: {voices.join(', ')}</p>
+            <p className="set-credit-links">
+              <a href="https://voicevox.hiroshiba.jp/" {...ext}>VOICEVOX</a>
             </p>
           </li>
           <li><p>Fonts: Shippori Mincho and Zen Kaku Gothic New, SIL Open Font License</p></li>

@@ -56,14 +56,16 @@ const WritePractice = lazyScreen(() => import('./screens/WritePractice.tsx'));
 const GrammarList = lazyScreen(() => import('./screens/GrammarList.tsx'));
 const GrammarDetail = lazyScreen(() => import('./screens/GrammarDetail.tsx'));
 const Reading = lazyScreen(() => import('./screens/Reading.tsx'));
+const CanDoCheck = lazyScreen(() => import('./screens/CanDoCheck.tsx'));
 const Together = lazyScreen(() => import('./screens/Together.tsx'));
+const TogetherSession = lazyScreen(() => import('./screens/TogetherSession.tsx'));
 const Chat = lazyScreen(() => import('./screens/Chat.tsx'));
 const RolePlayList = lazyScreen(() => import('./screens/RolePlayList.tsx'));
 const RolePlayRun = lazyScreen(() => import('./screens/RolePlayRun.tsx'));
 const QuizRun = lazyScreen(() => import('./screens/QuizRun.tsx'));
 
 /** Screens that show the bottom tab bar. Full-screen flows (session, chat, …) hide it. */
-const TAB_PATHS = new Set(['/', '/learn', '/write', '/together']);
+const TAB_PATHS = new Set(['/', '/learn', '/library', '/library/kanji', '/library/words', '/library/stories', '/together']);
 
 const APP_NAME = 'Issho';
 
@@ -73,15 +75,21 @@ const ROUTES: Array<{ path: string; title: string; element: ReactNode }> = [
   { path: '/welcome', title: 'Welcome', element: <Onboarding /> },
   { path: '/settings', title: 'Settings', element: <Settings /> },
   { path: '/learn', title: 'Learn', element: <LearnHub /> },
-  { path: '/kanji', title: 'Kanji library', element: <Library /> },
+  { path: '/library', title: 'Library', element: <Library /> },
+  { path: '/library/:tab', title: 'Library', element: <Library /> },
+  // The v1 kanji library's address: kept for bookmarks.
+  { path: '/kanji', title: 'Library', element: <Navigate to="/library/kanji" replace /> },
   { path: '/kanji/:char', title: 'Kanji', element: <KanjiDetail /> },
   { path: '/kana', title: 'Kana chart', element: <KanaChart /> },
   { path: '/session', title: 'Study session', element: <Session /> },
-  { path: '/write', title: 'Write', element: <WritePractice /> },
+  { path: '/write/:char', title: 'Write', element: <WritePractice /> },
   { path: '/grammar', title: 'Grammar', element: <GrammarList /> },
   { path: '/grammar/:id', title: 'Grammar point', element: <GrammarDetail /> },
-  { path: '/read', title: 'Read & shadow', element: <Reading /> },
+  { path: '/read', title: 'Read', element: <Reading /> },
+  { path: '/read/:storyId', title: 'Story', element: <Reading /> },
+  { path: '/cando/:id', title: 'Can-do check', element: <CanDoCheck /> },
   { path: '/together', title: 'Together', element: <Together /> },
+  { path: '/together/session/:id', title: 'Together session', element: <TogetherSession /> },
   { path: '/chat', title: 'Chat', element: <Chat /> },
   { path: '/roleplay', title: 'Role-plays', element: <RolePlayList /> },
   { path: '/roleplay/:id', title: 'Role-play', element: <RolePlayRun /> },
@@ -99,14 +107,16 @@ function decodeSegment(value: string): string {
   }
 }
 
+/** Routes whose title names the character in the path: "Kanji 水", "Write あ". */
+const CHAR_TITLES: Record<string, string> = { '/kanji/:char': 'Kanji', '/write/:char': 'Write' };
+
 /** The screen name for a path: "Kanji 水" for /kanji/水, "Page not found" for unknown paths. */
 function routeTitle(pathname: string): string {
   for (const route of ROUTES) {
     const match = matchPath(route.path, pathname);
     if (!match) continue;
-    return route.path === '/kanji/:char' && match.params.char
-      ? `Kanji ${decodeSegment(match.params.char)}`
-      : route.title;
+    const prefix = CHAR_TITLES[route.path];
+    return prefix && match.params.char ? `${prefix} ${decodeSegment(match.params.char)}` : route.title;
   }
   return NOT_FOUND_TITLE;
 }

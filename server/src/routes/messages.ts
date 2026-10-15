@@ -15,6 +15,8 @@ const SendMessageSchema = z.object({
   text: z.string().max(MAX_TEXT),
   transcript: z.string().max(MAX_TEXT).optional(),
   audioId: z.uuid().optional(),
+  /** The sender's output-step sentence of the day. */
+  tag: z.literal('daily').optional(),
 }) satisfies z.ZodType<SendMessageRequest>;
 
 const ListQuerySchema = z.object({
@@ -56,6 +58,7 @@ export function messageRoutes(app: FastifyInstance, ctx: AppContext): void {
       text: body.text,
       transcript: body.transcript,
       audioId: body.audioId,
+      tag: body.tag,
     });
     ctx.hub.broadcast({ type: 'message', message });
     reply.code(201);

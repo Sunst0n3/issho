@@ -3,7 +3,7 @@ import type { KanjiEntry, WordEntry } from '../../lib/types.ts';
 import { readingFor } from './kanjiReading.ts';
 
 const entry = (char: string, meanings: string[], on: string[], kun: string[]): KanjiEntry => ({
-  char, meanings, on, kun, strokeCount: 4, components: [],
+  char, meanings, on, kun, strokeCount: 4, components: [], parts: [],
 });
 const word = (written: string, kana: string, meanings: string[], freqRank = 49): WordEntry => ({
   id: `${written}-${kana}`, written, kana, meanings, pos: ['n'], freqRank, kanji: [written],

@@ -1,13 +1,17 @@
 import { randomUUID } from 'node:crypto';
 import { DatabaseSync, type StatementSync } from 'node:sqlite';
 import type {
+  AiReportRequest,
   ChatMessage,
   DayStats,
   Member,
+  MemberProgress,
   MessageKind,
   Quiz,
   QuizItem,
+  QuizKind,
   StatsUploadRequest,
+  TogetherEvent,
 } from '../../shared/api.ts';
 
 /**
@@ -160,6 +164,43 @@ export const MIGRATIONS: readonly string[] = [
   -- When the sender wrote a message on their phone, which may be long before it reached the server.
   ALTER TABLE messages ADD COLUMN written_at TEXT;
   `,
+  `
+  -- v2: minimum days, together minutes, rest tokens and opt-in accuracy per day; the progress
+  -- summary per member; quiz kinds; tagged chat messages; the together routine; AI tip reports.
+  ALTER TABLE day_stats ADD COLUMN minimum_done INTEGER NOT NULL DEFAULT 0;
+  ALTER TABLE day_stats ADD COLUMN together_minutes REAL NOT NULL DEFAULT 0;
+  ALTER TABLE day_stats ADD COLUMN rest_token INTEGER NOT NULL DEFAULT 0;
+  ALTER TABLE day_stats ADD COLUMN accuracy_shared INTEGER NOT NULL DEFAULT 0;
+  ALTER TABLE device_day_stats ADD COLUMN minimum_done INTEGER NOT NULL DEFAULT 0;
+  ALTER TABLE device_day_stats ADD COLUMN together_minutes REAL NOT NULL DEFAULT 0;
+  ALTER TABLE device_day_stats ADD COLUMN rest_token INTEGER NOT NULL DEFAULT 0;
+  ALTER TABLE device_day_stats ADD COLUMN accuracy_shared INTEGER NOT NULL DEFAULT 0;
+  -- A v1 phone's completed session was its minimum day.
+  UPDATE day_stats SET minimum_done = session_complete;
+  UPDATE device_day_stats SET minimum_done = session_complete;
+  ALTER TABLE member_stats ADD COLUMN progress TEXT;
+  ALTER TABLE device_stats ADD COLUMN progress TEXT;
+  ALTER TABLE quizzes ADD COLUMN kind TEXT NOT NULL DEFAULT 'kanji';
+  ALTER TABLE messages ADD COLUMN tag TEXT;
+
+  CREATE TABLE together_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    member_id TEXT NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    client_id TEXT NOT NULL,
+    week TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    event TEXT NOT NULL,
+    UNIQUE (member_id, client_id)
+  );
+  CREATE INDEX together_events_week ON together_events(week);
+
+  CREATE TABLE ai_reports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    member_id TEXT NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    created_at TEXT NOT NULL,
+    report TEXT NOT NULL
+  );
+  `,
 ];
 
 const HOUSEHOLD_NAME_SETTING = 'household_name';
@@ -175,6 +216,10 @@ type DayRow = {
   correct: number;
   new_items: number;
   session_complete: number;
+  minimum_done: number;
+  together_minutes: number;
+  rest_token: number;
+  accuracy_shared: number;
 };
 type MemberStatsRow = {
   streak: number;
@@ -183,6 +228,7 @@ type MemberStatsRow = {
   phase: number;
   reported_day: string | null;
   updated_at: string;
+  progress: string | null;
 };
 type DeviceStatsRow = MemberStatsRow & { token_hash: string };
 type MessageRow = {
@@ -195,6 +241,7 @@ type MessageRow = {
   text: string;
   transcript: string | null;
   audio_id: string | null;
+  tag: string | null;
 };
 type VoiceRow = {
   id: string;
@@ -206,6 +253,7 @@ type VoiceRow = {
 };
 type QuizRow = {
   id: string;
+  kind: QuizKind;
   from_member_id: string;
   to_member_id: string;
   created_at: string;
@@ -213,12 +261,33 @@ type QuizRow = {
   result: string | null;
 };
 
+type TogetherEventRow = {
+  id: number;
+  member_id: string;
+  client_id: string;
+  week: string;
+  created_at: string;
+  event: string;
+};
+
 export interface MemberSummary {
   streak: number;
   kanjiKnown: number;
   knownKanji: string[];
   phase: number;
+  /** v2 summary; null until one of the member's devices sent it. */
+  progress: MemberProgress | null;
   updatedAt: string;
+}
+
+/** A together event as stored, in arrival order (`id`). */
+export interface StoredTogetherEvent {
+  id: number;
+  memberId: string;
+  /** The Monday the sending phone filed it under. */
+  week: string;
+  createdAt: string;
+  event: TogetherEvent;
 }
 
 export interface VoiceRecord {
@@ -248,6 +317,7 @@ export interface NewMessage {
   text: string;
   transcript?: string;
   audioId?: string;
+  tag?: 'daily';
 }
 
 /** Same-name matching for re-registration: case-, width- and whitespace-insensitive. */
@@ -412,18 +482,27 @@ export class Store {
   ): void {
     const upsertDeviceDay = this.sql(`
       INSERT INTO device_day_stats
-        (token_hash, member_id, date, study_minutes, reviews, correct, new_items, session_complete)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        (token_hash, member_id, date, study_minutes, reviews, correct, new_items, session_complete,
+         minimum_done, together_minutes, rest_token, accuracy_shared)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT (token_hash, date) DO UPDATE SET
         study_minutes = excluded.study_minutes,
         reviews = excluded.reviews,
         correct = excluded.correct,
         new_items = excluded.new_items,
-        session_complete = excluded.session_complete
+        session_complete = excluded.session_complete,
+        minimum_done = excluded.minimum_done,
+        together_minutes = excluded.together_minutes,
+        rest_token = excluded.rest_token,
+        accuracy_shared = excluded.accuracy_shared
     `);
+    // A day whose whole plan was finished was also a minimum day, whatever an older phone said.
     const mergeDay = this.sql(`
-      INSERT INTO day_stats (member_id, date, study_minutes, reviews, correct, new_items, session_complete)
-      SELECT member_id, date, MAX(study_minutes), MAX(reviews), MAX(correct), MAX(new_items), MAX(session_complete)
+      INSERT INTO day_stats
+        (member_id, date, study_minutes, reviews, correct, new_items, session_complete,
+         minimum_done, together_minutes, rest_token, accuracy_shared)
+      SELECT member_id, date, MAX(study_minutes), MAX(reviews), MAX(correct), MAX(new_items), MAX(session_complete),
+        MAX(MAX(minimum_done), MAX(session_complete)), MAX(together_minutes), MAX(rest_token), MAX(accuracy_shared)
       FROM device_day_stats WHERE member_id = ? AND date = ?
       GROUP BY member_id, date
       ON CONFLICT (member_id, date) DO UPDATE SET
@@ -431,29 +510,35 @@ export class Store {
         reviews = excluded.reviews,
         correct = excluded.correct,
         new_items = excluded.new_items,
-        session_complete = excluded.session_complete
+        session_complete = excluded.session_complete,
+        minimum_done = excluded.minimum_done,
+        together_minutes = excluded.together_minutes,
+        rest_token = excluded.rest_token,
+        accuracy_shared = excluded.accuracy_shared
     `);
     const upsertDevice = this.sql(`
-      INSERT INTO device_stats (token_hash, member_id, streak, kanji_known, known_kanji, phase, reported_day, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO device_stats (token_hash, member_id, streak, kanji_known, known_kanji, phase, reported_day, updated_at, progress)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT (token_hash) DO UPDATE SET
         streak = excluded.streak,
         kanji_known = excluded.kanji_known,
         known_kanji = excluded.known_kanji,
         phase = excluded.phase,
         reported_day = excluded.reported_day,
-        updated_at = excluded.updated_at
+        updated_at = excluded.updated_at,
+        progress = excluded.progress
     `);
     const upsertSummary = this.sql(`
-      INSERT INTO member_stats (member_id, streak, kanji_known, known_kanji, phase, reported_day, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO member_stats (member_id, streak, kanji_known, known_kanji, phase, reported_day, updated_at, progress)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT (member_id) DO UPDATE SET
         streak = excluded.streak,
         kanji_known = excluded.kanji_known,
         known_kanji = excluded.known_kanji,
         phase = excluded.phase,
         reported_day = excluded.reported_day,
-        updated_at = excluded.updated_at
+        updated_at = excluded.updated_at,
+        progress = excluded.progress
     `);
     const updatedAt = now.toISOString();
     this.transaction(() => {
@@ -467,6 +552,11 @@ export class Store {
           day.correct,
           day.newItems,
           day.sessionComplete ? 1 : 0,
+          // v1 phones send no minimumDone: their completed session was the minimum day.
+          (day.minimumDone ?? day.sessionComplete) ? 1 : 0,
+          day.togetherMinutes ?? 0,
+          day.restToken ? 1 : 0,
+          day.accuracyShared ? 1 : 0,
         );
         mergeDay.run(memberId, day.date);
       }
@@ -476,9 +566,11 @@ export class Store {
         upload.streak,
         upload.kanjiKnown,
         JSON.stringify([...new Set(upload.knownKanji)]),
-        upload.phase,
+        // v2 phones have no phase.
+        upload.phase ?? 1,
         reportedDay,
         updatedAt,
+        upload.progress ? JSON.stringify(upload.progress) : null,
       );
       const devices = this.sql(`
         SELECT s.* FROM device_stats s JOIN devices d ON d.token_hash = s.token_hash
@@ -493,6 +585,7 @@ export class Store {
         summary.phase,
         summary.reportedDay,
         updatedAt,
+        summary.progress ? JSON.stringify(summary.progress) : null,
       );
     });
   }
@@ -501,14 +594,7 @@ export class Store {
     const rows = this.sql(
       'SELECT * FROM day_stats WHERE member_id = ? AND date BETWEEN ? AND ? ORDER BY date',
     ).all(memberId, from, to) as DayRow[];
-    return rows.map((row) => ({
-      date: row.date,
-      studyMinutes: row.study_minutes,
-      reviews: row.reviews,
-      correct: row.correct,
-      newItems: row.new_items,
-      sessionComplete: row.session_complete === 1,
-    }));
+    return rows.map(toDayStats);
   }
 
   memberSummary(memberId: string): MemberSummary | undefined {
@@ -521,6 +607,7 @@ export class Store {
         kanjiKnown: row.kanji_known,
         knownKanji: JSON.parse(row.known_kanji) as string[],
         phase: row.phase,
+        progress: row.progress === null ? null : (JSON.parse(row.progress) as MemberProgress),
         updatedAt: row.updated_at,
       }
     );
@@ -534,14 +621,23 @@ export class Store {
     return row.date ?? undefined;
   }
 
-  /** Dates on which every current member has a completed session. */
-  daysEveryoneCompleted(): Set<string> {
+  /** Dates on which every current member had a minimum day (a v1 phone: a completed session). */
+  daysEveryoneStudied(): Set<string> {
     const rows = this.sql(`
       SELECT date FROM day_stats
-      WHERE session_complete = 1
+      WHERE minimum_done = 1 OR session_complete = 1
       GROUP BY date
       HAVING COUNT(*) = (SELECT COUNT(*) FROM members)
     `).all() as { date: string }[];
+    return new Set(rows.map((row) => row.date));
+  }
+
+  /** A member's minimum days (a v1 phone: completed sessions) between `from` and `to`. */
+  minimumDates(memberId: string, from: string, to: string): Set<string> {
+    const rows = this.sql(`
+      SELECT date FROM day_stats
+      WHERE member_id = ? AND date BETWEEN ? AND ? AND (minimum_done = 1 OR session_complete = 1)
+    `).all(memberId, from, to) as { date: string }[];
     return new Set(rows.map((row) => row.date));
   }
 
@@ -557,8 +653,8 @@ export class Store {
 
   insertMessage(message: NewMessage): ChatMessage {
     const row = this.sql(`
-      INSERT INTO messages (client_id, member_id, created_at, written_at, kind, text, transcript, audio_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO messages (client_id, member_id, created_at, written_at, kind, text, transcript, audio_id, tag)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       RETURNING *
     `).get(
       message.clientId,
@@ -569,6 +665,7 @@ export class Store {
       message.text,
       message.transcript ?? null,
       message.audioId ?? null,
+      message.tag ?? null,
     ) as MessageRow;
     return toMessage(row);
   }
@@ -621,17 +718,19 @@ export class Store {
 
   // Quizzes
 
+  /** The caller validates the items for the quiz's kind. */
   insertQuiz(quiz: Omit<Quiz, 'id' | 'result'>): Quiz {
     const row = this.sql(`
-      INSERT INTO quizzes (id, from_member_id, to_member_id, created_at, items)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO quizzes (id, kind, from_member_id, to_member_id, created_at, items)
+      VALUES (?, ?, ?, ?, ?, ?)
       RETURNING *
     `).get(
       randomUUID(),
+      quiz.kind,
       quiz.fromMemberId,
       quiz.toMemberId,
       quiz.createdAt,
-      JSON.stringify(quiz.items.map((item) => ({ char: item.char }))),
+      JSON.stringify(quiz.items),
     ) as QuizRow;
     return toQuiz(row);
   }
@@ -656,6 +755,60 @@ export class Store {
       id,
     ) as QuizRow;
     return toQuiz(row);
+  }
+
+  // Together routine
+
+  /**
+   * Stores a together event once per (member, clientId). Returns false when that clientId was
+   * already stored (a phone resending from its outbox); the first one stands.
+   */
+  insertTogetherEvent(event: Omit<StoredTogetherEvent, 'id'> & { clientId: string }): boolean {
+    const row = this.sql(`
+      INSERT INTO together_events (member_id, client_id, week, created_at, event)
+      VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT (member_id, client_id) DO NOTHING
+      RETURNING id
+    `).get(event.memberId, event.clientId, event.week, event.createdAt, JSON.stringify(event.event)) as
+      | { id: number }
+      | undefined;
+    return row !== undefined;
+  }
+
+  /** Every together event of the current members, in arrival order. */
+  listTogetherEvents(): StoredTogetherEvent[] {
+    const rows = this.sql('SELECT * FROM together_events ORDER BY id').all() as TogetherEventRow[];
+    return rows.map((row) => ({
+      id: row.id,
+      memberId: row.member_id,
+      week: row.week,
+      createdAt: row.created_at,
+      event: JSON.parse(row.event) as TogetherEvent,
+    }));
+  }
+
+  // AI tip reports ("This tip seems wrong")
+
+  insertAiReport(memberId: string, report: AiReportRequest, now: Date): void {
+    this.sql('INSERT INTO ai_reports (member_id, created_at, report) VALUES (?, ?, ?)').run(
+      memberId,
+      now.toISOString(),
+      JSON.stringify(report),
+    );
+  }
+
+  /** Newest first (for the admin and tests). */
+  listAiReports(limit: number): { memberId: string; createdAt: string; report: AiReportRequest }[] {
+    const rows = this.sql('SELECT * FROM ai_reports ORDER BY id DESC LIMIT ?').all(limit) as {
+      member_id: string;
+      created_at: string;
+      report: string;
+    }[];
+    return rows.map((row) => ({
+      memberId: row.member_id,
+      createdAt: row.created_at,
+      report: JSON.parse(row.report) as AiReportRequest,
+    }));
   }
 
   // Internals
@@ -726,6 +879,7 @@ interface Summary {
   knownKanji: string[];
   phase: number;
   reportedDay: string | null;
+  progress: MemberProgress | null;
 }
 
 /**
@@ -733,7 +887,8 @@ interface Summary {
  * the union and the phase the highest; the count is never below the union's size. A streak drops
  * when a day is missed, so the device reporting the latest study day decides it; within one day
  * it only grows, so there the larger wins. A device that sent no study day can't be ordered, so
- * it decides only when no device sent one (the latest upload wins then).
+ * it decides only when no device sent one (the latest upload wins then). Progress: see
+ * mergeProgress.
  */
 function mergeDevices(devices: readonly DeviceStatsRow[]): Summary {
   const knownKanji = [...new Set(devices.flatMap((device) => JSON.parse(device.known_kanji) as string[]))];
@@ -742,22 +897,71 @@ function mergeDevices(devices: readonly DeviceStatsRow[]): Summary {
     (max, device) => (max === null || device.reported_day! > max ? device.reported_day : max),
     null,
   );
+  const newestFirst = [...devices].sort((a, b) => (a.updated_at < b.updated_at ? 1 : a.updated_at > b.updated_at ? -1 : 0));
   const streak =
     latestDay !== null
       ? Math.max(...dated.filter((device) => device.reported_day === latestDay).map((device) => device.streak))
-      : [...devices].sort((a, b) => (a.updated_at < b.updated_at ? -1 : a.updated_at > b.updated_at ? 1 : 0)).at(-1)
-          ?.streak ?? 0;
+      : newestFirst[0]?.streak ?? 0;
   return {
     streak,
     kanjiKnown: Math.max(knownKanji.length, ...devices.map((device) => device.kanji_known)),
     knownKanji,
     phase: Math.max(1, ...devices.map((device) => device.phase)),
     reportedDay: latestDay,
+    progress: mergeProgress(
+      newestFirst.flatMap((device) => (device.progress === null ? [] : [JSON.parse(device.progress) as MemberProgress])),
+    ),
+  };
+}
+
+const PROGRESS_LIST_LIMITS = { readyStories: 60, recentKanji: 20, recentItems: 20 } as const;
+
+/**
+ * Each device keeps its own study state, so a member on two devices has two summaries (newest
+ * upload first here). Counts and milestones take the largest value, like the day stats; the lists
+ * are merged newest device first, keeping their caps.
+ */
+export function mergeProgress(summaries: readonly MemberProgress[]): MemberProgress | null {
+  if (summaries.length === 0) return null;
+  const max = (pick: (p: MemberProgress) => number) => Math.max(...summaries.map(pick));
+  const list = (key: keyof typeof PROGRESS_LIST_LIMITS) =>
+    [...new Set(summaries.flatMap((p) => p[key]))].slice(0, PROGRESS_LIST_LIMITS[key]);
+  return {
+    unit: max((p) => p.unit),
+    chapter: max((p) => p.chapter),
+    kanjiCanWrite: max((p) => p.kanjiCanWrite),
+    kanjiCanRead: max((p) => p.kanjiCanRead),
+    wordsKnown: max((p) => p.wordsKnown),
+    grammarKnown: max((p) => p.grammarKnown),
+    hoursTotal: max((p) => p.hoursTotal),
+    daysThisMonth: max((p) => p.daysThisMonth),
+    longestStreak: max((p) => p.longestStreak),
+    readyStories: list('readyStories'),
+    recentKanji: list('recentKanji'),
+    recentItems: list('recentItems'),
+    settledUnit: max((p) => p.settledUnit),
+    coreReached: max((p) => p.coreReached),
+    grammarReached: max((p) => p.grammarReached),
   };
 }
 
 function toMember(row: MemberRow): Member {
   return { id: row.id, name: row.name, joinedAt: row.joined_at, lastSeenAt: row.last_seen_at };
+}
+
+function toDayStats(row: DayRow): DayStats {
+  return {
+    date: row.date,
+    studyMinutes: row.study_minutes,
+    reviews: row.reviews,
+    correct: row.correct,
+    newItems: row.new_items,
+    sessionComplete: row.session_complete === 1,
+    minimumDone: row.minimum_done === 1 || row.session_complete === 1,
+    togetherMinutes: row.together_minutes,
+    restToken: row.rest_token === 1,
+    accuracyShared: row.accuracy_shared === 1,
+  };
 }
 
 function toMessage(row: MessageRow): ChatMessage {
@@ -772,12 +976,14 @@ function toMessage(row: MessageRow): ChatMessage {
   if (row.written_at !== null) message.writtenAt = row.written_at;
   if (row.transcript !== null) message.transcript = row.transcript;
   if (row.audio_id !== null) message.audioId = row.audio_id;
+  if (row.tag === 'daily') message.tag = row.tag;
   return message;
 }
 
 function toQuiz(row: QuizRow): Quiz {
   const quiz: Quiz = {
     id: row.id,
+    kind: row.kind,
     fromMemberId: row.from_member_id,
     toMemberId: row.to_member_id,
     createdAt: row.created_at,

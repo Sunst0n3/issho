@@ -5,7 +5,7 @@
 //
 // Understands content/stories/*.json (StoryEntry, or an array of them), content/units.json and
 // content/units/*.json (UnitSpec: the task's scripted lines and each can-do's material),
-// content/roleplays-v2.json (and the old roleplays.json), content/grammar-v2.json (each point's
+// content/roleplays-v2/*.json (and roleplays-v2.json, the old roleplays.json), content/grammar-v2.json (each point's
 // examples) and any array of { jp } (content/sentences/*.json). A directory is searched for
 // .json files; files of other kinds are skipped.
 //
@@ -134,23 +134,44 @@ function unitsFrom(data: unknown): UnitSpec[] {
   return list.filter((u): u is UnitSpec => !!u && typeof u === 'object' && typeof (u as UnitSpec).id === 'number' && 'coreWordCeiling' in u);
 }
 
+/**
+ * The entries of one kind as the build reads them (scripts/lib/content.ts): a folder of JSON
+ * files (one entry or an array each, by file name), or the single file. `folderFirst` follows
+ * the build: units/ and roleplays-v2/ win over units.json and roleplays-v2.json; grammar-v2.json
+ * wins over its grammar-v2/ part files.
+ */
+function readKind(folder: string, file: string, folderFirst: boolean): unknown[] {
+  const dir = join(CONTENT, folder);
+  const single = join(CONTENT, file);
+  const fromDir = () =>
+    readdirSync(dir)
+      .filter((n) => n.endsWith('.json'))
+      .sort()
+      .flatMap((n) => {
+        const data = readOptional(join(dir, n));
+        return data === undefined ? [] : Array.isArray(data) ? data : [data];
+      });
+  const fromFile = () => {
+    const data = readOptional(single);
+    return data === undefined ? [] : Array.isArray(data) ? data : [data];
+  };
+  const hasDir = existsSync(dir);
+  const hasFile = existsSync(single);
+  if (hasDir && (folderFirst || !hasFile)) return fromDir();
+  if (hasFile) return fromFile();
+  return [];
+}
+
 export async function loadContext(): Promise<Context> {
   const tk = await getTokenizer();
   const grammarOrder = new Map<string, number>();
-  const grammar = readOptional(join(CONTENT, 'grammar-v2.json'));
-  if (Array.isArray(grammar)) for (const g of grammar as GrammarPoint[]) grammarOrder.set(g.id, g.order);
+  for (const g of readKind('grammar-v2', 'grammar-v2.json', false) as GrammarPoint[]) grammarOrder.set(g.id, g.order);
   const units = new Map<number, UnitSpec>();
-  for (const u of unitsFrom(readOptional(join(CONTENT, 'units.json')))) units.set(u.id, u);
-  const uDir = join(CONTENT, 'units');
-  if (existsSync(uDir)) {
-    for (const f of readdirSync(uDir).filter((n) => n.endsWith('.json')).sort()) {
-      for (const u of unitsFrom(readOptional(join(uDir, f)))) units.set(u.id, u);
-    }
-  }
+  for (const u of unitsFrom(readKind('units', 'units.json', true))) units.set(u.id, u);
   const grammarUnit = new Map<string, number>();
   for (const u of units.values()) for (const id of u.grammar ?? []) grammarUnit.set(id, u.id);
-  const roleplays = readOptional(join(CONTENT, 'roleplays-v2.json'));
-  const conversations = Array.isArray(roleplays) ? new Set((roleplays as RolePlay[]).map((r) => r.id)) : null;
+  const roleplays = readKind('roleplays-v2', 'roleplays-v2.json', true) as RolePlay[];
+  const conversations = roleplays.length ? new Set(roleplays.map((r) => r.id)) : null;
   let maxCoreOrder = 0;
   for (const w of tk.core.values()) maxCoreOrder = Math.max(maxCoreOrder, w.order);
   return { tk, grammarOrder, units, grammarUnit, conversations, maxCoreOrder };
@@ -483,7 +504,7 @@ export function analyzeItem(item: Item, ctx: Context, opts: Options = {}): ItemR
   if (item.grammarExists) checkGrammarIds(item.grammarExists.field, item.grammarExists.ids, ctx, undefined, errors);
   if (item.targets) checkTargets(item.targets, ctx, grammarMax, errors);
   if (item.conversation && ctx.conversations && !ctx.conversations.has(item.conversation)) {
-    warnings.push(`conversation "${item.conversation}" is not in content/roleplays-v2.json`);
+    warnings.push(`conversation "${item.conversation}" is not a role-play in content/roleplays-v2/`);
   }
   return report;
 }

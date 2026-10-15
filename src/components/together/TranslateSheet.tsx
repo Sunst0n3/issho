@@ -14,8 +14,10 @@ type State =
   | { kind: 'done'; result: AiTranslateResponse }
   | { kind: 'error'; message: string };
 
-export function TranslateSheet({ knownKanji, onUse, onClose }: {
+export function TranslateSheet({ knownKanji, showRomaji = false, onUse, onClose }: {
   knownKanji: string[];
+  /** Romaji is shown only during the kana sprint (never after it). */
+  showRomaji?: boolean;
   onUse(japanese: string): void;
   onClose(): void;
 }) {
@@ -90,7 +92,7 @@ export function TranslateSheet({ knownKanji, onUse, onClose }: {
         {state.kind === 'done' && (
           <div className="tg-translate-result" aria-live="polite">
             <p className="tg-translate-jp"><Ruby text={state.result.japanese} /></p>
-            {state.result.romaji && <p className="muted">{state.result.romaji}</p>}
+            {showRomaji && state.result.romaji && <p className="muted">{state.result.romaji}</p>}
             {state.result.note && <p className="tg-translate-note">{state.result.note}</p>}
             <button type="button" className="btn primary block" onClick={() => onUse(rubyToPlain(state.result.japanese))}>
               Use this

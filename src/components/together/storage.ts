@@ -25,6 +25,7 @@ export const STORAGE_KEYS = {
   rolePlayHistory: 'issho.roleplay.history.v1',
   quizzes: 'issho.quizzes.v1',
   quizResults: 'issho.quizResults.v1',
+  rulesShown: 'issho.together.rulesShown.v1',
 } as const;
 
 // ---- Chat ------------------------------------------------------------------

@@ -1,0 +1,350 @@
+{
+  "engine": "0.25.2",
+  "speaker": 30,
+  "queries": {
+    "先生": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "セ",
+              "consonant": "s",
+              "consonant_length": 0.0988859161734581,
+              "vowel": "e",
+              "vowel_length": 0.10161805152893066,
+              "pitch": 5.8194780349731445
+            },
+            {
+              "text": "ン",
+              "consonant": null,
+              "consonant_length": null,
+              "vowel": "N",
+              "vowel_length": 0.037747159600257874,
+              "pitch": 5.916993141174316
+            },
+            {
+              "text": "セ",
+              "consonant": "s",
+              "consonant_length": 0.12369641661643982,
+              "vowel": "e",
+              "vowel_length": 0.061377376317977905,
+              "pitch": 5.793476581573486
+            },
+            {
+              "text": "エ",
+              "consonant": null,
+              "consonant_length": null,
+              "vowel": "e",
+              "vowel_length": 0.16363570094108582,
+              "pitch": 5.380461692810059
+            }
+          ],
+          "accent": 3,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "センセ'エ"
+    },
+    "東京": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "ト",
+              "consonant": "t",
+              "consonant_length": 0.04499279707670212,
+              "vowel": "o",
+              "vowel_length": 0.09701886028051376,
+              "pitch": 5.670680999755859
+            },
+            {
+              "text": "オ",
+              "consonant": null,
+              "consonant_length": null,
+              "vowel": "o",
+              "vowel_length": 0.06260573863983154,
+              "pitch": 5.724981784820557
+            },
+            {
+              "text": "キョ",
+              "consonant": "ky",
+              "consonant_length": 0.11719413101673126,
+              "vowel": "o",
+              "vowel_length": 0.0955396443605423,
+              "pitch": 5.589727878570557
+            },
+            {
+              "text": "オ",
+              "consonant": null,
+              "consonant_length": null,
+              "vowel": "o",
+              "vowel_length": 0.09772605448961258,
+              "pitch": 5.509925842285156
+            }
+          ],
+          "accent": 4,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "トオキョオ'"
+    },
+    "コーヒー": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "コ",
+              "consonant": "k",
+              "consonant_length": 0.05659659206867218,
+              "vowel": "o",
+              "vowel_length": 0.10224442929029465,
+              "pitch": 5.66786003112793
+            },
+            {
+              "text": "オ",
+              "consonant": null,
+              "consonant_length": null,
+              "vowel": "o",
+              "vowel_length": 0.05577186122536659,
+              "pitch": 5.749643325805664
+            },
+            {
+              "text": "ヒ",
+              "consonant": "h",
+              "consonant_length": 0.0875457152724266,
+              "vowel": "i",
+              "vowel_length": 0.07882639765739441,
+              "pitch": 5.606814861297607
+            },
+            {
+              "text": "イ",
+              "consonant": null,
+              "consonant_length": null,
+              "vowel": "i",
+              "vowel_length": 0.1548515260219574,
+              "pitch": 5.300458908081055
+            }
+          ],
+          "accent": 3,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "コオヒ'イ"
+    },
+    "駅へ": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "エ",
+              "consonant": null,
+              "consonant_length": null,
+              "vowel": "e",
+              "vowel_length": 0.09614475071430206,
+              "pitch": 5.392148971557617
+            },
+            {
+              "text": "キ",
+              "consonant": "k",
+              "consonant_length": 0.11512354016304016,
+              "vowel": "i",
+              "vowel_length": 0.06074114516377449,
+              "pitch": 5.672954082489014
+            },
+            {
+              "text": "エ",
+              "consonant": null,
+              "consonant_length": null,
+              "vowel": "e",
+              "vowel_length": 0.16408029198646545,
+              "pitch": 5.2610554695129395
+            }
+          ],
+          "accent": 1,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "エ'キエ"
+    },
+    "本を": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "ホ",
+              "consonant": "h",
+              "consonant_length": 0.061062976717948914,
+              "vowel": "o",
+              "vowel_length": 0.06859028339385986,
+              "pitch": 5.989760875701904
+            },
+            {
+              "text": "ン",
+              "consonant": null,
+              "consonant_length": null,
+              "vowel": "N",
+              "vowel_length": 0.17281337082386017,
+              "pitch": 5.795134544372559
+            },
+            {
+              "text": "オ",
+              "consonant": null,
+              "consonant_length": null,
+              "vowel": "o",
+              "vowel_length": 0.18144665658473969,
+              "pitch": 5.1936259269714355
+            }
+          ],
+          "accent": 1,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "ホ'ンオ"
+    },
+    "は": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "ワ",
+              "consonant": "w",
+              "consonant_length": 0.16807594895362854,
+              "vowel": "a",
+              "vowel_length": 0.02099248766899109,
+              "pitch": 5.360049724578857
+            }
+          ],
+          "accent": 1,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "ワ'"
+    },
+    "ハ": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "ハ",
+              "consonant": "h",
+              "consonant_length": 0.0995853841304779,
+              "vowel": "a",
+              "vowel_length": 0.10410144180059433,
+              "pitch": 4.874819755554199
+            }
+          ],
+          "accent": 1,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "ハ'"
+    },
+    "を": {
+      "accent_phrases": [
+        {
+          "moras": [
+            {
+              "text": "オ",
+              "consonant": null,
+              "consonant_length": null,
+              "vowel": "o",
+              "vowel_length": 0.13463115692138672,
+              "pitch": 5.267121315002441
+            }
+          ],
+          "accent": 1,
+          "pause_mora": null,
+          "is_interrogative": false
+        }
+      ],
+      "speedScale": 1,
+      "pitchScale": 0,
+      "intonationScale": 1,
+      "volumeScale": 1,
+      "prePhonemeLength": 0.1,
+      "postPhonemeLength": 0.1,
+      "pauseLength": null,
+      "pauseLengthScale": 1,
+      "outputSamplingRate": 24000,
+      "outputStereo": false,
+      "kana": "オ'"
+    }
+  }
+}

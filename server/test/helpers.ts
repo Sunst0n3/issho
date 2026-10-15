@@ -9,6 +9,7 @@ import type { AiService } from '../src/ai.ts';
 import { buildApp, loggerOptions } from '../src/app.ts';
 import { dataPaths, loadConfig } from '../src/config.ts';
 import { Store } from '../src/db.ts';
+import type { TtsService } from '../src/tts.ts';
 
 export const HOUSEHOLD_CODE = 'correct horse battery staple';
 
@@ -22,6 +23,7 @@ export interface TestServer {
 
 export interface TestServerOptions {
   ai?: AiService | null;
+  tts?: TtsService | null;
   now?: () => Date;
   staticDir?: string;
   /** Extra environment variables for loadConfig(). */
@@ -52,6 +54,7 @@ export async function createTestServer(options: TestServerOptions = {}): Promise
     config,
     store,
     ai: options.ai,
+    tts: options.tts,
     now: options.now,
     logger: captureLogs(options.logLines),
     heartbeatMs: options.heartbeatMs,

@@ -1,292 +1,285 @@
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { useState } from 'react';
+import { createEmptyCard, Rating } from 'ts-fsrs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cardId, itemId } from '../../../lib/db.ts';
+import { cardId, db } from '../../../lib/db.ts';
 import type { CardRecord, CardType, ItemKind } from '../../../lib/types.ts';
-import { newCardRecord } from '../../../srs/scheduler.ts';
-import { GRAMMAR, KANA, KANJI, RADICALS, resetStudyDb, SURVIVAL, WORDS } from '../test-utils.tsx';
-import { GrammarDrillCard } from './GrammarDrillCard.tsx';
-import { KanaReadCard } from './KanaReadCard.tsx';
-import { KanaWriteCard } from './KanaWriteCard.tsx';
-import { KanjiMeaningCard } from './KanjiMeaningCard.tsx';
-import { KanjiReadingCard } from './KanjiReadingCard.tsx';
-import { KanjiWriteCard } from './KanjiWriteCard.tsx';
-import { RadicalMeaningCard } from './RadicalMeaningCard.tsx';
-import { SentenceReadCard } from './SentenceReadCard.tsx';
-import type { CardAnswer } from './types.ts';
-import { VocabMeaningCard } from './VocabMeaningCard.tsx';
-import { VocabRecallCard } from './VocabRecallCard.tsx';
-import { WordMeaningCard } from './WordMeaningCard.tsx';
-import { WordReadingCard } from './WordReadingCard.tsx';
+import { seededRandom } from '../../../srs/random.ts';
+import { listen, recognitionAvailable } from '../../../speech/recognition.ts';
+import { StudyDisplayContext } from '../display.ts';
+import { audioMock, KANA, resetStudyDb, TAUGHT_DAY_3 } from '../test-utils.tsx';
+import { KanaInput } from './KanaInput.tsx';
+import { KanaText } from './KanaText.tsx';
+import { prepareCard, type PrepareContext } from './prepare.ts';
+import { ReviewCard } from './ReviewCard.tsx';
+import type { CardAnswer, PreparedCard } from './types.ts';
 
 vi.mock('../../../lib/data.ts', async () => (await import('../test-utils.tsx')).dataMock);
 vi.mock('../../../writing/WritingPad.tsx', async () => (await import('../test-utils.tsx')).writingPadMock);
+vi.mock('../../../speech/audio.ts', async () => (await import('../test-utils.tsx')).audioMock);
+vi.mock('../../../speech/recognition.ts', () => ({ recognitionAvailable: vi.fn(() => false), listen: vi.fn() }));
 
-const card = (kind: ItemKind, key: string, type: CardType): CardRecord => newCardRecord(itemId(kind, key), kind, type);
-const choice = (name: string | RegExp) => within(screen.getByRole('group', { name: 'Answer choices' })).getByRole('button', { name });
-const answer = (onAnswer: ReturnType<typeof vi.fn>) => onAnswer.mock.calls[0][0] as CardAnswer;
-/** The feedback note of the first answer, rendered on its own. */
-const noteOf = (onAnswer: ReturnType<typeof vi.fn>) => render(<p>{answer(onAnswer).feedback?.note}</p>).container.firstElementChild!;
+const known = { isKnown: () => true, introducedDay: () => '2026-10-01' };
+const ctx = (over: Partial<PrepareContext> = {}): PrepareContext =>
+  ({ courseDay: 20, inSprint: false, taught: new Set(), grammarIntroduced: 5, handsBusy: false, known, random: seededRandom(4), ...over });
 
-const shi = KANA.find((k) => k.char === 'し')!;
-const mizu = WORDS.find((w) => w.id === 'w-mizu')!;
-const suiyoubi = WORDS.find((w) => w.id === 'w-sui')!;
+function card(kind: ItemKind, key: string, type: CardType): CardRecord {
+  const itemId = `${kind}:${key}`;
+  return { ...createEmptyCard(new Date()), id: cardId(itemId, type), itemId, kind, type };
+}
+
+async function prep(kind: ItemKind, key: string, type: CardType, over: Partial<PrepareContext> = {}): Promise<PreparedCard> {
+  const p = await prepareCard(card(kind, key, type), ctx(over));
+  if (!p) throw new Error('missing');
+  return p;
+}
+
+function show(prepared: PreparedCard, { handsBusy = false, paperAllowed = true, inSprint = false } = {}) {
+  const onAnswer = vi.fn<(a: CardAnswer) => void>();
+  render(
+    <StudyDisplayContext.Provider value={{ courseDay: 3, inSprint, taught: TAUGHT_DAY_3, kana: KANA }}>
+      <ReviewCard prepared={prepared} onAnswer={onAnswer} handsBusy={handsBusy} paperAllowed={paperAllowed} />
+    </StudyDisplayContext.Provider>,
+  );
+  return onAnswer;
+}
+
+const type = (label: RegExp | string, text: string) => {
+  const input = screen.getByLabelText(label);
+  fireEvent.change(input, { target: { value: text } });
+  fireEvent.submit(input.closest('form')!);
+};
+const choices = () => within(screen.getByRole('group', { name: 'Answer choices' }));
 
 beforeEach(async () => {
   await resetStudyDb();
+  audioMock.play.mockClear();
+  vi.mocked(recognitionAvailable).mockReturnValue(false);
+  vi.mocked(listen).mockReset();
 });
 
 afterEach(() => {
   cleanup();
 });
 
-describe('kana cards', () => {
-  it('read: a right choice is Good', () => {
-    const onAnswer = vi.fn();
-    render(<KanaReadCard prepared={{ view: 'kana-read', card: card('kana', 'し', 'read'), kana: shi, options: ['a', 'shi', 'ka', 'mi'] }} onAnswer={onAnswer} />);
-    expect(screen.getByRole('heading', { name: 'What sound is this hiragana?' })).toBeTruthy();
-    fireEvent.click(choice('shi'));
-    expect(answer(onAnswer)).toMatchObject({ grade: 3, mode: 'choice', correct: true, feedback: { expected: 'shi', speak: 'し' } });
-    expect(choice('shi, correct answer').className).toContain('correct');
+describe('typed cards', () => {
+  it('show no choice buttons by default, and grade a right typed answer Good', async () => {
+    const onAnswer = show(await prep('word', 'w-ike', 'read'));
+    expect(screen.queryByRole('group', { name: 'Answer choices' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Show options' })).toBeTruthy();
+    type('Reading', 'ike');
+    fireEvent.click(await screen.findByRole('button', { name: 'Yes' }));
+    expect(onAnswer).toHaveBeenCalledWith(expect.objectContaining({ grade: Rating.Good, mode: 'typed' }));
   });
 
-  it('read: number keys pick a choice, and a wrong one is Again', () => {
-    const onAnswer = vi.fn();
-    render(<KanaReadCard prepared={{ view: 'kana-read', card: card('kana', 'し', 'read'), kana: shi, options: ['a', 'shi', 'ka', 'mi'] }} onAnswer={onAnswer} />);
-    fireEvent.keyDown(window, { key: '3' });
-    expect(answer(onAnswer)).toMatchObject({ grade: 1, correct: false });
-    expect(choice('ka, your answer').className).toContain('wrong');
-    fireEvent.keyDown(window, { key: '2' });
-    expect(onAnswer).toHaveBeenCalledTimes(1);
+  it('"Show options" is a hint: a right pick is mode choice and at most Hard, a wrong one Again', async () => {
+    const onAnswer = show(await prep('kanaRule', 'hira-dakuten', 'read'));
+    fireEvent.click(screen.getByRole('button', { name: 'Show options' }));
+    fireEvent.click(choices().getByRole('button', { name: /かぎ/ }));
+    expect(onAnswer).toHaveBeenCalledWith({ grade: Rating.Hard, mode: 'choice' });
+
+    cleanup();
+    const wrong = show(await prep('kanaRule', 'hira-dakuten', 'read'));
+    fireEvent.click(screen.getByRole('button', { name: 'Show options' }));
+    fireEvent.click(choices().getAllByRole('button').find((b) => !b.textContent?.includes('かぎ'))!);
+    expect(wrong).toHaveBeenCalledWith({ grade: Rating.Again, mode: 'choice' });
   });
 
-  it('read: number keys do nothing while a dialog is over the card', () => {
-    const onAnswer = vi.fn();
-    render(
-      <>
-        <KanaReadCard prepared={{ view: 'kana-read', card: card('kana', 'し', 'read'), kana: shi, options: ['a', 'shi', 'ka', 'mi'] }} onAnswer={onAnswer} />
-        <div role="alertdialog" aria-modal="true" aria-label="Stop for now?" />
-      </>,
-    );
-    fireEvent.keyDown(window, { key: '2' });
-    expect(onAnswer).not.toHaveBeenCalled();
+  it('allows one retry: right on the second try is Hard, wrong twice is Again', async () => {
+    const onAnswer = show(await prep('kanaRule', 'hira-dakuten', 'read'));
+    type('Reading', 'kagu');
+    expect(await screen.findByText('Not quite. One more try.')).toBeTruthy();
+    type('Reading', 'kagi');
+    expect(onAnswer).toHaveBeenCalledWith({ grade: Rating.Hard, mode: 'typed' });
+
+    cleanup();
+    const twice = show(await prep('kanaRule', 'hira-dakuten', 'read'));
+    type('Reading', 'kagu');
+    type('Reading', 'kago');
+    expect(twice).toHaveBeenCalledWith({ grade: Rating.Again, mode: 'typed' });
   });
 
-  it('read: typed romaji accepts alternatives; a second try is Hard', () => {
-    const onAnswer = vi.fn();
-    render(<KanaReadCard prepared={{ view: 'kana-read', card: card('kana', 'し', 'read'), kana: shi, options: ['a', 'shi', 'ka', 'mi'] }} onAnswer={onAnswer} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Type it instead' }));
-    const input = screen.getByLabelText('Romaji');
-    fireEvent.change(input, { target: { value: 'su' } });
-    fireEvent.submit(input);
-    expect(screen.getByText('Not quite. One more try.')).toBeTruthy();
-    expect(onAnswer).not.toHaveBeenCalled();
-    fireEvent.change(input, { target: { value: 'si' } });
-    fireEvent.submit(input);
-    expect(answer(onAnswer)).toMatchObject({ grade: 2, mode: 'typed', correct: true });
-    // The choice remembers typing for next time.
-    expect(localStorage.getItem('issho.study.typed')).toContain('"kana-read":true');
+  it('hands-busy mode shows the options at once and logs choice', async () => {
+    const onAnswer = show(await prep('kanaRule', 'hira-dakuten', 'read'), { handsBusy: true });
+    expect(screen.queryByLabelText('Reading')).toBeNull();
+    fireEvent.click(choices().getByRole('button', { name: /かぎ/ }));
+    expect(onAnswer).toHaveBeenCalledWith({ grade: Rating.Hard, mode: 'choice' });
   });
 
-  it('write: a clean character is Good; giving up is Again', async () => {
-    const onAnswer = vi.fn();
-    const kana = KANA.find((k) => k.char === 'あ')!;
-    const prepared = { view: 'kana-write' as const, card: card('kana', 'あ', 'write'), kana };
-    const view = render(<KanaWriteCard prepared={prepared} onAnswer={onAnswer} />);
-    expect(screen.getByRole('heading', { name: 'Write the hiragana for' })).toBeTruthy();
-    expect(screen.getByText('a')).toBeTruthy();
-    // The pad's name says what to write, not the answer.
-    expect(await screen.findByRole('img', { name: 'Writing pad for the hiragana for "a" (memory)' })).toBeTruthy();
-    fireEvent.click(await screen.findByRole('button', { name: 'Finish writing' }));
-    expect(answer(onAnswer)).toMatchObject({ grade: 3, mode: 'written', correct: true, feedback: { title: 'Well written', expected: 'あ' } });
+  it('word read logs both parts of the answer', async () => {
+    const onAnswer = show(await prep('word', 'w-ike', 'read'));
+    type('Reading', 'ike');
+    expect(await screen.findByText('pond')).toBeTruthy();
+    expect(audioMock.play).toHaveBeenCalledWith({ ref: 'word:w-ike' }, expect.anything());
+    fireEvent.click(screen.getByRole('button', { name: 'No' }));
+    expect(onAnswer).toHaveBeenCalledWith({ grade: Rating.Again, mode: 'typed', parts: { reading: true, meaning: false }, revealed: true });
+  });
+});
 
-    view.unmount();
-    onAnswer.mockClear();
-    render(<KanaWriteCard prepared={prepared} onAnswer={onAnswer} />);
-    fireEvent.click(await screen.findByRole('button', { name: 'Give up' }));
-    expect(answer(onAnswer)).toMatchObject({ grade: 1, correct: false });
+describe('kana cards and romaji', () => {
+  it('a sprint kana-write card shows no romaji anywhere and plays the sound by itself', async () => {
+    await db.settings.update('me', { audio: true });
+    show(await prep('kana', 'か', 'write', { inSprint: true }), { inSprint: true });
+    expect(screen.getByRole('heading', { name: 'Write the hiragana you hear' })).toBeTruthy();
+    expect(document.body.textContent).not.toMatch(/\bka\b/);
+    await waitFor(() => expect(audioMock.play).toHaveBeenCalledWith({ ref: 'kana:か' }, expect.anything()));
+    expect(screen.getByRole('button', { name: /Play the sound/ })).toBeTruthy();
   });
 
-  it('write: names the row when the romaji fits two kana', async () => {
-    const di = { char: 'ぢ', script: 'hiragana' as const, romaji: 'ji', group: 'da', kind: 'dakuten' as const, order: 56 };
-    render(<KanaWriteCard prepared={{ view: 'kana-write', card: card('kana', 'ぢ', 'write'), kana: di, row: 'だ' }} onAnswer={vi.fn()} />);
-    expect(screen.getByText('ji')).toBeTruthy();
-    expect(document.querySelector('.st-write-target')?.textContent).toBe('ji(だ row)');
+  it('takes romaji on a sprint kana-read card, and no romaji at all once the sprint is over', async () => {
+    const onAnswer = show(await prep('kana', 'か', 'read', { inSprint: true }), { inSprint: true });
+    type('The sound', 'ka');
+    expect(onAnswer).toHaveBeenCalledWith({ grade: Rating.Good, mode: 'typed' });
+
+    cleanup();
+    show(await prep('kana', 'か', 'read'));
+    expect(screen.getByText('umbrella')).toBeTruthy();
+    expect(document.body.textContent).not.toMatch(/\bka\b|\bkasa\b/);
+    fireEvent.click(screen.getByRole('button', { name: 'Show options' }));
+    for (const b of choices().getAllByRole('button')) expect(b.textContent).not.toMatch(/[a-z]{2}/);
+  });
+});
+
+describe('writing cards', () => {
+  it('grades a recall written right Good, and offers "I wrote it right" after an Again', async () => {
+    const onAnswer = show(await prep('kanji', '水', 'write'));
+    expect(screen.getByText(/□/)).toBeTruthy();
+    fireEvent.click(await screen.findByRole('button', { name: 'Write it right' }));
+    expect(onAnswer).toHaveBeenCalledWith({ grade: Rating.Good, mode: 'written', input: 'finger' });
+
+    cleanup();
+    const missed = show(await prep('kanji', '水', 'write'));
+    fireEvent.click(await screen.findByRole('button', { name: 'Leave a stroke out' }));
+    expect(missed).not.toHaveBeenCalled();
+    expect(screen.getByText('1 stroke missing.')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'I wrote it right' }));
+    expect(missed).toHaveBeenCalledWith({ grade: Rating.Hard, mode: 'written', input: 'finger', override: true });
   });
 
-  it('write: on paper, the learner grades themselves', async () => {
-    const onAnswer = vi.fn();
-    const kana = KANA.find((k) => k.char === 'あ')!;
-    render(<KanaWriteCard prepared={{ view: 'kana-write', card: card('kana', 'あ', 'write'), kana }} onAnswer={onAnswer} />);
-    fireEvent.click(await screen.findByRole('button', { name: 'Write on paper instead' }));
+  it('hides "Write on paper" in an anywhere sitting; on paper it self-checks', async () => {
+    show(await prep('kanji', '水', 'write'), { paperAllowed: false });
+    expect(screen.queryByRole('button', { name: 'Write on paper' })).toBeNull();
+
+    cleanup();
+    const onAnswer = show(await prep('kanji', '水', 'write'));
+    fireEvent.click(screen.getByRole('button', { name: 'Write on paper' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Got it' }));
+    expect(onAnswer).toHaveBeenCalledWith({ grade: Rating.Good, mode: 'paper', input: 'paper', revealed: true });
+  });
+});
+
+describe('self-graded and spoken cards', () => {
+  it('listen: the audio plays, the text stays hidden until revealed, then Missed / Got it', async () => {
+    await db.settings.update('me', { audio: true });
+    const onAnswer = show(await prep('core', 'cw-0001', 'listen'));
+    await waitFor(() => expect(audioMock.play).toHaveBeenCalledWith({ ref: 'core:cw-0001' }, expect.anything()));
+    expect(screen.queryByText('thank you')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Show the answer' }));
-    expect(screen.getByRole('img', { name: /Stroke order animation for あ/ })).toBeTruthy();
-    const grades = screen.getByRole('group', { name: 'How did your writing compare?' });
-    expect(within(grades).getAllByRole('button').map((b) => b.textContent?.replace(/[\d.]+(m|h|d|mo|y)$/, ''))).toEqual(['Again', 'Hard', 'Good', 'Easy']);
-    // Read as "Easy, back in 7 days", not "Easy7d".
-    expect(within(grades).getByRole('button', { name: /^Easy, back in \d+ days$/ })).toBeTruthy();
-    fireEvent.click(within(grades).getByRole('button', { name: /Easy/ }));
-    expect(answer(onAnswer)).toEqual({ grade: 4, mode: 'self', correct: true });
+    expect(screen.getByText('thank you')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Missed' }));
+    expect(onAnswer).toHaveBeenCalledWith({ grade: Rating.Again, mode: 'self', revealed: true });
+    expect((screen.getByRole('button', { name: 'Got it' }) as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('produce: with recognition offline only the typed input renders', async () => {
+    vi.mocked(recognitionAvailable).mockReturnValue(true);
+    const online = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    show(await prep('core', 'cw-0001', 'produce'));
+    expect(screen.queryByRole('button', { name: 'Say it' })).toBeNull();
+    expect(screen.getByLabelText('Or type it')).toBeTruthy();
+    online.mockRestore();
+  });
+
+  it('produce: two failed recognitions offer "I said it", graded at most Hard', async () => {
+    vi.mocked(recognitionAvailable).mockReturnValue(true);
+    vi.mocked(listen).mockImplementation(() => ({ result: Promise.resolve('なにか'), stop: vi.fn() }));
+    const onAnswer = show(await prep('core', 'cw-0001', 'produce'));
+    fireEvent.click(screen.getByRole('button', { name: 'Say it' }));
+    expect(await screen.findByText(/Didn't catch that/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Say it' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'I said it — check myself' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Got it' }));
+    expect(onAnswer).toHaveBeenCalledWith({ grade: Rating.Hard, mode: 'spoken', revealed: true });
+  });
+
+  it('produce: a recognised answer is Good, mode spoken', async () => {
+    vi.mocked(recognitionAvailable).mockReturnValue(true);
+    vi.mocked(listen).mockImplementation(() => ({ result: Promise.resolve('ありがとう'), stop: vi.fn() }));
+    const onAnswer = show(await prep('core', 'cw-0001', 'produce'));
+    fireEvent.click(screen.getByRole('button', { name: 'Say it' }));
+    await waitFor(() => expect(onAnswer).toHaveBeenCalledWith({ grade: Rating.Good, mode: 'spoken' }));
   });
 });
 
-describe('radical and kanji cards', () => {
-  it('radical meaning: a wrong pick shows what it is', () => {
-    const onAnswer = vi.fn();
-    render(<RadicalMeaningCard prepared={{ view: 'radical-meaning', card: card('radical', '氵', 'meaning'), radical: RADICALS[0], options: ['hand', 'water', 'roof', 'mouth'] }} onAnswer={onAnswer} />);
-    fireEvent.click(choice('hand'));
-    expect(answer(onAnswer)).toMatchObject({ grade: 1, correct: false, feedback: { expected: 'water' } });
-    const note = noteOf(onAnswer);
-    expect(note.textContent).toBe('water (side), a form of 水');
-    // Japanese inside English is marked, so screen readers switch voice.
-    expect(note.querySelector('[lang="ja"]')?.textContent).toBe('水');
+describe('KanaInput', () => {
+  function Field() {
+    const [value, setValue] = useState('');
+    return <KanaInput value={value} onChange={setValue} label="Answer" />;
+  }
+
+  it('turns romaji into kana as you type, outside composition', () => {
+    render(<Field />);
+    const input = screen.getByLabelText('Answer') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'ki' } });
+    expect(input.value).toBe('き');
+    fireEvent.change(input, { target: { value: 'きtte' } });
+    expect(input.value).toBe('きって');
   });
 
-  it('kanji meaning: typed answers forgive a small typo but not another option', () => {
-    const onAnswer = vi.fn();
-    const prepared = { view: 'kanji-meaning' as const, card: card('kanji', '水', 'meaning'), kanji: KANJI['水'], options: ['water', 'waiter', 'fire', 'tree'], notAccepted: ['waiter', 'fire', 'tree'] };
-    const view = render(<KanjiMeaningCard prepared={prepared} onAnswer={onAnswer} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Type it instead' }));
-    const input = screen.getByLabelText('Meaning');
-    fireEvent.change(input, { target: { value: 'Watr' } });
-    fireEvent.submit(input);
-    expect(answer(onAnswer)).toMatchObject({ grade: 3, mode: 'typed', correct: true });
-
-    view.unmount();
-    onAnswer.mockClear();
-    render(<KanjiMeaningCard prepared={prepared} onAnswer={onAnswer} />);
-    const again = screen.getByLabelText('Meaning');
-    for (let i = 0; i < 2; i++) {
-      fireEvent.change(again, { target: { value: 'waiter' } });
-      fireEvent.submit(again);
-    }
-    expect(answer(onAnswer)).toMatchObject({ grade: 1, correct: false });
+  it('leaves the text alone while an IME composes, and keeps the composed kana', () => {
+    render(<Field />);
+    const input = screen.getByLabelText('Answer') as HTMLInputElement;
+    fireEvent.compositionStart(input);
+    fireEvent.change(input, { target: { value: 'かn' }, nativeEvent: { isComposing: true } });
+    expect(input.value).toBe('かn');
+    fireEvent.change(input, { target: { value: 'かんじ' } });
+    expect(input.value).toBe('かんじ');
+    fireEvent.compositionEnd(input);
+    expect(input.value).toBe('かんじ');
   });
 
-  it('kanji meaning: an accepted typo or plural still shows the right spelling, and the readings include an ON one', () => {
-    const onAnswer = vi.fn();
-    const aka = { char: '赤', meanings: ['red'], kun: ['あか', 'あか.い', 'あか.らむ', 'あか.らめる'], on: ['セキ', 'シャク'], strokeCount: 7, components: [] };
-    localStorage.setItem('issho.study.typed', JSON.stringify({ 'kanji-meaning': true }));
-    const view = render(<KanjiMeaningCard prepared={{ view: 'kanji-meaning', card: card('kanji', '赤', 'meaning'), kanji: aka, options: [], notAccepted: ['read'] }} onAnswer={onAnswer} />);
-    const input = screen.getByLabelText('Meaning');
-    fireEvent.change(input, { target: { value: 'reds' } });
-    fireEvent.submit(input);
-    expect(answer(onAnswer)).toMatchObject({ grade: 3, mode: 'typed', correct: true });
-    const note = noteOf(onAnswer);
-    expect(note.textContent).toContain('red');
-    expect(note.querySelector('[lang="ja"]')?.textContent).toBe('あか・あかい・セキ・シャク');
-    view.unmount();
-  });
-
-  it('kanji reading: the kanji is underlined in its word and the feedback breaks the word down', () => {
-    const onAnswer = vi.fn();
-    render(<KanjiReadingCard onAnswer={onAnswer} prepared={{
-      view: 'kanji-reading', card: card('kanji', '水', 'reading'), kanji: KANJI['水'], word: suiyoubi,
-      answer: 'すいようび', options: ['すいようび', 'もくようび', 'かようび', 'にちようび'],
-      breakdown: [{ char: '水', meaning: 'water' }, { char: '曜', meaning: 'weekday' }, { char: '日', meaning: 'day' }],
-    }} />);
-    expect(document.querySelector('.st-target')?.textContent).toBe('水');
-    // The underline is visual only, so screen readers hear which kanji it marks.
-    expect(document.querySelector('.st-big .visually-hidden')?.textContent).toBe(' (underlined: 水)');
-    fireEvent.click(choice('すいようび'));
-    const a = answer(onAnswer);
-    expect(a).toMatchObject({ grade: 3, feedback: { expected: 'すいようび', note: 'Wednesday', speak: 'すいようび' } });
-    expect(a.feedback?.breakdown).toHaveLength(3);
-  });
-
-  it('kanji write: shows the meaning and a reading, then checks the writing', async () => {
-    const onAnswer = vi.fn();
-    render(<KanjiWriteCard prepared={{ view: 'kanji-write', card: card('kanji', '水', 'write'), kanji: KANJI['水'], reading: 'みず' }} onAnswer={onAnswer} />);
-    expect(screen.getByRole('heading', { name: 'Write the kanji for' })).toBeTruthy();
-    expect(screen.getByText('みず')).toBeTruthy();
-    // The pad's name says what to write without giving the kanji away.
-    expect(await screen.findByRole('img', { name: 'Writing pad for the kanji for "water" (みず) (memory)' })).toBeTruthy();
-    fireEvent.click(await screen.findByRole('button', { name: 'Miss a stroke' }));
-    expect(screen.getByText('Check the direction this stroke travels.')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Finish writing' }));
-    expect(answer(onAnswer)).toMatchObject({ grade: 3, mode: 'written', feedback: { expected: '水', speak: 'みず' } });
+  it('turns off autocorrect, autocapitalize, autocomplete and spellcheck', () => {
+    render(<Field />);
+    const input = screen.getByLabelText('Answer');
+    expect(input.getAttribute('autocorrect')).toBe('off');
+    expect(input.getAttribute('autocapitalize')).toBe('off');
+    expect(input.getAttribute('autocomplete')).toBe('off');
+    expect(input.getAttribute('spellcheck')).toBe('false');
+    expect(input.getAttribute('lang')).toBe('ja');
   });
 });
 
-describe('word, vocab and grammar cards', () => {
-  it('word reading: typed romaji turns into kana as you type', () => {
-    const onAnswer = vi.fn();
-    render(<WordReadingCard prepared={{ view: 'word-reading', card: card('word', 'w-mizu', 'reading'), word: mizu, options: ['みず', 'ひ', 'き', 'かね'], breakdown: [] }} onAnswer={onAnswer} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Type it instead' }));
-    const input = screen.getByLabelText('Reading');
-    fireEvent.change(input, { target: { value: 'miz' } });
-    expect(screen.getByText('みz')).toBeTruthy();
-    fireEvent.change(input, { target: { value: 'mizu' } });
-    expect(screen.getByText('みず')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Check' }));
-    expect(answer(onAnswer)).toMatchObject({ grade: 3, mode: 'typed', correct: true });
+describe('KanaText', () => {
+  it('on course day 3 shows romaji over り and が only in ありがとう', () => {
+    const { container } = render(
+      <StudyDisplayContext.Provider value={{ courseDay: 3, inSprint: true, taught: TAUGHT_DAY_3, kana: KANA }}>
+        <KanaText text="ありがとう" />
+      </StudyDisplayContext.Provider>,
+    );
+    const ruby = [...container.querySelectorAll('ruby')].map((r) => [r.firstChild?.textContent, r.querySelector('rt')?.textContent]);
+    expect(ruby).toEqual([['り', 'ri'], ['が', 'ga']]);
+    expect(container.textContent).toBe('ありriがgaとう');
   });
 
-  it('word reading: a long-vowel mark may be typed as its vowel', () => {
-    const onAnswer = vi.fn();
-    const biidama = { id: 'w-biidama', written: 'ビー玉', kana: 'ビーだま', meanings: ['marble'], pos: ['n'], freqRank: 20, kanji: ['玉'] };
-    localStorage.setItem('issho.study.typed', JSON.stringify({ 'word-reading': true }));
-    render(<WordReadingCard prepared={{ view: 'word-reading', card: card('word', 'w-biidama', 'reading'), word: biidama, options: [], breakdown: [] }} onAnswer={onAnswer} />);
-    const input = screen.getByLabelText('Reading');
-    fireEvent.change(input, { target: { value: 'bidama' } });
-    fireEvent.submit(input);
-    expect(onAnswer).not.toHaveBeenCalled();
-    fireEvent.change(input, { target: { value: 'biidama' } });
-    fireEvent.submit(input);
-    expect(answer(onAnswer)).toMatchObject({ grade: 2, mode: 'typed', correct: true });
+  it('shows no romaji once the sprint is over', () => {
+    const { container } = render(
+      <StudyDisplayContext.Provider value={{ courseDay: 30, inSprint: false, taught: TAUGHT_DAY_3, kana: KANA }}>
+        <KanaText text="ありがとう" />
+      </StudyDisplayContext.Provider>,
+    );
+    expect(container.querySelector('ruby')).toBeNull();
+    expect(container.textContent).toBe('ありがとう');
   });
+});
 
-  it("word reading: \"I don't know\" is Again", () => {
-    const onAnswer = vi.fn();
-    localStorage.setItem('issho.study.typed', JSON.stringify({ 'word-reading': true }));
-    render(<WordReadingCard prepared={{ view: 'word-reading', card: card('word', 'w-mizu', 'reading'), word: mizu, options: ['みず', 'ひ', 'き', 'かね'], breakdown: [] }} onAnswer={onAnswer} />);
-    fireEvent.click(screen.getByRole('button', { name: "I don't know" }));
-    expect(answer(onAnswer)).toMatchObject({ grade: 1, mode: 'typed', correct: false });
+it('a self-graded card disables both buttons after the first tap', async () => {
+  const onAnswer = show(await prep('kanji', '曜', 'meaning'));
+  fireEvent.click(screen.getByRole('button', { name: 'Show the meaning' }));
+  const got = screen.getByRole('button', { name: 'Got it' });
+  await act(async () => {
+    fireEvent.click(got);
+    fireEvent.click(got);
   });
-
-  it('word meaning: choice of English meanings', () => {
-    const onAnswer = vi.fn();
-    render(<WordMeaningCard prepared={{ view: 'word-meaning', card: card('word', 'w-sui', 'meaning'), word: suiyoubi, options: ['Wednesday', 'fire', 'money', 'person'], breakdown: [] }} onAnswer={onAnswer} />);
-    expect(screen.getByText('水曜日')).toBeTruthy();
-    fireEvent.click(choice('Wednesday'));
-    expect(answer(onAnswer)).toMatchObject({ grade: 3, mode: 'choice', feedback: { expected: 'Wednesday', speak: 'すいようび' } });
-  });
-
-  it('vocab meaning and recall', () => {
-    const onAnswer = vi.fn();
-    const ie = SURVIVAL[1];
-    const view = render(<VocabMeaningCard prepared={{ view: 'vocab-meaning', card: card('vocab', ie.id, 'meaning'), vocab: ie, options: ['love', 'house', 'above', 'face'] }} onAnswer={onAnswer} />);
-    fireEvent.click(choice('house'));
-    expect(answer(onAnswer)).toMatchObject({ grade: 3 });
-    expect(noteOf(onAnswer).textContent).toBe('A home or a building.');
-    view.unmount();
-
-    onAnswer.mockClear();
-    render(<VocabRecallCard prepared={{ view: 'vocab-recall', card: card('vocab', ie.id, 'recall'), vocab: ie, options: ['あい', 'いえ', 'うえ', 'かお'] }} onAnswer={onAnswer} />);
-    expect(screen.getByText('house')).toBeTruthy();
-    fireEvent.click(choice('うえ'));
-    expect(answer(onAnswer)).toMatchObject({ grade: 1, correct: false, feedback: { expected: 'いえ', expectedLang: 'ja' } });
-  });
-
-  it('grammar drill: the English shows before answering and the gap fills after', () => {
-    const onAnswer = vi.fn();
-    const drill = GRAMMAR[0].drills[0];
-    render(<GrammarDrillCard prepared={{ view: 'grammar-drill', card: card('grammar', 'wa-desu', 'drill'), point: GRAMMAR[0], drill, options: ['か', 'を', 'は'] }} onAnswer={onAnswer} />);
-    expect(screen.getByText('I am a student.')).toBeTruthy();
-    expect(document.querySelector('.st-gap.filled')).toBeNull();
-    fireEvent.click(choice('は'));
-    expect(answer(onAnswer)).toMatchObject({ grade: 3, feedback: { expected: 'は', speak: 'わたしはがくせいです。' } });
-    expect(document.querySelector('.st-gap.filled')?.textContent).toBe('は');
-  });
-
-  it('sentence read: reveal, then grade yourself', async () => {
-    const onAnswer = vi.fn();
-    const c = card('sentence', 's-mizu', 'read');
-    expect(c.id).toBe(cardId('sentence:s-mizu', 'read'));
-    render(<SentenceReadCard prepared={{ view: 'sentence-read', card: c, sentence: { id: 's-mizu', jp: '{水|みず}をのむ。', en: 'I drink water.' } }} onAnswer={onAnswer} />);
-    expect(screen.queryByText('I drink water.')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Show translation' }));
-    expect(screen.getByText('I drink water.')).toBeTruthy();
-    fireEvent.click(within(screen.getByRole('group', { name: 'Did you understand it?' })).getByRole('button', { name: /Good/ }));
-    expect(answer(onAnswer)).toEqual({ grade: 3, mode: 'self', correct: true });
-  });
+  expect(onAnswer).toHaveBeenCalledTimes(1);
 });

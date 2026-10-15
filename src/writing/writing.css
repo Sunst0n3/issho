@@ -57,6 +57,20 @@
   100% { opacity: 0; }
 }
 
+/* ---- Recall mode: the whole character judged on Done ---- */
+.wp-recall { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.wp-recall-tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.wp-recall-tools .wp-done { grid-column: 1 / -1; }
+/* The model over the learner's ink: thinner and translucent, so both stay readable. */
+.wp-model { stroke: var(--shu); stroke-width: calc(var(--wp-width, 6) * 0.55); opacity: 0.7; }
+.wp-model .wp-reveal { opacity: 1; }
+.wp-notes { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.wp-notes li {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 6px 6px 6px 14px; border-radius: 12px; background: var(--ai-tint); color: var(--ai-ink); font-size: 14px;
+}
+.wp-notes .btn.ghost { color: var(--ai-ink); }
+
 /* ---- StrokeOrderStrip ---- */
 .stroke-strip {
   display: grid;

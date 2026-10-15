@@ -145,6 +145,18 @@ describe('messages', () => {
     assert.deepEqual(none, []);
   });
 
+  it('stores and returns the daily tag', async () => {
+    const daily = await send(carter.deviceToken, { clientId: 'd-1', kind: 'text', text: '今日はパンを食べた', tag: 'daily' });
+    assert.equal(daily.statusCode, 201);
+    assert.equal(daily.json<ChatMessage>().tag, 'daily');
+    const listed = (await list(aiko.deviceToken)).json<ChatMessage[]>().find((m) => m.clientId === 'd-1');
+    assert.equal(listed?.tag, 'daily');
+    // Untagged messages carry no tag at all, and only 'daily' is a tag.
+    const plain = await send(carter.deviceToken, { clientId: 'd-2', kind: 'text', text: 'ね' });
+    assert.equal('tag' in plain.json<ChatMessage>(), false);
+    assert.equal((await send(carter.deviceToken, { clientId: 'd-3', kind: 'text', text: 'ね', tag: 'weekly' })).statusCode, 400);
+  });
+
   it('validates list parameters', async () => {
     for (const query of ['?limit=0', '?limit=501', '?after=-1', '?after=abc']) {
       const res = await list(carter.deviceToken, query);
