@@ -10,7 +10,8 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { isKanji, kanjiIn, parseRuby, rubyToKana, rubyToPlain, validateRuby } from '../src/lib/ruby.ts';
 import type { CoreWord, KanjiEntry, RolePlay, UnitSpec } from '../src/lib/types.ts';
 import { mergeContent, readContentSources } from './lib/content.ts';
-import { CORE_CONVERSATION_LINES } from './lib/roleplays.ts';
+import { castProblems } from './lib/cast.ts';
+import { CORE_CONVERSATION_LINES, buildRolePlays } from './lib/roleplays.ts';
 import { composesReading, readJmdictReadings, soundVariants, toHiragana, type JmdictReadings } from './lib/readings.ts';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
@@ -147,6 +148,57 @@ describe('content/roleplays-v2', () => {
       });
     }
     expect(problems).toEqual([]);
+  });
+});
+
+describe('voices (role a is read with the female voice, role b with the male voice)', () => {
+  it('cast every role-play and task script so that each character speaks in their role\'s voice', () => {
+    const problems = [
+      ...rolePlays.flatMap((rp) => castProblems(rp.lines, rp.roles).map((p) => `${rp.id}: ${p}`)),
+      ...units.flatMap((u) => castProblems(u.task.scripted).map((p) => `${u.task.id}: ${p}`)),
+    ];
+    expect(problems).toEqual([]);
+    // The neighbour scene of unit 1 casts the newcomer as Ken (role b), Emma's husband.
+    const rp = rolePlays.find((r) => r.id === 'rp-u01')!;
+    expect(rp.roles.b.nameJp).toBe('ケン');
+  });
+
+  it('flag a woman in role b, a man in role a, and "my husband" or "my wife" in the wrong voice', () => {
+    const roles = (a: string, b: string) => ({ a: { name: a, nameJp: '' }, b: { name: b, nameJp: '' } });
+    expect(castProblems([], roles('Ms. Tanaka (neighbour)', 'Emma'))).toEqual([
+      'role b "Emma" is a woman, but role b is read with the male voice',
+    ]);
+    expect(castProblems([], roles('Ken', 'Mr. Sato'))).toEqual(['role a "Ken" is a man, but role a is read with the female voice']);
+    expect(castProblems([], { a: { name: 'Neighbour', nameJp: 'エマ' }, b: { name: 'Hikaru', nameJp: 'ひかる' } })).toEqual([]);
+    expect(castProblems([], roles('Hikaru', 'Aoi'))).toEqual([]);
+
+    const said = (role: 'a' | 'b', jp: string) => castProblems([{ role, jp }]);
+    expect(said('b', 'ほんとうですか！ {夫|おっと}は{日本語|にほんご}の{学生|がくせい}です。')).toEqual([
+      'lines[0] (role b, male voice) says {夫|おっと}, which only a woman says of their own spouse',
+    ]);
+    expect(said('a', '{妻|つま}のケイトもイギリス{人|じん}です。')).toHaveLength(1);
+    expect(said('a', 'つまのケイトです。')).toHaveLength(1);
+    expect(said('b', 'いいえ、{主人|しゅじん}のです。')).toHaveLength(1);
+    // The right voice, someone else's husband, and words that only look alike.
+    expect(said('a', '{夫|おっと}は{先生|せんせい}です。')).toEqual([]);
+    expect(said('b', '{妻|つま}のです。')).toEqual([]);
+    expect(said('b', 'ご{主人|しゅじん}はお{元気|げんき}ですか。')).toEqual([]);
+    expect(said('b', '{大丈夫|だいじょうぶ}、{大丈夫|だいじょうぶ}。')).toEqual([]);
+    expect(said('a', 'つまらないです。つまり、だめです。')).toEqual([]);
+    expect(said('b', 'おっと！ すみません。')).toEqual([]);
+  });
+
+  it('fail the build on a role-play cast against its voices', () => {
+    const rp = {
+      id: 'rp-x', unit: 1, title: 't', titleJp: 't', setting: 's', level: 1, register: 'polite', targets: [],
+      roles: { a: { name: 'Ms. Tanaka', nameJp: '{田中|たなか}' }, b: { name: 'Emma', nameJp: 'エマ' } },
+      lines: [{ role: 'b', jp: '{夫|おっと}です。', en: 'My husband.', cue: 'c' }],
+    };
+    const ctx = { grammarOrder: new Map<string, number>(), coreIds: new Set<string>(), conversations: new Map<string, number>() };
+    expect(buildRolePlays([rp], ctx).errors).toEqual([
+      'rp-x: role b "Emma" is a woman, but role b is read with the male voice',
+      'rp-x: lines[0] (role b, male voice) says {夫|おっと}, which only a woman says of their own spouse',
+    ]);
   });
 });
 

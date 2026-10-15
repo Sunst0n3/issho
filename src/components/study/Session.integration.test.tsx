@@ -32,6 +32,8 @@ vi.mock('../../sync/stats.ts', () => ({ pushStats: vi.fn(async () => true), useH
 vi.mock('../../sync/client.ts', async (original) => ({
   ...(await original<typeof import('../../sync/client.ts')>()),
   aiCheck: vi.fn(),
+  // The home server's checker is on: flushPendingOutputChecks asks before it sends a queued check.
+  aiStatus: vi.fn(async () => 'on' as const),
   aiReport: vi.fn(async () => {}),
 }));
 
@@ -200,11 +202,15 @@ async function step(pilot: Pilot): Promise<string | null> {
   const lessonPad = buttonNamed('Finish writing');
   if (lessonPad) return click(lessonPad, 'trace/copy', pilot);
 
-  // Tiles: the fixture's build item, in order.
+  // Tiles: the fixture's build item, in order. A tile may carry furigana, so its <rt> text is left out.
   const tray = q('.st-tile-tray');
   if (tray) {
     for (const tile of BUILD_TILES) {
-      const button = [...tray.querySelectorAll<HTMLButtonElement>('button.st-tile')].find((b) => b.textContent === tile && !b.disabled);
+      const button = [...tray.querySelectorAll<HTMLButtonElement>('button.st-tile')].find((b) => {
+        const c = b.cloneNode(true) as HTMLElement;
+        c.querySelectorAll('rt').forEach((rt) => rt.remove());
+        return c.textContent === tile && !b.disabled;
+      });
       if (button) return click(button, `tile ${tile}`, pilot);
     }
   }
@@ -264,7 +270,8 @@ async function step(pilot: Pilot): Promise<string | null> {
   if (choice) return click(choice, 'pick a gloss', pilot);
 
   // Lessons.
-  for (const name of ['Show me', 'See how it works', 'Try it', 'Trace it', 'Copy it', 'Next sentence', 'Next word', 'Next', 'Continue', 'Done']) {
+  // 'Hear it': the read step's kana words (recent core words before the sentences, after the sprint).
+  for (const name of ['Show me', 'See how it works', 'Try it', 'Trace it', 'Copy it', 'Hear it', 'Next sentence', 'Next word', 'Next', 'Continue', 'Done']) {
     const button = buttonNamed(name);
     if (button) return click(button, name, pilot);
   }

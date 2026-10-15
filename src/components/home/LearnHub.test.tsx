@@ -1,13 +1,18 @@
 import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { db, updateSettings } from '../../lib/db.ts';
-import type { CanDoRecord } from '../../lib/types.ts';
+import type { CanDoRecord, UnitSpec } from '../../lib/types.ts';
 import type { CourseProgressV2 } from '../../srs/course.ts';
 import type { LearnedCounts, RetentionStat } from '../../srs/progress.ts';
 import LearnHub from '../../screens/LearnHub.tsx';
-import { renderAt, resetDb } from './test-fixtures.tsx';
+import { readyCanDos } from './CanDoList.tsx';
+import { seasonSpan } from './SeasonCard.tsx';
+import { renderAt, resetDb, UNITS } from './test-fixtures.tsx';
 
-vi.mock('../../lib/data.ts', async () => (await import('./test-fixtures.tsx')).dataMock);
+vi.mock('../../lib/data.ts', async () => {
+  const { dataMock, UNITS: units } = await import('./test-fixtures.tsx');
+  return { ...dataMock, loadUnits: async () => state.units ?? units };
+});
 
 const state = vi.hoisted(() => ({
   progress: undefined as CourseProgressV2 | undefined,
@@ -18,6 +23,7 @@ const state = vi.hoisted(() => ({
   unit: 1,
   status: new Map<string, CanDoRecord>(),
   season: null as number | null,
+  units: undefined as UnitSpec[] | undefined,
   chapterItems: vi.fn(async (_chapter: number) => ({ from: '2026-09-01', to: null as string | null, kanji: [] as string[], words: [] as string[], grammar: [] as string[] })),
   recordMilestone: vi.fn(async () => {}),
   markMilestoneSeen: vi.fn(async () => {}),
@@ -65,6 +71,16 @@ beforeEach(async () => {
   state.unit = 1;
   state.status = new Map();
   state.season = null;
+  state.units = undefined;
+});
+
+/** Unit `id`: one grammar point and two ready read checks. */
+const unitSpec = (id: number, title: string): UnitSpec => ({
+  ...UNITS[0], id, title, grammar: [`g${id}`],
+  canDos: [1, 2].map((n) => ({
+    id: `u${id}-cd${n}`, text: `${title} check ${n}`, ready: true,
+    check: { kind: 'read' as const, instructions: '', material: '', questions: [] },
+  })),
 });
 afterEach(() => {
   cleanup();
@@ -148,6 +164,53 @@ describe('LearnHub', () => {
       .toBe('/cando/u01-cd1');
   });
 
+  it("lists the earlier units' checks that are ready, since the current unit's open only once it is done", async () => {
+    state.units = [unitSpec(1, 'Hello'), unitSpec(2, 'Cafe'), unitSpec(3, 'Weekend'), unitSpec(4, 'Shopping')];
+    // Units 1–3 taught; unit 4 is the one being taught now.
+    await db.items.bulkPut(['g1', 'g2', 'g3'].map((g) => ({ id: `grammar:${g}`, kind: 'grammar' as const, key: g, introducedAt: new Date() })));
+    state.unit = 4;
+    state.status = new Map([['u2-cd1', { id: 'u2-cd1', unit: 2, attempts: 1, passedAt: new Date(), via: 'auto' }]]);
+    renderAt('/learn', '/learn', <LearnHub />);
+    const current = await card('Shopping');
+    expect(current.textContent).toContain("After this unit's grammar");
+    const ready = await card('Can-dos ready to try');
+    const links = within(ready).getAllByRole('link');
+    // Newest unit first, passed ones left out (they're on their own unit's list).
+    expect(links.map((a) => a.getAttribute('href'))).toEqual([
+      '/cando/u3-cd1', '/cando/u3-cd2', '/cando/u2-cd2', '/cando/u1-cd1', '/cando/u1-cd2',
+    ]);
+    expect(links[0].getAttribute('aria-label')).toBe('Weekend check 1, Unit 3 · Ready to try');
+  });
+
+  it('shows five ready checks, then the rest on request', () => {
+    const units = [1, 2, 3, 4].map((n) => unitSpec(n, `Unit ${n}`));
+    const ready = readyCanDos(units, 4, new Map(), new Set(['g1', 'g2', 'g3']));
+    expect(ready.map((r) => r.cd.id)).toEqual(['u3-cd1', 'u3-cd2', 'u2-cd1', 'u2-cd2', 'u1-cd1', 'u1-cd2']);
+    // A unit whose grammar isn't all in yet has nothing ready.
+    expect(readyCanDos(units, 4, new Map(), new Set(['g1', 'g3'])).map((r) => r.cd.id)).toEqual(['u3-cd1', 'u3-cd2', 'u1-cd1', 'u1-cd2']);
+  });
+
+  it('moves focus to the first revealed check when "Show more" goes away', async () => {
+    state.units = [1, 2, 3, 4].map((n) => unitSpec(n, `Unit ${n}`));
+    await db.items.bulkPut(['g1', 'g2', 'g3'].map((g) => ({ id: `grammar:${g}`, kind: 'grammar' as const, key: g, introducedAt: new Date() })));
+    state.unit = 4;
+    renderAt('/learn', '/learn', <LearnHub />);
+    const ready = await card('Can-dos ready to try');
+    expect(within(ready).getAllByRole('link')).toHaveLength(5);
+    fireEvent.click(within(ready).getByRole('button', { name: 'Show 1 more' }));
+    const links = within(ready).getAllByRole('link');
+    expect(links).toHaveLength(6);
+    expect(within(ready).queryByRole('button', { name: /more/ })).toBeNull();
+    await waitFor(() => expect(document.activeElement).toBe(links[5]));
+  });
+
+  it('says "met" for introduced kana and grammar, and which kana the count covers', async () => {
+    state.progress = { ...state.progress!, kanaIntroduced: 46, grammarIntroduced: 4 };
+    renderAt('/learn', '/learn', <LearnHub />);
+    expect(await screen.findByRole('link', { name: 'Kana chart, 46 of 92 basic kana met' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Grammar, 4 points met so far' })).toBeTruthy();
+  });
+
   it('lists what a chapter taught: its kanji, words and grammar', async () => {
     state.chapterItems.mockImplementation(async (chapter: number) => (chapter === 3
       ? { from: '2026-10-01', to: null, kanji: ['水', '休'], words: ['core:cw-0005', 'word:w-yasumi'], grammar: ['tai'] }
@@ -167,17 +230,36 @@ describe('LearnHub', () => {
     expect(within(chapter).getByRole('button', { name: /Chapter 0 · Kana/ })).toBeTruthy();
   });
 
-  it('shows the season finale, linking a paired couple to the showcase in Session C', async () => {
+  it('shows the season finale with its own numbers, linking a paired couple to the showcase in Session C', async () => {
     await updateSettings({ deviceToken: 'token', memberId: 'm-sam' });
-    state.season = 1;
-    state.hours = 40;
+    state.season = 2;
+    // Whole-course totals (lifetime hours 69) are not the season's.
+    state.hours = 69;
+    // Season 2 runs from day 84 to day 167 after the first study day (2026-07-01, mocked).
+    const { from, to } = seasonSpan('2026-07-01', 2);
+    expect([from, to]).toEqual(['2026-09-23', '2026-12-16']);
+    const at = (key: string) => new Date(`${key}T12:00:00`);
+    await db.items.bulkPut([
+      { id: 'kanji:日', kind: 'kanji', key: '日', introducedAt: at('2026-08-01') },
+      { id: 'kanji:水', kind: 'kanji', key: '水', introducedAt: at('2026-10-01') },
+      { id: 'kanji:火', kind: 'kanji', key: '火', introducedAt: at('2026-10-02') },
+      { id: 'core:cw-0005', kind: 'core', key: 'cw-0005', introducedAt: at('2026-10-01') },
+      { id: 'grammar:tai', kind: 'grammar', key: 'tai', introducedAt: at('2026-09-01') },
+    ]);
+    const day = (date: string, studyMs: number) => ({
+      date, studyMs, togetherMs: 0, reviews: 0, correct: 0, reviewMs: 0, strandMs: 0, newItems: 0,
+      newSec: { sprint: 0, kanji: 0, staged: 0, core: 0, grammar: 0 }, minimumDone: true, goalMet: false, steps: [],
+    });
+    await db.days.bulkPut([day('2026-08-01', 10 * 3_600_000), day('2026-10-01', 2 * 3_600_000), day('2026-10-02', 3_600_000)]);
     renderAt('/learn', '/learn', <LearnHub />);
-    const season = (await screen.findByText('Season 1 finale')).closest('section')!;
-    expect(season.textContent).toContain('40 kanji you can write');
+    const season = (await screen.findByText('Season 2 finale')).closest('section')!;
+    const numbers = within(season).getAllByRole('listitem').map((li) => li.textContent);
+    expect(numbers).toEqual(['2 new kanji', '1 new word', '0 new grammar points', '3 hours of study']);
+    expect(season.textContent).not.toMatch(/69|kanji you can write/);
     expect(within(season).getByRole('link', { name: /Session C/ }).getAttribute('href')).toBe('/together/session/C');
     fireEvent.click(within(season).getByRole('button', { name: 'Done celebrating' }));
-    await waitFor(() => expect(state.markMilestoneSeen).toHaveBeenCalledWith('season:1'));
-    expect(state.recordMilestone).toHaveBeenCalledWith('season:1');
+    await waitFor(() => expect(state.markMilestoneSeen).toHaveBeenCalledWith('season:2'));
+    expect(state.recordMilestone).toHaveBeenCalledWith('season:2');
   });
 
   it('offers a passed can-do to run again when not paired', async () => {

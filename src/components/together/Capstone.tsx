@@ -1,10 +1,13 @@
 // The monthly capstone: co-write a short skit that uses the unit's structures, check your own
 // lines privately with the AI if you like, then perform it from memory. Nothing is recorded.
+// The skit is ready to perform once each partner wrote their lines (capstone.minLinesEach) and
+// at least 6 of the unit's structures are ticked as used.
 
-import { useId, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import type { AiCheckResponse } from '../../../shared/api.ts';
+import { loadGrammarIndex } from '../../lib/data.ts';
 import { dayKey } from '../../lib/db.ts';
-import type { UnitSpec } from '../../lib/types.ts';
+import type { GrammarPoint, UnitSpec } from '../../lib/types.ts';
 import { learnerAiContext } from '../../srs/output.ts';
 import { aiCheck } from '../../sync/client.ts';
 import { postTogetherEvent } from '../../sync/together.ts';
@@ -12,6 +15,9 @@ import { Ruby } from '../ui.tsx';
 import { aiErrorMessage } from './ai.ts';
 import { DiffText } from './DiffText.tsx';
 import type { QuizPerson } from './PartnerQuiz.tsx';
+
+/** Structures a skit uses at least (or all of them, when the unit lists fewer). */
+export const MIN_STRUCTURES = 6;
 
 interface SkitLine {
   id: number;
@@ -39,6 +45,19 @@ export function Capstone({ unit, duo, me, partner, aiOn, onDone }: {
   const [posted, setPosted] = useState(false);
   const count = (w: 'me' | 'partner') => lines.filter((l) => l.who === w && l.text.trim()).length;
   const need = capstone.minLinesEach;
+  const needStructures = Math.min(MIN_STRUCTURES, capstone.structures.length);
+  const grammar = useGrammar();
+  // In duo each phone writes its own lines; the partner's count is on their phone.
+  const linesLeft = [
+    { name: duo ? 'you' : me.name, left: Math.max(0, need - count('me')) },
+    ...(duo ? [] : [{ name: partner.name, left: Math.max(0, need - count('partner')) }]),
+  ].filter((p) => p.left > 0);
+  const structuresLeft = Math.max(0, needStructures - ticked.size);
+  const ready = linesLeft.length === 0 && structuresLeft === 0;
+  const toGo = [
+    ...linesLeft.map((p) => `${p.left} more ${p.left === 1 ? 'line' : 'lines'} for ${p.name}`),
+    ...(structuresLeft > 0 ? [`${structuresLeft} more ${structuresLeft === 1 ? 'structure' : 'structures'} to use`] : []),
+  ].join(' · ');
 
   const add = () => {
     const text = draft.trim();
@@ -95,18 +114,31 @@ export function Capstone({ unit, duo, me, partner, aiOn, onDone }: {
       <p>{capstone.brief}</p>
 
       <fieldset className="tg-option-group">
-        <legend className="label">Use these ({ticked.size} of {capstone.structures.length})</legend>
-        {capstone.structures.map((s, i) => (
-          <label key={s} className="tg-check-row">
-            <input type="checkbox" checked={ticked.has(i)}
-              onChange={() => setTicked((t) => {
-                const n = new Set(t);
-                if (n.has(i)) n.delete(i); else n.add(i);
-                return n;
-              })} />
-            <span lang="ja"><Ruby text={s} show="all" /></span>
-          </label>
-        ))}
+        <legend className="label">
+          Use at least {needStructures} of these ({ticked.size} of {capstone.structures.length} ticked)
+        </legend>
+        {capstone.structures.map((s, i) => {
+          const point = grammar?.get(s);
+          return (
+            <label key={s} className="tg-check-row">
+              <input type="checkbox" checked={ticked.has(i)}
+                onChange={() => setTicked((t) => {
+                  const n = new Set(t);
+                  if (n.has(i)) n.delete(i); else n.add(i);
+                  return n;
+                })} />
+              {point ? (
+                // The title names the pattern and what it means: '〜は〜です — "X is Y"'.
+                <span>{point.title}</span>
+              ) : grammar ? (
+                // Not a grammar id this phone knows: authored text.
+                <span lang="ja"><Ruby text={s} show="all" /></span>
+              ) : (
+                <span className="tg-skeleton-line" aria-busy="true" />
+              )}
+            </label>
+          );
+        })}
       </fieldset>
 
       <p className="tg-capstone-counts" role="status">
@@ -155,9 +187,23 @@ export function Capstone({ unit, duo, me, partner, aiOn, onDone }: {
         <button type="button" className="btn secondary small" disabled={!draft.trim()} onClick={add}>Add</button>
       </div>
 
-      <button type="button" className="btn primary block" disabled={!lines.length} onClick={() => setPhase('perform')}>
+      {!ready && <p className="muted tg-small" role="status">Keep going: {toGo}.</p>}
+      <button type="button" className="btn primary block" disabled={!ready} onClick={() => setPhase('perform')}>
         Perform it
       </button>
+      {/* Not ready this month: the capstone stays due for next time. */}
+      <button type="button" className="btn ghost block" onClick={onDone}>Skip the skit this time</button>
     </section>
   );
+}
+
+/** Grammar points by id, for showing a capstone's structures by their titles rather than ids. */
+function useGrammar(): Map<string, GrammarPoint> | undefined {
+  const [grammar, setGrammar] = useState<Map<string, GrammarPoint>>();
+  useEffect(() => {
+    let alive = true;
+    loadGrammarIndex().then((g) => { if (alive) setGrammar(g); }, () => { if (alive) setGrammar(new Map()); });
+    return () => { alive = false; };
+  }, []);
+  return grammar;
 }

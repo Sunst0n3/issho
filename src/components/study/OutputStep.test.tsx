@@ -1,11 +1,13 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AiCheckResponse } from '../../../shared/api.ts';
 import { updateSettings } from '../../lib/db.ts';
 import type { OutputSentenceRecord } from '../../lib/types.ts';
 import { logEncounters } from '../../srs/encounters.ts';
 import { completeOutputCheck, saveOutput } from '../../srs/output.ts';
-import { aiCheck, aiReport, ApiError } from '../../sync/client.ts';
+import { aiCheck, aiReport, ApiError, health, isPaired } from '../../sync/client.ts';
 import { queueChatMessage } from '../../sync/outbox.ts';
 import { OutputStep } from './OutputStep.tsx';
 import { resetStudyDb } from './test-utils.tsx';
@@ -15,6 +17,8 @@ vi.mock('../../sync/client.ts', async (original) => ({
   ...(await original<typeof import('../../sync/client.ts')>()),
   aiCheck: vi.fn(),
   aiReport: vi.fn(async () => {}),
+  health: vi.fn(),
+  isPaired: vi.fn(async () => false),
 }));
 vi.mock('../../sync/outbox.ts', () => ({ queueChatMessage: vi.fn(async () => 'client-1') }));
 vi.mock('../../srs/encounters.ts', () => ({ logEncounters: vi.fn(async () => 1) }));
@@ -58,6 +62,8 @@ beforeEach(async () => {
   await resetStudyDb();
   vi.mocked(aiCheck).mockReset();
   vi.mocked(aiReport).mockClear();
+  vi.mocked(isPaired).mockReset().mockResolvedValue(false);
+  vi.mocked(health).mockReset().mockResolvedValue({ ok: true, version: 'test', aiEnabled: true, ttsEnabled: false });
   vi.mocked(queueChatMessage).mockClear();
   vi.mocked(saveOutput).mockClear();
   vi.mocked(completeOutputCheck).mockClear();
@@ -109,6 +115,9 @@ describe('OutputStep', () => {
     typeSentence(DRAFT);
     fireEvent.click(screen.getByRole('button', { name: 'Check it' }));
     expect(await screen.findByText(/runs when the home server is reachable/)).toBeTruthy();
+    // Nothing is sent yet, so nothing says it was (V062).
+    expect(screen.getByRole('status').textContent).toBe('No check for now: it runs when the home server is reachable.');
+    expect(document.body.textContent).not.toMatch(/Sent/);
     expect(aiCheck).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: /Send to Taylor/ }));
     expect(await screen.findByText('Sent to Taylor')).toBeTruthy();
@@ -127,6 +136,65 @@ describe('OutputStep', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Check it' }));
     fireEvent.click(await screen.findByRole('button', { name: /Send to Taylor/ }));
     await waitFor(() => expect(saveOutput).toHaveBeenCalledWith(expect.objectContaining({ check: 'unavailable' })));
+  });
+
+  it('paired with a server whose AI is off: no check is sent, and the note says the checker is off (V045, V087)', async () => {
+    vi.mocked(isPaired).mockResolvedValue(true);
+    vi.mocked(health).mockResolvedValue({ ok: true, version: 'test', aiEnabled: false, ttsEnabled: false });
+    step();
+    typeSentence(DRAFT);
+    fireEvent.click(screen.getByRole('button', { name: 'Check it' }));
+    expect(await screen.findByText('The sentence checker is turned off on the home server. Your sentence goes to Taylor as it is.')).toBeTruthy();
+    expect(screen.queryByText(/needs the home server/)).toBeNull();
+    expect(aiCheck).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: /Send to Taylor/ }));
+    await waitFor(() => expect(saveOutput).toHaveBeenCalledWith(expect.objectContaining({ check: 'unavailable', text: DRAFT })));
+  });
+
+  it('paired with a server that answers ai_disabled anyway: the note still says the checker is off', async () => {
+    vi.mocked(isPaired).mockResolvedValue(true);
+    vi.mocked(aiCheck).mockRejectedValue(new ApiError(503, 'ai_disabled'));
+    step();
+    typeSentence(DRAFT);
+    fireEvent.click(screen.getByRole('button', { name: 'Check it' }));
+    expect(await screen.findByText(/The sentence checker is turned off on the home server/)).toBeTruthy();
+  });
+
+  it('paired but the server is unreachable: the check waits, without asking the AI', async () => {
+    vi.mocked(isPaired).mockResolvedValue(true);
+    vi.mocked(health).mockRejectedValue(new ApiError(0, 'network'));
+    step();
+    typeSentence(DRAFT);
+    fireEvent.click(screen.getByRole('button', { name: 'Check it' }));
+    expect(await screen.findByText('No check for now: it runs when the home server is reachable.')).toBeTruthy();
+    expect(aiCheck).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: /Send to Taylor/ }));
+    await waitFor(() => expect(saveOutput).toHaveBeenCalledWith(expect.objectContaining({ check: 'pending' })));
+  });
+
+  it('paired with the AI on: the check runs as usual', async () => {
+    vi.mocked(isPaired).mockResolvedValue(true);
+    vi.mocked(aiCheck).mockImplementation(async (req) => (req.mode === 'prompt' ? promptResult : revealResult));
+    step();
+    typeSentence(DRAFT);
+    fireEvent.click(screen.getByRole('button', { name: 'Check it' }));
+    expect(await screen.findByText('Conjugation')).toBeTruthy();
+    expect(health).toHaveBeenCalledTimes(1);
+  });
+
+  it('the one-line rule flows as one line of mixed Japanese and English (V064)', async () => {
+    vi.mocked(aiCheck).mockImplementation(async (req) => (req.mode === 'prompt' ? promptResult : { ...revealResult, rule: 'い-adjectives drop い before くない: たかい → たかくない.' }));
+    step();
+    typeSentence(DRAFT);
+    fireEvent.click(screen.getByRole('button', { name: 'Check it' }));
+    typeSentence(EDITED);
+    fireEvent.click(await screen.findByRole('button', { name: 'Check again' }));
+    const note = (await screen.findByText(/adjectives drop/)).closest('.st-fb-note')!;
+    expect(note.textContent).toBe('い-adjectives drop い before くない: たかい → たかくない.');
+    // jsdom has no layout: the note must not be a flex row, which split each Japanese run into its own item.
+    const css = readFileSync(join(process.cwd(), 'src/components/study/study.css'), 'utf8');
+    const rule = css.match(/\.st-fb-note \{([^}]*)\}/)![1];
+    expect(rule).not.toMatch(/display:\s*(inline-)?flex/);
   });
 
   it('"This tip seems wrong" reports the tip and marks the sentence', async () => {
@@ -219,6 +287,38 @@ describe('OutputStep', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Check again' }));
     expect(await screen.findByText('Here is the correction')).toBeTruthy();
     expect(screen.getByText('ま', { selector: 'ins' })).toBeTruthy();
+  });
+
+  it('tells how to type katakana, under the field (V061)', () => {
+    step();
+    const hint = document.getElementById(screen.getByLabelText('Your sentence').getAttribute('aria-describedby') ?? '');
+    expect(hint?.textContent).toMatch(/Type CAPITALS for katakana: KE-KI → ケーキ/);
+  });
+
+  it('keeps keyboard focus when Check it and Send give way (V086)', async () => {
+    vi.mocked(isPaired).mockResolvedValue(true);
+    vi.mocked(health).mockResolvedValue({ ok: true, version: 'test', aiEnabled: false, ttsEnabled: false });
+    step();
+    typeSentence(DRAFT);
+    const checkIt = screen.getByRole('button', { name: 'Check it' });
+    checkIt.focus();
+    fireEvent.click(checkIt);
+    const send = await screen.findByRole('button', { name: /Send to Taylor/ });
+    expect(document.activeElement).toBe(send);
+    fireEvent.click(send);
+    const next = await screen.findByRole('button', { name: 'Continue' });
+    expect(document.activeElement).toBe(next);
+  });
+
+  it('moves focus to the field when the first look marks something to fix', async () => {
+    vi.mocked(aiCheck).mockImplementation(async (req) => (req.mode === 'prompt' ? promptResult : revealResult));
+    step();
+    typeSentence(DRAFT);
+    const checkIt = screen.getByRole('button', { name: 'Check it' });
+    checkIt.focus();
+    fireEvent.click(checkIt);
+    expect(await screen.findByText('Conjugation')).toBeTruthy();
+    expect(document.activeElement).toBe(screen.getByLabelText('Your sentence'));
   });
 
   it('a send retried after the save failed queues the chat message once', async () => {

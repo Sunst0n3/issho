@@ -292,7 +292,8 @@ export async function iPlusOneContext(now: Date, opts: { ignoreResting?: boolean
 /**
  * Fits the plan into `minutes` (never more): a story when one qualifies and its estimate (Σ clip ms / rate / 60 000
  * + 1 min for the gist, at least 2) fits, then sentences (≈ 1 min each) in the minutes left, at most 1 with a story;
- * without a story, min(floor(minutes), courseDay ≤ 60 ? 2 : 3) sentences (at least 1). ReadPlan.minutes = the estimate.
+ * without a story, min(floor(minutes), courseDay ≤ 60 ? 2 : 3) sentences (at least 1). ReadPlan.minutes = the estimate
+ * in whole minutes. The planner fills the minutes this leaves with recent words (planner.ts READ_WORD_SECONDS).
  */
 export async function pickRead(opts: { minutes: number; sharedStoryId?: string }, now: Date = new Date()): Promise<ReadPlan> {
   const today = dayKey(now);
@@ -318,7 +319,9 @@ export async function pickRead(opts: { minutes: number; sharedStoryId?: string }
     if (estimate <= opts.minutes) {
       plan.kind = 'story';
       plan.story = pick;
-      plan.minutes = estimate;
+      // Whole minutes, as Today shows them ("3 min read & listen"), when that still fits.
+      const whole = Math.ceil(estimate - 1e-9);
+      plan.minutes = whole <= opts.minutes ? whole : estimate;
     }
   }
   const slots = plan.story

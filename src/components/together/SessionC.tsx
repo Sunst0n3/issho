@@ -40,10 +40,11 @@ export function SessionC(props: SessionProps) {
   const { run, plan, duo, me, partner, partnerProgress, online, units, weekPlan, ownSlots } = props;
   const story = useStory(plan.storyId);
   const { state } = useTogetherState();
-  // The check-in starts from the slots the week plan uses: the household's, else this phone's own
-  // (not shared yet), not the defaults. Without the together state (never synced) the household's
-  // slots are unknown, so an unchanged form posts none rather than risk overwriting them.
-  const slots = state?.slots.length ? state.slots : ownSlots;
+  // The check-in starts from the slots the week plan uses: next week's when an earlier check-in this week already
+  // planned them, else the household's, else this phone's own (not shared yet), not the defaults. Without the
+  // together state (never synced) the household's slots are unknown, so an unchanged form posts none rather than
+  // risk overwriting them.
+  const slots = state?.nextSlots?.length ? state.nextSlots : state?.slots.length ? state.slots : ownSlots;
   const shared = state ? state.slots.length > 0 : true;
   switch (run.live.step) {
     case 'story':

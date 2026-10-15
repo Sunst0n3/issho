@@ -1,15 +1,19 @@
 // Multiple choice as a capped hint: typed cards show no options until the learner asks ("Show options"), and a pick
 // is graded at most Hard. Hands-busy mode shows them at once.
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { ChoiceGrid } from './parts.tsx';
 
-export function ShowOptions({ options, answer, lang, open: openAtStart = false, onOpen, onPick }: {
+export function ShowOptions({ options, answer, lang, open: openAtStart = false, focusOnShow = false, render, onOpen, onPick }: {
   options: readonly string[];
   answer: string;
   lang?: 'ja';
-  /** Shown at once (hands-busy mode). */
+  /** Shown at once (hands-busy mode, or after the link gave way to the choices). */
   open?: boolean;
+  /** The choices replace the link that had focus: focus moves to them. */
+  focusOnShow?: boolean;
+  /** How a choice reads on its button (e.g. with furigana). */
+  render?: (option: string) => ReactNode;
   /** The link was tapped: the typed field gives way to the choices. */
   onOpen?: () => void;
   onPick: (correct: boolean) => void;
@@ -25,7 +29,7 @@ export function ShowOptions({ options, answer, lang, open: openAtStart = false, 
     );
   }
   return (
-    <ChoiceGrid options={options} answer={answer} picked={picked} lang={lang}
+    <ChoiceGrid options={options} answer={answer} picked={picked} lang={lang} render={render} focusOnShow={focusOnShow || !openAtStart}
       onPick={(option) => {
         if (picked !== null) return;
         setPicked(option);

@@ -516,7 +516,7 @@ export function simulate(opts: SimOptions): { days: SimDay[]; state?: SimState }
     const previous = accuracy.at(-1);
 
     const yesterday = studyDays.at(-1) ?? null;
-    const first = orderWarmup(warm, { yesterday, takenGroups: new Set(), catchUp: false });
+    const first = orderWarmup(warm, { yesterday, takenGroups: new Set(), catchUp: false, seed: date });
     const input: GovernorInput = {
       budgetMin,
       courseDay: courseDayNow,
@@ -539,7 +539,7 @@ export function simulate(opts: SimOptions): { days: SimDay[]; state?: SimState }
     let plan = govern(input);
     let bury = first.bury;
     if (plan.mode === 'catch-up') {
-      const spacedOrder = orderWarmup(warm, { yesterday, takenGroups: new Set(), catchUp: true });
+      const spacedOrder = orderWarmup(warm, { yesterday, takenGroups: new Set(), catchUp: true, seed: date });
       plan = govern({ ...input, due: govDue(spacedOrder.order) });
       bury = [];
     }

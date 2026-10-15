@@ -1,13 +1,13 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { CanDoList } from '../components/home/CanDoList.tsx';
+import { CanDoList, ReadyCanDos, readyCanDos } from '../components/home/CanDoList.tsx';
 import { ChapterCard } from '../components/home/ChapterCard.tsx';
 import { CoverageCard } from '../components/home/CoverageCard.tsx';
 import { HoursCard } from '../components/home/HoursCard.tsx';
 import { plural } from '../components/home/labels.ts';
 import { MilestonesCard } from '../components/home/MilestonesCard.tsx';
 import { RetentionCard } from '../components/home/RetentionCard.tsx';
-import { SeasonCard } from '../components/home/SeasonCard.tsx';
+import { SeasonCard, seasonNumbers } from '../components/home/SeasonCard.tsx';
 import { SpeedCard } from '../components/home/SpeedCard.tsx';
 import { useLive } from '../components/home/useLive.ts';
 import { Icon, Screen } from '../components/ui.tsx';
@@ -40,17 +40,20 @@ async function loadHub(now: Date = new Date()) {
   const today = dayKey(now);
   const seen = new Set(milestones.filter((m) => m.seenAt).map((m) => m.id));
   const passed = [...status.values()].filter((r) => r.passedAt).sort((a, b) => b.passedAt!.getTime() - a.passedAt!.getTime());
+  const grammarIntroduced = new Set(grammarIds.map((id) => String(id).slice('grammar:'.length)));
+  const season = seasonFinaleDue(firstDay, today, seen);
   return {
     progress,
     learned,
     chapter: chapterInfo(progress.kanjiIntroduced, progress.kanaIntroduced, progress.kanaTotal),
     unit: units.find((u) => u.id === unitId),
+    ready: readyCanDos(units, unitId, status, grammarIntroduced),
     status,
-    grammarIntroduced: new Set(grammarIds.map((id) => String(id).slice('grammar:'.length))),
+    grammarIntroduced,
     retention: stats,
     hours,
     speed,
-    season: seasonFinaleDue(firstDay, today, seen),
+    season: season === null ? null : { number: season, counts: await seasonNumbers(season, firstDay) },
     passedCanDo: passed[0]?.id,
     paired: isPairedSettings(settings),
   };
@@ -90,19 +93,21 @@ export default function LearnHub() {
         </section>
       )}
 
-      {h && h.season !== null && (
-        <SeasonCard season={h.season} counts={h.learned} hours={h.hours} paired={h.paired} passedCanDo={h.passedCanDo} />
+      {h?.season && (
+        <SeasonCard season={h.season.number} counts={h.season.counts} paired={h.paired} passedCanDo={h.passedCanDo} />
       )}
       {h && <ChapterCard info={h.chapter} theme={h.unit?.title} />}
       {h?.unit && <CanDoList unit={h.unit} status={h.status} grammarIntroduced={h.grammarIntroduced} />}
+      {h && <ReadyCanDos ready={h.ready} />}
 
       <nav className="hub-tiles" aria-label="Study areas">
         <HubTile to="/library" mark="漢" title="Library" wide
           sub={h ? `${plural(h.progress.kanjiIntroduced, 'kanji', 'kanji')} and ${plural(h.learned.wordsIntroduced, 'word')} so far` : undefined} />
+        {/* "Met" (introduced), as the library's words: "learned" means 3 spaced successes (§3.1.13). */}
         <HubTile to="/kana" mark="あ" title="Kana chart"
-          sub={h ? `${h.progress.kanaIntroduced} of ${h.progress.kanaTotal} kana learned` : undefined} />
+          sub={h ? `${h.progress.kanaIntroduced} of ${h.progress.kanaTotal} basic kana met` : undefined} />
         <HubTile to="/grammar" mark="は" title="Grammar"
-          sub={h ? `${plural(h.progress.grammarIntroduced, 'point')} learned` : undefined} />
+          sub={h ? `${plural(h.progress.grammarIntroduced, 'point')} met so far` : undefined} />
         <HubTile to="/library/stories" mark="読" title="Stories" sub="Read and listen" />
         <HubTile to="/roleplay" mark="話" title="Role-plays" sub="Scenes to act out" />
       </nav>

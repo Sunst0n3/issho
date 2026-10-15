@@ -3,13 +3,13 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { clipRef } from '../../../../shared/voicevox.ts';
-import { useRubyShow } from '../../../lib/hooks.ts';
+import { useCardRubyShow, useRubyShow } from '../../../lib/hooks.ts';
 import type { ClipAccentPhrase, GrammarPoint } from '../../../lib/types.ts';
-import { shuffle } from '../../../srs/random.ts';
 import { Ruby } from '../../ui.tsx';
 import { AudioButton } from '../AudioButton.tsx';
 import { KanaText } from '../cards/KanaText.tsx';
 import { tilesMatch } from '../cards/GrammarBuildCard.tsx';
+import { piecesRuby, shuffleTiles } from '../cards/prepare.ts';
 import { DrillPractice } from '../DrillPractice.tsx';
 import { grammarGloss } from '../format.ts';
 import { MixedText } from '../MixedText.tsx';
@@ -45,7 +45,7 @@ export function GrammarExplainer({ point, examples = point.examples, examplePitc
               <li key={ex.jp}>
                 <span className="st-example-text">
                   <KanaText className="st-example-jp" text={ex.jp} show={show} />
-                  {examplePitch[n] && <PhrasePitchLine phrases={examplePitch[n]!} />}
+                  {examplePitch[n] && <PhrasePitchLine phrases={examplePitch[n]!} text={ex.jp} />}
                   <span className="st-word-en"><MixedText text={ex.en} /></span>
                 </span>
                 <AudioButton compact source={{ ref: clipRef.grammarExample(point.id, point.examples.indexOf(ex)) }} fallbackText={ex.jp}
@@ -96,7 +96,7 @@ function TryToSay({ point, onNext }: { point: GrammarPoint; onNext: () => void }
   );
 }
 
-/** One ungraded build with tiles: tap the pieces in order; the answer shows either way. */
+/** One ungraded build with tiles, never dealt in the answer's order: tap the pieces in order; the answer shows either way. */
 export function BuildPractice({ point, index = 0, onDone, doneLabel = 'Done' }: {
   point: GrammarPoint;
   index?: number;
@@ -104,11 +104,15 @@ export function BuildPractice({ point, index = 0, onDone, doneLabel = 'Done' }: 
   doneLabel?: string;
 }) {
   const item = point.buildItems[index];
-  const tiles = useMemo(() => (item ? shuffle(item.tiles) : []), [item]);
+  const tiles = useMemo(() => (item ? shuffleTiles(item.tiles, Math.random) : []), [item]);
+  // Tiles carry furigana over kanji the learner hasn't met, as on the review card; the plain tile is what is checked.
+  const rubies = useMemo(() => (item ? piecesRuby(item.jp, item.tiles) : []), [item]);
+  const show = useCardRubyShow();
   const [placed, setPlaced] = useState<number[]>([]);
   const [checked, setChecked] = useState<boolean | null>(null);
   if (!item) return null;
   const built = placed.map((i) => tiles[i]);
+  const tile = (t: string) => <Ruby text={rubies[item.tiles.indexOf(t)] ?? t} show={show} />;
   return (
     <>
       <section className="st-question">
@@ -121,13 +125,13 @@ export function BuildPractice({ point, index = 0, onDone, doneLabel = 'Done' }: 
         <p className={checked === null ? 'st-built' : checked ? 'st-built good' : 'st-built bad'} lang="ja" aria-live="polite">
           {built.length ? built.map((t, k) => (
             <button key={k} type="button" className="st-tile placed" disabled={checked !== null}
-              onClick={() => setPlaced(placed.filter((_, j) => j !== k))} aria-label={`Remove ${t}`}>{t}</button>
+              onClick={() => setPlaced(placed.filter((_, j) => j !== k))} aria-label={`Remove ${t}`}>{tile(t)}</button>
           )) : <span className="st-built-empty">Tap the pieces in order</span>}
         </p>
         <div className="st-tile-tray" role="group" aria-label="Pieces">
           {tiles.map((t, i) => (
             <button key={i} type="button" className="st-tile" lang="ja" disabled={placed.includes(i) || checked !== null}
-              onClick={() => setPlaced([...placed, i])}>{t}</button>
+              onClick={() => setPlaced([...placed, i])}>{tile(t)}</button>
           ))}
         </div>
       </div>

@@ -17,20 +17,20 @@ import { Icon } from '../../ui.tsx';
 import { AudioButton } from '../AudioButton.tsx';
 import { KanaInput } from '../cards/KanaInput.tsx';
 import { KanaText } from '../cards/KanaText.tsx';
-import { useAutoPlay } from '../cards/parts.tsx';
-import { blankKanji, zeroWordReading } from '../cards/prepare.ts';
+import { Blanked, useAutoPlay } from '../cards/parts.tsx';
+import { blankKanji, writtenMatches, zeroWordReading } from '../cards/prepare.ts';
 import { useFocusHeading, useScrollToTop } from '../focus.ts';
 import type { LearnedItem } from '../session/machine.ts';
 import { useAsync } from '../useAsync.ts';
 import { useSpeech } from '../useSpeech.ts';
-import { wordRuby } from './data.ts';
+import { kanaSoundRow, wordRuby } from './data.ts';
 
 /** The framing line at the memory pass and the first check. */
 export const SPACED_RECALL_LINE = 'Spaced recalls feel harder — that is why they stick.';
 
 type Prompt =
   | { kind: 'kanji'; cardId: string; kanji: KanjiEntry; anchor?: WordInfo; blanked?: string; reading: string }
-  | { kind: 'kana'; cardId: string; kana: KanaEntry }
+  | { kind: 'kana'; cardId: string; kana: KanaEntry; row?: string }
   | { kind: 'say'; cardId: string; word: WordInfo; display: RubyText }
   | { kind: 'meaning'; cardId: string; word: WordInfo; display: RubyText };
 
@@ -49,7 +49,9 @@ async function loadPrompts(items: readonly LearnedItem[]): Promise<Prompt[]> {
         : { kind: 'kanji', cardId, kanji: kanji[key], reading: zeroWordReading(kanji[key]) });
     } else if (kind === 'kana') {
       const entry = kana.find((k) => k.char === key);
-      if (entry) out.push({ kind: 'kana', cardId, kana: entry });
+      if (!entry) continue;
+      const row = kanaSoundRow(entry, kana);
+      out.push({ kind: 'kana', cardId, kana: entry, ...(row ? { row } : {}) });
     } else if (kind === 'core') {
       const word = info(itemId);
       if (!word) continue;
@@ -105,7 +107,9 @@ function SayIt({ word, display, onAnswered }: { word: WordInfo; display: RubyTex
     setResult(correct);
     onAnswered();
   };
-  const check = (giveUp: boolean) => settle(!giveUp && kanaMatches(value, word.readings));
+  // Kana, or kanji from a phone's Japanese keyboard (each kanji word as written or as its reading), as on the cards (V040).
+  const check = (giveUp: boolean) =>
+    settle(!giveUp && (kanaMatches(value, word.readings) || writtenMatches(value, [{ written: word.written, readings: word.readings }])));
   // Saying it is the first choice; a transcript that doesn't match is not a miss (recognizers mishear), just a retry.
   const speech = useSpeech({
     onHeard: (heard) => (spokenMatches(heard, { written: word.written, readings: word.readings }) ? settle(true) : setNotCaught(true)),
@@ -169,11 +173,17 @@ function HearIt({ word, display, onAnswered }: { word: WordInfo; display: RubyTe
   );
 }
 
-function KanaSound({ kana, onAnswered }: { kana: KanaEntry; onAnswered: () => void }) {
+/** The kana's sound, and its row when another kana sounds the same (を: "(わ row)"), as on the review card. */
+function KanaSound({ kana, row, onAnswered }: { kana: KanaEntry; row?: string; onAnswered: () => void }) {
   useAutoPlay({ ref: clipRef.kana(kana.char) }, { fallbackText: kana.char });
   return (
     <WriteFromMemory char={kana.char} ask={`Write the ${kana.script} you hear`} label={`the ${kana.script} you hear`}
-      cue={<AudioButton source={{ ref: clipRef.kana(kana.char) }} fallbackText={kana.char} label="Play the sound" />}
+      cue={(
+        <div className="st-row st-center">
+          <AudioButton source={{ ref: clipRef.kana(kana.char) }} fallbackText={kana.char} label="Play the sound" />
+          {row && <span className="st-write-reading">(<span lang="ja">{row}</span> row)</span>}
+        </div>
+      )}
       onAnswered={onAnswered} />
   );
 }
@@ -229,15 +239,18 @@ export function MemoryPass({ items, onRetrieved, mayRetrieve, onDone }: {
           cue={(
             <div className="st-row st-center st-write-cue">
               <span className="st-write-keyword">{prompt.kanji.meanings[0]}</span>
-              {prompt.blanked && <span lang="ja" className="st-write-blanked">· {prompt.blanked}</span>}
+              {prompt.blanked && <span lang="ja" className="st-write-blanked">· <Blanked text={prompt.blanked} /></span>}
               <span lang="ja" className="st-write-reading">{prompt.reading}</span>
+              {prompt.anchor && (
+                <AudioButton compact source={{ ref: prompt.anchor.ref }} fallbackText={prompt.anchor.kana} label={`Listen to ${prompt.anchor.kana}`} />
+              )}
             </div>
           )}
           onAnswered={answer} />
       );
       break;
     case 'kana':
-      body = <KanaSound kana={prompt.kana} onAnswered={answer} />;
+      body = <KanaSound kana={prompt.kana} row={prompt.row} onAnswered={answer} />;
       break;
     case 'say':
       body = <SayIt word={prompt.word} display={prompt.display} onAnswered={answer} />;

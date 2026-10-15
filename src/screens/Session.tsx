@@ -3,11 +3,11 @@
 // → first check → today's sentence → fluency → summary. Reopening re-plans, so stopping part-way loses nothing.
 // Short sessions from Today (?mode=micro|welcome|makeup) skip the choice.
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { loadStudyDisplay, StudyDisplayProvider } from '../components/study/DisplayProvider.tsx';
 import type { StudyDisplay } from '../components/study/display.ts';
-import { useScrollToTop } from '../components/study/focus.ts';
+import { useFocusHeading, useScrollToTop } from '../components/study/focus.ts';
 import { FluencySprint } from '../components/study/FluencySprint.tsx';
 import { youCanNow } from '../components/study/learn/data.ts';
 import { MemoryPass, SPACED_RECALL_LINE } from '../components/study/learn/MemoryPass.tsx';
@@ -21,6 +21,8 @@ import {
   firstCheckIds,
   initialSession,
   sessionReducer,
+  sessionSteps,
+  sittingTaught,
   stepLabel,
   type LearnedItem,
   type SessionEvent,
@@ -28,11 +30,12 @@ import {
   type SessionStep,
 } from '../components/study/session/machine.ts';
 import { SessionHeader, StopDialog } from '../components/study/SessionChrome.tsx';
-import { SessionEmpty, SessionSummary, type SummaryData } from '../components/study/SessionSummary.tsx';
+import { SessionEmpty, SessionSummary, type EmptyReason, type SummaryData } from '../components/study/SessionSummary.tsx';
 import { useStudyTimer, type StudyTimeKind } from '../components/study/time.ts';
 import { Icon, Screen } from '../components/ui.tsx';
+import { loadKanaRules } from '../lib/data.ts';
 import { dayKey, db, getSettings } from '../lib/db.ts';
-import type { OutputSentenceRecord } from '../lib/types.ts';
+import type { KanaRule, OutputSentenceRecord } from '../lib/types.ts';
 import { currentUnit } from '../srs/course.ts';
 import { weekStart } from '../srs/days.ts';
 import { completeDay, completeMakeup, completeMicro, streak, type StreakV2 } from '../srs/habits.ts';
@@ -84,6 +87,38 @@ function planFor(mode: ShortMode | null, sitting: Sitting, extraKanji: boolean):
   return planToday(now, { sitting, ...(extraKanji ? { extraKanji: true } : {}) });
 }
 
+/**
+ * A short session (micro, welcome-back, make-up) on a catch-up day shows no card count either (§3.2.1 item 5): whether
+ * today is a catch-up day comes from the day record (an earlier catch-up sitting) or from today's full plan (read-only).
+ */
+async function catchUpDay(mode: ShortMode | null, plan: DayPlan): Promise<boolean> {
+  if (plan.mode === 'catch-up' || plan.counts === undefined) return true;
+  if (!mode) return false;
+  try {
+    if ((await db.days.get(dayKey()))?.catchUp) return true;
+    return mode !== 'makeup' && (await planToday(new Date()))?.mode === 'catch-up';
+  } catch (e) {
+    console.warn('could not tell whether today is a catch-up day', e);
+    return false;
+  }
+}
+
+/**
+ * Why an empty sitting is empty. A phone-only sitting holds only the reviews: when today's lessons, reading or first
+ * check are still to do, they need a desk sitting, and the summary must not say they are done.
+ */
+async function emptyReason(mode: ShortMode | null, plan: DayPlan): Promise<EmptyReason> {
+  if (mode) return 'short';
+  if (plan.sitting !== 'anywhere' || sessionSteps(plan).length > 1) return 'done';
+  try {
+    const full = await planToday(new Date(), { sitting: 'any' });
+    return full && sessionSteps(full).some((s) => s.id !== 'warmup' && s.id !== 'summary') ? 'desk' : 'done';
+  } catch (e) {
+    console.warn('could not plan the rest of today', e);
+    return 'done';
+  }
+}
+
 /** The first sitting of this ISO week on this device shows the retention card; later ones don't. */
 function firstSittingOfWeek(): boolean {
   const week = weekStart(dayKey());
@@ -114,16 +149,20 @@ async function summaryData(plan: DayPlan, learned: readonly LearnedItem[], strea
 }
 
 function SittingChoice({ busy, onChoose, onClose }: { busy: boolean; onChoose: (s: Sitting) => void; onClose: () => void }) {
+  // Opened again by "Choose another sitting", whose button is gone: focus goes to the question, not the page.
+  const root = useRef<HTMLElement>(null);
+  useFocusHeading(root, 'sittings');
   return (
     <Screen label="Today's session">
       <SessionHeader progress={0} label="" onClose={onClose} />
-      <section className="st-sittings" aria-labelledby="st-sitting-title" aria-busy={busy || undefined}>
+      <section ref={root} className="st-sittings" aria-labelledby="st-sitting-title" aria-busy={busy || undefined}>
         <h1 id="st-sitting-title" className="st-summary-title">Where are you?</h1>
         <p className="muted">Each sitting plans what is left of today.</p>
         <div className="st-links">
           {SITTINGS.map((s) => (
             <button key={s.sitting} type="button" className={s.sitting === 'any' ? 'card st-link st-sitting default' : 'card st-link st-sitting'}
-              disabled={busy} onClick={() => onChoose(s.sitting)}>
+              // aria-disabled, not disabled, while planning: the chosen button keeps keyboard focus.
+              aria-disabled={busy || undefined} onClick={() => { if (!busy) onChoose(s.sitting); }}>
               <span><strong>{s.label}</strong><span className="muted">{s.note}</span></span>
               <Icon name="forward" size={18} />
             </button>
@@ -137,6 +176,10 @@ function SittingChoice({ busy, onChoose, onClose }: { busy: boolean; onChoose: (
 interface Loaded {
   plan: DayPlan;
   display: StudyDisplay;
+  /** Kana rule lessons: the kana each one teaches, for the romaji helper during the sitting. */
+  rules: KanaRule[];
+  /** What the empty screen says when the sitting has nothing to do. */
+  empty: EmptyReason;
   /** Checks of earlier sentences that came back after they were sent: shown once, before the first step. */
   results: OutputSentenceRecord[];
 }
@@ -147,10 +190,12 @@ interface Loaded {
  */
 export default function Session() {
   const { search } = useLocation();
-  return <SessionRun key={search} />;
+  /** "Choose a sitting" on an empty phone-only sitting: a fresh opening with the sitting choice. */
+  const [run, setRun] = useState(0);
+  return <SessionRun key={`${search}#${run}`} onRestart={() => setRun((r) => r + 1)} />;
 }
 
-function SessionRun() {
+function SessionRun({ onRestart }: { onRestart: () => void }) {
   const navigate = useNavigate();
   const location = useLocation();
   const shortMode = shortModeOf(location.search);
@@ -163,6 +208,8 @@ function SessionRun() {
   const [state, setState] = useState<SessionState | null>(null);
   const [blockProgress, setBlockProgress] = useState(NO_PROGRESS);
   const [summary, setSummary] = useState<SummaryData>();
+  /** The item on screen in a teach batch (0-based), for the romaji helper. */
+  const [lessonAt, setLessonAt] = useState(0);
   /** Why "Stop for now?" is open: the close button, or the back gesture. */
   const [confirming, setConfirming] = useState<false | 'close' | 'back'>(false);
   /** Day-0 retrievals, mirrored synchronously so a re-ask can be checked against the cap at once. */
@@ -181,18 +228,26 @@ function SessionRun() {
     setPlanning(true);
     setLoadError(false);
     try {
-      const plan = await planFor(shortMode, sitting, extraKanji);
-      await startSitting(plan);
-      const [settings, display, results] = await Promise.all([
+      const planned = await planFor(shortMode, sitting, extraKanji);
+      await startSitting(planned);
+      const [settings, display, results, rules, catchUp, empty] = await Promise.all([
         getSettings(),
         loadStudyDisplay(),
         unseenOutputResults().catch((e: unknown) => {
           console.warn('could not load checked sentences', e);
           return [];
         }),
+        loadKanaRules().catch((e: unknown) => {
+          console.warn('could not load the kana rules', e);
+          return [] as KanaRule[];
+        }),
+        catchUpDay(shortMode, planned),
+        emptyReason(shortMode, planned),
       ]);
+      // During catch-up no card count shows anywhere: the header and the block read a plan without counts.
+      const plan: DayPlan = catchUp ? { ...planned, counts: undefined } : planned;
       setDefaultAudioRate(plan.courseDay, settings.audioRate);
-      setLoaded({ plan, display, results });
+      setLoaded({ plan, display, results, rules, empty });
       setState(initialSession(plan));
     } catch (e) {
       console.error('could not plan the session', e);
@@ -209,6 +264,14 @@ function SessionRun() {
 
   const plan = loaded?.plan;
   const step = state ? state.steps[state.index] : undefined;
+  // Kana taught earlier in this sitting (and the one whose lesson is on screen) lose their romaji at once (§3.2.3).
+  const lessonItem = step?.id === 'teach' && step.batch !== undefined ? plan?.teach[step.batch]?.items[lessonAt] : undefined;
+  const learnedNow = state?.learned;
+  const display = useMemo<StudyDisplay | undefined>(() => {
+    if (!loaded) return undefined;
+    const taught = sittingTaught(loaded.display.taught, learnedNow ?? [], lessonItem, loaded.rules);
+    return taught === loaded.display.taught ? loaded.display : { ...loaded.display, taught };
+  }, [loaded, learnedNow, lessonItem]);
   // The checked sentences' screen comes before the first step: leaving it starts that step at the top too.
   useScrollToTop(state ? `${state.index}:${loaded?.results.length ? 'results' : 'steps'}` : 'choice');
 
@@ -227,6 +290,7 @@ function SessionRun() {
     const upcoming = state.steps[state.index + 1];
     void timer.setKind(timeKindOf(upcoming, plan.mode));
     setBlockProgress(NO_PROGRESS);
+    setLessonAt(0);
     dispatch({ type: 'next' });
   }, [state, plan, step, leaveStep, timer, dispatch]);
 
@@ -358,7 +422,7 @@ function SessionRun() {
   if (loaded.results.length) {
     const results = loaded.results;
     return (
-      <StudyDisplayProvider value={loaded.display}>
+      <StudyDisplayProvider value={display ?? loaded.display}>
         <Screen label="Today's session">
           <SessionHeader progress={0} label="" title="Today's session" onClose={() => setConfirming('close')} />
           <OutputResults results={results}
@@ -381,7 +445,7 @@ function SessionRun() {
     return (
       <Screen label="Today's session">
         <SessionHeader progress={1} label="" onClose={() => navigate('/')} />
-        <SessionEmpty />
+        <SessionEmpty reason={loaded.empty} onChooseSitting={onRestart} />
       </Screen>
     );
   }
@@ -409,7 +473,7 @@ function SessionRun() {
   const todayReadCards = new Set(state.learned.filter((l) => l.plan.kind === 'kana').map((l) => `${l.plan.itemId}|read`));
 
   return (
-    <StudyDisplayProvider value={loaded.display}>
+    <StudyDisplayProvider value={display ?? loaded.display}>
       <Screen label="Today's session">
         <SessionHeader progress={progress} label={label} title={step.id === 'summary' ? undefined : "Today's session"}
           onClose={() => (step.id === 'summary' ? finish() : setConfirming('close'))} />
@@ -419,7 +483,8 @@ function SessionRun() {
             makeup={plan.mode === 'makeup'} paperAllowed={plan.paperAllowed} onProgress={setBlockProgress} onDone={next} />
         )}
         {step.id === 'teach' && batch && (
-          <NewItemFlow key={`teach-${step.batch}`} batch={batch} onTaught={(item) => dispatch({ type: 'taught', item })} onDone={next} />
+          <NewItemFlow key={`teach-${step.batch}`} batch={batch} onTaught={(item) => dispatch({ type: 'taught', item })}
+            onProgress={setLessonAt} onDone={next} />
         )}
         {step.id === 'memory' && (
           <MemoryPass key={`memory-${step.batch}`} items={state.learned.filter((l) => batchIds.has(l.plan.itemId))}

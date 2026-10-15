@@ -101,6 +101,14 @@ export async function pendingOutputChecks(): Promise<OutputSentenceRecord[]> {
   return rows.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 }
 
+/**
+ * pure: the English line of a cloze card made from a corrected sentence: the AI's translation of that sentence, or ''
+ * (no English line). Never the day's target gloss: it describes one word or grammar point, not what the sentence says.
+ */
+export function clozeEnglish(result: Pick<AiCheckResponse, 'en'>): string {
+  return result.en?.trim() ?? '';
+}
+
 /** Stores the reveal result; runs the guard; on success creates the cloze card and returns its id. Idempotent. */
 export async function completeOutputCheck(id: string, result: AiCheckResponse, now: Date = new Date()): Promise<{ cardId?: string }> {
   const row = await db.outputs.get(id);
@@ -112,7 +120,7 @@ export async function completeOutputCheck(id: string, result: AiCheckResponse, n
   if (corrected) {
     cardId =
       (await createGuardedCloze(
-        { corrected, en: row.target.en, words: result.words, grammarUsed: result.grammarUsed, target: row.target.ref },
+        { corrected, en: clozeEnglish(result), words: result.words, grammarUsed: result.grammarUsed, target: row.target.ref },
         'correction',
         now,
       )) ?? undefined;

@@ -6,19 +6,20 @@
 //   whichever phone ran it (creditTogetherSession is idempotent, so repeats are harmless);
 // - a partner quiz this phone answered gets its verdicts applied to the FSRS cards once the
 //   asker posts them (applyPartnerVerdicts applies each quiz once);
-// - output-step checks that were queued offline are revealed when the server is reachable.
+// - output-step checks that were queued offline are revealed when the server is reachable;
+// - the household's slots and goal are mirrored into Settings, so every screen and the planner read the household plan.
 
 import { useEffect, useSyncExternalStore } from 'react';
 import type { Table } from 'dexie';
 import type { Quiz, TogetherEvent, TogetherLiveState, TogetherState } from '../../shared/api.ts';
-import { db, dayKey, getSettings } from '../lib/db.ts';
+import { db, dayKey, getSettings, updateSettings } from '../lib/db.ts';
 import { rubyToPlain } from '../lib/ruby.ts';
-import type { TogetherOutboxRecord } from '../lib/types.ts';
+import type { OutputSentenceRecord, Settings, TogetherOutboxRecord } from '../lib/types.ts';
 import { addDays, weekStart } from '../srs/days.ts';
 import { creditTogetherSession } from '../srs/habits.ts';
 import { completeOutputCheck, learnerAiContext, pendingOutputChecks } from '../srs/output.ts';
 import { applyPartnerVerdicts } from '../srs/together.ts';
-import { aiCheck, ApiError, getQuizzes, getTogether, isPairedSettings, postTogetherEventRaw } from './client.ts';
+import { aiCheck, aiStatus, ApiError, getQuizzes, getTogether, isPairedSettings, postTogetherEventRaw } from './client.ts';
 import { uuid } from './outbox.ts';
 import { onServerEvent, onStatusChange, sendClientEvent } from './socket.ts';
 
@@ -68,6 +69,7 @@ async function flushOnce(): Promise<{ sent: number; blocked: boolean; remaining:
       sent++;
       setState({ state, fetchedAt: Date.now(), offline: false });
       void creditRecentSessions(state);
+      await mirrorPlan(state).catch((e: unknown) => console.warn('could not save the household plan', e));
     } catch (e) {
       const permanent = e instanceof ApiError && !e.transient
         && e.status !== 401 && e.status !== 403 && e.code !== 'unpaired';
@@ -142,6 +144,34 @@ function writeCache(state: TogetherState | null, fetchedAt?: number): void {
   }
 }
 
+/** The event types waiting in the together outbox (not failed): offline edits the server state hasn't seen yet. */
+async function pendingEventTypes(): Promise<Set<TogetherEvent['type']>> {
+  const types = new Set<TogetherEvent['type']>();
+  for (const row of await outbox().filter((r) => !r.failed).toArray()) {
+    try {
+      types.add((JSON.parse(row.event) as TogetherEvent).type);
+    } catch {
+      // Unreadable: flushOnce marks it failed.
+    }
+  }
+  return types;
+}
+
+const sameJson = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+
+/**
+ * Mirrors the household's slots and goal (the server's state, set on either phone) into Settings, so Today, the
+ * together session and the planner's fallback follow the household plan (V071). A field waits while an event of its
+ * type is still unsent, so an offline edit is not overwritten by state that predates it. Never empties a field.
+ */
+export async function mirrorPlan(state: Pick<TogetherState, 'slots' | 'goal'>): Promise<void> {
+  const [settings, pending] = await Promise.all([getSettings(), pendingEventTypes()]);
+  const patch: Partial<Settings> = {};
+  if (state.slots.length && !pending.has('slots') && !sameJson(state.slots, settings.togetherSlots)) patch.togetherSlots = state.slots;
+  if (state.goal && !pending.has('goal') && !sameJson(state.goal, settings.sharedGoal)) patch.sharedGoal = state.goal;
+  if (Object.keys(patch).length) await updateSettings(patch);
+}
+
 let store: TogetherStore = readCache();
 const listeners = new Set<() => void>();
 
@@ -164,6 +194,7 @@ export function refreshTogether(): Promise<void> {
       const state = await getTogether();
       setState({ state, fetchedAt: Date.now(), offline: false });
       await creditRecentSessions(state);
+      await mirrorPlan(state).catch((e: unknown) => console.warn('could not save the household plan', e));
     } catch (e) {
       if (!(e instanceof ApiError && e.transient)) console.warn('could not load the together state', e);
       setState({ offline: true });
@@ -278,22 +309,54 @@ export async function syncPartnerQuizzes(): Promise<number> {
 
 let checking: Promise<number> | null = null;
 
-/** Retries B's pendingOutputChecks with aiCheck({ mode: 'reveal' }) when the server is reachable. */
+/**
+ * The home server has no AI: these checks can never run. They become 'unavailable' (as a sentence
+ * sent while the AI is off does), so they aren't asked for, and refused with a 503, on every reconnect.
+ */
+async function markChecksUnavailable(recs: readonly OutputSentenceRecord[]): Promise<void> {
+  try {
+    await db.transaction('rw', db.outputs, async () => {
+      for (const rec of recs) {
+        // Only rows still waiting: the output step may have finished one meanwhile.
+        if ((await db.outputs.get(rec.id))?.check === 'pending') await db.outputs.update(rec.id, { check: 'unavailable' });
+      }
+    });
+  } catch (e) {
+    console.error('could not update the pending output checks', e);
+  }
+}
+
+/**
+ * Retries B's pendingOutputChecks with aiCheck({ mode: 'reveal' }) when the server is reachable and
+ * its AI is on (health.aiEnabled). Without an AI on the server they become 'unavailable' instead, as
+ * they do when the server refuses its key or model ('ai_misconfigured'), as the output step does.
+ */
 export function flushPendingOutputChecks(): Promise<number> {
   checking ??= (async () => {
     if (!isPairedSettings(await getSettings())) return 0;
-    let pending: Awaited<ReturnType<typeof pendingOutputChecks>>;
-    let context: Awaited<ReturnType<typeof learnerAiContext>>;
+    let pending: OutputSentenceRecord[];
     try {
       pending = await pendingOutputChecks();
-      if (!pending.length) return 0;
+    } catch (e) {
+      console.error('could not read the pending output checks', e);
+      return 0;
+    }
+    if (!pending.length) return 0;
+    const ai = await aiStatus();
+    if (ai === 'unreachable') return 0;
+    if (ai === 'off') {
+      await markChecksUnavailable(pending);
+      return 0;
+    }
+    let context: Awaited<ReturnType<typeof learnerAiContext>>;
+    try {
       context = await learnerAiContext();
     } catch (e) {
       console.error('could not read the pending output checks', e);
       return 0;
     }
     let done = 0;
-    for (const rec of pending) {
+    for (const [i, rec] of pending.entries()) {
       try {
         const result = await aiCheck({
           ...context,
@@ -305,9 +368,15 @@ export function flushPendingOutputChecks(): Promise<number> {
         await completeOutputCheck(rec.id, result);
         done++;
       } catch (e) {
-        // A request the server refuses for good is skipped; anything else (offline, AI off, rate
-        // limited) waits for the next time the server is reachable.
-        if (e instanceof ApiError && !e.transient && e.code !== 'ai_disabled' && e.status !== 401 && e.status !== 403) continue;
+        // The AI was switched off since the health check, or its key or model is refused: the rest can't run either.
+        // OutputStep marks a new sentence 'unavailable' in both cases too, so a broken key isn't asked on every reconnect.
+        if (e instanceof ApiError && (e.code === 'ai_disabled' || e.code === 'ai_misconfigured')) {
+          await markChecksUnavailable(pending.slice(i));
+          break;
+        }
+        // A request the server refuses for good is skipped; anything else (offline, rate limited,
+        // the AI erroring) waits for the next time the server is reachable.
+        if (e instanceof ApiError && !e.transient && e.status !== 401 && e.status !== 403) continue;
         if (!(e instanceof ApiError)) console.error('could not complete the output check', e);
         break;
       }

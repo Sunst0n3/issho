@@ -4,7 +4,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { KanaExamplesFile } from '../src/lib/data.ts';
-import type { AudioManifest, CoreWord, GrammarPoint, StoryEntry, UnitSpec } from '../src/lib/types.ts';
+import type { AudioManifest, CoreWord, GrammarPoint, KanaRule, StoryEntry, UnitSpec } from '../src/lib/types.ts';
 import { clipTextKey, splitMoras, toKatakana, type VvQuery } from '../shared/voicevox.ts';
 import type { Engine } from './audio/engine.ts';
 import {
@@ -207,6 +207,30 @@ describe('jobs', () => {
     expect(refs.get('kanaRule:hira-dakuten#1')).toMatchObject({ text: 'ごみ', reading: 'ごみ', pack: 'kana' });
   });
 
+  it('gives both sides of every rule pair a kana: clip: extended katakana as exact sounds, contrast words as words', () => {
+    const rule: KanaRule = {
+      id: 'kata-extended', day: 14, script: 'katakana', title: '', explanation: '', practiceWords: [],
+      pairs: [
+        { from: 'か', to: 'が', romaji: 'ga' },
+        { from: 'テ', to: 'ティ', romaji: 'ti' },
+        { from: 'ウ', to: 'ヴ', romaji: 'vu' },
+        { from: 'ヴ', to: 'ヴァ', romaji: 'va' },
+        { from: 'おと', to: 'おっと', romaji: 'otto' },
+        { from: 'ハト', to: 'ハート', romaji: 'haato' },
+      ],
+    };
+    const all = buildJobs({ ...sources(), kanaRules: [rule] });
+    const kana = all.filter((j) => refKind(j.ref) === 'kana');
+    // The 208 sounds once each, then each side outside them once.
+    expect(kana.slice(208).map((j) => j.ref)).toEqual(['kana:ティ', 'kana:ヴ', 'kana:ヴァ', 'kana:おと', 'kana:おっと', 'kana:ハト', 'kana:ハート']);
+    expect(new Set(kana.map((j) => j.ref)).size).toBe(kana.length);
+    const refs = byRef(all);
+    for (const p of rule.pairs) for (const side of [p.from, p.to]) expect(refs.has(`kana:${side}`), side).toBe(true);
+    expect(refs.get('kana:ティ')).toMatchObject({ kind: 'kana', exact: true, text: 'ティ', reading: 'ティ', voice: 'f', pack: 'kana' });
+    expect(refs.get('kana:おっと')).toMatchObject({ kind: 'word', text: 'おっと', reading: 'おっと', voice: 'f', pack: 'kana' });
+    expect(refs.get('kana:おっと')!.exact).toBeUndefined();
+  });
+
   it('reads core and JMdict words as {written|kana}, in their unit or chapter pack', () => {
     expect(refs.get('core:cw-0002')).toMatchObject({ text: '{橋|はし}', reading: 'はし', pack: 'u01', word: { nounLike: true } });
     expect(refs.get('core:cw-0001')).toMatchObject({ text: 'ありがとう', pack: 'u01', word: { nounLike: false } });
@@ -362,6 +386,19 @@ describe('run', () => {
     // Role b is the male voice (speaker 13).
     expect(m.clips[m.byRef['rp:rp-u02#1']].voice).toBe('m');
     expect(engine.syntheses.some((s) => s.moras === 'イイエ' && s.speaker === 13)).toBe(true);
+  });
+
+  it('makes a clip for each side of the rule pairs, so the pair grid never falls back to the device voice', async () => {
+    const rule: KanaRule = {
+      id: 'hira-yoon', day: 7, script: 'hiragana', title: '', explanation: '', practiceWords: [],
+      pairs: [{ from: 'テ', to: 'ティ', romaji: 'ti' }, { from: 'おと', to: 'おっと', romaji: 'otto' }, { from: 'ビル', to: 'ビール', romaji: 'biiru' }],
+    };
+    const jobs = buildJobs({ ...sources(), kanaRules: [rule] }).filter((j) => /^kana:(ティ|おと|おっと|ビル|ビール)$/.test(j.ref));
+    const { result, engine } = await run(jobs);
+    expect(result.failures).toEqual([]);
+    const m = result.manifest;
+    for (const side of ['ティ', 'おと', 'おっと', 'ビル', 'ビール']) expect(m.clips[m.byRef[`kana:${side}`]], side).toMatchObject({ pack: 'kana', voice: 'f', via: 'text' });
+    expect(engine.syntheses.map((s) => s.moras).sort()).toEqual(['オット', 'オト', 'ティ', 'ビル', 'ビール'].sort());
   });
 
   it('reads a lone は as "ha" from the katakana, never as the particle "wa"', async () => {

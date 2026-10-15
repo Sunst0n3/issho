@@ -59,7 +59,8 @@ export function WriteQuestion({ char, ask, target, label, paperAllowed = true, o
       hintUsed: r.hintUsed,
     });
     if (grade === Rating.Again) setJudged(r);
-    else answer({ grade, mode: 'written', input: writingHand });
+    // Stroke-order coaching (a note and a replay per slip) shows on the pad now: the feedback waits for Continue.
+    else answer({ grade, mode: 'written', input: writingHand, ...(r.match.orderSlips.length ? { hold: true } : {}) });
   };
 
   return (

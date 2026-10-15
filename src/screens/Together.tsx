@@ -14,13 +14,13 @@ import { focusLost } from '../components/together/focus.ts';
 import { dateFromKey, memberName, PARTNER_FALLBACK, splitHousehold, timeAgo, useNow } from '../components/together/household.ts';
 import { useRolePlayInvite } from '../components/together/live.ts';
 import { useQuizzes } from '../components/together/quizzes.ts';
-import { SESSION_TITLES, useLiveInvite } from '../components/together/session.ts';
+import { MONTHLY_DETAIL, SESSION_TITLES, useLiveInvite } from '../components/together/session.ts';
 import { lastReadMessageId } from '../components/together/storage.ts';
 import '../components/together/together.css';
 import { WeekChart } from '../components/together/WeekChart.tsx';
-import { lettersDone, sessionStatus, useWeekPlan, type SessionStatus } from '../components/together/weekPlan.ts';
+import { lettersDone, sessionsInOrder, sessionStatus, useWeekPlan, type SessionStatus } from '../components/together/weekPlan.ts';
 import { Icon, Screen } from '../components/ui.tsx';
-import { loadStories } from '../lib/data.ts';
+import { loadStories, loadUnits } from '../lib/data.ts';
 import { db, dayKey } from '../lib/db.ts';
 import { useSettings, useSettingsLoaded } from '../lib/hooks.ts';
 import type { Settings, StoryEntry, TogetherWeekPlan } from '../lib/types.ts';
@@ -183,9 +183,10 @@ function ThisWeek({ plan, failed, offline }: { plan?: TogetherWeekPlan; failed: 
         <p className="muted">No sessions set yet. Pick your three slots in Settings → Together, or at the next check-in.</p>
       ) : (
         <ul className="tg-session-list">
-          {plan.sessions.map((s) => {
+          {sessionsInOrder(plan).map((s) => {
             const st = sessionStatus(s, today);
             const name = s.id === 'monthly' ? 'Monthly session' : `Session ${s.id}`;
+            const detail = s.id === 'monthly' ? MONTHLY_DETAIL : SESSION_TITLES[s.id];
             return (
               <li key={`${s.id}-${s.day}`}>
                 <Link to={`/together/session/${s.id}`} className={`tg-session-row tg-${st}`}>
@@ -194,7 +195,7 @@ function ThisWeek({ plan, failed, offline }: { plan?: TogetherWeekPlan; failed: 
                   </span>
                   <span className="tg-session-what">
                     <strong>{name}</strong>
-                    <span className="muted"> · {SESSION_TITLES[s.id]}</span>
+                    <span className="muted"> · {detail}</span>
                   </span>
                   <span className={`chip tg-status-${st}`}>{STATUS_TEXT[st]}</span>
                 </Link>
@@ -293,6 +294,7 @@ function CheckinHistory({ state, data, myId, partnerName }: {
   partnerName: string;
 }) {
   const weeks = [...new Set((state?.checkins ?? []).map((c) => c.week))].sort().reverse().slice(0, CHECKIN_WEEKS);
+  const canDos = useCanDoTexts(weeks.length > 0);
   if (!weeks.length) return null;
   return (
     <section className="card" aria-labelledby="tg-checkins">
@@ -305,6 +307,7 @@ function CheckinHistory({ state, data, myId, partnerName }: {
               <p key={c.memberId} className="tg-small">
                 <strong>{c.memberId === myId ? 'You' : memberName(data, c.memberId, partnerName)}</strong>
                 {' '}{c.checkin.counts.kanji} kanji · {c.checkin.counts.words} words · {c.checkin.counts.grammar} grammar · {Math.round(c.checkin.counts.minutes)} min
+                {c.checkin.canDo && canDos?.has(c.checkin.canDo) && <> · managed “{canDos.get(c.checkin.canDo)}”</>}
                 {c.checkin.note && <span className="muted"> · {c.checkin.note}</span>}
               </p>
             ))}
@@ -313,6 +316,23 @@ function CheckinHistory({ state, data, myId, partnerName }: {
       </ul>
     </section>
   );
+}
+
+/** Can-do id → its text, for the check-ins that ticked one. */
+function useCanDoTexts(wanted: boolean): Map<string, string> | undefined {
+  const [texts, setTexts] = useState<Map<string, string>>();
+  useEffect(() => {
+    if (!wanted) return;
+    let alive = true;
+    loadUnits().then(
+      (units) => {
+        if (alive) setTexts(new Map(units.flatMap((u) => u.canDos.map((c) => [c.id, c.text] as const))));
+      },
+      () => { if (alive) setTexts(new Map()); },
+    );
+    return () => { alive = false; };
+  }, [wanted]);
+  return texts;
 }
 
 function SyncStatus({ status, fetchedAt, hasData, failed }: {

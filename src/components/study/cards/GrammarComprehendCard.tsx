@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { clipRef } from '../../../../shared/voicevox.ts';
 import { useCardRubyShow } from '../../../lib/hooks.ts';
 import { selfGrade } from '../../../srs/answers.ts';
@@ -13,6 +13,7 @@ export function GrammarComprehendCard({ prepared, onAnswer }: CardProps<'grammar
   const { point, example, exampleIndex } = prepared;
   const show = useCardRubyShow();
   const [revealed, setRevealed] = useState(false);
+  const revealId = useId();
   const source = { ref: clipRef.grammarExample(point.id, exampleIndex) };
   useAutoPlay(source, { fallbackText: example.jp });
   return (
@@ -21,14 +22,14 @@ export function GrammarComprehendCard({ prepared, onAnswer }: CardProps<'grammar
         <KanaText text={example.jp} show={show} className="st-sentence" />
         <AudioButton compact source={source} fallbackText={example.jp} label="Listen to the sentence" />
         {revealed && (
-          <div className="st-reveal">
+          <div className="st-reveal" id={revealId}>
             <p className="st-english"><MixedText text={example.en} /></p>
             <p className="st-note"><MixedText text={point.title} /></p>
           </div>
         )}
       </Question>
       {revealed ? (
-        <SelfGrade onGrade={(gotIt) => onAnswer({ grade: selfGrade(gotIt), mode: 'self', revealed: true })} />
+        <SelfGrade describedBy={revealId} onGrade={(gotIt) => onAnswer({ grade: selfGrade(gotIt), mode: 'self', revealed: true })} />
       ) : (
         <button type="button" className="btn ink block" onClick={() => setRevealed(true)}>Show the meaning</button>
       )}

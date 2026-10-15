@@ -6,11 +6,13 @@ import type { Settings, TogetherSlot } from '../../lib/types.ts';
 import { health, isPairedSettings, unpair } from '../../sync/client.ts';
 import { useServerStatus, type ServerStatus } from '../../sync/socket.ts';
 import { pushStats, refreshHousehold, resetHousehold, useHousehold } from '../../sync/stats.ts';
-import { postTogetherEvent } from '../../sync/together.ts';
+import { postTogetherEvent, useTogetherState } from '../../sync/together.ts';
 import { useAiProblem, type AiProblem } from '../together/ai.ts';
 import { ConnectServerForm } from '../together/ConnectServerForm.tsx';
 import { focusLost } from '../together/focus.ts';
 import { Switch } from './controls.tsx';
+import { useCurrentPlan } from './householdPlan.ts';
+import { isoWeekdayName } from './labels.ts';
 import { syncMemberName } from './nameSync.ts';
 import { completeSlots, goalFromDraft, GoalFields, PartnerRules, SlotsEditor, type GoalDraft } from './planControls.tsx';
 import { SettingsSection } from './SettingsStudy.tsx';
@@ -151,25 +153,42 @@ function Paired({ settings }: { settings: Settings }) {
 const sameSlots = (a: readonly TogetherSlot[], b: readonly TogetherSlot[]) =>
   a.length === b.length && a.every((s, i) => s.session === b[i].session && s.weekday === b[i].weekday && s.time === b[i].time);
 
-/** The weekly slots and the shared goal. Saved on this phone, and posted to the household when paired. */
+/** 'A Tuesday 20:00 · B Thursday 20:00 · C Sunday 19:30' */
+export function slotsText(slots: readonly TogetherSlot[]): string {
+  return [...slots].sort((a, b) => a.session.localeCompare(b.session))
+    .map((s) => `${s.session} ${isoWeekdayName(s.weekday)} ${s.time}`).join(' · ');
+}
+
+/**
+ * The weekly slots and the shared goal. Saved on this phone, and posted to the household when paired. While
+ * paired it starts from the household's current plan (the partner may have changed it), and a save posts
+ * only what this phone changed, so saving the goal never sends this phone's older slots back.
+ */
 function TogetherPlan({ settings }: { settings: Settings }) {
-  const saved = completeSlots(settings.togetherSlots);
-  const [slots, setSlots] = useState<TogetherSlot[]>(saved);
-  const [goal, setGoal] = useState<GoalDraft>(settings.sharedGoal ?? { text: '', targetDate: '' });
+  const plan = useCurrentPlan(settings);
+  const { state: household } = useTogetherState();
+  const current = completeSlots(plan.slots);
+  const [slots, setSlots] = useState<TogetherSlot[]>(current);
+  const [goal, setGoal] = useState<GoalDraft>(plan.goal ?? { text: '', targetDate: '' });
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string }>();
   const edited = useRef(false);
-  // The partner changed the plan (synced into Settings): show theirs unless this phone is mid-edit.
+  // The plan changed elsewhere (the partner, or a session on this phone): show it unless this phone is mid-edit.
   useEffect(() => {
     if (edited.current) return;
-    setSlots(completeSlots(settings.togetherSlots));
-    setGoal(settings.sharedGoal ?? { text: '', targetDate: '' });
-  }, [settings.togetherSlots, settings.sharedGoal]);
+    setSlots(completeSlots(plan.slots));
+    setGoal(plan.goal ?? { text: '', targetDate: '' });
+  }, [plan.slots, plan.goal]);
   const paired = isPairedSettings(settings);
+  // A check-in this week planned next week's sessions: they take over on Monday, whatever is saved here for this week.
+  const nextWeek = paired && household?.nextSlots?.length && !sameSlots(completeSlots(household.nextSlots), current)
+    ? completeSlots(household.nextSlots)
+    : null;
   const nextGoal = goalFromDraft(goal);
-  const goalChanged = (nextGoal?.text ?? '') !== (settings.sharedGoal?.text ?? '')
-    || (nextGoal?.targetDate ?? '') !== (settings.sharedGoal?.targetDate ?? '');
-  const changed = !sameSlots(slots, saved) || !settings.togetherSlots.length || goalChanged;
+  const goalChanged = (nextGoal?.text ?? '') !== (plan.goal?.text ?? '')
+    || (nextGoal?.targetDate ?? '') !== (plan.goal?.targetDate ?? '');
+  const slotsChanged = !sameSlots(slots, current) || !plan.slots.length;
+  const changed = slotsChanged || goalChanged;
 
   const save = async () => {
     setBusy(true);
@@ -178,7 +197,7 @@ function TogetherPlan({ settings }: { settings: Settings }) {
       await updateSettings({ togetherSlots: slots, sharedGoal: nextGoal });
       if (paired) {
         // Queued while offline, sent in order when the home server is back.
-        await postTogetherEvent({ type: 'slots', slots });
+        if (slotsChanged) await postTogetherEvent({ type: 'slots', slots });
         if (nextGoal && goalChanged) await postTogetherEvent({ type: 'goal', goal: nextGoal });
       }
       edited.current = false;
@@ -196,6 +215,11 @@ function TogetherPlan({ settings }: { settings: Settings }) {
         <p className="hm-field-label">Your sessions</p>
         <p className="hm-hint">Three 15-minute sessions a week. Changing them changes them for both of you.</p>
         <SlotsEditor slots={slots} onChange={(s) => { edited.current = true; setMessage(undefined); setSlots(s); }} />
+        {nextWeek && (
+          <p className="hm-hint" role="note">
+            From next week, as planned in your check-in: {slotsText(nextWeek)}. Changes saved here are for this week.
+          </p>
+        )}
       </div>
       <div className="set-row">
         <GoalFields draft={goal} onChange={(g) => { edited.current = true; setMessage(undefined); setGoal(g); }} min={dayKey()} />

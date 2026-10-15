@@ -34,7 +34,7 @@ import type {
   WordRef,
 } from '../lib/types.ts';
 import { addDays, isStudyDay, normalizeDay, updateDay, weekStart } from './days.ts';
-import { GRAMMAR_FLOOR_PER_WEEK, PRICE_SEC } from './governor.ts';
+import { GRAMMAR_FLOOR_PER_WEEK, PRICE_SEC, stagedPriceSec } from './governor.ts';
 import { introduceItem, markKnownMany, upgradeSpelling, type IntroduceResult, type ItemRef2 } from './items.ts';
 import { shuffle } from './random.ts';
 
@@ -192,7 +192,7 @@ export interface NewItemPlan {
   kanji?: string;
   /** staged core ref that is already an introduced core item: spelling upgrade (adds its read card only). */
   upgrade?: boolean;
-  /** Seconds the governor priced it at (PRICE_SEC). */
+  /** Seconds the governor priced it at (PRICE_SEC; staged: stagedPriceSec). */
   priceSec: number;
   /** kana/kanaRule → 'sprint'; staged → 'staged' (outside the 60/20/20 shares); else its own stream. */
   stream: NewStream;
@@ -292,7 +292,7 @@ export interface StreamCandidates {
   grammar: NewItemPlan | null;
   /** True when this ISO week has fewer than 2 grammar points (floor): grammar goes ahead of kanji. */
   grammarBelowFloor: boolean;
-  /** Due releases (releaseDay ≤ today), oldest first, up to 4, price 28. */
+  /** Due releases (releaseDay ≤ today), oldest first, up to 4, priced by stagedPriceSec (28; a new core word 35–47). */
   staged: NewItemPlan[];
 }
 
@@ -418,19 +418,24 @@ export function streamCandidates(s: CourseSnapshot): StreamCandidates {
     out.grammarBelowFloor = belowFloor;
   }
 
+  const coreById = new Map(s.core.map((w) => [w.id, w]));
   out.staged = s.staged
     .filter((r) => !r.releasedAt && r.releaseDay <= s.today)
     .sort((a, b) => a.releaseDay.localeCompare(b.releaseDay) || a.slot - b.slot)
     .slice(0, STAGED_CANDIDATES)
-    .map((r) => ({
-      itemId: r.itemId,
-      kind: 'staged',
-      key: refKey(r.itemId),
-      kanji: r.kanji,
-      upgrade: r.itemId.startsWith('core:') && s.introduced.has(r.itemId),
-      priceSec: PRICE_SEC.staged,
-      stream: 'staged',
-    }));
+    .map((r): NewItemPlan => {
+      const core = r.itemId.startsWith('core:');
+      const upgrade = core && s.introduced.has(r.itemId);
+      return {
+        itemId: r.itemId,
+        kind: 'staged',
+        key: refKey(r.itemId),
+        kanji: r.kanji,
+        upgrade,
+        priceSec: stagedPriceSec(core && !upgrade, coreById.get(refKey(r.itemId))?.use ?? false),
+        stream: 'staged',
+      };
+    });
   return out;
 }
 

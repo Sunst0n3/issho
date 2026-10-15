@@ -497,7 +497,9 @@
 .tg-quiz-answer { display: flex; flex-direction: column; gap: 2px; padding: 12px; border-radius: 12px; background: var(--paper-deep); }
 .tg-quiz-answer-text { font-family: var(--font-display); font-size: 28px; }
 .tg-verdicts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.tg-quiz-pad { display: flex; flex-direction: column; gap: 8px; }
+.tg-quiz-pad, .tg-quiz-pads { display: flex; flex-direction: column; gap: 8px; }
+.tg-quiz-pads > .btn { align-self: flex-start; }
+.tg-quiz-read { text-align: center; padding: 12px; border-radius: 12px; background: var(--paper-deep); }
 
 /* Teach-me, task card, timers */
 .tg-teach { display: flex; flex-direction: column; gap: 10px; }

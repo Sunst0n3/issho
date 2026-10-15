@@ -29,11 +29,13 @@ export interface StreakV2 {
   todayGoal: boolean;
   tokensLeftThisWeek: number;
   /** Most recent uncovered missed day still repairable, with its deadline (4 a.m. after that day + 48 h). Only when
-   *  that day's ISO week has no rest token left (the token is always offered first). */
+   *  that day's ISO week has no rest token left (the token is always offered first), and only when every uncovered
+   *  missed day of its gap can still be repaired: otherwise repairing it could not save the run. */
   repairable?: { date: string; deadline: Date };
   /** repairable is set and today's goal is met: Today and the Session summary offer the 10-minute make-up. */
   makeupOffer: boolean;
-  /** Yesterday was missed, uncovered, and its week has a token left: Today asks "Use a rest token for yesterday?". */
+  /** Yesterday was missed, uncovered, its week has a token left, and it is the gap's only uncovered missed day (a
+   *  token for it keeps the run alive): Today asks "Use a rest token for yesterday?". */
   offerTokenFor?: string;
   /** Monday → Sunday of this week. */
   week: { date: string; status: HabitDayStatus }[];
@@ -79,6 +81,18 @@ export function streakFromHabitDays(days: readonly HabitDay[], today: string, st
   const tokensIn = (week: string) => days.filter((d) => d.token && weekStart(d.date) === week).length;
   const thisWeek = weekStart(today);
 
+  /**
+   * The uncovered missed days of the gap around a missed `date`: the days before today with no minimum day on either
+   * side of it (token, travel and repaired days are skipped, as comebackOffer walks).
+   */
+  const gapOf = (date: string): string[] => {
+    const out: string[] = [];
+    for (let d = date; d >= start && !get(d).minimumDone; d = addDays(d, -1)) if (isMissed(get(d))) out.push(d);
+    for (let d = addDays(date, 1); d < today && !get(d).minimumDone; d = addDays(d, 1)) if (isMissed(get(d))) out.push(d);
+    return out;
+  };
+  const stillRepairable = (date: string) => repairDeadline(date).getTime() > now.getTime();
+
   let repairable: StreakV2['repairable'];
   for (let back = 1; back <= 3; back++) {
     const date = addDays(today, -back);
@@ -86,14 +100,17 @@ export function streakFromHabitDays(days: readonly HabitDay[], today: string, st
     const deadline = repairDeadline(date);
     if (deadline.getTime() <= now.getTime()) break;
     if (isMissed(get(date)) && tokensIn(weekStart(date)) >= TOKENS_PER_WEEK) {
-      repairable = { date, deadline };
+      // A day whose gap holds a day past its deadline can't save the run (a gap of 3 days or more): no make-up.
+      if (gapOf(date).every(stillRepairable)) repairable = { date, deadline };
       break;
     }
   }
 
   const yesterday = addDays(today, -1);
   const offerTokenFor =
-    yesterday >= start && isMissed(get(yesterday)) && tokensIn(weekStart(yesterday)) < TOKENS_PER_WEEK ? yesterday : undefined;
+    yesterday >= start && isMissed(get(yesterday)) && tokensIn(weekStart(yesterday)) < TOKENS_PER_WEEK && gapOf(yesterday).length === 1
+      ? yesterday
+      : undefined;
 
   const todayDay = get(today);
   const week = Array.from({ length: 7 }, (_, i) => {

@@ -11,6 +11,14 @@ export const VOICES: Record<VoiceId, { speaker: number; style: string; credit: s
   m: { speaker: 13, style: '青山龍星 ノーマル', credit: 'VOICEVOX:青山龍星' },
 };
 
+/**
+ * The voice of a role-play or task-script role: a → 'f', b → 'm' (TECH-DESIGN §2.2). The voice is fixed by the role,
+ * not the character, so content casts a woman as role a and a man as role b (scripts/lib/cast.ts checks it).
+ */
+export function roleVoice(role: 'a' | 'b'): VoiceId {
+  return role === 'b' ? 'm' : 'f';
+}
+
 /** Clip refs (AudioManifest.byRef keys). Indexes are 0-based positions in the source arrays. */
 export const clipRef = {
   kana: (char: string) => `kana:${char}`,

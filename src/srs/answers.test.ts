@@ -89,18 +89,20 @@ describe('toKana', () => {
     expect(toKana('tsudzuku')).toBe('つづく');
   });
 
-  it('writes the long-vowel mark only in katakana mode', () => {
+  it('writes the long-vowel mark in both scripts, as an IME does', () => {
     expect(toKana('ko-hi-', { katakana: true })).toBe('コーヒー');
-    expect(toKana('ko-hi-')).toBe('こ-ひ-');
+    expect(toKana('ko-hi-')).toBe('こーひー');
     expect(toKana('ra-men', { katakana: true })).toBe('ラーメン');
     expect(toKana('vu', { katakana: true })).toBe('ヴ');
   });
 
-  it('is case-insensitive, folds full-width letters and passes other text through', () => {
-    expect(toKana('KONBANWA')).toBe('こんばんわ');
+  it('types capitals as katakana, folds full-width letters and passes other text through', () => {
+    expect(toKana('KONBANWA')).toBe('コンバンワ');
+    expect(toKana('Konbanwa')).toBe('こんばんわ');
+    expect(kanaMatches('KONBANWA', ['こんばんわ'])).toBe(true);
     expect(toKana('ｓｕｓｈｉ')).toBe('すし');
     expect(toKana('すushi')).toBe('すうし');
-    expect(toKana('hai, desu')).toBe('はい, です');
+    expect(toKana('hai, desu')).toBe('はい、 です');
   });
 
   it('keeps an unfinished syllable as romaji while typing', () => {

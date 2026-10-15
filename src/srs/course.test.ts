@@ -282,6 +282,22 @@ describe('streamCandidates', () => {
     expect(staged.map((s) => s.itemId)).toEqual(['word:3005', 'word:3004', 'word:3003', 'word:3002']);
     expect(staged[0]).toMatchObject({ kind: 'staged', stream: 'staged', priceSec: 28, kanji: '日', key: '3005' });
   });
+
+  it('prices a staged new core word with all its first-check cards, never below a core lesson (QA V041)', () => {
+    const rows: StagedWordRecord[] = [
+      { itemId: 'core:cw-0042', kanji: '本', releaseDay: todayFor(18), slot: 2 }, // new, use: listen + produce + read
+      { itemId: 'core:cw-0041', kanji: '気', releaseDay: todayFor(18), slot: 3 }, // new, no use: listen + read
+      { itemId: 'core:cw-0040', kanji: '元', releaseDay: todayFor(19), slot: 2 }, // introduced: spelling upgrade, read only
+    ];
+    const introduced: [string, string][] = [...wholeSprint(todayFor(1)), ['core:cw-0040', todayFor(5)]];
+    const staged = streamCandidates(snapshot(20, introduced, { staged: rows })).staged;
+    expect(staged.map((s) => [s.itemId, s.upgrade, s.priceSec])).toEqual([
+      ['core:cw-0042', false, 28 + 7 + 12],
+      ['core:cw-0041', false, 28 + 7],
+      ['core:cw-0040', true, 28],
+    ]);
+    for (const s of staged.filter((i) => !i.upgrade)) expect(s.priceSec).toBeGreaterThanOrEqual(35);
+  });
 });
 
 describe('introducePlanItem', () => {

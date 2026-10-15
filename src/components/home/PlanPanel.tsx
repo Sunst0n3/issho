@@ -5,10 +5,18 @@ import type { NewItemPlan } from '../../srs/course.ts';
 import type { DayPlan } from '../../srs/planner.ts';
 import { Icon } from '../ui.tsx';
 
-/** "About 25 min today · tomorrow about 24", or "About 12 min left today · …" after an earlier sitting. */
+/**
+ * "About 25 min today · tomorrow about 24", or "About 12 min left today · …" after an earlier sitting. Tomorrow's
+ * minutes are the governor's plan for tomorrow: 0 on a travel day with nothing due, which reads "nothing planned".
+ */
 export function minutesLine(plan: Pick<DayPlan, 'estimateMin' | 'partOfDayDone' | 'tomorrowMin'>): string {
   const today = plan.partOfDayDone ? `About ${plan.estimateMin} min left today` : `About ${plan.estimateMin} min today`;
-  return `${today} · tomorrow about ${plan.tomorrowMin}`;
+  return `${today} · ${plan.tomorrowMin > 0 ? `tomorrow about ${plan.tomorrowMin}` : 'nothing planned tomorrow'}`;
+}
+
+/** "Tomorrow about 24 min." or "Nothing planned tomorrow." */
+export function tomorrowSentence(tomorrowMin: number): string {
+  return tomorrowMin > 0 ? `Tomorrow about ${tomorrowMin} min.` : 'Nothing planned tomorrow.';
 }
 
 export function plannedItems(plan: Pick<DayPlan, 'teach'>): NewItemPlan[] {
@@ -59,7 +67,7 @@ export function PlanPanel({ plan, goalMet }: {
       <section className="plan-panel" aria-labelledby="plan-title">
         <p className="plan-eyebrow" lang="ja">おつかれさま</p>
         <h2 id="plan-title" className="plan-title">Done for today</h2>
-        <p className="plan-copy">Today's goal is met. Tomorrow about {plan.tomorrowMin} min.</p>
+        <p className="plan-copy">Today's goal is met. {tomorrowSentence(plan.tomorrowMin)}</p>
         {more && (
           <Link to="/session" className="plan-more">
             Keep going if you like <Icon name="forward" size={16} />
@@ -93,7 +101,7 @@ export function PlanPanel({ plan, goalMet }: {
         <p className="plan-copy">
           {plan.courseComplete
             ? "Reviews keep coming as they fall due, and there's always more to read."
-            : `Nothing is due right now. Tomorrow about ${plan.tomorrowMin} min.`}
+            : `Nothing is due right now. ${tomorrowSentence(plan.tomorrowMin)}`}
         </p>
         <ExtraPractice />
       </section>

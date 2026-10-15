@@ -1,16 +1,17 @@
 // Today's sentence to the partner, using a recent word or grammar point. With the home server's AI, a first look
 // marks at most two places to check (with a type label, never the fix); the learner edits once, then the correction
 // is revealed as a diff with a one-line rule. "Just show me" goes straight to the correction. Sending is never
-// blocked: offline or without the AI the sentence goes out and its check waits ('pending') or is skipped.
+// blocked: offline or without the AI the sentence goes out and its check waits ('pending') or is skipped. A paired
+// phone asks the server's health first, so a server without an API key is never sent a check it can only refuse.
 
-import { useRef, useState, type ReactNode } from 'react';
+import { useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { AiCheckResponse, AiIssue, AiIssueType } from '../../../shared/api.ts';
 import { dayKey, getSettings } from '../../lib/db.ts';
 import { rubyToPlain } from '../../lib/ruby.ts';
 import type { OutputSentenceRecord, OutputTarget } from '../../lib/types.ts';
 import { logEncounters } from '../../srs/encounters.ts';
 import { completeOutputCheck, learnerAiContext, saveOutput } from '../../srs/output.ts';
-import { aiCheck, aiReport, ApiError } from '../../sync/client.ts';
+import { aiCheck, aiReport, ApiError, health, isPaired } from '../../sync/client.ts';
 import { queueChatMessage } from '../../sync/outbox.ts';
 import { Icon, Ruby } from '../ui.tsx';
 import { KanaInput } from './cards/KanaInput.tsx';
@@ -28,10 +29,32 @@ export const ISSUE_LABELS: Record<AiIssueType, string> = {
 type CheckState = OutputSentenceRecord['check'];
 type Stage = 'write' | 'checking' | 'prompt' | 'revealing' | 'reveal' | 'sending' | 'sent';
 
-/** The AI cannot run here (no server, not paired, no key): the check is 'unavailable'. Anything else is retried later. */
-function checkStateFor(e: unknown): CheckState {
-  if (e instanceof ApiError && ['ai_disabled', 'ai_misconfigured', 'unpaired', 'invalid_server_url'].includes(e.code)) return 'unavailable';
-  return 'pending';
+/**
+ * Why there is no check: 'later' it waits for the server ('pending'); otherwise it can't run here ('unavailable'):
+ * 'no-server' (not paired, no server address), 'off' (the server has no API key), 'broken' (the key or model is refused).
+ */
+export type NoCheck = 'later' | 'no-server' | 'off' | 'broken';
+
+function noCheckFor(e: unknown): NoCheck {
+  const code = e instanceof ApiError ? e.code : '';
+  if (code === 'ai_disabled') return 'off';
+  if (code === 'ai_misconfigured') return 'broken';
+  if (code === 'unpaired' || code === 'invalid_server_url') return 'no-server';
+  return 'later';
+}
+
+/**
+ * Whether to ask the home server's AI, asked before any AI request: a server without an API key refuses each one with
+ * a 503 (a console error every time). 'ask' when this phone isn't paired too: the request then fails at once, on the
+ * phone, as 'unpaired'. Never rejects.
+ */
+export async function checkerStatus(): Promise<'ask' | 'off' | 'unreachable'> {
+  try {
+    if (!(await isPaired())) return 'ask';
+    return (await health()).aiEnabled ? 'ask' : 'off';
+  } catch (e) {
+    return e instanceof ApiError && e.code === 'invalid_server_url' ? 'ask' : 'unreachable';
+  }
 }
 
 function online(): boolean {
@@ -78,6 +101,16 @@ function Diff({ result }: { result: AiCheckResponse }) {
 
 const isGrammarIssue = (i: AiIssue) => i.type !== 'word-choice';
 
+/** Before sending: why there is no check, in words that match what is actually wrong. */
+export function noCheckNote(why: NoCheck, partner: string): string {
+  switch (why) {
+    case 'later': return 'No check for now: it runs when the home server is reachable.';
+    case 'off': return `The sentence checker is turned off on the home server. Your sentence goes to ${partner} as it is.`;
+    case 'broken': return `The sentence checker isn't set up right on the home server. Your sentence goes to ${partner} as it is.`;
+    case 'no-server': return `The sentence checker needs the home server. Your sentence goes to ${partner} as it is.`;
+  }
+}
+
 export function OutputStep({ target, partnerName, onDone }: { target: OutputTarget; partnerName: string; onDone(): void }) {
   const [text, setText] = useState('');
   const [stage, setStage] = useState<Stage>('write');
@@ -93,9 +126,32 @@ export function OutputStep({ target, partnerName, onDone }: { target: OutputTarg
   /** The chat message once queued: a send retried after a failed save reuses it instead of sending twice. */
   const queued = useRef<{ clientId: string; text: string } | null>(null);
   const check = useRef<CheckState>('skipped');
+  /** Why the sentence has no check, once that is known (shown before it is sent). */
+  const [noCheck, setNoCheck] = useState<NoCheck | null>(null);
   const busy = useRef(false);
   const targetText = rubyToPlain(target.label);
   const partner = partnerName || 'your partner';
+  const hintId = useId();
+  const root = useRef<HTMLDivElement>(null);
+  const fieldRef = useRef<HTMLInputElement>(null);
+
+  // Each stage swaps the controls ('Check it', the send buttons), so the one that had keyboard focus is gone and focus
+  // would fall to the page (V086). It moves to what comes next: the field to edit, the send buttons, then Continue.
+  useLayoutEffect(() => {
+    if (stage !== 'prompt' && stage !== 'reveal' && stage !== 'sent') return;
+    if (document.activeElement && document.activeElement !== document.body) return;
+    const next = stage === 'prompt'
+      ? fieldRef.current
+      : root.current?.querySelector<HTMLButtonElement>('.st-footer .btn.primary:not(:disabled)')
+        ?? root.current?.querySelector<HTMLButtonElement>('.st-footer button:not(:disabled)');
+    next?.focus();
+  }, [stage, held]);
+
+  const without = (why: NoCheck) => {
+    check.current = why === 'later' ? 'pending' : 'unavailable';
+    setNoCheck(why);
+    setStage('reveal');
+  };
 
   /** `hold`: after the edit of a word-choice-only flag, a remaining word-choice issue stays a flag until asked. */
   const reveal = async (current: string, hold = false) => {
@@ -111,8 +167,7 @@ export function OutputStep({ target, partnerName, onDone }: { target: OutputTarg
       setHeld(hold && !r.ok && r.issues.length > 0 && !r.issues.some(isGrammarIssue));
       setStage('reveal');
     } catch (e) {
-      check.current = checkStateFor(e);
-      setStage('reveal');
+      without(noCheckFor(e));
     }
   };
 
@@ -123,8 +178,13 @@ export function OutputStep({ target, partnerName, onDone }: { target: OutputTarg
     draft.current = current;
     try {
       if (!online()) {
-        check.current = 'pending';
-        setStage('reveal');
+        without('later');
+        return;
+      }
+      setStage('checking');
+      const status = await checkerStatus();
+      if (status !== 'ask') {
+        without(status === 'off' ? 'off' : 'later');
         return;
       }
       // Read now rather than from a hook: the choice must hold even if the screen opened a moment ago.
@@ -132,7 +192,6 @@ export function OutputStep({ target, partnerName, onDone }: { target: OutputTarg
         await reveal(current);
         return;
       }
-      setStage('checking');
       try {
         const r = await aiCheck({ ...(await learnerAiContext()), mode: 'prompt', text: current, target: targetText });
         if (r.ok || !r.issues.length) {
@@ -143,8 +202,7 @@ export function OutputStep({ target, partnerName, onDone }: { target: OutputTarg
         setIssues(r.issues);
         setStage('prompt');
       } catch (e) {
-        check.current = checkStateFor(e);
-        setStage('reveal');
+        without(noCheckFor(e));
       }
     } finally {
       busy.current = false;
@@ -218,7 +276,7 @@ export function OutputStep({ target, partnerName, onDone }: { target: OutputTarg
 
   if (stage === 'sent') {
     return (
-      <div className="st-output">
+      <div className="st-output" ref={root}>
         {prompt}
         <div className="feedback good st-feedback" role="status">
           <p className="st-fb-title">Sent to {partner}</p>
@@ -231,7 +289,8 @@ export function OutputStep({ target, partnerName, onDone }: { target: OutputTarg
   }
 
   const field = (
-    <KanaInput value={text} onChange={setText} label="Your sentence" placeholder="Type in romaji or kana"
+    <KanaInput value={text} onChange={setText} label="Your sentence" placeholder="Type in romaji or kana" inputRef={fieldRef}
+      describedBy={stage === 'write' || stage === 'checking' ? hintId : undefined}
       readOnly={stage !== 'write' && stage !== 'prompt'} onSubmit={() => (stage === 'write' ? void firstLook() : stage === 'prompt' ? resubmit() : undefined)} />
   );
 
@@ -240,7 +299,9 @@ export function OutputStep({ target, partnerName, onDone }: { target: OutputTarg
       <div className="st-output">
         {prompt}
         {field}
-        <p className="st-note">Kana is fine. Kanji are not needed.</p>
+        <p className="st-note" id={hintId}>
+          Kana is fine. Kanji are not needed. Type CAPITALS for katakana: KE-KI → <span lang="ja">ケーキ</span>
+        </p>
         <div className="st-footer">
           <button type="button" className="btn ink st-grow" disabled={!text.trim() || stage === 'checking'} onClick={() => void firstLook()}>
             {stage === 'checking' ? 'Looking…' : 'Check it'}
@@ -253,7 +314,7 @@ export function OutputStep({ target, partnerName, onDone }: { target: OutputTarg
   if (stage === 'prompt') {
     const grammar = issues.some(isGrammarIssue);
     return (
-      <div className="st-output">
+      <div className="st-output" ref={root}>
         {prompt}
         <MarkedText text={draft.current} issues={issues} />
         <ul className="st-issues">
@@ -280,7 +341,7 @@ export function OutputStep({ target, partnerName, onDone }: { target: OutputTarg
   const corrected = result && !held && !result.ok && rubyToPlain(result.corrected) !== text.trim() ? result.corrected : null;
   const retry = sendFailed ? queued.current : null;
   return (
-    <div className="st-output">
+    <div className="st-output" ref={root}>
       {prompt}
       {stage === 'revealing' && <div className="st-skeleton st-skeleton-card" aria-busy="true" aria-label="Getting the correction" />}
       {stage !== 'revealing' && result && held && (
@@ -306,13 +367,7 @@ export function OutputStep({ target, partnerName, onDone }: { target: OutputTarg
           )}
         </div>
       )}
-      {stage !== 'revealing' && !result && (
-        <p className="card st-note" role="status">
-          {check.current === 'pending'
-            ? 'Sent without a check for now: it runs when the home server is reachable.'
-            : 'The sentence checker needs the home server. Your sentence goes to your partner as it is.'}
-        </p>
-      )}
+      {stage !== 'revealing' && !result && <p className="card st-note" role="status">{noCheckNote(noCheck ?? 'later', partner)}</p>}
       {stage !== 'revealing' && !result && <p className="st-output-text" lang="ja">{text.trim()}</p>}
       {sendFailed && <p className="feedback bad" role="alert">Couldn't save the message on this phone. Try again.</p>}
       {stage !== 'revealing' && (

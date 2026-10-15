@@ -61,27 +61,62 @@ export function sameCue(a: HabitCue | undefined, b: HabitCue | undefined): boole
   return a?.text === b?.text && a?.time === b?.time;
 }
 
+/** The two blanks, tidied: without a repeated "After I" or "at". */
+function cueParts(d: CueDraft): { action: string; place: string } {
+  return { action: d.action.trim().replace(/^after i\s+/i, ''), place: d.place.trim().replace(/^at\s+/i, '') };
+}
+
 /** The two blanks → the cue, or undefined while the first is empty. */
 export function cueFromDraft(d: CueDraft): HabitCue | undefined {
-  const action = d.action.trim().replace(/^after i\s+/i, '');
-  const place = d.place.trim().replace(/^at\s+/i, '');
+  const { action, place } = cueParts(d);
   if (!action || !d.time) return undefined;
   return { text: place ? `After I ${action} at ${place}, I open Issho` : `After I ${action}, I open Issho`, time: d.time };
 }
 
-export function CueFields({ draft, onChange }: { draft: CueDraft; onChange: (d: CueDraft) => void }) {
+export type CueProblem = 'time' | 'action';
+
+/**
+ * pure: why a half-filled cue can't be saved (cueFromDraft would drop it), or undefined when it is complete
+ * or left empty on purpose.
+ */
+export function cueProblem(d: CueDraft): CueProblem | undefined {
+  const { action, place } = cueParts(d);
+  if (action && !d.time) return 'time';
+  if (!action && place) return 'action';
+  return undefined;
+}
+
+const CUE_PROBLEM_TEXT: Record<CueProblem, string> = {
+  time: 'Pick a time for the reminder, or clear the cue.',
+  action: 'Say what you already do (“After I …”), or clear the place.',
+};
+
+export function CueFields({ draft, onChange, problem }: {
+  draft: CueDraft;
+  onChange: (d: CueDraft) => void;
+  /** Shown with the field it is about (cueProblem). */
+  problem?: CueProblem;
+}) {
   const id = useId();
+  const problemId = `${id}-problem`;
+  const about = (field: CueProblem) => (problem === field
+    ? { 'aria-invalid': true, 'aria-describedby': problemId } as const
+    : {});
   return (
     <div className="hm-cue" role="group" aria-labelledby={`${id}-legend`}>
       <p id={`${id}-legend`} className="hm-field-label">My cue</p>
       <div className="hm-cue-sentence">
         <label className="hm-cue-part" htmlFor={`${id}-action`}>
           <span>After I</span>
+          {/* Read on its own, "After I" doesn't say what goes in the blank. */}
+          <span className="visually-hidden">: something you already do every day</span>
           <input id={`${id}-action`} className="text-input" value={draft.action} maxLength={80}
-            placeholder="pour my evening tea" autoComplete="off" onChange={(e) => onChange({ ...draft, action: e.target.value })} />
+            placeholder="pour my evening tea" autoComplete="off" {...about('action')}
+            onChange={(e) => onChange({ ...draft, action: e.target.value })} />
         </label>
         <label className="hm-cue-part" htmlFor={`${id}-place`}>
           <span>at</span>
+          <span className="visually-hidden">: the place, optional</span>
           <input id={`${id}-place`} className="text-input" value={draft.place} maxLength={80}
             placeholder="the kitchen table" autoComplete="off" onChange={(e) => onChange({ ...draft, place: e.target.value })} />
         </label>
@@ -89,9 +124,10 @@ export function CueFields({ draft, onChange }: { draft: CueDraft; onChange: (d: 
       </div>
       <label className="hm-field hm-time-field" htmlFor={`${id}-time`}>
         <span className="hm-field-label">Remind me at</span>
-        <input id={`${id}-time`} type="time" className="text-input hm-time" value={draft.time} required
+        <input id={`${id}-time`} type="time" className="text-input hm-time" value={draft.time} required {...about('time')}
           onChange={(e) => onChange({ ...draft, time: e.target.value })} />
       </label>
+      {problem && <p id={problemId} className="hm-error" role="alert">{CUE_PROBLEM_TEXT[problem]}</p>}
     </div>
   );
 }

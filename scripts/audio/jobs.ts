@@ -20,7 +20,7 @@ import type {
   VoiceId,
   WordEntry,
 } from '../../src/lib/types.ts';
-import { VOICES, clipRef, clipTextKey, rubyKana, rubyPlain } from '../../shared/voicevox.ts';
+import { VOICES, clipRef, clipTextKey, roleVoice, rubyKana, rubyPlain, splitMoras } from '../../shared/voicevox.ts';
 
 /**
  * Bump to regenerate every clip on purpose (new encoder settings, a better voice). The engine version is deliberately
@@ -136,6 +136,21 @@ export function buildJobs(src: AudioSources, opts: BuildJobsOptions = {}): Audio
       jobs.push({ ref: clipRef.kanaRule(rule.id, n), family: 'kana', kind: 'word', voice: 'f', text: w.kana, reading: w.kana, pack: KANA_PACK });
     });
   }
+  // Rule pairs: the grid plays kana:<side> for both sides (か→が, テ→ティ, おと→おっと). Sides outside the 208 sounds
+  // get their own clip: extended katakana (ティ, ヴ) are one sound and read exactly; contrast words (おっと, ハート)
+  // are words, matched like any word reading.
+  const kanaRefs = new Set(jobs.filter((j) => j.kind === 'kana').map((j) => j.ref));
+  for (const rule of src.kanaRules) {
+    for (const pair of rule.pairs) {
+      for (const side of [pair.from, pair.to]) {
+        const ref = clipRef.kana(side);
+        if (!side.trim() || kanaRefs.has(ref)) continue;
+        kanaRefs.add(ref);
+        const sound = splitMoras(side).length === 1;
+        jobs.push({ ref, family: 'kana', kind: sound ? 'kana' : 'word', voice: 'f', text: side, reading: side, pack: KANA_PACK, ...(sound ? { exact: true } : {}) });
+      }
+    }
+  }
 
   // Core words, in teaching order.
   for (const c of [...src.coreWords].sort((a, b) => a.order - b.order)) {
@@ -202,14 +217,14 @@ export function buildJobs(src: AudioSources, opts: BuildJobsOptions = {}): Audio
   // Role-plays: role a → f, role b → m.
   for (const rp of src.rolePlays) {
     rp.lines.forEach((line, n) => {
-      sentenceJob(clipRef.rolePlay(rp.id, n), 'roleplays', 'line', line.role === 'b' ? 'm' : 'f', line.jp, unitPack(rp.unit));
+      sentenceJob(clipRef.rolePlay(rp.id, n), 'roleplays', 'line', roleVoice(line.role), line.jp, unitPack(rp.unit));
     });
   }
 
   // Units: scripted task lines and listen-check material.
   for (const u of src.units) {
     u.task.scripted.forEach((line, n) => {
-      sentenceJob(clipRef.task(u.task.id, n), 'units', 'line', line.role === 'b' ? 'm' : 'f', line.jp, unitPack(u.id));
+      sentenceJob(clipRef.task(u.task.id, n), 'units', 'line', roleVoice(line.role), line.jp, unitPack(u.id));
     });
     for (const cd of u.canDos) {
       if (cd.check.kind === 'listen' && cd.check.material.trim()) {

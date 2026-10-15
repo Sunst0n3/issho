@@ -4,11 +4,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { db, dayKey, updateSettings } from '../../lib/db.ts';
 import GrammarDetail from '../../screens/GrammarDetail.tsx';
 import GrammarList, { byUnit } from '../../screens/GrammarList.tsx';
-import Reading from '../../screens/Reading.tsx';
+import Reading, { storyStepFor } from '../../screens/Reading.tsx';
+import type { PreToken, StoryEntry } from '../../lib/types.ts';
 import WritePractice, { markTried, triedToday } from '../../screens/WritePractice.tsx';
 import { introduceItem } from '../../srs/items.ts';
 import { saveSentence } from './sentences.ts';
-import { audioMock, GRAMMAR, resetStudyDb, SENTENCES } from './test-utils.tsx';
+import { audioMock, GRAMMAR, resetStudyDb, SENTENCES, STORIES } from './test-utils.tsx';
 
 vi.mock('../../lib/data.ts', async () => (await import('./test-utils.tsx')).dataMock);
 vi.mock('../../writing/WritingPad.tsx', async () => (await import('./test-utils.tsx')).writingPadMock);
@@ -226,11 +227,38 @@ describe('Reading', () => {
   });
 
   it('opens a Library story, or says it is missing', async () => {
+    for (const w of ['w-mizu', 'w-nihon', 'w-hon']) {
+      await introduceItem('word', w, daysAgo(5));
+      await db.reviewLogs.add({ cardId: `word:${w}|read`, itemId: `word:${w}`, kind: 'word', type: 'read', grade: 3, reviewedAt: daysAgo(1),
+        durationMs: 1, mode: 'typed', prevState: 2, elapsedDays: 3, context: 'review' });
+    }
     renderAt('/read/st-l0-01');
-    expect(await screen.findByRole('heading', { name: 'Stretch story' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: 'Story' })).toBeTruthy();
+    expect(await screen.findByText('Read while you listen')).toBeTruthy();
     cleanup();
     renderAt('/read/st-nope');
     expect(await screen.findByRole('heading', { name: 'Story not found' })).toBeTruthy();
     await waitFor(() => expect(screen.getByRole('link', { name: 'All stories' }).getAttribute('href')).toBe('/library/stories'));
+  });
+
+  it('does not open a story below Stretch level by its address (V068)', async () => {
+    renderAt('/read/st-l0-01');
+    expect(await screen.findByRole('heading', { name: 'Not open yet' })).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: 'Stretch story' })).toBeNull();
+    expect(screen.queryByText('Tap a word for its English')).toBeNull();
+    expect(screen.getByRole('link', { name: 'All stories' }).getAttribute('href')).toBe('/library/stories');
+  });
+
+  it('opens a story as Easy from 98 %, as Stretch from 95 %, and not below unless already started', () => {
+    // 100 content words, of which `known` are known.
+    const story = (known: number): StoryEntry => ({
+      ...STORIES[0],
+      sentences: [{ jp: '', en: '', phrases: [], tokens: Array.from({ length: 100 }, (_, i): PreToken => ({ s: 'x', k: 'c', ref: `word:${i < known ? 'k' : 'u'}${i}` })) }],
+    });
+    const isKnown = (ref: string) => ref.startsWith('word:k');
+    expect(storyStepFor(story(98), isKnown)).toEqual({ step: 'rwl', stretch: false });
+    expect(storyStepFor(story(95), isKnown)).toEqual({ step: 'library', stretch: true });
+    expect(storyStepFor(story(85), isKnown)).toBeNull();
+    expect(storyStepFor(story(85), isKnown, true)).toEqual({ step: 'library', stretch: false });
   });
 });

@@ -5,7 +5,7 @@
 // Without a task, Session B runs a free role-play (or the next core conversation) at stage 1.
 
 import { useEffect, useId, useRef, useState } from 'react';
-import type { AiRecapResponse, AiRolePlayRequest } from '../../../shared/api.ts';
+import type { AiRecapResponse, AiRolePlayRequest, VoiceId } from '../../../shared/api.ts';
 import { dayKey } from '../../lib/db.ts';
 import type { TaskCard } from '../../lib/types.ts';
 import { play, stopAudio } from '../../speech/audio.ts';
@@ -20,7 +20,7 @@ import { Icon, Ruby } from '../ui.tsx';
 import { aiErrorMessage } from './ai.ts';
 import { ConversationStage } from './ConversationStage.tsx';
 import { PlanningTimer } from './PlanningTimer.tsx';
-import type { Role } from './rolePlay.ts';
+import { personaVoice, type Role } from './rolePlay.ts';
 import { MissingContent, SkipStep, type SessionProps } from './SessionA.tsx';
 import { TaskCardView } from './TaskCardView.tsx';
 
@@ -159,7 +159,7 @@ function AiRun({ task, props, myRole, swapped, onMyLine }: {
       setHistory([...turns, { speaker: 'ai', text: reply.reply }]);
       setEn((list) => [...list, reply.en]);
       if (reply.done) setDone(true);
-      void play({ text: reply.reply, voice: 'm' });
+      void play({ text: reply.reply, voice: personaVoice(task.aiRole) });
     } catch (e) {
       setError(aiErrorMessage(e));
     } finally {
@@ -194,7 +194,7 @@ function AiRun({ task, props, myRole, swapped, onMyLine }: {
           <li key={i} className={turn.speaker === 'ai' ? 'tg-ai' : 'tg-learner'}>
             <span className="label">{turn.speaker === 'ai' ? task.aiRole : nameOf(turn.speaker)}</span>
             <span lang="ja"><Ruby text={turn.text} show="all" /></span>
-            {turn.speaker === 'ai' && <AiLineTools text={turn.text} en={en[aiIndex++]} />}
+            {turn.speaker === 'ai' && <AiLineTools text={turn.text} en={en[aiIndex++]} voice={personaVoice(task.aiRole)} />}
           </li>
         ))}
       </ol>
@@ -280,11 +280,11 @@ export function VoiceLine({ disabled, onHeard, onNotice }: {
   );
 }
 
-function AiLineTools({ text, en }: { text: string; en?: string }) {
+function AiLineTools({ text, en, voice }: { text: string; en?: string; voice: VoiceId }) {
   const [shown, setShown] = useState(false);
   return (
     <span className="tg-ai-tools">
-      <button type="button" className="tg-link-btn" onClick={() => void play({ text, voice: 'm' })}>Again</button>
+      <button type="button" className="tg-link-btn" onClick={() => void play({ text, voice })}>Again</button>
       {en && (shown ? <span className="muted"> {en}</span> : (
         <button type="button" className="tg-link-btn" onClick={() => setShown(true)}>English</button>
       ))}
@@ -385,7 +385,7 @@ function Recap({ task, props, lines, repeat }: { task: TaskCard; props: SessionP
         const recap = await aiRecap({ ...(await learnerAiContext().catch(() => ({}))), goal: task.goal, lines: lines.slice(-30) });
         let cards = 0;
         for (const p of recap.points.slice(0, 2)) {
-          const card = await createGuardedCloze({ corrected: p.corrected, en: '', words: p.words, grammarUsed: p.grammarUsed }, 'recap')
+          const card = await createGuardedCloze({ corrected: p.corrected, en: p.en ?? '', words: p.words, grammarUsed: p.grammarUsed }, 'recap')
             .catch(() => null);
           if (card) cards++;
         }

@@ -4,7 +4,7 @@
 
 import type { MemberProgress } from '../../shared/api.ts';
 import { dayKey, db } from '../lib/db.ts';
-import { loadCoreWords, loadGrammar, loadKana } from '../lib/data.ts';
+import { loadCoreWords, loadGrammar, loadKana, loadUnits } from '../lib/data.ts';
 import type { GrammarPoint, ItemRecord } from '../lib/types.ts';
 import { unitOfNextGrammar } from './course.ts';
 import { daysBetween } from './days.ts';
@@ -49,15 +49,29 @@ export function reachedOrder(entries: readonly { id: string; order: number }[], 
   return reached;
 }
 
-/** pure: item ids introduced 2–21 days ago, newest first, max 20. */
-export function recentItemIds(items: readonly ItemRecord[], today: string, kinds: ReadonlySet<string>): string[] {
+/**
+ * pure: item ids introduced 2–21 days ago, max 20: the `first` ids (the units' authored task-card targets) ahead of the
+ * rest, newest first within each. Five days of new items already fill 20, so without this the partner's phone (which
+ * only sees these 20) would miss an authored target learned a week or two ago (QA V070).
+ */
+export function recentItemIds(
+  items: readonly ItemRecord[],
+  today: string,
+  kinds: ReadonlySet<string>,
+  first: ReadonlySet<string> = new Set(),
+): string[] {
   return items
     .filter((i) => {
       if (!kinds.has(i.kind) || i.via === 'placement') return false;
       const age = daysBetween(dayKey(i.introducedAt), today);
       return age >= RECENT_AGE[0] && age <= RECENT_AGE[1];
     })
-    .sort((a, b) => b.introducedAt.getTime() - a.introducedAt.getTime() || a.id.localeCompare(b.id))
+    .sort(
+      (a, b) =>
+        Number(first.has(b.id)) - Number(first.has(a.id)) ||
+        b.introducedAt.getTime() - a.introducedAt.getTime() ||
+        a.id.localeCompare(b.id),
+    )
     .slice(0, RECENT_MAX)
     .map((i) => i.id);
 }
@@ -68,7 +82,7 @@ export function recentItemIds(items: readonly ItemRecord[], today: string, kinds
  */
 export async function memberProgress(now: Date = new Date()): Promise<MemberProgress> {
   const today = dayKey(now);
-  const [items, grammar, core, kana, learned, hours, habits, readyStories] = await Promise.all([
+  const [items, grammar, core, kana, learned, hours, habits, readyStories, units] = await Promise.all([
     db.items.toArray(),
     loadGrammar(),
     loadCoreWords(),
@@ -77,7 +91,9 @@ export async function memberProgress(now: Date = new Date()): Promise<MemberProg
     hoursTotal(),
     streak(now),
     readyStoryIds(now),
+    loadUnits(),
   ]);
+  const taskTargets = new Set<string>(units.flatMap((u) => u.task?.targets ?? []));
   const introduced = new Map(items.map((i) => [i.id, dayKey(i.introducedAt)]));
   const basic = kana.filter((k) => k.kind === 'basic');
   const kanaIntroduced = basic.filter((k) => introduced.has(`kana:${k.char}`)).length;
@@ -95,7 +111,7 @@ export async function memberProgress(now: Date = new Date()): Promise<MemberProg
     longestStreak: habits.longest,
     readyStories,
     recentKanji: recentItemIds(items, today, new Set(['kanji'])).map((id) => id.slice('kanji:'.length)),
-    recentItems: recentItemIds(items, today, new Set(['core', 'word', 'grammar', 'kanji'])),
+    recentItems: recentItemIds(items, today, new Set(['core', 'word', 'grammar', 'kanji']), taskTargets),
     settledUnit: settledUnitFrom(grammar, introduced, today),
     coreReached,
     grammarReached,

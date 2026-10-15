@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Rating } from 'ts-fsrs';
+import type { WordInfo } from '../../../lib/data.ts';
 import { gradeFor, kanaMatches } from '../../../srs/answers.ts';
 import { spokenMatches } from '../../../speech/compare.ts';
 import { listen, recognitionAvailable, type Listening } from '../../../speech/recognition.ts';
@@ -8,6 +9,7 @@ import { AudioButton } from '../AudioButton.tsx';
 import { MixedText } from '../MixedText.tsx';
 import { KanaText } from './KanaText.tsx';
 import { AnswerArea, Question, SelfGrade } from './parts.tsx';
+import { shownWord, writtenMatches } from './prepare.ts';
 import type { CardProps } from './types.ts';
 
 /** Failed recognitions before "I said it — check myself" is offered. */
@@ -18,6 +20,18 @@ const REGISTER_NOTE: Record<string, string> = {
   polite: 'polite, to someone you don’t know well',
 };
 
+/** Kana or kanji: a note with Japanese in it holds the answer or a form of it ("casual: わかった", "polite: いきます"). */
+const JAPANESE = /[\u3040-\u30ff\u3400-\u9fff々〆ヵヶ]/u;
+
+/**
+ * The context note under the English. Word notes are usage notes, and nearly all that hold Japanese spell the answer
+ * or a form of it; the cue side never shows answer material (§3.2.4), so such a note gives way to the register note.
+ */
+export function cueNote(word: Pick<WordInfo, 'note' | 'register'>): string | undefined {
+  if (word.note && !JAPANESE.test(word.note)) return word.note;
+  return word.register ? REGISTER_NOTE[word.register] : undefined;
+}
+
 function online(): boolean {
   return typeof navigator === 'undefined' || navigator.onLine !== false;
 }
@@ -26,7 +40,7 @@ function online(): boolean {
  * English → say or type the Japanese. The mic appears only where speech recognition works and the phone is online;
  * after two failed recognitions the learner may grade themselves (at most Hard). Typing always works.
  */
-export function ProduceCard({ prepared, onAnswer, handsBusy }: CardProps<'produce'>) {
+export function ProduceCard({ prepared, onAnswer, handsBusy, mask }: CardProps<'produce'>) {
   const { word, display, options, answer } = prepared;
   const [canSpeak] = useState(() => recognitionAvailable() && online());
   const [listening, setListening] = useState(false);
@@ -67,7 +81,7 @@ export function ProduceCard({ prepared, onAnswer, handsBusy }: CardProps<'produc
     );
   };
 
-  const note = word.note ?? (word.register && REGISTER_NOTE[word.register]);
+  const note = cueNote(word);
   return (
     <>
       <Question ask="Say it in Japanese">
@@ -75,7 +89,7 @@ export function ProduceCard({ prepared, onAnswer, handsBusy }: CardProps<'produc
         {note && <p className="st-note"><MixedText text={note} /></p>}
         {selfCheck && (
           <div className="st-reveal">
-            <KanaText text={display} className="st-reveal-word" show="all" />
+            <KanaText text={shownWord(display, word, mask)} className="st-reveal-word" show="all" />
             <AudioButton compact source={{ ref: word.ref }} fallbackText={display} label="Listen" />
           </div>
         )}
@@ -98,7 +112,7 @@ export function ProduceCard({ prepared, onAnswer, handsBusy }: CardProps<'produc
             </div>
           )}
           <AnswerArea options={options} answer={answer} lang="ja" handsBusy={handsBusy}
-            typed={{ kind: 'kana', label: 'Or type it', check: (s) => kanaMatches(s, word.readings) }}
+            typed={{ kind: 'kana', label: 'Or type it', check: (s) => kanaMatches(s, word.readings) || writtenMatches(s, [{ written: word.written, readings: word.readings }]) }}
             onResult={(r) => answer_({ grade: gradeFor({ correct: r.correct, retries: r.retries, choice: r.mode === 'choice' }), mode: r.mode })} />
         </>
       )}

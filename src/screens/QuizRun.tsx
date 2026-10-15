@@ -16,7 +16,7 @@ import { Glyph } from '../components/Glyph.tsx';
 import { ConnectServerForm } from '../components/together/ConnectServerForm.tsx';
 import { useFocusWhenLost } from '../components/together/focus.ts';
 import { memberName, midSentence } from '../components/together/household.ts';
-import { QuizAnswerer, QuizAsker, resultOf } from '../components/together/PartnerQuiz.tsx';
+import { QuizAnswerer, QuizAsker, resultOf, type TogetherQuizKind } from '../components/together/PartnerQuiz.tsx';
 import { readingFor } from '../components/together/kanjiReading.ts';
 import { finishQuiz, useQuizzes, useResultDelivery, type ResultDelivery } from '../components/together/quizzes.ts';
 import '../components/together/together.css';
@@ -231,7 +231,7 @@ function AskQuiz({ quiz, answererName }: { quiz: Quiz; answererName: string }) {
       <Screen label="Quiz">
         <TopBar close="/together" title={`${answererName}'s ${KIND_NAME[quiz.kind as keyof typeof KIND_NAME]}`} heading={false} />
         <h1 className="visually-hidden">Ask {answererName}</h1>
-        <QuizAsker items={items} index={index} answererName={answererName} kind={quiz.kind as 'partner'}
+        <QuizAsker items={items} index={index} answererName={answererName} kind={quiz.kind as TogetherQuizKind}
           onVerdict={(verdict) => setVerdicts((v) => (v.length === index ? [...v, { key: items[index].key, verdict }] : v))} />
       </Screen>
     );
@@ -265,9 +265,9 @@ function TogetherQuizSummary({ quiz, answeredByMe, otherName }: { quiz: Quiz; an
   if (answeredByMe && !result) {
     return (
       <Screen label="Quiz">
-        <TopBar back="/together" title={`Your ${what}`} heading={false} />
-        <h1 className="visually-hidden">Your {what}</h1>
-        <QuizAnswerer item={items[index]} index={index} total={items.length} askerName={otherName} />
+        <TopBar back="/together" title={`Your ${what}`} />
+        <QuizAnswerer item={items[index]} index={index} total={items.length} askerName={otherName}
+          kind={quiz.kind as TogetherQuizKind} />
         <div className="tg-button-row">
           <button type="button" className="btn secondary small" disabled={index === 0} onClick={() => setIndex(index - 1)}>Back</button>
           <button type="button" className="btn secondary small" disabled={index + 1 >= items.length} onClick={() => setIndex(index + 1)}>Next</button>

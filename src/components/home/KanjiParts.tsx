@@ -155,7 +155,8 @@ export function CardStatus({ item, cards, justLearned = false }: {
   return (
     <section ref={section} className="card kd-status" aria-label="Your progress" tabIndex={justLearned ? -1 : undefined}>
       <div>
-        <span className="kd-stat-label">Learned</span>
+        {/* The day it was introduced: "learned" is 3 spaced successes, which this date isn't. */}
+        <span className="kd-stat-label">First met</span>
         <span className="kd-stat">{DAY.format(item.introducedAt)}</span>
       </div>
       <div>

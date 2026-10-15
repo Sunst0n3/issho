@@ -13,10 +13,12 @@ import type {
 } from '../../../shared/api.ts';
 import type { WordInfo } from '../../lib/data.ts';
 import { dayKey, db, updateSettings } from '../../lib/db.ts';
-import type { RolePlay, StoryEntry, TaskCard, TogetherWeekPlan, UnitSpec } from '../../lib/types.ts';
+import type { Curriculum, GrammarPoint, RolePlay, StoryEntry, TaskCard, TogetherWeekPlan, UnitSpec } from '../../lib/types.ts';
 import TogetherSession from '../../screens/TogetherSession.tsx';
 import { resetAiAvailability } from './ai.ts';
+import { Capstone } from './Capstone.tsx';
 import { CheckIn } from './CheckIn.tsx';
+import { askerPrompt, QuizAnswerer, QuizAsker } from './PartnerQuiz.tsx';
 import { resetQuizzes } from './quizzes.ts';
 import { resetLiveInvites } from './session.ts';
 
@@ -82,9 +84,11 @@ const mocks = vi.hoisted(() => ({
   plan: undefined as unknown as TogetherWeekPlan,
   live: new Set<(memberId: string, state: TogetherLiveState) => void>(),
   sendLive: vi.fn((_state: TogetherLiveState) => true),
-  postTogetherEvent: vi.fn(async (_event: TogetherEvent) => {}),
+  postTogetherEvent: vi.fn(async (_event: TogetherEvent, _now?: Date) => {}),
   creditTogetherSession: vi.fn(async () => true),
-  spendRestToken: vi.fn(async () => 'ok' as const),
+  spendRestToken: vi.fn(async (_date: string) => 'ok' as const),
+  cancelPlannedToken: vi.fn(async (_date: string) => {}),
+  grammarIndex: new Map<string, GrammarPoint>(),
   buildQuizPool: vi.fn(async (_kind: string): Promise<PartnerQuizItem[]> => []),
   applyLocalVerdicts: vi.fn(async () => ({ graded: 1, practiced: 0 })),
   teachMeKanji: vi.fn(async () => '水'),
@@ -139,7 +143,11 @@ vi.mock('../../srs/together.ts', () => ({
   taskTargets: mocks.taskTargets,
   weeklyCheckinCounts: mocks.weeklyCheckinCounts,
 }));
-vi.mock('../../srs/habits.ts', () => ({ creditTogetherSession: mocks.creditTogetherSession, spendRestToken: mocks.spendRestToken }));
+vi.mock('../../srs/habits.ts', () => ({
+  creditTogetherSession: mocks.creditTogetherSession,
+  spendRestToken: mocks.spendRestToken,
+  cancelPlannedToken: mocks.cancelPlannedToken,
+}));
 vi.mock('../../srs/memberProgress.ts', () => ({ memberProgress: mocks.memberProgress }));
 vi.mock('../../srs/output.ts', () => ({ learnerAiContext: async () => ({ knownGrammar: ['wa-desu'] }) }));
 vi.mock('../../srs/sentenceGuard.ts', () => ({ createGuardedCloze: mocks.createGuardedCloze }));
@@ -155,11 +163,21 @@ vi.mock('../../lib/data.ts', async (importOriginal) => ({
   loadRolePlays: async () => SCRIPTS,
   loadStories: async () => STORIES,
   loadKanji: async () => ({ 木: { char: '木', meanings: ['tree'] }, 水: { char: '水', meanings: ['water'] } }),
-  loadGrammarIndex: async () => new Map(),
+  loadGrammarIndex: async () => mocks.grammarIndex,
+  // 木 was taught with き "tree"; 水 has no anchor word.
+  loadCurriculum: async (): Promise<Curriculum> => ({
+    version: 2,
+    units: [
+      { index: 0, char: '木', anchor: 'core:cw-9', staged: [], inferable: false, chapter: 1 },
+      { index: 1, char: '水', anchor: null, staged: [], inferable: false, chapter: 1 },
+    ],
+    confusables: [],
+  }),
   strokesFor: async () => ['M10 10 L90 10'],
   loadWordInfo: async () => (ref: string): WordInfo | undefined => ({
     'core:cw-1': { ref: 'core:cw-1', written: 'すし', kana: 'すし', en: 'sushi', kanji: [], use: true, readings: ['すし'] },
     'core:cw-2': { ref: 'core:cw-2', written: 'ラーメン', kana: 'ラーメン', en: 'ramen', kanji: [], use: true, readings: ['ラーメン'] },
+    'core:cw-9': { ref: 'core:cw-9', written: '木', kana: 'き', en: 'tree; wood', kanji: ['木'], use: false, readings: ['き'] },
   } as Record<string, WordInfo>)[ref],
 }));
 vi.mock('../../screens/CanDoCheck.tsx', () => ({
@@ -217,6 +235,7 @@ beforeEach(async () => {
   mocks.recognition = false;
   // Listeners remove themselves on unmount; the invite store's own listener lives as long as the app.
   mocks.buildQuizPool.mockResolvedValue(ITEMS);
+  mocks.grammarIndex = new Map();
   mocks.getQuizzes.mockRejectedValue(new Error('offline'));
   await updateSettings({ name: 'Aiko', deviceToken: 'token', memberId: 'me' });
 });
@@ -303,6 +322,9 @@ describe('Session A on two phones', () => {
     };
     await screen.findByRole('heading', { name: 'Session A · Quiz & conversation' });
     emit('ken', kens);
+    // Ken is already in: the two-phone option says so instead of telling him to open it.
+    expect(await screen.findByText('Ken is already in. Join them above.')).toBeTruthy();
+    expect(screen.queryByText('Ken opens this session on their phone too.')).toBeNull();
     await clickSoon('Join Ken');
 
     // Ken answers first: this phone asks his quiz.
@@ -564,6 +586,8 @@ describe('Weekly check-in', () => {
     expect((await screen.findByText('Minutes')).nextSibling?.textContent).toBe('95');
     fireEvent.change(screen.getByLabelText('Can-do you managed'), { target: { value: 'u01-cd1' } });
     fireEvent.change(screen.getByLabelText('Session A day'), { target: { value: '3' } });
+    // The rest days open once the ones already planned are known.
+    await waitFor(() => expect(screen.getAllByRole('checkbox')[0]).toHaveProperty('disabled', false));
     fireEvent.click(screen.getAllByRole('checkbox')[0]);
     click('Save the check-in');
 
@@ -629,8 +653,18 @@ describe('Monthly session', () => {
 
     expect(await screen.findByRole('heading', { name: 'Lunch date' })).toBeTruthy();
     expect(events()).toContainEqual({ type: 'goal', goal: { text: 'Order a whole dinner in Japanese', targetDate: '2026-11-30' } });
-    fireEvent.change(screen.getByLabelText('Next line'), { target: { value: 'すしが すき' } });
-    click('Add');
+    // Ready to perform only with the lines each and the structures used.
+    const perform = screen.getByRole('button', { name: 'Perform it' });
+    expect(perform).toHaveProperty('disabled', true);
+    expect(screen.getByText('Keep going: 2 more lines for Aiko · 2 more lines for Ken · 2 more structures to use.')).toBeTruthy();
+    for (const line of ['すしを ください', 'はい、どうぞ', 'すしが すき', 'わたしも すき']) {
+      fireEvent.change(screen.getByLabelText('Next line'), { target: { value: line } });
+      click('Add');
+    }
+    expect(screen.getByText('Keep going: 2 more structures to use.')).toBeTruthy();
+    expect(perform).toHaveProperty('disabled', true);
+    for (const box of screen.getAllByRole('checkbox')) fireEvent.click(box);
+    expect(perform).toHaveProperty('disabled', false);
     click('Perform it');
     await clickSoon('We performed it');
 
@@ -638,5 +672,187 @@ describe('Monthly session', () => {
     expect(events()).toContainEqual({ type: 'capstone-done', unit: 1, date: dayKey() });
     await waitFor(() => expect(events()).toContainEqual(expect.objectContaining({ type: 'session-done', session: 'monthly' })));
     expect(mocks.creditTogetherSession).toHaveBeenCalledWith('monthly', expect.any(Number), dayKey());
+  });
+});
+
+describe('Capstone checklist', () => {
+  const point = (id: string, title: string, pattern: string) => ({ id, title, pattern }) as GrammarPoint;
+  const IDS = ['wa-desu', 'ka-question', 'kore-sore-are', 'mo-also', 'ne-yo', 'numbers-prices', 'masu-forms'];
+
+  it('shows the structures as grammar patterns, and needs 6 of them and the lines on this phone in duo', async () => {
+    mocks.grammarIndex = new Map([
+      point('wa-desu', '〜は〜です — "X is Y"', '〜は〜です'),
+      point('ka-question', '〜ですか — asking questions', '〜ですか'),
+      point('kore-sore-are', 'これ・それ・あれ — "this, that, that over there"', 'これ・それ・あれ・どれ'),
+      point('mo-also', '〜も — "too, also"', '〜も'),
+      point('ne-yo', '〜ね・〜よ — "right?" and "you know"', '〜ね・〜よ'),
+      point('numbers-prices', 'いくらですか — numbers and prices', 'いくらですか・〜{円|えん}です'),
+      point('masu-forms', '〜ます・〜ません — polite verbs', '〜ます・〜ません'),
+    ].map((g) => [g.id, g]));
+    const unit = { ...UNITS[0], id: 2, capstone: { title: 'Our little café', brief: 'Run a café.', minLinesEach: 2, structures: IDS } };
+    const onDone = vi.fn();
+    render(<Capstone unit={unit} duo me={{ id: 'me', name: 'Aiko' }} partner={{ id: 'ken', name: 'Ken' }} aiOn={false} onDone={onDone} />);
+
+    expect(await screen.findByText('〜は〜です — "X is Y"')).toBeTruthy();
+    expect(screen.getByText('いくらですか — numbers and prices')).toBeTruthy();
+    for (const id of IDS) expect(screen.queryByText(id)).toBeNull();
+    expect(screen.getByText('Use at least 6 of these (0 of 7 ticked)')).toBeTruthy();
+    // In duo the partner writes on their phone: only this phone's lines count here.
+    expect(screen.getByText('Keep going: 2 more lines for you · 6 more structures to use.')).toBeTruthy();
+
+    for (const line of ['いらっしゃいませ', 'コーヒーは 300えんです']) {
+      fireEvent.change(screen.getByLabelText('Next line'), { target: { value: line } });
+      click('Add');
+    }
+    const boxes = screen.getAllByRole('checkbox');
+    for (const box of boxes.slice(0, 5)) fireEvent.click(box);
+    expect(screen.getByRole('button', { name: 'Perform it' })).toHaveProperty('disabled', true);
+    expect(screen.getByText('Keep going: 1 more structure to use.')).toBeTruthy();
+    fireEvent.click(boxes[5]);
+    expect(screen.getByRole('button', { name: 'Perform it' })).toHaveProperty('disabled', false);
+
+    // Not ready this month: skipping moves on without marking the capstone done.
+    click('Skip the skit this time');
+    expect(onDone).toHaveBeenCalled();
+    expect(events().some((e) => e.type === 'capstone-done')).toBe(false);
+  });
+});
+
+describe('Partner quiz views', () => {
+  const READ: PartnerQuizItem = { key: 'core:cw-0189|read', kind: 'read', prompt: '言う', answer: 'いう' };
+  const WORD: PartnerQuizItem = { key: 'kanji:員|write', kind: 'write', prompt: 'かいしゃいん · office worker', answer: '会社員' };
+
+  it('shows a read item’s word to the answerer, and tells the asker not to say it', () => {
+    render(<QuizAnswerer item={READ} index={0} total={2} askerName="Aiko" />);
+    expect(screen.getByText('言う')).toBeTruthy();
+    expect(screen.getByText('Read this word aloud. Aiko has the answer.')).toBeTruthy();
+    expect(screen.queryByText('いう')).toBeNull();
+    cleanup();
+
+    render(<QuizAsker items={[READ]} index={0} answererName="Ken" kind="partner" duo onVerdict={() => {}} />);
+    expect(screen.getByText("They read this word aloud from their phone. Don't say it for them.")).toBeTruthy();
+    expect(screen.getByText('いう')).toBeTruthy();
+  });
+
+  it('keeps a read item’s answer covered on one phone, where the asker shows the screen', () => {
+    const items = [READ, { ...READ, key: 'core:cw-0120|read', prompt: '二', answer: 'に' }];
+    const view = render(<QuizAsker items={items} index={0} answererName="Ken" kind="partner" onVerdict={() => {}} />);
+    expect(screen.getByText('Show them the word, not the answer. They read it aloud.')).toBeTruthy();
+    expect(screen.getByText('言う')).toBeTruthy();
+    expect(screen.queryByText('いう')).toBeNull();
+    click('Show the answer');
+    expect(screen.getByText('いう')).toBeTruthy();
+    // The next word starts covered again.
+    view.rerender(<QuizAsker items={items} index={1} answererName="Ken" kind="partner" onVerdict={() => {}} />);
+    expect(screen.queryByText('に')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Show the answer' })).toBeTruthy();
+  });
+
+  it('starts the other direction covered on one phone, even at the index whose answer was shown', async () => {
+    const kensRead: PartnerQuizItem = { key: 'core:cw-0120|read', kind: 'read', prompt: '二', answer: 'に' };
+    mocks.plan = weekPlan({ conversation: { scriptId: 'rp-u01', stage: 2 } });
+    mocks.buildQuizPool.mockResolvedValue([READ]);
+    const kensQuiz: Quiz = { id: 'q-ken', kind: 'partner', fromMemberId: 'ken', toMemberId: 'me', createdAt: '2026-10-15T10:00:00Z', items: [kensRead] };
+    mocks.getQuizzes.mockResolvedValue({ inbox: [kensQuiz], sent: [] });
+    renderSession('A');
+    await clickSoon('Start');
+    expect(await screen.findByText(/Hand the phone to Ken/)).toBeTruthy();
+    click('Show the answer');
+    expect(screen.getByText('いう')).toBeTruthy();
+    click('Right');
+    // Ken's waiting quiz, also a read item at index 0: its answer stays covered.
+    expect(await screen.findByText(/Take the phone back/)).toBeTruthy();
+    expect(screen.getByText('二')).toBeTruthy();
+    expect(screen.queryByText('に')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Show the answer' })).toBeTruthy();
+  });
+
+  it('reads out English, never a note that holds the answer', () => {
+    const produce: PartnerQuizItem = {
+      key: 'core:cw-0056|produce', kind: 'produce', prompt: 'congratulations (polite: おめでとうございます)', answer: 'おめでとう',
+    };
+    expect(askerPrompt(produce)).toBe('congratulations');
+    expect(askerPrompt({ ...produce, prompt: 'Japan (country)', answer: '{日本|にほん}' })).toBe('Japan (country)');
+    expect(askerPrompt({ ...produce, prompt: 'say にほん', answer: '{日本|にほん}' })).toBe('say …');
+    render(<QuizAsker items={[produce]} index={0} answererName="Ken" kind="partner" duo onVerdict={() => {}} />);
+    expect(screen.getByText('Read the English out. They say it in Japanese.')).toBeTruthy();
+    expect(screen.getByText('congratulations')).toBeTruthy();
+  });
+
+  it('lets the answerer write a dictation word whole, one kanji at a time', async () => {
+    render(<QuizAnswerer item={WORD} index={0} total={5} askerName="Aiko" kind="dictation" />);
+    expect(screen.getByRole('heading', { name: 'Your turn: write the word you hear' })).toBeTruthy();
+    expect(screen.getByText('Aiko reads a word aloud. Write the whole word in kanji, here or on paper.')).toBeTruthy();
+    expect(screen.queryByText('会社員')).toBeNull();
+    expect(screen.getByText('Kanji 1 of 3')).toBeTruthy();
+    expect(await screen.findByRole('img', { name: 'Pad for your answer' })).toBeTruthy();
+    click('Next kanji');
+    expect(screen.getByText('Kanji 2 of 3')).toBeTruthy();
+    click('Next kanji');
+    expect(screen.getByText('Kanji 3 of 3')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Next kanji' })).toBeNull();
+  });
+
+  it('runs a one-phone dictation practice round from the partner’s anchor words', async () => {
+    mocks.plan = weekPlan({});
+    mocks.buildQuizPool.mockResolvedValue([WORD]);
+    renderSession('C');
+    await clickSoon('Start');
+    await runRetell([]);
+
+    // Aiko's own dictation: Ken reads the kana.
+    expect(await screen.findByText('Read the kana aloud. They write the whole word in kanji.')).toBeTruthy();
+    expect(screen.getByText('かいしゃいん · office worker')).toBeTruthy();
+    click('Right');
+
+    // Ken's practice round: his recent kanji 木 as its anchor word, read as kana.
+    expect(await screen.findByText(/Practice round/)).toBeTruthy();
+    expect(screen.getByText('Read the kana aloud. They write the whole word in kanji.')).toBeTruthy();
+    expect(screen.getByText('き · tree')).toBeTruthy();
+    expect(screen.queryByText(/Write the kanji for/)).toBeNull();
+  });
+});
+
+describe('Weekly check-in, rest days and next week', () => {
+  it('starts with the rest days already planned ticked, gives back an unticked one, and reads "Mon 19"', async () => {
+    await db.restTokens.bulkPut([
+      { date: '2026-10-19', week: '2026-10-19', usedAt: new Date() },
+      { date: '2026-10-21', week: '2026-10-19', usedAt: new Date() },
+    ]);
+    const onSaved = vi.fn();
+    render(<CheckIn week="2026-10-12" units={UNITS} settledUnit={1} slots={[]} onSaved={onSaved} />);
+    await screen.findByText('Minutes');
+    const mon = await screen.findByLabelText<HTMLInputElement>('Mon 19');
+    await waitFor(() => expect(mon.checked).toBe(true));
+    expect(screen.getByLabelText<HTMLInputElement>('Wed 21').checked).toBe(true);
+    // Two a week: the others wait until one is unticked.
+    expect(screen.getByLabelText<HTMLInputElement>('Fri 23').disabled).toBe(true);
+    fireEvent.click(screen.getByLabelText('Wed 21'));
+    fireEvent.click(screen.getByLabelText('Fri 23'));
+    click('Save the check-in');
+
+    await waitFor(() => expect(onSaved).toHaveBeenCalled());
+    expect(mocks.cancelPlannedToken).toHaveBeenCalledWith('2026-10-21');
+    expect(mocks.spendRestToken.mock.calls.map(([d]) => d)).toEqual(['2026-10-19', '2026-10-23']);
+    expect(events()).toContainEqual(expect.objectContaining({
+      type: 'checkin', checkin: expect.objectContaining({ plannedRest: ['2026-10-19', '2026-10-23'] }),
+    }));
+  });
+
+  it('files changed slots under next week, so this week’s sessions stay put', async () => {
+    const ours: TogetherSlot[] = [
+      { session: 'A', weekday: 5, time: '20:00' },
+      { session: 'B', weekday: 4, time: '20:00' },
+      { session: 'C', weekday: 7, time: '19:30' },
+    ];
+    const onSaved = vi.fn();
+    render(<CheckIn week="2026-10-12" units={UNITS} settledUnit={1} slots={ours} onSaved={onSaved} />);
+    await screen.findByText('Minutes');
+    fireEvent.change(screen.getByLabelText('Session A day'), { target: { value: '2' } });
+    click('Save the check-in');
+    await waitFor(() => expect(onSaved).toHaveBeenCalled());
+    const call = mocks.postTogetherEvent.mock.calls.find(([e]) => e.type === 'slots');
+    expect(call?.[0]).toEqual({ type: 'slots', slots: [{ ...ours[0], weekday: 2 }, ours[1], ours[2]] });
+    expect(call?.[1] && dayKey(call[1])).toBe('2026-10-19');
   });
 });

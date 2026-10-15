@@ -1,12 +1,13 @@
 import { clipRef } from '../../../../shared/voicevox.ts';
 import { AudioButton } from '../AudioButton.tsx';
-import { useAutoPlay } from './parts.tsx';
+import { Blanked, useAutoPlay } from './parts.tsx';
 import type { CardProps } from './types.ts';
 import { WriteQuestion } from './WriteQuestion.tsx';
 
 /**
  * Sound → write the kana. During the sprint the prompt is the sound only (played at once, with a replay button):
- * never a romaji label. After it, the kana's example word with the kana as □, its English and its audio.
+ * never a romaji label. After it, the kana's example word with the kana as □, its English and its audio. Names read
+ * by screen readers never spell the □ ("white square"): they name the word by its English.
  */
 export function KanaWriteCard({ prepared, onAnswer, paperAllowed }: CardProps<'kana-write'>) {
   const { kana, prompt, word, blanked, row } = prepared;
@@ -19,14 +20,14 @@ export function KanaWriteCard({ prepared, onAnswer, paperAllowed }: CardProps<'k
     </div>
   ) : (
     <div className="st-row st-center">
-      <span lang="ja">{blanked}</span>
+      {blanked && <span lang="ja"><Blanked text={blanked} /></span>}
       {word && <span className="st-write-en">· {word.en}</span>}
-      {word && <AudioButton compact source={{ ref: clipRef.kanaEx(kana.char) }} fallbackText={word.kana} label={`Listen to ${blanked}`} />}
+      {word && <AudioButton compact source={{ ref: clipRef.kanaEx(kana.char) }} fallbackText={word.kana} label="Listen to the word" />}
     </div>
   );
   return (
     <WriteQuestion char={kana.char} ask={sound ? `Write the ${kana.script} you hear` : `Write the missing ${kana.script}`}
-      target={target} label={sound ? `the ${kana.script} you hear` : `the missing ${kana.script} in ${blanked}`}
+      target={target} label={sound ? `the ${kana.script} you hear` : word ? `the missing ${kana.script} in the word for "${word.en}"` : `the missing ${kana.script}`}
       paperAllowed={paperAllowed} onAnswer={onAnswer} />
   );
 }

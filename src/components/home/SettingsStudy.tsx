@@ -1,8 +1,10 @@
 // Settings: You, Study and Appearance sections.
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useId, useState, type ReactNode } from 'react';
-import { db, getSettings, MAX_WRITE_LIST, RECEPTIVE_RETENTIONS, updateSettings } from '../../lib/db.ts';
-import type { DailyMinutes, KanaScript, Settings } from '../../lib/types.ts';
+import { loadCurriculum, loadKana } from '../../lib/data.ts';
+import { db, getSettings, itemId, MAX_WRITE_LIST, RECEPTIVE_RETENTIONS, updateSettings } from '../../lib/db.ts';
+import type { DailyMinutes, KanaEntry, KanaScript, Settings } from '../../lib/types.ts';
+import { PLACEMENT_PASS } from '../../srs/course.ts';
 import { syncWriteRetirement } from '../../srs/items.ts';
 import { speak, ttsAvailable, useJapaneseVoices } from '../../speech/tts.ts';
 import { isPairedSettings } from '../../sync/client.ts';
@@ -129,13 +131,28 @@ export function writeListStop(size: number): number {
   return Math.max(0, Math.min(WRITE_LIST_STOPS, Math.round(size / WRITE_LIST_STEP)));
 }
 
+/**
+ * pure: pinned kanji beyond a handwriting list of `size` (curriculum rank above it, or not in the curriculum).
+ * A pin inside the list changes nothing, so it isn't counted.
+ */
+export function pinnedBeyond(pinnedRanks: readonly (number | undefined)[], size: number): number {
+  return pinnedRanks.filter((rank) => rank === undefined || rank > size).length;
+}
+
+/** Curriculum rank (1-based) of each pinned kanji; undefined for one outside the curriculum. */
+async function pinnedRanks(): Promise<(number | undefined)[]> {
+  const [pinned, curriculum] = await Promise.all([
+    db.items.where('kind').equals('kanji').filter((i) => Boolean(i.pinned)).toArray(),
+    loadCurriculum(),
+  ]);
+  const ranks = new Map(curriculum.units.map((u) => [u.char, u.index + 1]));
+  return pinned.map((i) => ranks.get(i.key));
+}
+
 /** The write list: kanji ranked within it keep their handwriting card; the rest retire once solid. */
 function WriteListRow({ settings }: { settings: Settings }) {
   const id = useId();
-  const pinned = useLiveQuery(
-    () => db.items.where('kind').equals('kanji').filter((i) => Boolean(i.pinned)).count(),
-    [],
-  );
+  const ranks = useLiveQuery(() => pinnedRanks().catch(() => []), []);
   const [status, setStatus] = useState<string>();
   const [value, setValue] = useDraft(settings.writeList, async (writeList: number) => {
     await updateSettings({ writeList });
@@ -150,6 +167,7 @@ function WriteListRow({ settings }: { settings: Settings }) {
     }
   }, 400);
   const text = (n: number) => `${n.toLocaleString()} kanji kept in handwriting`;
+  const pinned = ranks ? pinnedBeyond(ranks, value) : 0;
   return (
     <div className="set-row set-range">
       <div className="set-range-head">
@@ -175,23 +193,53 @@ function rateChoice(rate: number | undefined): RateChoice {
   return rate < 0.95 ? '0.85' : '1';
 }
 
+/** How much of a script's basic kana the course already has (taught, or passed in a check). */
+export type ScriptTaught = 'none' | 'some' | 'all';
+
+/** pure */
+export function scriptTaught(kana: readonly KanaEntry[], introduced: ReadonlySet<string>, script: KanaScript): ScriptTaught {
+  const basic = kana.filter((k) => k.script === script && k.kind === 'basic');
+  const n = basic.filter((k) => introduced.has(itemId('kana', k.char))).length;
+  if (n === 0) return 'none';
+  return n >= basic.length ? 'all' : 'some';
+}
+
+async function loadScriptTaught(script: KanaScript): Promise<ScriptTaught> {
+  const [kana, ids] = await Promise.all([loadKana(), db.items.where('kind').equals('kana').primaryKeys()]);
+  return scriptTaught(kana, new Set(ids.map(String)), script);
+}
+
 /**
- * A re-check from Settings. A pass moves the script's kana into reviews (as in onboarding). A fail changes
- * nothing: kana already passed stay in reviews, and the others are taught by the course as planned, so
- * no sprint length is promised (the learner may be in the middle of it, or past it).
+ * pure: what a pass does, as the re-check's intro says it. Once the course has taught the script there are
+ * no lessons left to skip.
  */
-export function recheckSummary(r: PlacementResult, passedBefore: boolean): PlacementSummary {
+export function recheckPassNote(script: KanaScript, taught: ScriptTaught): string {
+  if (taught === 'all') return `All your ${script} are in your course already, so this only shows how well you know them: your reviews carry on either way.`;
+  if (taught === 'some') return `${PLACEMENT_PASS} or more right and the course skips the ${script} lessons still to come.`;
+  return `${PLACEMENT_PASS} or more right and you skip the ${script} lessons.`;
+}
+
+/**
+ * A re-check from Settings. A pass moves the script's kana into reviews (as in onboarding), and skips the
+ * lessons still to come. A fail changes nothing: kana already passed or taught stay in reviews, and the
+ * others are taught by the course as planned, so no sprint length is promised (the learner may be in the
+ * middle of it, or past it).
+ */
+export function recheckSummary(r: PlacementResult, passedBefore: boolean, taught: ScriptTaught = 'none'): PlacementSummary {
+  const inReviews = passedBefore || taught === 'all';
   if (r.outcome === 'known') {
     return {
       title: placementText(r, false),
-      detail: passedBefore
+      detail: inReviews
         ? `Your ${r.script} stay in your reviews.`
-        : `Your ${r.script} move into your reviews, and the course skips their lessons.`,
+        : taught === 'some'
+          ? `The rest of your ${r.script} move into your reviews, and the course skips their lessons.`
+          : `Your ${r.script} move into your reviews, and the course skips their lessons.`,
     };
   }
   return {
     title: `${r.correct}/${r.total} — nothing changes`,
-    detail: passedBefore
+    detail: inReviews
       ? `Your ${r.script} stay in your reviews, which keep them fresh.`
       : `The course teaches and reviews ${r.script} as planned.`,
   };
@@ -199,22 +247,26 @@ export function recheckSummary(r: PlacementResult, passedBefore: boolean): Place
 
 function PlacementRow({ settings }: { settings: Settings }) {
   const known = (s: KanaScript) => (s === 'hiragana' ? settings.knowsHiragana : settings.knowsKatakana);
-  // Whether the script was passed before this check (a pass sets it, so it is read at the start).
-  const [checking, setChecking] = useState<{ script: KanaScript; passedBefore: boolean }>();
+  // Whether the script was passed before this check (a pass sets it, so it is read at the start), and how
+  // much of it the course has taught.
+  const [checking, setChecking] = useState<{ script: KanaScript; passedBefore: boolean; taught: ScriptTaught }>();
   const [result, setResult] = useState<PlacementSummary>();
   if (checking) {
-    const summary = (r: PlacementResult) => recheckSummary(r, checking.passedBefore);
+    const summary = (r: PlacementResult) => recheckSummary(r, checking.passedBefore, checking.taught);
     return (
       <div className="set-row">
-        <PlacementCheck script={checking.script} summary={summary}
+        <PlacementCheck script={checking.script} summary={summary} passNote={recheckPassNote(checking.script, checking.taught)}
           onDone={(r) => { setResult(summary(r)); setChecking(undefined); }}
           onCancel={() => setChecking(undefined)} />
       </div>
     );
   }
-  const start = (script: KanaScript) => {
+  const start = async (script: KanaScript) => {
     setResult(undefined);
-    setChecking({ script, passedBefore: known(script) });
+    const passedBefore = known(script);
+    // Unreadable data only loses the finer wording: the check itself still runs.
+    const taught = await loadScriptTaught(script).catch((): ScriptTaught => 'none');
+    setChecking({ script, passedBefore, taught });
   };
   return (
     <div className="set-row">
@@ -225,10 +277,10 @@ function PlacementRow({ settings }: { settings: Settings }) {
         {known('katakana') && ' Katakana: passed.'}
       </p>
       <div className="set-buttons">
-        <button type="button" className="btn secondary small" onClick={() => start('hiragana')}>
+        <button type="button" className="btn secondary small" onClick={() => void start('hiragana')}>
           Check hiragana
         </button>
-        <button type="button" className="btn secondary small" onClick={() => start('katakana')}>
+        <button type="button" className="btn secondary small" onClick={() => void start('katakana')}>
           Check katakana
         </button>
       </div>

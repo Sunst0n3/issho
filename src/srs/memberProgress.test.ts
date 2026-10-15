@@ -59,6 +59,23 @@ describe('recentItemIds', () => {
     expect(recent).not.toContain('word:old');
     expect(recent[0]).toBe('word:0');
   });
+
+  it("keeps the units' task targets learned 2–21 days ago, even behind 20 newer items (QA V070)", () => {
+    const items: ItemRecord[] = [
+      ...Array.from({ length: 24 }, (_, i): ItemRecord => ({ id: `core:cw-${200 + i}`, kind: 'core', key: `cw-${200 + i}`, introducedAt: ago(2 + i / 8) })),
+      { id: 'core:cw-0105', kind: 'core', key: 'cw-0105', introducedAt: ago(9.1) },
+      { id: 'grammar:numbers-prices', kind: 'grammar', key: 'numbers-prices', introducedAt: ago(15.1) },
+      { id: 'grammar:mo-also', kind: 'grammar', key: 'mo-also', introducedAt: ago(22.1) },
+    ];
+    const targets = new Set(['core:cw-0105', 'grammar:numbers-prices', 'grammar:mo-also', 'grammar:ne-yo']);
+    const recent = recentItemIds(items, '2026-03-20', new Set(['core', 'grammar']), targets);
+    expect(recent).toHaveLength(20);
+    expect(recent.slice(0, 2)).toEqual(['core:cw-0105', 'grammar:numbers-prices']);
+    expect(recent).not.toContain('grammar:mo-also'); // 22 days: outside the window
+    expect(recent[2]).toBe('core:cw-200');
+    // Without the targets, both fall off the end.
+    expect(recentItemIds(items, '2026-03-20', new Set(['core', 'grammar']))).not.toContain('core:cw-0105');
+  });
 });
 
 describe('memberProgress', () => {

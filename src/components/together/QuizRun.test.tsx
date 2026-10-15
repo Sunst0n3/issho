@@ -382,6 +382,18 @@ describe('QuizRun', () => {
       expect(screen.queryByRole('button', { name: 'Right' })).toBeNull();
     });
 
+    it('names your own quiz once, and shows a read item\u2019s word but not its reading', async () => {
+      const read: PartnerQuizItem = { key: 'core:cw-0189|read', kind: 'read', prompt: '言う', answer: 'いう' };
+      const mine: Quiz = { ...PARTNER_QUIZ, id: 'q4', fromMemberId: 'me', toMemberId: 'ken', items: [read] };
+      mocks.getQuizzes.mockResolvedValue({ inbox: [], sent: [mine] });
+      renderQuiz('q4');
+
+      expect(await screen.findByRole('heading', { name: 'Your quiz', level: 1 })).toBeTruthy();
+      expect(screen.getAllByText('Your quiz')).toHaveLength(1);
+      expect(screen.getByText('言う')).toBeTruthy();
+      expect(screen.queryByText('いう')).toBeNull();
+    });
+
     it('still runs a kanji quiz cached without a kind by a v1 phone', async () => {
       const { kind: _kind, ...old } = QUIZ;
       mocks.getQuizzes.mockResolvedValue({ inbox: [old], sent: [] });

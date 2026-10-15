@@ -5,8 +5,9 @@ import { useId, useMemo, useState } from 'react';
 import { dayKey, db, updateSettings } from '../../lib/db.ts';
 import type { Settings } from '../../lib/types.ts';
 import { cancelPlannedToken, setTravel, spendRestToken, TOKENS_PER_WEEK, TRAVEL_MAX_DAYS } from '../../srs/habits.ts';
+import { useCurrentPlan } from './householdPlan.ts';
 import { dayLabel, shiftDay } from './labels.ts';
-import { CopingField, cueDraft, CueFields, cueFromDraft, completeSlots, sameCue, type CueDraft } from './planControls.tsx';
+import { CopingField, cueDraft, CueFields, cueFromDraft, cueProblem, completeSlots, sameCue, type CueDraft } from './planControls.tsx';
 import { AddToCalendar, reminderSeed } from './RemindersStep.tsx';
 import { SettingsSection } from './SettingsStudy.tsx';
 import { useDraft } from './useDraft.ts';
@@ -130,10 +131,13 @@ export function HabitsSection({ settings }: { settings: Settings }) {
   const [coping, setCoping] = useDraft(settings.coping ?? '', (v: string) => updateSettings({ coping: v.trim() || undefined }), 600,
     (saved, draft) => saved === draft.trim());
   const savedCue = cueFromDraft(cue);
+  // The household's sessions while paired (the partner may have moved one), not only this phone's copy.
+  const { slots } = useCurrentPlan(settings);
   return (
     <SettingsSection id="set-habits" title="Habits">
       <div className="set-row">
-        <CueFields draft={cue} onChange={setCue} />
+        {/* A half-filled cue isn't saved (the last whole one stays): say what's missing. */}
+        <CueFields draft={cue} onChange={setCue} problem={cueProblem(cue)} />
       </div>
       <div className="set-row">
         <CopingField value={coping} onChange={setCoping} />
@@ -146,7 +150,7 @@ export function HabitsSection({ settings }: { settings: Settings }) {
         <AddToCalendar label="Download reminders (.ics)"
           input={{
             cue: savedCue,
-            slots: settings.togetherSlots.length ? completeSlots(settings.togetherSlots) : [],
+            slots: slots.length ? completeSlots(slots) : [],
             start: dayKey(),
             name: settings.name,
             uidSeed: reminderSeed(settings.memberId),

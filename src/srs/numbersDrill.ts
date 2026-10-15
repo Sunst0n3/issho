@@ -104,6 +104,9 @@ export const NUMBER_DRILL_GRAMMAR = {
 } as const satisfies { prices: 'numbers-prices'; time: 'time-telling'; counters: Record<Counter, string> };
 
 const TSU = ['', 'ひとつ', 'ふたつ', 'みっつ', 'よっつ', 'いつつ', 'むっつ', 'ななつ', 'やっつ', 'ここのつ', 'とお'];
+/** The つ counter is written 1つ … 9つ. Ten (とお) takes no つ, and a bare 十 or 10 prompt reads じゅう, so the drill
+ *  never asks for it in writing ('10つ' is not Japanese). */
+export const TSU_PROMPT_MAX = 9;
 
 /** Counters with sound changes, 1..10 (index), each with its accepted readings. */
 const SOUND_CHANGE: Record<'本' | '杯' | '匹' | '個' | '回', string[][]> = {
@@ -183,7 +186,7 @@ export function numbersDrill(
       }
       case 'counter': {
         const counter = opts.counters[pickInt(random, 0, opts.counters.length - 1)];
-        const n = pickInt(random, 1, 10);
+        const n = pickInt(random, 1, counter === 'つ' ? TSU_PROMPT_MAX : 10);
         items.push({ kind, prompt: `${n}${counter}`, answers: readCounter(n, counter) });
         break;
       }

@@ -130,6 +130,7 @@ vi.mock('../../srs/together.ts', () => ({
 vi.mock('../../lib/data.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../lib/data.ts')>()),
   loadStories: async () => STORIES,
+  loadUnits: async () => [{ id: 2, canDos: [{ id: 'u02-cd1', text: 'Order a drink at a café' }] }],
 }));
 
 function renderTogether() {
@@ -187,6 +188,36 @@ describe('Together, paired', () => {
     expect(c.getAttribute('href')).toBe('/together/session/C');
   });
 
+  it('lists the monthly session in date order with what it holds', async () => {
+    mocks.plan = {
+      ...PLAN,
+      monthly: true,
+      // The engine appends the monthly Saturday after the slots.
+      sessions: [...PLAN.sessions, { id: 'monthly', day: addDays(today, 1), time: '10:00' }],
+    };
+    renderTogether();
+    const week = (await screen.findByRole('heading', { name: 'This week' })).closest('section')!;
+    await waitFor(() => expect(within(week).getAllByRole('link')).toHaveLength(4));
+    const links = within(week).getAllByRole('link');
+    expect(links.map((l) => l.getAttribute('href'))).toEqual([
+      '/together/session/A', '/together/session/B', '/together/session/monthly', '/together/session/C',
+    ]);
+    expect(links[2].textContent).toContain('Monthly session · Quiz, goals & skit');
+    expect(links[2].textContent).not.toContain('Monthly session · Monthly session');
+  });
+
+  it('counts together minutes in the week chart, as in the totals', async () => {
+    const me = member('me', 'Aiko', [10, 0, 15, 20, 5, 0, 12]);
+    me.days[6] = { ...me.days[6], studyMinutes: 0, togetherMinutes: 3 };
+    mocks.household = { ...mocks.household, data: { ...HOUSEHOLD, members: [me, HOUSEHOLD.members[1]] } };
+    renderTogether();
+    const effort = (await screen.findByRole('heading', { name: 'Your week' })).closest('section')!;
+    const row = within(effort).getAllByRole('row').find((r) => r.textContent?.startsWith('Wednesday'))!;
+    expect(row.textContent).toBe('Wednesday3 min0 min');
+    const stat = [...effort.querySelectorAll('dt')].find((dt) => dt.textContent?.startsWith('Minutes'))?.nextSibling?.textContent;
+    expect(stat).toBe('53 · 66');
+  });
+
   it('shows the couple quest and its streak, never the v1 shared streak', async () => {
     renderTogether();
     const quest = (await screen.findByRole('heading', { name: 'Couple quest' })).closest('section')!;
@@ -227,6 +258,19 @@ describe('Together, paired', () => {
     expect(history.textContent).toContain('Week of 5 Oct');
     expect(history.textContent).toContain('You 3 kanji · 12 words · 1 grammar · 140 min · Good week');
     expect(history.textContent).toContain('Ken 4 kanji');
+  });
+
+  it('shows the can-do each partner ticked in the check-in history', async () => {
+    mocks.together = {
+      state: {
+        ...STATE,
+        checkins: [{ week: '2026-10-12', memberId: 'me', checkin: { counts: { kanji: 2, words: 16, grammar: 1, minutes: 75 }, canDo: 'u02-cd1' } }],
+      },
+      offline: false,
+    };
+    renderTogether();
+    const history = (await screen.findByRole('heading', { name: 'Check-ins' })).closest('section')!;
+    await waitFor(() => expect(history.textContent).toContain('You 2 kanji · 16 words · 1 grammar · 75 min · managed “Order a drink at a café”'));
   });
 
   it('offers chat, the free role-plays and the quizzes waiting for this phone', async () => {

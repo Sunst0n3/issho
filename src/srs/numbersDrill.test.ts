@@ -86,4 +86,14 @@ describe('numbersDrill', () => {
     expect(numbersDrill(seededRandom(2), { counters: ['本', '人'], time: true, prices: true })).toEqual(all);
     for (const item of all) expect(item.answers.length).toBeGreaterThan(0);
   });
+
+  it('writes つ-counter prompts the way Japanese writes them: 1つ … 9つ, never 10つ (QA V063)', () => {
+    for (let seed = 0; seed < 200; seed++) {
+      for (const item of numbersDrill(seededRandom(seed), { counters: ['つ'], time: false, prices: false, count: 20 })) {
+        if (item.kind !== 'counter') continue;
+        expect(item.prompt).toMatch(/^[1-9]つ$/);
+        expect(item.answers).not.toContain('とお');
+      }
+    }
+  });
 });

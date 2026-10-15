@@ -6,7 +6,7 @@ import type { CourseProgressV2 } from '../../srs/course.ts';
 import type { ComebackOffer, StreakV2 } from '../../srs/habits.ts';
 import type { DayPlan } from '../../srs/planner.ts';
 import Today from '../../screens/Today.tsx';
-import { mondayOf, shiftDay } from './labels.ts';
+import { dateOfKey, mondayOf, shiftDay, WEEKDAYS_EN } from './labels.ts';
 import { renderAt, resetDb } from './test-fixtures.tsx';
 import { choosePrompt, type PromptInputs } from './TodayPrompts.tsx';
 
@@ -142,6 +142,14 @@ describe('Today', () => {
     expect((await panel()).textContent).toContain('About 12 min left today · tomorrow about 24');
   });
 
+  it('says "nothing planned tomorrow" when the governor plans no minutes tomorrow (a travel day)', async () => {
+    setPlan({ tomorrowMin: 0 });
+    renderAt('/', '/', <Today />);
+    const plan = await panel();
+    expect(plan.textContent).toContain('About 25 min today · nothing planned tomorrow');
+    expect(plan.textContent).not.toContain('tomorrow about 0');
+  });
+
   it('shows no card counts in catch-up', async () => {
     setPlan({ mode: 'catch-up', counts: undefined, warmup: Array.from({ length: 140 }, (_, i) => `kanji:k${i}|write`), teach: [] });
     renderAt('/', '/', <Today />);
@@ -222,8 +230,54 @@ describe('Today', () => {
     renderAt('/', '/', <Today />);
     expect(await screen.findByText('A fresh start — this week begins today')).toBeTruthy();
     const week = screen.getByRole('list', { name: 'This week' });
-    expect(week.textContent).toContain('before this week began');
+    expect(week.textContent).toContain('before your fresh start');
     expect(week.textContent).not.toContain('no study');
+  });
+
+  it('reads the week out as plain status text', async () => {
+    const today = dayKey();
+    const before = shiftDay(today, -2);
+    const studied = shiftDay(today, -1);
+    setStreak({ week: [{ date: before, status: 'before' }, { date: studied, status: 'done' }, { date: today, status: 'today' }] });
+    renderAt('/', '/', <Today />);
+    const week = await screen.findByRole('list', { name: 'This week' });
+    const day = (key: string) => WEEKDAYS_EN[dateOfKey(key).getDay()];
+    expect(week.textContent).toContain(`${day(before)}: before you started`);
+    expect(week.textContent).toContain(`${day(studied)}: studied`);
+    expect(week.textContent).toContain(`${day(today)}: today, not studied yet`);
+    expect(week.textContent).not.toMatch(/not yet today|this week began/);
+  });
+
+  it('offers the make-up once the goal is met after a missed day, not the welcome-back warm-up', async () => {
+    const missed = shiftDay(dayKey(), -1);
+    state.comeback = { kind: 'welcome-back', missedDays: 1 };
+    setStreak({ repairable: { date: missed, deadline: new Date(2026, 9, 17, 4, 0) }, makeupOffer: true, todayGoal: true, todayMinimum: true });
+    renderAt('/', '/', <Today />);
+    expect(await screen.findByRole('link', { name: /Start the make-up/ })).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: /Welcome back/ })).toBeNull();
+  });
+
+  it('stops offering the warm-up once today counts, keeping only an open fresh start', async () => {
+    state.comeback = { kind: 'welcome-back', missedDays: 2 };
+    setStreak({ todayMinimum: true, current: 1 });
+    renderAt('/', '/', <Today />);
+    await panel();
+    expect(screen.queryByRole('heading', { name: /Welcome back/ })).toBeNull();
+    cleanup();
+
+    state.comeback = { kind: 'fresh-start', missedDays: 5, freshStart: '2026-10-19' };
+    renderAt('/', '/', <Today />);
+    const card = (await screen.findByRole('heading', { name: 'Welcome back' })).closest('section')!;
+    expect(within(card).queryByRole('link', { name: /Start the warm-up/ })).toBeNull();
+    expect(within(card).getByRole('button', { name: /Start fresh on Monday 19 Oct/ })).toBeTruthy();
+  });
+
+  it("doesn't offer a rest token for yesterday after a longer gap: the welcome-back leads", async () => {
+    state.comeback = { kind: 'fresh-start', missedDays: 6, freshStart: '2026-10-19' };
+    setStreak({ offerTokenFor: shiftDay(dayKey(), -1), current: 0, alive: false, longest: 53 });
+    renderAt('/', '/', <Today />);
+    expect(await screen.findByRole('heading', { name: /Welcome back — a 3-minute warm-up\?/ })).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: /Use a rest token/ })).toBeNull();
   });
 
   it('shows the make-up offer only with makeupOffer, and a quiet line before the goal is met', async () => {
@@ -408,5 +462,34 @@ describe('choosePrompt', () => {
 
   it('ignores a finished travel period and a plan review still to come', () => {
     expect(choosePrompt(inputs({ settings: { travelUntil: '2026-10-14', planReviewDays: ['2026-10-16'] } }))).toBeNull();
+  });
+
+  const repairable = { date: '2026-10-14', deadline: new Date(2026, 9, 17, 4) };
+
+  it('offers a rest token only when it keeps the streak: yesterday is the only uncovered day', () => {
+    const offer = { offerTokenFor: '2026-10-14', tokensLeftThisWeek: 2 };
+    expect(choosePrompt(inputs({ comeback: { kind: 'welcome-back', missedDays: 1 } }, offer))).toBe('rest-token');
+    // Two or more missed days: the run is already over, a token for yesterday would be wasted.
+    expect(choosePrompt(inputs({ comeback: { kind: 'welcome-back', missedDays: 2 } }, offer))).toBe('comeback');
+    expect(choosePrompt(inputs({ comeback: { kind: 'fresh-start', missedDays: 6, freshStart: '2026-10-19' } }, offer))).toBe('comeback');
+  });
+
+  it("puts the make-up ahead of the welcome-back once today's goal is met", () => {
+    const met = { makeupOffer: true, repairable, todayGoal: true, todayMinimum: true };
+    expect(choosePrompt(inputs({ comeback: { kind: 'welcome-back', missedDays: 1 } }, met))).toBe('makeup');
+    // Before the goal the warm-up is offered (and the make-up isn't open yet).
+    expect(choosePrompt(inputs({ comeback: { kind: 'welcome-back', missedDays: 1 } }, { repairable }))).toBe('comeback');
+  });
+
+  it('drops the warm-up once today counts, but keeps a fresh start on offer', () => {
+    const done = { todayMinimum: true };
+    expect(choosePrompt(inputs({ comeback: { kind: 'welcome-back', missedDays: 3 } }, done))).toBeNull();
+    expect(choosePrompt(inputs({ comeback: { kind: 'fresh-start', missedDays: 4, freshStart: '2026-10-19' } }, done))).toBe('comeback');
+  });
+
+  it("doesn't offer a make-up that can't keep the streak (a gap long enough for a fresh start)", () => {
+    const met = { makeupOffer: true, repairable, todayGoal: true, todayMinimum: true };
+    const fresh = inputs({ comeback: { kind: 'fresh-start', missedDays: 4, freshStart: '2026-10-19' } }, met);
+    expect(choosePrompt({ ...fresh, dismissed: new Set(['comeback']) })).toBeNull();
   });
 });

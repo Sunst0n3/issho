@@ -5,13 +5,17 @@ import type { CardRecord, ItemRecord } from '../../../lib/types.ts';
 import type { NewItemPlan } from '../../../srs/course.ts';
 import type { IntroduceResult } from '../../../srs/items.ts';
 import { listen, recognitionAvailable } from '../../../speech/recognition.ts';
-import { audioMock, KANA_RULES, resetStudyDb } from '../test-utils.tsx';
+import { audioMock, CURRICULUM, GRAMMAR, KANA, KANA_RULES, resetStudyDb } from '../test-utils.tsx';
 import { CoreWordLesson, LISTEN_FIRST_MS } from './CoreWordLesson.tsx';
-import { learnedItem, loadLesson, wordRuby, youCanNow, type LessonData } from './data.ts';
+import { grammarPhrase, kanaSoundRow, learnedItem, loadLesson, wordRuby, youCanNow, type LessonData } from './data.ts';
+import { BuildPractice } from './GrammarLesson.tsx';
 import { KanaRuleLesson } from './KanaRuleLesson.tsx';
 import { KanjiLesson, MemoryHook, MNEMONIC_MAX } from './KanjiLesson.tsx';
 import { MemoryPass } from './MemoryPass.tsx';
+import { copyPasses } from './NewItemFlow.tsx';
+import { Readings } from './Readings.tsx';
 import { StagedWordLesson } from './StagedWordLesson.tsx';
+import { LESSON_PASSES } from './WriteSteps.tsx';
 
 vi.mock('../../../lib/data.ts', async () => (await import('../test-utils.tsx')).dataMock);
 vi.mock('../../../writing/WritingPad.tsx', async () => (await import('../test-utils.tsx')).writingPadMock);
@@ -65,12 +69,31 @@ describe('loadLesson', () => {
     let k = (await loadLesson(plan('kanji', '休'))) as Extract<LessonData, { kind: 'kanji' }>;
     expect(k.parts.map((p) => p.known)).toEqual([true, true, false]);
     expect(k.newPart).toBe(true);
+    // 本 is 木 and strokes the parts list doesn't name: 木 was introduced, so a guided copy only.
+    k = (await loadLesson(plan('kanji', '本'))) as Extract<LessonData, { kind: 'kanji' }>;
+    expect(k.newPart).toBe(false);
+    expect(copyPasses(k)).toEqual(['guided']);
     // The anchor and the hook come from the curriculum and the mnemonics.
     k = (await loadLesson(plan('kanji', '水'))) as Extract<LessonData, { kind: 'kanji' }>;
     expect(k.anchor?.ref).toBe('word:w-mizu');
     expect(k.mnemonic?.sound).toBe('Me-zoo drinks water.');
     expect(k.anchorAccent?.type).toBe('heiban');
+  });
+
+  it('traces a kanji with no listed parts (日, 一, 人) until an earlier lesson\'s kanji contained it', async () => {
+    let k = (await loadLesson(plan('kanji', '日'))) as Extract<LessonData, { kind: 'kanji' }>;
+    expect(k.parts).toEqual([]);
+    expect(k.newPart).toBe(true);
+    expect(copyPasses(k)).toEqual(LESSON_PASSES);
+    // 曜 has 日 as a component: its shape was already met in that lesson.
+    await introduced('kanji', '曜');
+    k = (await loadLesson(plan('kanji', '日'))) as Extract<LessonData, { kind: 'kanji' }>;
     expect(k.newPart).toBe(false);
+    // Its own introduction doesn't count as an earlier lesson.
+    await resetStudyDb();
+    await introduced('kanji', '日');
+    k = (await loadLesson(plan('kanji', '日'))) as Extract<LessonData, { kind: 'kanji' }>;
+    expect(k.newPart).toBe(true);
   });
 
   it('shows a core word in kana until every kanji of its spelling is taught', async () => {
@@ -116,15 +139,49 @@ describe('learnedItem', () => {
 });
 
 describe('youCanNow', () => {
-  it('leads with kanji and their anchor words, then grammar', async () => {
-    expect(await youCanNow(['kanji:休', 'grammar:tai', 'core:cw-0001'])).toBe('You can now write 休 and read 休み and use 〜たい (want to).');
+  it('leads with kanji and their anchor words, then grammar and core words', async () => {
+    expect(await youCanNow(['kanji:休', 'word:w-yasumi'])).toBe('You can now write 休 and read 休み.');
+    expect(await youCanNow(['kanji:休', 'word:w-yasumi', 'grammar:tai', 'core:cw-0001']))
+      .toBe('You can now write 休, read 休み, use 〜たい (want to), and say ありがとう.');
   });
 
   it('names today’s kana words, or the kana themselves, and core words', async () => {
-    expect(await youCanNow(['kana:あ', 'kana:い'], ['あい', 'いえ', 'あお'])).toBe('You can now read あい and いえ.');
+    expect(await youCanNow(['kana:あ', 'kana:い'], ['あい', 'いえ', 'あお', 'いい'])).toBe('You can now read あい, いえ and あお.');
     expect(await youCanNow(['kana:あ', 'kana:い'])).toBe('You can now read あ and い.');
     expect(await youCanNow(['core:cw-0001', 'core:cw-0005'])).toBe('You can now say ありがとう and のむ.');
     expect(await youCanNow([])).toBeUndefined();
+  });
+
+  it('names every kanji, reads anchors and staged words, and says only the new core words', async () => {
+    // 食's anchor is a core word, introduced with it; げんき (元気) is a staged word released today.
+    CURRICULUM.units.push({ index: 7, char: '食', anchor: 'core:cw-0002', staged: [], inferable: false, chapter: 1 });
+    try {
+      await db.items.put({ id: 'core:cw-0004', kind: 'core', key: 'cw-0004', introducedAt: new Date(), via: 'staged' });
+      const ids = ['kanji:水', 'word:w-mizu', 'kanji:休', 'word:w-yasumi', 'kanji:食', 'core:cw-0002', 'core:cw-0004',
+        'core:cw-0001', 'core:cw-0005', 'core:cw-0006'];
+      expect(await youCanNow(ids))
+        .toBe('You can now write 水, 休 and 食, read 休み, 食べる and 元気, and say ありがとう, のむ and みる.');
+      // Two kanji and one anchor: the clause lists stay apart.
+      expect(await youCanNow(['kanji:水', 'kanji:休', 'word:w-yasumi'])).toBe('You can now write 水 and 休, and read 休み.');
+    } finally {
+      CURRICULUM.units.pop();
+    }
+  });
+
+  it('names a grammar point by its short pattern with whole quotes', async () => {
+    const point = (title: string, pattern: string) => ({ ...GRAMMAR[2], title, pattern });
+    expect(grammarPhrase(point('〜と — "and", "with"', '〜と〜・〜と{一緒|いっしょ}に'))).toBe('〜と ("and", "with")');
+    expect(grammarPhrase(point('あります・います — "there is", "I have"', '〜に〜があります・〜がいます')))
+      .toBe('あります・います ("there is", "I have")');
+    expect(grammarPhrase(point('〜は〜です — "X is Y"', '〜は〜です'))).toBe('〜は〜です (X is Y)');
+    expect(grammarPhrase(point('〜で — where and how', '〜で'))).toBe('〜で (where and how)');
+    expect(grammarPhrase(point('AかB・〜にします — "A or B", "I\'ll have …"', 'AかB・〜にします')))
+      .toBe('AかB・〜にします ("A or B", "I\'ll have …")');
+    expect(grammarPhrase(point('Passive — "was done (to me)"', '〜れる・〜られる'))).toBe('〜れる・〜られる (passive)');
+    expect(grammarPhrase(point('い-adjectives — "it\'s tasty / it\'s not tasty"', '〜いです・〜くないです')))
+      .toBe('〜いです・〜くないです (い-adjectives)');
+    expect(grammarPhrase(point('Describing nouns with sentences', '〜た＋N・〜る＋N'))).toBe('〜た＋N・〜る＋N (describing nouns with sentences)');
+    expect(grammarPhrase(point('Dictionary form — the plain verb', '{食|た}べる・{飲|の}む'))).toBe('食べる・飲む (dictionary form)');
   });
 });
 
@@ -146,7 +203,20 @@ describe('KanjiLesson', () => {
     expect(screen.getByText('A stream splashing drops to both sides: water.')).toBeTruthy();
     expect(screen.getByText('Me-zoo drinks water.')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Listen to みず' })).toBeTruthy();
+    // 水 has no listed parts and no earlier lesson contained it: its whole shape is new.
+    expect(screen.getByRole('button', { name: /Trace it/ })).toBeTruthy();
+    cleanup();
+    await introduced('kanji', '木');
+    const hon = (await loadLesson(plan('kanji', '本'))) as Extract<LessonData, { kind: 'kanji' }>;
+    render(<KanjiLesson data={hon} onHookChange={() => {}} onPractice={() => {}} />);
     expect(screen.getByRole('button', { name: /Copy it/ })).toBeTruthy();
+  });
+
+  it('lists each reading once, keeping the okurigana spelling', () => {
+    render(<Readings kun={['のち', 'うし.ろ', 'うしろ', 'あと', 'おく.れる']} on={['ゴ', 'コウ', '-ゴ']} />);
+    const rows = [...document.querySelectorAll('.st-readings dd')].map((dd) => dd.textContent);
+    expect(rows).toEqual(['のち、うしろ、あと', 'ゴ、コウ']);
+    expect(document.querySelectorAll('.st-okuri')).toHaveLength(1);
   });
 
   it('allows the same memory-hook length as the kanji page (200 characters)', () => {
@@ -189,10 +259,12 @@ describe('word lessons', () => {
 });
 
 describe('KanaRuleLesson', () => {
-  it('plays every pair from its kana clip, then each practice word after reading it', () => {
+  it('plays both sides of every pair from their kana clips, then each practice word after reading it', () => {
     const onDone = vi.fn();
     render(<KanaRuleLesson rule={KANA_RULES[0]} onDone={onDone} />);
-    fireEvent.click(screen.getByRole('button', { name: 'か becomes が. Listen' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hear か' }));
+    expect(audioMock.play).toHaveBeenLastCalledWith({ ref: 'kana:か' }, { fallbackText: 'か' });
+    fireEvent.click(screen.getByRole('button', { name: 'Hear が' }));
     expect(audioMock.play).toHaveBeenLastCalledWith({ ref: 'kana:が' }, { fallbackText: 'が' });
     fireEvent.click(screen.getByRole('button', { name: 'Read some words' }));
     expect(screen.queryByText('key')).toBeNull();
@@ -204,8 +276,66 @@ describe('KanaRuleLesson', () => {
   });
 });
 
+describe('BuildPractice', () => {
+  it('never deals the tiles already in the answer order', () => {
+    // Math.random → 0.99 keeps every Fisher–Yates swap in place: a plain shuffle would deal the answer.
+    const random = vi.spyOn(Math, 'random').mockReturnValue(0.99);
+    try {
+      render(<BuildPractice point={GRAMMAR[0]} onDone={() => {}} />);
+      const tray = [...screen.getByRole('group', { name: 'Pieces' }).querySelectorAll('button')].map((b) => b.textContent);
+      expect([...tray].sort()).toEqual([...GRAMMAR[0].buildItems[0].tiles].sort());
+      expect(tray).not.toEqual(GRAMMAR[0].buildItems[0].tiles);
+    } finally {
+      random.mockRestore();
+    }
+  });
+
+  it('shows furigana on a tile over a kanji the learner has not met, as the review card does (V043)', async () => {
+    const point = {
+      ...GRAMMAR[0],
+      buildItems: [{
+        en: 'I am a student.', jp: '{私|わたし}は{学生|がくせい}です。', tiles: ['私', 'は', '学生', 'です'], alternatives: [],
+        answers: ['わたしはがくせいです'],
+      }],
+    };
+    render(<BuildPractice point={point} onDone={() => {}} />);
+    const tray = screen.getByRole('group', { name: 'Pieces' });
+    await vi.waitFor(() => expect([...tray.querySelectorAll('rt')].map((rt) => rt.textContent).sort()).toEqual(['がくせい', 'わたし']));
+    // The tile string is still what is placed and checked.
+    const tile = [...tray.querySelectorAll('button')].find((b) => b.querySelector('rt')?.textContent === 'わたし')!;
+    fireEvent.click(tile);
+    expect(screen.getByRole('button', { name: 'Remove 私' })).toBeTruthy();
+  });
+});
+
 describe('MemoryPass', () => {
   const eat = () => learnedItem(plan('core', 'cw-0002'), [result('core:cw-0002', 'core', ['listen', 'produce'])]);
+  const kanaItem = (c: string) => learnedItem(plan('kana', c), [result(`kana:${c}`, 'kana', ['read', 'write'])]);
+
+  it('names the row of a sprint kana whose sound another kana shares (を, お), as the review card does', async () => {
+    const find = (c: string) => KANA.find((k) => k.char === c)!;
+    expect(kanaSoundRow(find('を'), KANA)).toBe('わ');
+    expect(kanaSoundRow(find('お'), KANA)).toBe('あ');
+    expect(kanaSoundRow(find('か'), KANA)).toBeUndefined();
+    render(<MemoryPass items={[kanaItem('を')]} onRetrieved={() => {}} onDone={() => {}} />);
+    expect(await screen.findByRole('heading', { name: 'Write the hiragana you hear' })).toBeTruthy();
+    expect(document.querySelector('.st-write-reading')?.textContent).toBe('(わ row)');
+    cleanup();
+    render(<MemoryPass items={[kanaItem('あ')]} onRetrieved={() => {}} onDone={() => {}} />);
+    expect(await screen.findByRole('heading', { name: 'Write the hiragana you hear' })).toBeTruthy();
+    expect(document.querySelector('.st-write-reading')).toBeNull();
+  });
+
+  it('lets a kanji prompt play its anchor word, and reads its blank as "blank" (V051)', async () => {
+    const item = learnedItem(plan('kanji', '日', { anchor: 'word:w-nihon' }), [result('kanji:日', 'kanji', ['write'])]);
+    render(<MemoryPass items={[item]} onRetrieved={() => {}} onDone={() => {}} />);
+    expect(await screen.findByRole('heading', { name: 'Write the kanji' })).toBeTruthy();
+    const blanked = document.querySelector('.st-write-blanked')!;
+    expect(blanked.querySelector('[aria-hidden="true"]')?.textContent).toBe('□');
+    expect(blanked.querySelector('.visually-hidden')?.textContent).toBe('blank');
+    fireEvent.click(screen.getByRole('button', { name: 'Listen to にほん' }));
+    expect(audioMock.play).toHaveBeenLastCalledWith({ ref: 'word:w-nihon' }, { fallbackText: 'にほん' });
+  });
 
   it('asks a core word from English, typed, and counts one retrieval of its produce card', async () => {
     const onRetrieved = vi.fn();
@@ -219,6 +349,16 @@ describe('MemoryPass', () => {
     expect(onRetrieved).toHaveBeenCalledExactlyOnceWith('core:cw-0002|produce');
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
     expect(onDone).toHaveBeenCalledOnce();
+  });
+
+  it('accepts the word typed with its kanji from a Japanese keyboard (V040)', async () => {
+    const onRetrieved = vi.fn();
+    render(<MemoryPass items={[eat()]} onRetrieved={onRetrieved} onDone={() => {}} />);
+    expect(await screen.findByText('to eat')).toBeTruthy();
+    fireEvent.change(screen.getByRole('textbox', { name: 'Your answer' }), { target: { value: '食べる' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Check' }));
+    expect(screen.getByText('Yes.')).toBeTruthy();
+    expect(onRetrieved).toHaveBeenCalledExactlyOnceWith('core:cw-0002|produce');
   });
 
   it('lets the word be said: a mishearing is only a retry, a match counts', async () => {

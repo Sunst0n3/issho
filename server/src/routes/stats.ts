@@ -101,7 +101,7 @@ export function statsRoutes(app: FastifyInstance, ctx: AppContext): void {
 
     const week = mondayOf(today);
     const from = addDays(week, -7 * QUEST_STREAK_WEEKS);
-    const together = togetherQuestHistory(ctx.store.listTogetherEvents());
+    const together = togetherQuestHistory(ctx.store.listTogetherEvents(), today);
     const history: QuestHistory = {
       members: listed.map((member) => member.id),
       minimumDates: Object.fromEntries(

@@ -19,6 +19,10 @@ describe('serving the built app', () => {
     await writeFile(path.join(dist, 'index.html'), '<!doctype html><title>Issho</title>');
     await writeFile(path.join(dist, 'sw.js'), 'self.addEventListener("fetch", () => {});');
     await writeFile(path.join(dist, 'assets', 'index-abc123.js'), 'console.log(1)');
+    await writeFile(path.join(dist, 'workbox-835c8c05.js'), 'define([], () => {});');
+    await writeFile(path.join(dist, 'workbox-835c8c05.js.br'), Buffer.from([0x0b, 0x02, 0x80]));
+    await mkdir(path.join(dist, 'icons'), { recursive: true });
+    await writeFile(path.join(dist, 'icons', 'icon-192.png'), Buffer.from('\x89PNG icon'));
     await mkdir(path.join(dist, 'audio', 'a3'), { recursive: true });
     await mkdir(path.join(dist, 'data'), { recursive: true });
     await writeFile(path.join(dist, 'audio', 'a3', 'a3f09c1e5b2d7781.m4a'), Buffer.from('....ftypM4A clip'));
@@ -47,6 +51,26 @@ describe('serving the built app', () => {
     const res = await get('/assets/index-abc123.js');
     assert.equal(res.statusCode, 200);
     assert.equal(res.headers['cache-control'], 'public, max-age=31536000, immutable');
+  });
+
+  it("serves the service worker's hashed Workbox runtime as immutable, compressed or not", async () => {
+    for (const encoding of [undefined, 'br']) {
+      const label = encoding ?? 'identity';
+      const res = await server.app.inject({ method: 'GET', url: '/workbox-835c8c05.js', headers: encoding ? { 'accept-encoding': encoding } : {} });
+      assert.equal(res.statusCode, 200, label);
+      assert.equal(res.headers['content-encoding'], encoding, label);
+      assert.equal(res.headers['cache-control'], 'public, max-age=31536000, immutable', label);
+    }
+  });
+
+  it('answers /favicon.ico with the app icon instead of a 404', async () => {
+    for (const method of ['GET', 'HEAD'] as const) {
+      const res = await server.app.inject({ method, url: '/favicon.ico' });
+      assert.equal(res.statusCode, 200, method);
+      assert.match(String(res.headers['content-type']), /^image\/png/, method);
+      assert.equal(res.headers['cache-control'], 'no-cache', method);
+    }
+    assert.equal((await get('/favicon.ico')).body, '\x89PNG icon');
   });
 
   it('serves voice clips as immutable (their names are content hashes) and the audio manifest without caching', async () => {

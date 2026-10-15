@@ -1,5 +1,5 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 import type { HouseholdResponse, MemberProgress, StatsUploadRequest } from '../../shared/api.ts';
 import { db, updateSettings } from '../lib/db.ts';
 import { connectSocket, disconnectSocket } from './socket.ts';
@@ -185,6 +185,40 @@ describe('household', () => {
 
     act(() => FakeSocket.latest().receive({ type: 'stats', memberId: 'partner' }));
     await waitFor(() => expect(householdGets).toBe(2));
+    stop();
+  });
+
+  it('shows the quest as of the last together event, even when events arrive while a request is in flight', async () => {
+    const stop = startHousehold();
+    connectSocket('ws://home:8787/api/ws?token=tok');
+    act(() => FakeSocket.latest().accept());
+    await waitFor(() => expect(householdGets).toBe(1));
+
+    // The server answers the first request before the burst of events lands; the second one after.
+    const before: HouseholdResponse = { ...household, quest: { ...household.quest, reserveUsed: true, reserveLeft: false } };
+    const answers: Array<(res: Response) => void> = [];
+    const usual = fetchMock.getMockImplementation()!;
+    onTestFinished(() => { fetchMock.mockImplementation(usual); });
+    fetchMock.mockImplementation(async (input) => {
+      if (!String(input).endsWith('/api/household')) return json({ error: 'not_found' }, 404);
+      householdGets++;
+      return new Promise<Response>((resolve) => answers.push(resolve));
+    });
+    const { result } = renderHook(() => useHousehold());
+
+    act(() => FakeSocket.latest().receive({ type: 'together' }));
+    await waitFor(() => expect(answers).toHaveLength(1));
+    // Session B's task-done and session-done, 4 ms apart, while the first request is still out.
+    act(() => FakeSocket.latest().receive({ type: 'together' }));
+    act(() => FakeSocket.latest().receive({ type: 'together' }));
+    answers[0](json(before));
+    await waitFor(() => expect(answers).toHaveLength(2));
+    expect(result.current.data?.quest.reserveLeft).toBe(false);
+    answers[1](json(household));
+
+    await waitFor(() => expect(result.current.data?.quest).toMatchObject({ reserveLeft: true, reserveUsed: false }));
+    // One request for the burst after the one already in flight.
+    expect(householdGets).toBe(3);
     stop();
   });
 

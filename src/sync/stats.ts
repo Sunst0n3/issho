@@ -156,6 +156,24 @@ export function refreshHousehold(): Promise<void> {
   return householdRequest;
 }
 
+let householdQueued: Promise<void> | null = null;
+
+/**
+ * Something changed on the server ('stats', 'together'): a request already in flight may have
+ * been answered before the change (and would leave the quest stale), so fetch once more after
+ * it. Calls arriving meanwhile share that queued fetch, so a burst of events makes at most two
+ * requests.
+ */
+export function refreshHouseholdAfterChange(): Promise<void> {
+  if (!householdRequest) return refreshHousehold();
+  householdQueued ??= householdRequest.catch(() => {}).then(() => {
+    householdQueued = null;
+    // A request started since then left after the change: sharing it is enough.
+    return householdRequest ?? refreshHousehold();
+  });
+  return householdQueued;
+}
+
 /** Forgets the household view (after unpairing or pairing elsewhere). */
 export function resetHousehold() {
   writeCache(undefined);
@@ -178,10 +196,13 @@ export function useHousehold(): HouseholdState & { refresh: () => Promise<void> 
   return { ...state, refresh: refreshHousehold };
 }
 
-/** Refreshes the household view on 'stats' events and whenever the socket reconnects. */
+/**
+ * Refreshes the household view on 'stats' and 'together' events (the couple quest counts both
+ * members' days and the together sessions) and whenever the socket reconnects.
+ */
 export function startHousehold(): () => void {
   const offEvents = onServerEvent((ev) => {
-    if (ev.type === 'stats') void refreshHousehold();
+    if (ev.type === 'stats' || ev.type === 'together') void refreshHouseholdAfterChange();
   });
   const offStatus = onStatusChange((s) => {
     if (s === 'online') void refreshHousehold();

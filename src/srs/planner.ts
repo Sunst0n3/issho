@@ -10,10 +10,12 @@ import { loadKanaExamples, loadSentences, loadWordInfo } from '../lib/data.ts';
 import { rubyToKana, rubyToPlain } from '../lib/ruby.ts';
 import type {
   CardRecord,
+  CardType,
   DailyMinutes,
   DailyStepId,
   DayRecord,
   FluencyKind,
+  ItemKind,
   ItemRecord,
   KanaRule,
   OutputTarget,
@@ -21,25 +23,36 @@ import type {
   Settings,
   WordRef,
 } from '../lib/types.ts';
-import { loadCourseSnapshot, streamCandidates, taughtKanaFrom, type CourseSnapshot, type NewItemPlan } from './course.ts';
-import { addDays, DAY_MS, dayStart, getDay, normalizeDay, studyDayLookback, totalNewSec, updateDay, weekStart } from './days.ts';
+import { buildSnapshot, loadCourseSnapshot, streamCandidates, taughtKanaFrom, type CourseSnapshot, type NewItemPlan } from './course.ts';
+import {
+  addDays,
+  DAY_MS,
+  daysBetween,
+  dayStart,
+  emptyStreamSeconds,
+  getDay,
+  normalizeDay,
+  studyDayLookback,
+  totalNewSec,
+  updateDay,
+  weekStart,
+} from './days.ts';
+import { encounterCounts } from './encounters.ts';
 import { pickFluency, speedRoundCards, SPEED_ROUND_MIN_CARDS } from './fluency.ts';
 import {
   cardSeconds,
   govern,
-  HARD_CAP_FACTOR,
   PRICE_SEC,
-  strandMinutes,
   type GovDueCard,
   type GovernorInput,
   type GovernorOutput,
   type SharedStream,
 } from './governor.ts';
-import { syncWriteRetirement } from './items.ts';
+import { cardTypesFor, syncWriteRetirement } from './items.ts';
 import type { NumberDrillItem } from './numbersDrill.ts';
 import { pickOutputTarget } from './output.ts';
 import type { PitchItem } from './pitch.ts';
-import { iPlusOneContext, pickIPlusOne, pickRead } from './readListen.ts';
+import { iPlusOneContext, pickIPlusOne, pickRead, TARGET_AGE } from './readListen.ts';
 import { retrievability } from './scheduler.ts';
 import { secondsPerKey, timingKeyOf, type TimingKey } from './timing.ts';
 import { orderWarmup, siblingGroups, type WarmupCard } from './warmup.ts';
@@ -54,7 +67,10 @@ export interface TeachBatch { items: NewItemPlan[] }
 export interface ReadPlan {
   kind: 'kana-words' | 'kana-check' | 'sentences' | 'story';
   /** Sprint: 2–3 real words per kana lesson, made only of taught kana (kana-examples + rule practice words), each
-   *  with its clip ref ('kanaEx:<c>' or 'kanaRule:<id>#<n>'). kana-check: KanaRule.checkWords (refs 'core:<id>'). */
+   *  with its clip ref ('kanaEx:<c>' or 'kanaRule:<id>#<n>'), chosen so today's kana are each read in a word.
+   *  kana-check: KanaRule.checkWords (refs 'core:<id>'). After the sprint ('kana-words' with sentences after them):
+   *  recent core words still in kana (introduced 1–21 days ago, nothing of theirs due or unchecked) read aloud, then
+   *  heard (ref 'core:<id>'), filling the read minutes the sentences leave (READ_WORD_SECONDS each). */
   kanaWords: { kana: string; en: string; ref: string }[];
   sentences: { id: string; target: WordRef }[];
   story?: { storyId: string; step: 'rwl' | 'listen'; shared: boolean };
@@ -78,12 +94,13 @@ export interface DayPlan {
   mode: DayMode;
   sitting: Sitting;
   budgetMin: DailyMinutes;
-  /** "About N min (left) today": ceil(GovernorOutput.seconds.total / 60), without the unused strand reserve once no
-   *  read, output or fluency step is left (an anywhere sitting: its warm-up only). */
+  /** "About N min (left) today": ceil(GovernorOutput.seconds.total / 60), counting of the strand reserve only what the
+   *  read, output and fluency steps still planned take (an anywhere sitting: its warm-up only). */
   estimateMin: number;
   /** An earlier sitting already did something today: the UI says "left today". */
   partOfDayDone: boolean;
-  /** "tomorrow about M": cards due by tomorrow's rollover + 7-day mean new seconds + R. */
+  /** "tomorrow about M": the governor run on tomorrow as today's plan leaves it (cards due by tomorrow's rollover with
+   *  siblings buried, every card checked today, tomorrow's sprint row or new items, tomorrow's strand). */
   tomorrowMin: number;
   strandMin: number;
   /** Due cards not yet reviewed today (never New, never of items introduced today), in warm-up order. */
@@ -273,6 +290,10 @@ async function governorInput(ctx: PlanContext, due: GovDueCard[], extraKanji: bo
   }
 
   const introducedToday = [...ctx.items.values()].filter((i) => dayKey(i.introducedAt) === today && i.via === 'lesson');
+  // Staged releases today: rows released today, except a core word whose own lesson today released its row.
+  const stagedToday = snapshot.staged.filter(
+    (r) => r.releasedAt !== undefined && dayKey(r.releasedAt) === today && !introducedToday.some((i) => i.id === r.itemId),
+  ).length;
   return {
     budgetMin: settings.dailyMinutes,
     courseDay: snapshot.courseDay,
@@ -287,7 +308,7 @@ async function governorInput(ctx: PlanContext, due: GovDueCard[], extraKanji: bo
     today: {
       kanji: introducedToday.filter((i) => i.kind === 'kanji').length,
       core: Math.round(day.newSec.core / PRICE_SEC.core),
-      staged: Math.round(day.newSec.staged / PRICE_SEC.staged),
+      staged: stagedToday,
       grammar: introducedToday.filter((i) => i.kind === 'grammar').length,
       newSec: { ...day.newSec },
       reviewSec: day.reviewMs / 1000,
@@ -325,42 +346,124 @@ export function batchItems(items: readonly NewItemPlan[]): TeachBatch[] {
   return batches;
 }
 
-/** Review seconds a new item's cards will cost tomorrow. */
-function newItemReviewSeconds(item: NewItemPlan, sec: Record<TimingKey, number>): number {
+/** Retrievability assumed for tomorrow's first review of a card learned today (checked today, then a night). */
+export const FIRST_NIGHT_R = 0.9;
+
+interface PlannedCard { itemId: string; kind: ItemKind; type: CardType }
+
+/** The cards a planned new item will create (introducePlanItem's table), for tomorrow's estimate. */
+function plannedCards(ctx: PlanContext, item: NewItemPlan): PlannedCard[] {
+  const cardsOf = (itemId: string, kind: ItemKind, types: readonly CardType[]) => types.map((type) => ({ itemId, kind, type }));
+  const wordCards = (ref: string): PlannedCard[] => {
+    const kind: ItemKind = ref.startsWith('core:') ? 'core' : 'word';
+    if (kind === 'core' && ctx.items.has(ref)) return cardsOf(ref, kind, ['read']); // spelling upgrade
+    return cardsOf(ref, kind, cardTypesFor(kind, ref, { use: ctx.wordUse(ref), spelled: true }));
+  };
   switch (item.kind) {
     case 'kana':
-      return sec.kanaRead + sec.kanaWrite;
     case 'kanaRule':
-      return sec.kanaRead;
+      return cardsOf(item.itemId, item.kind, cardTypesFor(item.kind, item.key));
     case 'kanji':
-      return sec.kanjiWrite + (item.anchor ? sec.wordRead : sec.kanjiMeaning);
+      return [...cardsOf(item.itemId, 'kanji', cardTypesFor('kanji', item.key, { zeroWord: !item.anchor })), ...(item.anchor ? wordCards(item.anchor) : [])];
     case 'core':
-      return sec.listen + sec.produce;
-    case 'grammar':
-      return sec.comprehend + sec.build;
+      return cardsOf(item.itemId, 'core', cardTypesFor('core', item.key, { use: ctx.wordUse(item.itemId) }));
+    case 'grammar': {
+      const recognitionOnly = ctx.snapshot.grammar.find((g) => g.id === item.key)?.recognitionOnly ?? false;
+      return cardsOf(item.itemId, 'grammar', cardTypesFor('grammar', item.key, { recognitionOnly }));
+    }
     case 'staged':
-      return sec.wordRead;
+      return wordCards(item.itemId);
   }
 }
 
-async function tomorrowMinutes(ctx: PlanContext, warmup: ReadonlySet<string>, teach: readonly NewItemPlan[], pending: readonly string[]): Promise<number> {
-  const end = nextStudyDayStart(ctx.now).getTime() + DAY_MS;
-  let seconds = 0;
+/**
+ * "Tomorrow about M": the governor run on tomorrow as today's plan leaves it. Tomorrow's warm-up is every card due by
+ * tomorrow's rollover that today's warm-up does not review, plus every card checked today (today's New cards and the
+ * cards of today's new items), with siblings buried as tomorrow's order would; the new items are tomorrow's own
+ * candidates (the next sprint row, or what the governor prices into tomorrow's room); the strand is tomorrow's. So
+ * the estimate is what tomorrow will plan, at or under 1.1 × budget outside the sprint, and reviews only on a travel day.
+ */
+async function tomorrowMinutes(
+  ctx: PlanContext,
+  plan: { warmup: ReadonlySet<string>; newItems: readonly NewItemPlan[]; mode?: GovernorOutput['mode']; input?: GovernorInput },
+): Promise<number> {
+  const { snapshot, settings, now } = ctx;
+  const tomorrow = addDays(ctx.today, 1);
+  const at = new Date(now.getTime() + DAY_MS);
+  const end = nextStudyDayStart(now).getTime() + DAY_MS;
+  const input = plan.input ?? (await governorInput(ctx, [], false));
+
+  const warm: WarmupCard[] = [];
+  const keys = new Map<string, TimingKey>();
   for (const card of ctx.cards) {
-    if (card.suspended || warmup.has(card.id)) continue;
-    const key = timingKeyOf(card.kind, card.type);
-    if (card.state === State.New) {
-      if (pending.includes(card.id)) seconds += ctx.seconds[key];
-      continue;
-    }
-    if (card.due.getTime() <= end) seconds += ctx.seconds[key];
+    if (card.suspended || plan.warmup.has(card.id)) continue;
+    const isNew = card.state === State.New;
+    if (!isNew && card.due.getTime() > end) continue;
+    const w = toWarmupCard(ctx, card);
+    warm.push(isNew ? { ...w, state: State.Learning, r: FIRST_NIGHT_R, due: now } : { ...w, r: retrievability(card, at) });
+    keys.set(card.id, timingKeyOf(card.kind, card.type));
   }
-  for (const item of teach) seconds += newItemReviewSeconds(item, ctx.seconds);
-  const week = await daysBefore(ctx, 7);
-  seconds += week.reduce((s, d) => s + totalNewSec(d.newSec), 0) / 7;
-  const budget = ctx.settings.dailyMinutes;
-  seconds += 60 * strandMinutes(ctx.snapshot.courseDay + 1, [...ctx.items.values()].filter((i) => i.kind === 'word' || i.kind === 'core').length, budget);
-  return Math.min(Math.ceil(seconds / 60), Math.ceil(HARD_CAP_FACTOR * budget));
+  for (const item of plan.newItems) {
+    for (const c of plannedCards(ctx, item)) {
+      const id = `${c.itemId}|${c.type}`;
+      if (keys.has(id)) continue;
+      warm.push({
+        id, itemId: c.itemId, type: c.type, state: State.Learning, r: FIRST_NIGHT_R, due: now, introducedDay: ctx.today,
+        groups: siblingGroups(c, ctx.wordKanji(c.itemId)), value: 0,
+      });
+      keys.set(id, timingKeyOf(c.kind, c.type));
+    }
+  }
+  const ordered = orderWarmup(warm, { yesterday: ctx.today, takenGroups: new Set(), catchUp: false, seed: tomorrow });
+  const warmById = new Map(warm.map((w) => [w.id, w]));
+  const due: GovDueCard[] = ordered.order.map((id) => ({ id, key: keys.get(id)!, r: warmById.get(id)!.r, value: warmById.get(id)!.value }));
+
+  const upcoming: TimingKey[] = [];
+  const horizon = at.getTime() + 7 * DAY_MS;
+  for (const card of ctx.cards) {
+    if (card.suspended || card.state === State.New) continue;
+    const t = card.due.getTime();
+    if (t > end && t <= horizon) upcoming.push(timingKeyOf(card.kind, card.type));
+  }
+
+  // Tomorrow's course: today counts as a study day and today's new items (and kanji anchors) are introduced.
+  const introduced = new Map(snapshot.introduced);
+  for (const item of plan.newItems) {
+    introduced.set(item.itemId, ctx.today);
+    if (item.kind === 'kanji' && item.anchor) introduced.set(item.anchor, ctx.today);
+  }
+  const released = new Set(plan.newItems.filter((i) => i.kind === 'staged').map((i) => i.itemId));
+  const next = buildSnapshot(
+    { kana: snapshot.kana, rules: snapshot.rules, curriculum: snapshot.curriculum, core: snapshot.core, grammar: snapshot.grammar, components: snapshot.components },
+    {
+      today: tomorrow,
+      known: snapshot.known,
+      introduced,
+      studyDays: [...snapshot.studyDays, ctx.today],
+      staged: snapshot.staged.filter((r) => !released.has(r.itemId)),
+      travel: settings.travelUntil !== undefined && settings.travelUntil >= tomorrow,
+    },
+  );
+  const planned = (stream: SharedStream) => ctx.day.newSec[stream] + plan.newItems.filter((i) => i.stream === stream).reduce((sum, i) => sum + i.priceSec, 0);
+  const newWords = plan.newItems.filter((i) => i.kind === 'core' || (i.kind === 'staged' && !i.upgrade) || (i.kind === 'kanji' && i.anchor)).length;
+  const mode = plan.mode ?? (ctx.day.catchUp ? 'catch-up' : undefined);
+  const freshStart = settings.freshStart !== undefined && settings.freshStart <= tomorrow && mode !== 'normal';
+  const out = govern({
+    ...input,
+    courseDay: next.courseDay,
+    gates: next.gates,
+    sprintComplete: next.sprintComplete,
+    wordsKnown: input.wordsKnown + newWords,
+    due,
+    upcoming,
+    candidates: streamCandidates(next),
+    spent14: { kanji: input.spent14.kanji + planned('kanji'), core: input.spent14.core + planned('core'), grammar: input.spent14.grammar + planned('grammar') },
+    today: { kanji: 0, core: 0, staged: 0, grammar: 0, newSec: emptyStreamSeconds(), reviewSec: 0, strandSec: 0, catchUp: false },
+    catchUpBefore: mode === 'catch-up' || freshStart,
+    travel: next.travel,
+    extraKanji: false,
+  });
+  return Math.ceil(out.seconds.total / 60);
 }
 
 function courseComplete(s: CourseSnapshot): boolean {
@@ -431,11 +534,27 @@ async function sprintRead(ctx: PlanContext, teach: readonly NewItemPlan[], kanaC
     seen.add(kana);
     words.push({ kana, en, ref });
   };
-  // Examples that use today's kana first, then any other readable example.
+  const limit = lessons * KANA_WORDS_PER_LESSON;
   const candidates = Object.entries(examples).filter(([, ex]) => readableWith(ex.kana, taught));
+  // Each word is the reading retrieval of its kana's read card, so every kana taught today should be read in some word:
+  // greedy cover, the word reading most of today's not-yet-read kana first (ties: chart order of the example's kana).
+  const unread = new Set(todayKana);
+  for (;;) {
+    let best: [string, { kana: string; en: string }] | undefined;
+    let gain = 0;
+    for (const entry of candidates) {
+      if (seen.has(entry[1].kana)) continue;
+      const g = new Set([...entry[1].kana].filter((c) => unread.has(c))).size;
+      if (g > gain) [best, gain] = [entry, g];
+    }
+    if (!best || words.length >= limit) break;
+    addWord(best[1].kana, best[1].en, clipRef.kanaEx(best[0]));
+    for (const c of best[1].kana) unread.delete(c);
+  }
+  // Then other words with today's kana, then any other readable example.
   const usesToday = (kana: string) => kanaUnits(kana).some((u) => todayKana.includes(u));
   for (const [char, ex] of [...candidates.filter(([, ex]) => usesToday(ex.kana)), ...candidates.filter(([, ex]) => !usesToday(ex.kana))]) {
-    if (words.length >= lessons * KANA_WORDS_PER_LESSON) break;
+    if (words.length >= limit) break;
     addWord(ex.kana, ex.en, clipRef.kanaEx(char));
   }
   for (const ruleId of todayRules) {
@@ -461,6 +580,51 @@ async function sprintRead(ctx: PlanContext, teach: readonly NewItemPlan[], kanaC
 }
 
 // ---------------------------------------------------------------------------
+// Read & listen words after the sprint
+// ---------------------------------------------------------------------------
+
+/** One recent word read aloud, then heard (the sprint read's pace). */
+export const READ_WORD_SECONDS = 15;
+
+/**
+ * Recent words for the read block's minutes that sentences and stories leave: core words introduced 1–21 days ago
+ * that the learner still knows in kana (not spelled), fewest encounters first, then newest. A word with a card never
+ * checked, or due before the rollover and neither answered today nor in this sitting's warm-up (which comes before the
+ * read block), is left out: reading it and hearing its meaning would give away that card's answer. Sentence targets in
+ * the same block are left out too.
+ */
+async function recentReadWords(
+  ctx: PlanContext,
+  seconds: number,
+  opts: { warmup: ReadonlySet<string>; skip: ReadonlySet<string> },
+): Promise<ReadPlan['kanaWords']> {
+  // Whole minutes of words, so the block's minutes stay whole.
+  const n = Math.floor(seconds / 60 + 1e-9) * Math.round(60 / READ_WORD_SECONDS);
+  if (n <= 0) return [];
+  const until = nextStudyDayStart(ctx.now).getTime();
+  const answered = new Set([...ctx.todayLogs.map((l) => l.cardId), ...opts.warmup]);
+  const held = new Set<string>();
+  for (const card of ctx.cards) {
+    if (card.suspended) continue;
+    if (card.state === State.New || (card.due.getTime() < until && !answered.has(card.id))) held.add(card.itemId);
+  }
+  const pool = [...ctx.items.values()].filter((i) => {
+    if (i.kind !== 'core' || i.spelledAt !== undefined || i.via === 'placement' || opts.skip.has(i.id) || held.has(i.id)) return false;
+    const age = daysBetween(dayKey(i.introducedAt), ctx.today);
+    return age >= TARGET_AGE[0] && age <= TARGET_AGE[1];
+  });
+  if (!pool.length) return [];
+  const [info, counts] = await Promise.all([loadWordInfo(), encounterCounts(pool.map((i) => i.id), ctx.now)]);
+  return pool
+    .sort((a, b) => (counts.get(a.id) ?? 0) - (counts.get(b.id) ?? 0) || b.introducedAt.getTime() - a.introducedAt.getTime() || a.id.localeCompare(b.id))
+    .flatMap((i) => {
+      const word = info(i.id);
+      return word ? [{ kana: word.kana, en: word.en, ref: clipRef.word(i.id) }] : [];
+    })
+    .slice(0, n);
+}
+
+// ---------------------------------------------------------------------------
 // planToday and the sitting
 // ---------------------------------------------------------------------------
 
@@ -475,11 +639,11 @@ export async function planToday(now: Date = new Date(), opts: { sitting?: Sittin
   const warmById = new Map(warmCards.map((w) => [w.id, w]));
   const taken = takenGroups(ctx);
   const yesterday = studyDays(ctx).at(-1) ?? null;
-  let ordered = orderWarmup(warmCards, { yesterday, takenGroups: taken, catchUp: false });
+  let ordered = orderWarmup(warmCards, { yesterday, takenGroups: taken, catchUp: false, seed: today });
   const input = await governorInput(ctx, govDue(ctx, ordered.order, warmById), opts.extraKanji ?? false);
   let gov: GovernorOutput = govern(input);
   if (gov.mode === 'catch-up') {
-    ordered = orderWarmup(warmCards, { yesterday, takenGroups: taken, catchUp: true });
+    ordered = orderWarmup(warmCards, { yesterday, takenGroups: taken, catchUp: true, seed: today });
     gov = govern({ ...input, due: govDue(ctx, ordered.order, warmById) });
   }
   const mode = gov.mode;
@@ -509,14 +673,27 @@ export async function planToday(now: Date = new Date(), opts: { sitting?: Sittin
       const minutes = gov.strandMin - (output ? 1 : 0) - (fluency ? 2 : 0);
       const shared = (await db.togetherPlans.get(weekStart(today)))?.plan.storyId;
       const picked = await pickRead({ minutes, sharedStoryId: shared }, now);
-      read = picked.story || picked.sentences.length ? picked : null;
+      // The minutes sentences leave (none qualify early in the course: their grammar comes later) go to recent words.
+      if (!picked.story) {
+        const words = await recentReadWords(ctx, (minutes - picked.minutes) * 60, {
+          warmup: new Set(gov.reviews),
+          skip: new Set(picked.sentences.map((p) => p.target)),
+        });
+        if (words.length) {
+          picked.kind = 'kana-words';
+          picked.kanaWords = words;
+          picked.minutes += Math.ceil((words.length * READ_WORD_SECONDS) / 60);
+        }
+      }
+      read = picked.story || picked.sentences.length || picked.kanaWords.length ? picked : null;
     }
   }
 
   const warmup = gov.reviews;
-  // The unused strand reserve is time left today only while a read, output or fluency step is still planned:
-  // once they are done (or there is nothing to read), "About N min left" must not count it.
-  const strandLeft = read || output || fluency ? gov.seconds.strands : 0;
+  // Of the strand reserve, only what the read, output and fluency steps still planned take is time left today: once
+  // a step is done (or there is nothing to read), "About N min left" must not count its unused minutes.
+  const stepSec = (read ? read.minutes * 60 : 0) + (output ? 60 : 0) + (fluency ? 120 : 0);
+  const strandLeft = Math.min(gov.seconds.strands, stepSec);
   const total = anywhere ? gov.seconds.reviews : gov.seconds.total - gov.seconds.strands + strandLeft;
   return {
     day: today,
@@ -526,7 +703,7 @@ export async function planToday(now: Date = new Date(), opts: { sitting?: Sittin
     budgetMin: settings.dailyMinutes,
     estimateMin: Math.ceil(total / 60),
     partOfDayDone: gov.seconds.doneToday > 0,
-    tomorrowMin: await tomorrowMinutes(ctx, new Set(warmup), teachItems, pending),
+    tomorrowMin: await tomorrowMinutes(ctx, { warmup: new Set(warmup), newItems: gov.newItems, mode, input }),
     strandMin: anywhere ? 0 : gov.strandMin,
     warmup,
     bury: ordered.bury,
@@ -554,8 +731,9 @@ function sprintCompletedBy(s: CourseSnapshot, items: readonly NewItemPlan[]): bo
 
 /**
  * Side effects at sitting start, all idempotent: bury (due = max(due, nextStudyDayStart(now)), an absolute target, so a
- * second call changes nothing), syncWriteRetirement, DayRecord.catchUp = true when plan.mode is 'catch-up' (never reset
- * to false within the day), and Settings.freshStart cleared when plan.mode is 'normal' on or after that date.
+ * second call changes nothing), syncWriteRetirement, DayRecord.catchUp = true when plan.mode is 'catch-up' or a micro,
+ * welcome-back or make-up plan has no counts (planned on a catch-up day; never reset to false within the day), and
+ * Settings.freshStart cleared when plan.mode is 'normal' on or after that date.
  */
 export async function startSitting(plan: DayPlan, now: Date = new Date()): Promise<void> {
   const until = nextStudyDayStart(now);
@@ -564,7 +742,9 @@ export async function startSitting(plan: DayPlan, now: Date = new Date()): Promi
     const cards = await db.cards.bulkGet(plan.bury);
     const moved = cards.filter((c): c is CardRecord => c !== undefined && c.due.getTime() < until.getTime()).map((c) => ({ ...c, due: until }));
     if (moved.length) await db.cards.bulkPut(moved);
-    if (plan.mode === 'catch-up') {
+    if (plan.mode === 'catch-up' || (SHORT_MODES.has(plan.mode) && plan.counts === undefined)) {
+      // A short sitting on a catch-up day keeps the day in catch-up: its reviews would otherwise bring the load under
+      // the budget, and the next full sitting would plan new items and show counts.
       await updateDay(today, (d) => {
         d.catchUp = true;
       });
@@ -580,6 +760,8 @@ export async function startSitting(plan: DayPlan, now: Date = new Date()): Promi
 // ---------------------------------------------------------------------------
 // Micro, welcome-back and make-up plans
 // ---------------------------------------------------------------------------
+
+const SHORT_MODES: ReadonlySet<DayMode> = new Set(['micro', 'welcome-back', 'makeup']);
 
 export const MICRO_SECONDS = 180;
 export const MAKEUP_SECONDS = 600;
@@ -606,7 +788,22 @@ function pickByRetrievability(ctx: PlanContext, cards: readonly CardRecord[], li
   return chosen;
 }
 
-function emptyPlan(ctx: PlanContext, mode: DayMode, warmup: string[], seconds: number): DayPlan {
+/**
+ * Whether today is a catch-up day: an earlier sitting ran in catch-up (DayRecord.catchUp), or the governor would plan
+ * catch-up now. A micro, welcome-back or make-up plan then shows no counts, like the catch-up plan itself.
+ */
+async function catchUpToday(ctx: PlanContext): Promise<boolean> {
+  if (ctx.day.catchUp) return true;
+  const warmCards = ctx.cards.filter((c) => isWarmupCandidate(ctx, c)).map((c) => toWarmupCard(ctx, c));
+  const warmById = new Map(warmCards.map((w) => [w.id, w]));
+  const yesterday = studyDays(ctx).at(-1) ?? null;
+  const ordered = orderWarmup(warmCards, { yesterday, takenGroups: takenGroups(ctx), catchUp: false, seed: ctx.today });
+  return govern(await governorInput(ctx, govDue(ctx, ordered.order, warmById), false)).mode === 'catch-up';
+}
+
+/** A short plan (micro, welcome-back, make-up): no counts on a catch-up day (see catchUpToday). */
+async function emptyPlan(ctx: PlanContext, mode: DayMode, warmup: string[], seconds: number): Promise<DayPlan> {
+  const catchUp = await catchUpToday(ctx);
   return {
     day: ctx.today,
     courseDay: ctx.snapshot.courseDay,
@@ -625,7 +822,7 @@ function emptyPlan(ctx: PlanContext, mode: DayMode, warmup: string[], seconds: n
     output: null,
     fluency: null,
     doneSteps: [...ctx.day.steps],
-    counts: { reviews: warmup.length, newItems: 0 },
+    ...(catchUp ? {} : { counts: { reviews: warmup.length, newItems: 0 } }),
     brake: false,
     offerExtraKanji: false,
     paperAllowed: false,
@@ -649,8 +846,8 @@ export async function planMicro(now: Date = new Date(), opts: { welcomeBack?: bo
   const ctx = await planContext(now);
   const cards = ctx.cards.filter((c) => isWarmupCandidate(ctx, c) && c.type !== 'write');
   const warmup = pickByRetrievability(ctx, cards, MICRO_SECONDS);
-  const plan = emptyPlan(ctx, opts.welcomeBack ? 'welcome-back' : 'micro', warmup, secondsOf(ctx, warmup));
-  plan.tomorrowMin = await tomorrowMinutes(ctx, new Set(warmup), [], []);
+  const plan = await emptyPlan(ctx, opts.welcomeBack ? 'welcome-back' : 'micro', warmup, secondsOf(ctx, warmup));
+  plan.tomorrowMin = await tomorrowMinutes(ctx, { warmup: new Set(warmup), newItems: [] });
   return plan;
 }
 
@@ -668,11 +865,11 @@ export async function planMakeup(now: Date = new Date()): Promise<DayPlan> {
   const warmup = pickByRetrievability(ctx, cards, MAKEUP_REVIEW_SECONDS);
   const [sentences, readCtx, speed] = await Promise.all([loadSentences(), iPlusOneContext(now, { ignoreResting: true }), speedRoundCards(now)]);
   const picks = pickIPlusOne(sentences, readCtx, MAKEUP_SENTENCES);
-  const plan = emptyPlan(ctx, 'makeup', warmup, MAKEUP_SECONDS);
+  const plan = await emptyPlan(ctx, 'makeup', warmup, MAKEUP_SECONDS);
   plan.paperAllowed = true;
   plan.read = picks.length ? { kind: 'sentences', kanaWords: [], sentences: picks.map((p) => ({ id: p.id, target: p.target })), minutes: picks.length } : null;
   plan.fluency = speed.length >= SPEED_ROUND_MIN_CARDS ? { kind: 'speed', cardIds: speed } : null;
-  plan.tomorrowMin = await tomorrowMinutes(ctx, new Set(warmup), [], []);
+  plan.tomorrowMin = await tomorrowMinutes(ctx, { warmup: new Set(warmup), newItems: [] });
   return plan;
 }
 
@@ -688,7 +885,10 @@ export async function finishStep(step: DailyStepId, now: Date = new Date()): Pro
 // ---------------------------------------------------------------------------
 
 export interface LeakMask {
-  /** Item ids whose reading must not be shown (their read card is due today, unanswered). */
+  /**
+   * Item ids whose reading must not be shown (their read or produce card is due today, unanswered: a produce card's
+   * answer is the word's kana).
+   */
   readings: Set<string>;
   /** Item ids whose meaning must not be shown (listen/meaning/comprehend due, unanswered). */
   meanings: Set<string>;
@@ -708,7 +908,7 @@ export async function leakMask(now: Date = new Date()): Promise<LeakMask> {
   const mask: LeakMask = { readings: new Set(), meanings: new Set(), kanji: new Set() };
   for (const card of due) {
     if (answered.has(card.id)) continue;
-    if (card.type === 'read') mask.readings.add(card.itemId);
+    if (card.type === 'read' || card.type === 'produce') mask.readings.add(card.itemId);
     else if (card.type === 'listen' || card.type === 'meaning' || card.type === 'comprehend') mask.meanings.add(card.itemId);
     else if (card.type === 'write' && card.kind === 'kanji') mask.kanji.add(card.itemId.slice('kanji:'.length));
   }

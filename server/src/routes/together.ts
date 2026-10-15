@@ -4,8 +4,8 @@ import type { TogetherEvent, TogetherEventRequest, TogetherState } from '../../.
 import { currentMember } from '../auth.ts';
 import type { AppContext } from '../context.ts';
 import { isDayKey, mondayOf } from '../days.ts';
-import { parseWith } from '../errors.ts';
-import { foldTogether } from '../together.ts';
+import { HttpError, parseWith } from '../errors.ts';
+import { foldTogether, latestEventDate, latestEventWeek } from '../together.ts';
 import { householdToday } from './stats.ts';
 
 const dayKey = z.string().refine(isDayKey, 'must be a YYYY-MM-DD date');
@@ -64,11 +64,13 @@ export function togetherRoutes(app: FastifyInstance, ctx: AppContext): void {
   app.post('/api/together/events', async (request, reply): Promise<TogetherState> => {
     const member = currentMember(request);
     const body = parseWith(TogetherEventRequestSchema, request.body);
+    // Phones send the Monday of their week; any day of it files the event under that week.
+    const week = mondayOf(body.week);
+    rejectFuture(householdToday(ctx), week, body.event);
     const stored = ctx.store.insertTogetherEvent({
       memberId: member.id,
       clientId: body.clientId,
-      // Phones send the Monday of their week; any day of it files the event under that week.
-      week: mondayOf(body.week),
+      week,
       createdAt: ctx.now().toISOString(),
       event: body.event,
     });
@@ -78,6 +80,18 @@ export function togetherRoutes(app: FastifyInstance, ctx: AppContext): void {
     }
     return togetherState(ctx);
   });
+}
+
+/**
+ * A phone with a wrong clock must not credit sessions, quest letters or minimum days ahead of
+ * time: dates after the household's today (beyond a day of clock skew) are refused, and so is a
+ * week after today's (the week after that for `slots`, which plan next week). The 400 is permanent,
+ * so the phone's outbox drops the event rather than retrying it.
+ */
+function rejectFuture(today: string, week: string, event: TogetherEvent): void {
+  if (week > latestEventWeek(today, event.type)) throw new HttpError(400, 'invalid_request', 'week: is in the future');
+  const date = 'date' in event ? event.date : undefined;
+  if (date !== undefined && date > latestEventDate(today)) throw new HttpError(400, 'invalid_request', 'event.date: is in the future');
 }
 
 function togetherState(ctx: AppContext): TogetherState {

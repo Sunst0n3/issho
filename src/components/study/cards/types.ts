@@ -15,6 +15,7 @@ import type {
   SavedSentenceRecord,
   SentenceEntry,
 } from '../../../lib/types.ts';
+import type { LeakMask } from '../../../srs/planner.ts';
 
 interface Base {
   card: CardRecord;
@@ -64,7 +65,16 @@ export type PreparedCard =
       reading: string;
     })
   | (Base & { view: 'kanji-meaning'; kanji: KanjiEntry })
-  | (Base & { view: 'word-read'; word: WordInfo; carrier?: SentenceEntry; accent?: AccentInfo; cue: SplitCue; display: RubyText })
+  | (Base & {
+      view: 'word-read';
+      word: WordInfo;
+      carrier?: SentenceEntry;
+      accent?: AccentInfo;
+      cue: SplitCue;
+      display: RubyText;
+      /** Shown alone: readings of the other words written the same way (人: ひと, じん, にん), right as well. */
+      homographs: string[];
+    })
   | (Base & { view: 'produce'; word: WordInfo; accent?: AccentInfo; display: RubyText })
   | (Base & { view: 'listen'; word: WordInfo; accent?: AccentInfo; display: RubyText })
   | (Base & { view: 'grammar-comprehend'; point: GrammarPoint; example: GrammarExample; exampleIndex: number })
@@ -75,6 +85,8 @@ export type PreparedCard =
       itemIndex: number;
       tiles: boolean;
       shuffledTiles: string[];
+      /** Display only: each tile and choice (plain text, as checked) as ruby markup, for furigana over unmet kanji. */
+      rubyOf: Record<string, RubyText>;
     })
   | (Base & { view: 'cloze'; sentence: SavedSentenceRecord; cue: SplitCue });
 
@@ -92,6 +104,8 @@ export interface CardAnswer {
   override?: boolean;
   /** The answer is already on screen (a self-graded card's reveal): Got it moves straight on. */
   revealed?: boolean;
+  /** The card still shows something to read after the answer (stroke-order coaching): the feedback never moves on by itself. */
+  hold?: boolean;
 }
 
 export interface CardProps<V extends CardView> {
@@ -101,4 +115,6 @@ export interface CardProps<V extends CardView> {
   handsBusy?: boolean;
   /** "Write on paper" is offered (false in an anywhere sitting). */
   paperAllowed?: boolean;
+  /** Fields other cards due today still ask (§3.2.4 leak guard): the question keeps them back. */
+  mask?: LeakMask;
 }

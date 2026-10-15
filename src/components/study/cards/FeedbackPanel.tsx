@@ -2,16 +2,19 @@
 // audio and pitch line, the word inside a known sentence, the parts with their names and the memory hook. A fast
 // correct answer only confirms it in one line and moves on by itself; a slower one waits for Continue. A surprise
 // miss (a word that was easy last time) also lists the parts, two related words and a field for your own hook.
-// The leak guard keeps out anything another card due today still asks.
+// The leak guard keeps out anything another card due today still asks: a word whose kanji is still to be written from
+// memory today is shown in kana, and its parts panel leaves that kanji out.
+// "Back …" says when the card is really next shown: a missed card comes once more in this block, and nothing reviewed
+// today comes back before the next study day, whatever its learning step says.
 
 import Dexie from 'dexie';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Rating, type Grade } from 'ts-fsrs';
 import { clipRef } from '../../../../shared/voicevox.ts';
-import { db } from '../../../lib/db.ts';
+import { dayKey, db } from '../../../lib/db.ts';
 import { loadKanaExamples, loadKanji, loadMnemonics, loadRadicals, loadSentences, loadWords } from '../../../lib/data.ts';
 import { useCardRubyShow, useSettings } from '../../../lib/hooks.ts';
-import { isKanji } from '../../../lib/ruby.ts';
+import { isKanji, parseRuby } from '../../../lib/ruby.ts';
 import type { KanjiEntry, ReviewLogRecord, RubyText, SentenceEntry } from '../../../lib/types.ts';
 import { needsCalibrationTip } from '../../../srs/answers.ts';
 import type { LeakMask } from '../../../srs/planner.ts';
@@ -28,6 +31,7 @@ import { MixedText } from '../MixedText.tsx';
 import { PitchLine } from '../PitchLine.tsx';
 import { useAsync } from '../useAsync.ts';
 import { KanaText } from './KanaText.tsx';
+import { shownWord } from './prepare.ts';
 import type { PreparedCard } from './types.ts';
 
 export const FAST_AUTO_ADVANCE_MS = 1200;
@@ -36,18 +40,38 @@ const RELATED_WORDS = 2;
 /** Write logs looked at for the calibration tip. */
 const CALIBRATION_WINDOW = 200;
 
-/** The item the card belongs to, and the kanji its answer is written with. */
-function ownOf(p: PreparedCard): { itemId: string; kanji: string[] } {
+/**
+ * The item the card belongs to, the kanji its answer is written with (related words share them), and the kanji the
+ * card itself has already shown or asks (the leak guard lets those through: they are on screen anyway). A produce or
+ * listen card never showed its word's kanji: a kanji still to be written today stays out of its feedback.
+ */
+function ownOf(p: PreparedCard): { itemId: string; kanji: string[]; shown: string[] } {
   const itemId = p.card.itemId;
   switch (p.view) {
     case 'kanji-write':
-    case 'kanji-meaning': return { itemId, kanji: [p.kanji.char, ...(p.view === 'kanji-write' && p.anchor ? p.anchor.kanji : [])] };
-    case 'word-read':
+    case 'kanji-meaning': {
+      const kanji = [p.kanji.char, ...(p.view === 'kanji-write' && p.anchor ? p.anchor.kanji : [])];
+      return { itemId, kanji, shown: kanji };
+    }
+    case 'word-read': return { itemId, kanji: p.word.kanji, shown: p.word.kanji };
     case 'produce':
-    case 'listen': return { itemId, kanji: p.word.kanji };
-    case 'cloze': return { itemId, kanji: [...p.sentence.jp].filter(isKanji) };
-    default: return { itemId, kanji: [] };
+    case 'listen': return { itemId, kanji: p.word.kanji, shown: [] };
+    case 'cloze': {
+      const kanji = [...p.sentence.jp].filter(isKanji);
+      return { itemId, kanji, shown: kanji };
+    }
+    default: return { itemId, kanji: [], shown: [] };
   }
+}
+
+/**
+ * "Back …": once more in this block after a re-ask; else the next study day for anything due again today (the
+ * warm-up never brings back a card reviewed today, §1.1), else when it is due.
+ */
+export function backText(due: Date | undefined, reasked: boolean, now: Date = new Date()): string {
+  if (reasked) return 'Back once more in a few cards';
+  if (!due) return ' ';
+  return dayKey(due) <= dayKey(now) ? 'Back tomorrow' : `Back ${untilText(due, now)}`;
 }
 
 interface AnswerView {
@@ -93,15 +117,25 @@ export function answerOf(p: PreparedCard, mask?: LeakMask): AnswerView {
     case 'kanji-meaning':
       return { jp: p.kanji.char, text: p.kanji.meanings.join(', '), glyph: p.kanji.char };
     case 'word-read':
-    case 'produce':
-    case 'listen':
       return { jp: p.display, en: p.word.en, audio: { source: { ref: p.word.ref }, fallbackText: p.display }, wordRef: p.word.ref, pitchKana: p.word.kana };
+    case 'produce':
+    case 'listen': {
+      // The question never showed the word's kanji: one still to be written from memory today stays back (kana only).
+      const jp = shownWord(p.display, p.word, mask);
+      return { jp, en: p.word.en, audio: { source: { ref: p.word.ref }, fallbackText: jp }, wordRef: p.word.ref, pitchKana: p.word.kana };
+    }
     case 'grammar-comprehend':
       return { jp: p.example.jp, en: p.example.en, audio: { source: { ref: clipRef.grammarExample(p.point.id, p.exampleIndex) }, fallbackText: p.example.jp } };
     case 'grammar-build':
       return { jp: p.item.jp, en: p.item.en, audio: { source: { ref: clipRef.grammarBuild(p.point.id, p.itemIndex) }, fallbackText: p.item.jp } };
     case 'cloze':
-      return { jp: p.sentence.jp, text: `${p.sentence.blank.surface} (${p.sentence.blank.reading})`, en: p.sentence.en, audio: { source: { ref: clipRef.sentence(p.sentence.id) }, fallbackText: p.sentence.jp } };
+      return {
+        jp: p.sentence.jp,
+        // わたし (わたし) says nothing twice: the reading only follows a surface written differently.
+        text: p.sentence.blank.surface === p.sentence.blank.reading ? p.sentence.blank.surface : `${p.sentence.blank.surface} (${p.sentence.blank.reading})`,
+        en: p.sentence.en,
+        audio: { source: { ref: clipRef.sentence(p.sentence.id) }, fallbackText: p.sentence.jp },
+      };
   }
 }
 
@@ -116,8 +150,12 @@ interface MissExtras {
   calibrationTip: boolean;
 }
 
-/** The kanji the parts panel explains for this card: the kanji itself, or each kanji of the word. */
-function partsFor(p: PreparedCard, kanji: Record<string, KanjiEntry>, names: ReadonlyMap<string, string>, mask: LeakMask): Part[] {
+/**
+ * The kanji the parts panel explains for this card: the kanji itself, or each kanji of the word as the feedback shows
+ * it. A word still in kana (a core word not yet spelled, or a kanji held back by the leak guard) has no parts, and only
+ * kanji the learner has been introduced to are listed (`met`).
+ */
+function partsFor(p: PreparedCard, kanji: Record<string, KanjiEntry>, names: ReadonlyMap<string, string>, mask: LeakMask, met: ReadonlySet<string>): Part[] {
   if (p.view === 'kanji-write' || p.view === 'kanji-meaning') {
     const k = p.kanji;
     return [
@@ -126,7 +164,10 @@ function partsFor(p: PreparedCard, kanji: Record<string, KanjiEntry>, names: Rea
     ];
   }
   if (p.view === 'word-read' || p.view === 'produce' || p.view === 'listen') {
-    return [...new Set(p.word.kanji)].map((c) => ({ char: c, name: mask.meanings.has(`kanji:${c}`) ? undefined : kanji[c]?.meanings[0] }));
+    const shown = new Set(parseRuby(answerOf(p, mask).jp ?? '').flatMap((seg) => [...seg.text]));
+    return [...new Set(p.word.kanji)]
+      .filter((c) => shown.has(c) && met.has(c))
+      .map((c) => ({ char: c, name: mask.meanings.has(`kanji:${c}`) ? undefined : kanji[c]?.meanings[0] }));
   }
   return [];
 }
@@ -136,7 +177,8 @@ async function loadExtras(p: PreparedCard, mask: LeakMask, surprise: boolean): P
   const [kanji, radicals, mnemonics] = await Promise.all([loadKanji(), loadRadicals(), loadMnemonics()]);
   const names = new Map(radicals.map((r) => [r.char, r.name]));
   const ownKanji = new Set(own.kanji);
-  const leaks = (chars: Iterable<string>) => [...chars].some((c) => isKanji(c) && !ownKanji.has(c) && mask.kanji.has(c));
+  const shownKanji = new Set(own.shown);
+  const leaks = (chars: Iterable<string>) => [...chars].some((c) => isKanji(c) && !shownKanji.has(c) && mask.kanji.has(c));
 
   let hook = p.customMnemonic;
   if (!hook && (p.view === 'kana-write' || p.view === 'kana-read')) {
@@ -177,7 +219,10 @@ async function loadExtras(p: PreparedCard, mask: LeakMask, surprise: boolean): P
       .reverse().limit(CALIBRATION_WINDOW).toArray();
     calibrationTip = needsCalibrationTip(logs);
   }
-  return { ...(hook ? { hook } : {}), parts: partsFor(p, kanji, names, mask), ...(sentence ? { sentence } : {}), related, calibrationTip };
+  const wordKanji = p.view === 'word-read' || p.view === 'produce' || p.view === 'listen' ? [...new Set(p.word.kanji)] : [];
+  const metRows = wordKanji.length ? await db.items.bulkGet(wordKanji.map((c) => `kanji:${c}`)) : [];
+  const met = new Set(metRows.flatMap((row) => (row ? [row.key] : [])));
+  return { ...(hook ? { hook } : {}), parts: partsFor(p, kanji, names, mask, met), ...(sentence ? { sentence } : {}), related, calibrationTip };
 }
 
 function AnswerLine({ answer }: { answer: AnswerView }) {
@@ -205,7 +250,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-export function FeedbackPanel({ prepared, grade, durationMs, medianMs, surprise, due, mask, onContinue }: {
+export function FeedbackPanel({ prepared, grade, durationMs, medianMs, surprise, due, reasked = false, hold = false, mask, onContinue }: {
   prepared: PreparedCard;
   grade: Grade;
   durationMs: number;
@@ -213,6 +258,10 @@ export function FeedbackPanel({ prepared, grade, durationMs, medianMs, surprise,
   medianMs: number;
   surprise: boolean;
   due?: Date;
+  /** A missed card comes back once more later in this block. */
+  reasked?: boolean;
+  /** The card still shows something to read (stroke-order coaching): no automatic Continue. */
+  hold?: boolean;
   mask: LeakMask;
   onContinue: () => void;
 }) {
@@ -221,7 +270,7 @@ export function FeedbackPanel({ prepared, grade, durationMs, medianMs, surprise,
   const continueRef = useRef<HTMLButtonElement>(null);
   const continued = useRef(false);
   const missed = grade === Rating.Again || grade === Rating.Hard || surprise;
-  const fast = !missed && grade === Rating.Good && durationMs < medianMs;
+  const fast = !missed && !hold && grade === Rating.Good && durationMs < medianMs;
   const answer = answerOf(prepared, mask);
   const extras = useAsync(() => (missed ? loadExtras(prepared, mask, surprise) : Promise.resolve(null)), [prepared.card.id, missed, surprise]);
   const own = ownOf(prepared);
@@ -264,7 +313,7 @@ export function FeedbackPanel({ prepared, grade, durationMs, medianMs, surprise,
         <p className="st-fb-title">{headline}</p>
         <AnswerLine answer={answer} />
         {missed && accent && <PitchLine accent={accent} kana={answer.pitchKana} size="sm" />}
-        <p className="st-fb-when">{due ? `Back ${untilText(due)}` : ' '}</p>
+        <p className="st-fb-when">{backText(due, reasked)}</p>
       </div>
 
       {missed && (

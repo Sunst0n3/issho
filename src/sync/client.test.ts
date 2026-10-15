@@ -8,6 +8,7 @@ import {
   aiRecap,
   aiReport,
   aiRolePlay,
+  aiStatus,
   fetchTts,
   forgetRevokedPairing,
   getTogether,
@@ -473,6 +474,30 @@ describe('server reachability', () => {
     } finally {
       off();
     }
+  });
+});
+
+describe('aiStatus', () => {
+  const healthBody = (aiEnabled: boolean) => json({ ok: true, version: '0.2.0', aiEnabled, ttsEnabled: false });
+
+  it("asks /api/health: 'on' or 'off' as the server says, 'unreachable' when it can't answer", async () => {
+    fetchMock.mockResolvedValueOnce(healthBody(true));
+    await expect(aiStatus()).resolves.toBe('on');
+    expect(lastCall().url).toBe('http://192.168.1.20:8787/api/health');
+
+    fetchMock.mockResolvedValueOnce(healthBody(false));
+    await expect(aiStatus()).resolves.toBe('off');
+
+    fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+    await expect(aiStatus()).resolves.toBe('unreachable');
+    fetchMock.mockResolvedValueOnce(json({ error: 'internal' }, 500));
+    await expect(aiStatus()).resolves.toBe('unreachable');
+  });
+
+  it("is 'off' without a request when the phone isn't paired", async () => {
+    await updateSettings({ deviceToken: undefined });
+    await expect(aiStatus()).resolves.toBe('off');
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });
 

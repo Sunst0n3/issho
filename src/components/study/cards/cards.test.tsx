@@ -11,6 +11,7 @@ import { audioMock, KANA, resetStudyDb, TAUGHT_DAY_3 } from '../test-utils.tsx';
 import { KanaInput } from './KanaInput.tsx';
 import { KanaText } from './KanaText.tsx';
 import { prepareCard, type PrepareContext } from './prepare.ts';
+import { cueNote } from './ProduceCard.tsx';
 import { ReviewCard } from './ReviewCard.tsx';
 import type { CardAnswer, PreparedCard } from './types.ts';
 
@@ -73,16 +74,32 @@ describe('typed cards', () => {
   });
 
   it('"Show options" is a hint: a right pick is mode choice and at most Hard, a wrong one Again', async () => {
-    const onAnswer = show(await prep('kanaRule', 'hira-dakuten', 'read'));
+    const onAnswer = show(await prep('core', 'cw-0005', 'produce'));
     fireEvent.click(screen.getByRole('button', { name: 'Show options' }));
-    fireEvent.click(choices().getByRole('button', { name: /かぎ/ }));
+    fireEvent.click(choices().getByRole('button', { name: /のむ/ }));
     expect(onAnswer).toHaveBeenCalledWith({ grade: Rating.Hard, mode: 'choice' });
 
     cleanup();
-    const wrong = show(await prep('kanaRule', 'hira-dakuten', 'read'));
+    const wrong = show(await prep('core', 'cw-0005', 'produce'));
     fireEvent.click(screen.getByRole('button', { name: 'Show options' }));
-    fireEvent.click(choices().getAllByRole('button').find((b) => !b.textContent?.includes('かぎ'))!);
+    fireEvent.click(choices().getAllByRole('button').find((b) => !b.textContent?.includes('のむ'))!);
     expect(wrong).toHaveBeenCalledWith({ grade: Rating.Again, mode: 'choice' });
+  });
+
+  it('kana rule and kana word cards offer no "Show options": the shown kana is its own reading (V021)', async () => {
+    show(await prep('kanaRule', 'hira-dakuten', 'read'));
+    expect(screen.getByText('かぎ')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Show options' })).toBeNull();
+
+    cleanup();
+    show(await prep('kana', 'か', 'read'));
+    expect(screen.queryByRole('button', { name: 'Show options' })).toBeNull();
+
+    cleanup();
+    // Hands-busy mode has nothing to choose from either: the reading is typed.
+    show(await prep('kanaRule', 'hira-dakuten', 'read'), { handsBusy: true });
+    expect(screen.queryByRole('group', { name: 'Answer choices' })).toBeNull();
+    expect(screen.getByLabelText('Reading')).toBeTruthy();
   });
 
   it('allows one retry: right on the second try is Hard, wrong twice is Again', async () => {
@@ -100,9 +117,9 @@ describe('typed cards', () => {
   });
 
   it('hands-busy mode shows the options at once and logs choice', async () => {
-    const onAnswer = show(await prep('kanaRule', 'hira-dakuten', 'read'), { handsBusy: true });
-    expect(screen.queryByLabelText('Reading')).toBeNull();
-    fireEvent.click(choices().getByRole('button', { name: /かぎ/ }));
+    const onAnswer = show(await prep('core', 'cw-0005', 'produce'), { handsBusy: true });
+    expect(screen.queryByLabelText('Or type it')).toBeNull();
+    fireEvent.click(choices().getByRole('button', { name: /のむ/ }));
     expect(onAnswer).toHaveBeenCalledWith({ grade: Rating.Hard, mode: 'choice' });
   });
 
@@ -135,8 +152,7 @@ describe('kana cards and romaji', () => {
     show(await prep('kana', 'か', 'read'));
     expect(screen.getByText('umbrella')).toBeTruthy();
     expect(document.body.textContent).not.toMatch(/\bka\b|\bkasa\b/);
-    fireEvent.click(screen.getByRole('button', { name: 'Show options' }));
-    for (const b of choices().getAllByRole('button')) expect(b.textContent).not.toMatch(/[a-z]{2}/);
+    expect(screen.queryByRole('button', { name: 'Show options' })).toBeNull();
   });
 });
 
@@ -282,4 +298,101 @@ it('a self-graded card disables both buttons after the first tap', async () => {
     fireEvent.click(got);
   });
   expect(onAnswer).toHaveBeenCalledTimes(1);
+});
+
+describe('QA round 2 fixes', () => {
+  const NO_MASK = { readings: new Set<string>(), meanings: new Set<string>(), kanji: new Set<string>() };
+
+  it('a produce card never shows a note holding Japanese on the question, only the English or the register (V020)', async () => {
+    const base = await prep('core', 'cw-0002', 'produce');
+    if (base.view !== 'produce') throw new Error('view');
+    show({ ...base, word: { ...base.word, note: 'polite: たべます' } });
+    expect(screen.getByText('to eat')).toBeTruthy();
+    expect(document.body.textContent).not.toContain('たべます');
+    expect(screen.getByText('casual, to your partner')).toBeTruthy();
+
+    cleanup();
+    show({ ...base, word: { ...base.word, note: 'to friends, family and your partner' } });
+    expect(screen.getByText('to friends, family and your partner')).toBeTruthy();
+    expect(cueNote({ note: 'casual: わかった', register: 'polite' })).toBe('polite, to someone you don’t know well');
+    expect(cueNote({ note: 'say the word first: すしってなに？' })).toBeUndefined();
+  });
+
+  it('accepts a produce answer typed with kanji, as a phone keyboard offers it (V040)', async () => {
+    const onAnswer = show(await prep('core', 'cw-0002', 'produce'));
+    type('Or type it', '食べる');
+    expect(onAnswer).toHaveBeenCalledWith({ grade: Rating.Good, mode: 'typed' });
+  });
+
+  it('a word shown alone takes the reading of another word written the same way, and says which word it is (V036)', async () => {
+    const base = await prep('word', 'w-hito', 'read');
+    if (base.view !== 'word-read') throw new Error('view');
+    const onAnswer = show({ ...base, homographs: ['じん', 'にん'] });
+    expect(screen.getByText(/any of their readings counts/)).toBeTruthy();
+    type('Reading', 'jin');
+    expect(await screen.findByText('Reading: right')).toBeTruthy();
+    expect(screen.getByText(/is right too/).textContent).toContain('じん is right too. This card is about ひと');
+    fireEvent.click(screen.getByRole('button', { name: 'Yes' }));
+    expect(onAnswer).toHaveBeenCalledWith(expect.objectContaining({ grade: Rating.Good, parts: { reading: true, meaning: true } }));
+  });
+
+  it('the kanji write prompt keeps the anchor’s reading and audio back while another card still asks it (V039)', async () => {
+    const prepared = await prep('kanji', '水', 'write');
+    const onAnswer = vi.fn();
+    const { rerender } = render(<ReviewCard prepared={prepared} onAnswer={onAnswer} mask={NO_MASK} />);
+    expect(screen.getByText('みず')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Listen to みず' })).toBeTruthy();
+    rerender(<ReviewCard prepared={prepared} onAnswer={onAnswer} mask={{ ...NO_MASK, readings: new Set(['word:w-mizu']) }} />);
+    expect(screen.queryByText('みず')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Listen to みず' })).toBeNull();
+    expect(screen.getByText('water')).toBeTruthy();
+
+    cleanup();
+    // 日本 for 日 while 本 is still to be written today: □□, never 本.
+    render(<ReviewCard prepared={await prep('kanji', '日', 'write')} onAnswer={onAnswer} mask={{ ...NO_MASK, kanji: new Set(['本', '日']) }} />);
+    expect(document.querySelector('.st-write-blanked')?.textContent).not.toContain('本');
+  });
+
+  it('a revealed listen or produce answer stays in kana while its kanji is still to be written today (V022)', async () => {
+    await db.items.put({ id: 'core:cw-0002', kind: 'core', key: 'cw-0002', introducedAt: new Date(), spelledAt: new Date() });
+    const listen = await prep('core', 'cw-0002', 'listen');
+    render(<ReviewCard prepared={listen} onAnswer={() => {}} mask={{ ...NO_MASK, kanji: new Set(['食']) }} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Show the answer' }));
+    expect(document.querySelector('.st-reveal-word')?.textContent).toBe('たべる');
+    cleanup();
+    render(<ReviewCard prepared={listen} onAnswer={() => {}} mask={NO_MASK} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Show the answer' }));
+    expect(document.querySelector('.st-reveal-word')?.textContent).toContain('食');
+  });
+
+  it('names a kana write prompt’s audio and pad without the □ a screen reader would read as "white square" (V051)', async () => {
+    show(await prep('kana', 'か', 'write'));
+    expect(screen.getByRole('button', { name: 'Listen to the word' })).toBeTruthy();
+    expect(screen.getByRole('img', { name: /the missing hiragana in the word for "umbrella"/ })).toBeTruthy();
+    for (const el of screen.getAllByRole('button')) expect(el.getAttribute('aria-label') ?? '').not.toContain('□');
+    expect(screen.getByText('blank')).toBeTruthy();
+  });
+
+  it('keeps keyboard focus in the card when a reveal or an answer replaces the focused control (V086)', async () => {
+    show(await prep('core', 'cw-0001', 'listen'));
+    const reveal = screen.getByRole('button', { name: 'Show the answer' });
+    reveal.focus();
+    fireEvent.click(reveal);
+    const group = screen.getByRole('group', { name: 'Did you get it?' });
+    expect(document.activeElement).toBe(group);
+    expect(document.getElementById(group.getAttribute('aria-describedby')!)?.textContent).toContain('thank you');
+
+    cleanup();
+    show(await prep('word', 'w-ike', 'read'));
+    expect(document.activeElement).toBe(screen.getByLabelText('Reading'));
+    type('Reading', 'ike');
+    expect(document.activeElement).toBe(await screen.findByRole('group', { name: 'Knew the meaning?' }));
+
+    cleanup();
+    show(await prep('word', 'w-ike', 'read'));
+    const link = screen.getByRole('button', { name: 'Show options' });
+    link.focus();
+    fireEvent.click(link);
+    expect(document.activeElement).toBe(choices().getAllByRole('button')[0].parentElement);
+  });
 });

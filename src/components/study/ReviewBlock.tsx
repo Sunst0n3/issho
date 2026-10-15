@@ -1,7 +1,10 @@
 // Runs a block of graded cards (the warm-up or the first check): shows each card, grades the answer once with FSRS,
 // and shows feedback. A graded Again comes back once, after at least five other cards, and that re-ask is graded too.
+// Leak guard (§3.2.4): questions and feedback keep back what another card due today still asks, from the day's due
+// cards and from the cards still to come in this block (the first check's New cards, re-asks).
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { CardType } from '../../lib/types.ts';
 import { Rating, type Grade } from 'ts-fsrs';
 import { db } from '../../lib/db.ts';
 import { useSettings } from '../../lib/hooks.ts';
@@ -53,6 +56,34 @@ interface Answered {
   durationMs: number;
   surprise: boolean;
   due?: Date;
+  /** The card was put back for a re-ask later in this block. */
+  reasked: boolean;
+}
+
+/**
+ * pure: what the cards still to come in this block ask, as a leak mask: a read or produce card its word's reading
+ * (the produce answer is the kana), a listen, meaning or comprehend card its meaning, a kanji write card the kanji.
+ */
+export function askedLater(cardIds: readonly string[]): LeakMask {
+  const mask: LeakMask = { readings: new Set(), meanings: new Set(), kanji: new Set() };
+  for (const id of cardIds) {
+    const at = id.lastIndexOf('|');
+    const itemId = id.slice(0, at);
+    const type = id.slice(at + 1) as CardType;
+    if (type === 'read' || type === 'produce') mask.readings.add(itemId);
+    else if (type === 'listen' || type === 'meaning' || type === 'comprehend') mask.meanings.add(itemId);
+    else if (type === 'write' && itemId.startsWith('kanji:')) mask.kanji.add(itemId.slice('kanji:'.length));
+  }
+  return mask;
+}
+
+/** pure: both masks together. */
+export function mergeMasks(a: LeakMask, b: LeakMask): LeakMask {
+  return {
+    readings: new Set([...a.readings, ...b.readings]),
+    meanings: new Set([...a.meanings, ...b.meanings]),
+    kanji: new Set([...a.kanji, ...b.kanji]),
+  };
 }
 
 /** pure: where a missed card goes back in the queue: after REASK_GAP other cards, or at the end when fewer remain. */
@@ -85,6 +116,8 @@ export function ReviewBlock({ cardIds, timer, context, hideCounts = false, onPro
   const [shown, setShown] = useState<Shown | null>(null);
   const [answer, setAnswer] = useState<Answered | null>(null);
   const [mask, setMask] = useState<LeakMask>(EMPTY_MASK);
+  /** The day's mask has loaded once (or failed): the first question waits for it. */
+  const [maskReady, setMaskReady] = useState(false);
   const ctx = useRef<Promise<PrepareContext> | null>(null);
   const seconds = useRef<Promise<Record<TimingKey, number>> | null>(null);
   const loads = useRef(new Map<number, Promise<Omit<Shown, 'index'>>>());
@@ -97,10 +130,19 @@ export function ReviewBlock({ cardIds, timer, context, hideCounts = false, onPro
   const item = queue[index];
   const current = shown?.index === index ? shown : null;
   useScrollToTop(index);
-  useFocusHeading(block, current);
+  useFocusHeading(block, maskReady ? current : null);
 
   const refreshMask = () => {
-    leakMask().then(setMask, (e: unknown) => console.warn('could not load the leak mask', e));
+    leakMask().then(
+      (m) => {
+        setMask(m);
+        setMaskReady(true);
+      },
+      (e: unknown) => {
+        console.warn('could not load the leak mask', e);
+        setMaskReady(true);
+      },
+    );
   };
   useEffect(refreshMask, []);
 
@@ -169,10 +211,12 @@ export function ReviewBlock({ cardIds, timer, context, hideCounts = false, onPro
   });
 
   useEffect(() => {
-    if (current?.prepared) startedAt.current = timer.elapsed();
-  }, [current, timer]);
+    if (current?.prepared && maskReady) startedAt.current = timer.elapsed();
+  }, [current, timer, maskReady]);
 
   const answered = answer !== null;
+  const later = useMemo(() => askedLater(queue.slice(index + 1).map((q) => q.cardId)), [queue, index]);
+  const fullMask = useMemo(() => mergeMasks(mask, later), [mask, later]);
   useEffect(() => {
     if (!item) return;
     const before = queue.slice(0, index + (answered ? 1 : 0)).filter((q) => !q.reask).length;
@@ -212,7 +256,8 @@ export function ReviewBlock({ cardIds, timer, context, hideCounts = false, onPro
 
     let next = queue;
     const reaskAllowed = context !== 'first-check' || (mayRetrieve?.(item.cardId) ?? true);
-    if (grade === Rating.Again && !item.reask && reaskAllowed) {
+    const reasked = grade === Rating.Again && !item.reask && reaskAllowed;
+    if (reasked) {
       const at = reaskPosition(index, queue.length);
       next = [...queue];
       next.splice(at, 0, { cardId: item.cardId, reask: true });
@@ -222,11 +267,11 @@ export function ReviewBlock({ cardIds, timer, context, hideCounts = false, onPro
     }
     // A revealed card answered Good already shows its answer: no panel to read again.
     if (value.revealed && grade === Rating.Good) advance(next);
-    else setAnswer({ value, durationMs, surprise });
+    else setAnswer({ value, durationMs, surprise, reasked });
   };
 
   if (!item) return null;
-  if (!current || (!current.prepared && !current.failed)) {
+  if (!current || (!current.prepared && !current.failed) || !maskReady) {
     return <div className="st-skeleton st-skeleton-card" aria-busy="true" aria-label="Loading the next card" />;
   }
   if (!current.prepared) {
@@ -241,10 +286,11 @@ export function ReviewBlock({ cardIds, timer, context, hideCounts = false, onPro
   return (
     <div className="st-block" ref={block}>
       {item.reask && <p className="chip shu st-practice-chip">{hideCounts ? 'Once more' : 'Once more, from earlier'}</p>}
-      <ReviewCard key={index} prepared={current.prepared} onAnswer={onAnswer} handsBusy={handsBusy} paperAllowed={paperAllowed} />
+      <ReviewCard key={index} prepared={current.prepared} onAnswer={onAnswer} handsBusy={handsBusy} paperAllowed={paperAllowed} mask={fullMask} />
       {answer && (
         <FeedbackPanel key={`feedback-${index}`} prepared={current.prepared} grade={answer.value.grade} durationMs={answer.durationMs}
-          medianMs={current.medianMs} surprise={answer.surprise} due={answer.due} mask={mask} onContinue={() => advance(queue)} />
+          medianMs={current.medianMs} surprise={answer.surprise} due={answer.due} reasked={answer.reasked} hold={answer.value.hold}
+          mask={fullMask} onContinue={() => advance(queue)} />
       )}
     </div>
   );

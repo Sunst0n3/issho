@@ -16,7 +16,10 @@ import { StrokeAnimation, useStrokes } from '../writing/index.ts';
 import '../components/home/home.css';
 import '../components/home/library.css';
 
-// The kana chart is the one place romaji is shown after the kana sprint.
+// The kana chart is the one place romaji is shown after the kana sprint. A kana is "met" once the course
+// has taught it (or its script's placement check was passed): "learned" means 3 spaced successes, which
+// the chart doesn't track. Each tab counts its own script, marks and combinations included, where the
+// Learn hub counts the 92 basic kana of both scripts: the summary names the script and what it includes.
 
 const SECTIONS: Array<{ title: string; kinds: KanaKind[]; columns: string }> = [
   { title: 'Basic', kinds: ['basic'], columns: 'aiueo' },
@@ -64,7 +67,7 @@ function KanaSheet({ entry, learned, onClose }: { entry: KanaEntry; learned: boo
           <p className="kana-sheet-romaji">{entry.romaji}</p>
           <p className="muted">
             {entry.script === 'hiragana' ? 'Hiragana' : 'Katakana'}, {KIND_TEXT[entry.kind]}
-            {learned && <span className="chip ai kana-sheet-chip">Learned</span>}
+            {learned && <span className="chip ai kana-sheet-chip">Met</span>}
           </p>
           <button type="button" className="btn secondary small" onClick={() => void listen()} aria-pressed={playing}>
             <Icon name="speaker" size={16} />Listen
@@ -117,7 +120,12 @@ export default function KanaChart() {
           { value: 'hiragana', label: <><span lang="ja">ひらがな</span> Hiragana</> },
           { value: 'katakana', label: <><span lang="ja">カタカナ</span> Katakana</> },
         ]} />
-      {data && <p className="muted lib-summary">{learnedCount} of {entries.length} learned. Tap one to hear it and see how it's written.</p>}
+      {data && (
+        <p className="muted lib-summary">
+          {learnedCount} of {entries.length} {script} met so far, with marks and combinations. Tap one to hear it and
+          see how it's written.
+        </p>
+      )}
 
       {chart.status === 'loading' && <div className="hm-skeleton card-sized" aria-busy="true" aria-label="Loading the chart" />}
       {chart.status === 'error' && (
@@ -137,7 +145,7 @@ export default function KanaChart() {
             <div className={`kana-grid cols-${section.columns.length}`}>
               {rows.flat().map((e, i) => e ? (
                 <button key={e.char} type="button" className={data.learned.has(e.char) ? 'kana-cell learned' : 'kana-cell'}
-                  aria-label={`${e.char}, ${e.romaji}${data.learned.has(e.char) ? ', learned' : ''}`}
+                  aria-label={`${e.char}, ${e.romaji}${data.learned.has(e.char) ? ', met' : ''}`}
                   onClick={() => choose(e)}>
                   <span lang="ja" className="kana-char" aria-hidden="true">{e.char}</span>
                   <span className="kana-romaji" aria-hidden="true">{e.romaji}</span>

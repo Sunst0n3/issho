@@ -17,18 +17,20 @@ import {
   type KanaExample,
   type WordInfo,
 } from '../../../lib/data.ts';
-import { parseRuby, type RubySegment } from '../../../lib/ruby.ts';
-import type { CardRecord, KanaEntry, RubyText, WordEntry } from '../../../lib/types.ts';
+import { isKanji, parseRuby, rubyToPlain, type RubySegment } from '../../../lib/ruby.ts';
+import type { CardRecord, RubyText, WordEntry } from '../../../lib/types.ts';
 import { choicesFrom, shuffle, toHiragana } from '../../../srs/answers.ts';
 import { loadCourseSnapshot, taughtKana } from '../../../srs/course.ts';
+import type { LeakMask } from '../../../srs/planner.ts';
 import { exampleSentenceFor, loadKnownWords, type KnownWords } from '../../../srs/readListen.ts';
-import { cleanReading, sharedSoundRow } from '../format.ts';
+import { cleanReading } from '../format.ts';
+import { kanaSoundRow } from '../learn/data.ts';
 import type { PreparedCard, SplitCue } from './types.ts';
 
 export const OPTION_COUNT = 4;
 /** Kana that are also particles, said differently then: は "wa", へ "e", を "o". */
 const PARTICLE_SOUND: Record<string, string> = { は: 'wa', へ: 'e', を: 'o' };
-/** Basic kana that sound the same (お and を are both "o"): a sound-only prompt names the row. */
+/** Basic kana that sound the same (お and を are both "o"): the read card leaves the twin's romaji out of its choices. */
 const SOUND_TWINS: Record<string, string> = { お: 'を', を: 'お', オ: 'ヲ', ヲ: 'オ' };
 /** Words up to this JMdict rank are common enough to make fair distractors. */
 const COMMON_RANK = 30;
@@ -215,13 +217,6 @@ async function produceOptions(word: WordInfo, random: Random): Promise<string[]>
   return options(word.kana, tiers, random, word.readings, toHiragana);
 }
 
-/** The kana's sound twin and other basic kana of its script that share its romaji decide whether to name the row. */
-function soundRow(kana: KanaEntry, all: readonly KanaEntry[]): string | undefined {
-  const twin = SOUND_TWINS[kana.char];
-  if (twin) return all.filter((k) => k.script === kana.script && k.group === kana.group).sort((a, b) => a.order - b.order)[0]?.char;
-  return sharedSoundRow(kana, all.filter((k) => k.kind === 'basic'));
-}
-
 /** Reading shown with a zero-word kanji's write prompt: its first kun reading, else its first on reading. */
 export function zeroWordReading(kanji: { kun: readonly string[]; on: readonly string[] }): string {
   if (kanji.kun.length) return cleanReading(kanji.kun[0]);
@@ -245,6 +240,106 @@ export function wordDisplay(word: Pick<WordInfo, 'written' | 'kana'>, spelled: b
   return spelled && word.written !== word.kana ? `{${word.written}|${word.kana}}` : word.kana;
 }
 
+/**
+ * The word as a card may show it once answered: its spelling, unless one of its kanji is still to be written from
+ * memory today (§3.2.4 leak guard: the kanji's write card asks it), then its kana.
+ */
+export function shownWord(display: RubyText, word: Pick<WordInfo, 'kana' | 'kanji'>, mask?: Pick<LeakMask, 'kanji'>): RubyText {
+  return mask && word.kanji.some((k) => mask.kanji.has(k)) ? word.kana : display;
+}
+
+/**
+ * Ruby markup for each piece of a sentence (grammar build tiles spell `jp` in order): a piece keeps the reading of each
+ * word it holds whole, so a kanji the learner hasn't met can carry its furigana on the tile too.
+ */
+export function piecesRuby(jp: RubyText, pieces: readonly string[]): RubyText[] {
+  const segs = parseRuby(jp);
+  const plain = segs.map((seg) => seg.text).join('');
+  let cursor = 0;
+  return pieces.map((piece) => {
+    let start = plain.indexOf(piece, cursor);
+    if (start < 0) start = plain.indexOf(piece);
+    if (!piece || start < 0) return piece;
+    const end = start + piece.length;
+    cursor = end;
+    const out: RubySegment[] = [];
+    let pos = 0;
+    for (const seg of segs) {
+      const from = pos;
+      pos += seg.text.length;
+      if (pos <= start || from >= end) continue;
+      // A word the piece holds whole keeps its reading; one it cuts through is plain text.
+      if (from >= start && pos <= end) out.push(seg);
+      else out.push({ text: seg.text.slice(Math.max(0, start - from), Math.min(seg.text.length, end - from)) });
+    }
+    return toRuby(out);
+  });
+}
+
+/** Punctuation and spaces never count in a typed answer (as in kanaMatches). */
+const LOOSE_TYPED = /[\s、。・,.!?！？「」『』…~〜]/gu;
+/** A typed answer for comparing: NFKC, katakana as hiragana, without punctuation or spaces. */
+const looseTyped = (s: string) => toHiragana(s.normalize('NFKC')).replace(/-/g, 'ー').replace(LOOSE_TYPED, '');
+const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const isKanjiChar = (ch: string) => isKanji(ch) || ch === '々';
+
+/** One stretch of a written form, typed as any of its spellings (a kanji word: as written or as its reading). */
+type Piece = readonly string[];
+
+function piecesMatch(input: string, pieces: readonly Piece[]): boolean {
+  const pattern = pieces.map((alts) => `(?:${alts.map((a) => escapeRegExp(looseTyped(a))).join('|')})`).join('');
+  return new RegExp(`^${pattern}$`, 'u').test(looseTyped(input));
+}
+
+/** A plain written form split at its kanji runs, each run paired with the part of `kana` it is read as; null when they don't line up. */
+function alignWritten(written: string, kana: string): Piece[] | null {
+  const runs = written.match(/[\p{Script=Han}々]+|[^\p{Script=Han}々]+/gu) ?? [];
+  const isRun = (run: string) => [...run].every(isKanjiChar);
+  const pattern = runs.map((run) => (isRun(run) ? '(.+?)' : escapeRegExp(looseTyped(run)))).join('');
+  const found = looseTyped(kana).match(new RegExp(`^${pattern}$`, 'u'));
+  if (!found) return null;
+  let group = 1;
+  return runs.map((run) => (isRun(run) ? [run, found[group++]] : [run]));
+}
+
+/**
+ * A typed answer with kanji in it (a phone's Japanese keyboard offers them, and KanaInput lets them through) is right
+ * when it spells one of the accepted written forms, each kanji word typed as written or as its reading: 疲れたから
+ * ちょっと休もう and 疲れたからちょっとやすもう both spell {疲|つか}れたからちょっと{休|やす}もう. A form is ruby markup
+ * (each `{kanji|reading}` either way), or plain text aligned with one of its `readings` (each run of kanji either way).
+ * Kana-only answers are kanaMatches' job: this returns false for them.
+ */
+export function writtenMatches(input: string, forms: readonly { written: RubyText; readings?: readonly string[] }[]): boolean {
+  if (![...input].some(isKanjiChar)) return false;
+  return forms.some(({ written, readings = [] }) => {
+    const segs = parseRuby(written);
+    if (segs.some((seg) => seg.reading !== undefined)) {
+      return piecesMatch(input, segs.map((seg) => (seg.reading === undefined ? [seg.text] : [seg.text, seg.reading])));
+    }
+    if (![...written].some(isKanjiChar)) return false;
+    if (looseTyped(input) === looseTyped(written)) return true;
+    return readings.some((reading) => {
+      const pieces = alignWritten(written, rubyToPlain(reading));
+      return pieces !== null && piecesMatch(input, pieces);
+    });
+  });
+}
+
+/**
+ * Readings of the other words written like this one (人: ひと, じん, にん). Shown alone, without a sentence, the written
+ * form can be read as any of them, so each is a right reading too (and never a wrong option).
+ */
+async function homographReadings(word: WordInfo): Promise<string[]> {
+  if (!word.kanji.length) return [];
+  const [core, words] = await Promise.all([loadCoreWords(), loadWords()]);
+  const own = new Set(word.readings.map(toHiragana));
+  const others = [
+    ...core.filter((c) => c.written === word.written).flatMap((c) => [c.kana, ...(c.altKana ?? [])]),
+    ...words.filter((w) => w.written === word.written).flatMap((w) => [w.kana, ...(w.altKana ?? [])]),
+  ];
+  return [...new Set(others)].filter((r) => !own.has(toHiragana(r)));
+}
+
 /** Card content with its options; null when its data is missing. */
 export async function prepareCard(card: CardRecord, ctx: PrepareContext): Promise<PreparedCard | null> {
   const random = ctx.random ?? Math.random;
@@ -260,11 +355,13 @@ export async function prepareCard(card: CardRecord, ctx: PrepareContext): Promis
       const word = examples[kana.char];
       if (card.type === 'write') {
         const prompt = ctx.inSprint || !word ? 'sound' : 'word';
+        // One row-naming rule for the card, the memory pass and the placement check.
+        const row = kanaSoundRow(kana, all);
         return {
           ...base, view: 'kana-write', kana, prompt, options: [], answer: kana.char,
           ...(word ? { word } : {}),
           ...(prompt === 'word' && word ? { blanked: blankKana(word.kana, kana.char) } : {}),
-          ...(soundRow(kana, all) ? { row: soundRow(kana, all) } : {}),
+          ...(row ? { row } : {}),
         };
       }
       if (ctx.inSprint) {
@@ -279,15 +376,10 @@ export async function prepareCard(card: CardRecord, ctx: PrepareContext): Promis
           ...(word ? { word } : {}),
         };
       }
+      // The reading of a kana word is the word itself: choices in kana would only ask to match the same string, and
+      // romaji is over with the sprint. So no "Show options" here (§3.2.3: it is a hint, never a giveaway).
       const shown = word?.kana ?? kana.char;
-      const sameScript = Object.entries(examples)
-        .filter(([c]) => all.find((k) => k.char === c)?.script === kana.script)
-        .map(([, w]) => w.kana);
-      return {
-        ...base, view: 'kana-read', kana, mode: 'word', answer: shown,
-        options: options(shown, [sameScript.filter((k) => Math.abs(kanaLength(k) - kanaLength(shown)) <= 1), sameScript], random, [], toHiragana),
-        ...(word ? { word } : {}),
-      };
+      return { ...base, view: 'kana-read', kana, mode: 'word', answer: shown, options: [], ...(word ? { word } : {}) };
     }
 
     case 'kanaRule': {
@@ -295,8 +387,8 @@ export async function prepareCard(card: CardRecord, ctx: PrepareContext): Promis
       if (!rule || !rule.practiceWords.length) return null;
       const wordIndex = card.reps % rule.practiceWords.length;
       const word = rule.practiceWords[wordIndex];
-      const others = rule.practiceWords.filter((w) => w.kana !== word.kana).map((w) => w.kana);
-      return { ...base, view: 'kana-rule', rule, word, wordIndex, answer: word.kana, options: options(word.kana, [others], random, [], toHiragana) };
+      // As for kana words: the shown kana is its own reading, so kana choices would give it away.
+      return { ...base, view: 'kana-rule', rule, word, wordIndex, answer: word.kana, options: [] };
     }
 
     case 'kanji': {
@@ -329,10 +421,13 @@ export async function prepareCard(card: CardRecord, ctx: PrepareContext): Promis
       const carrier = exampleSentenceFor(card.itemId, await loadSentences(), ctx.known);
       const surface = carrier?.tokens.find((t) => t.ref === card.itemId)?.s ?? word.written;
       const cue = (carrier && splitCue(carrier.jp, surface, tokenOffset(carrier.tokens, card.itemId))) || { before: '', target: word.written, after: '' };
-      const opts = await readingOptions(word.kana, { kanji: word.kanji, written: word.written, exclude: word.readings }, random);
+      const inCarrier = Boolean(carrier && cue.before + cue.after);
+      // Alone, 人 could be ひと, じん or にん: every word written the same way counts (the reveal says which one this is).
+      const homographs = inCarrier ? [] : await homographReadings(word);
+      const opts = await readingOptions(word.kana, { kanji: word.kanji, written: word.written, exclude: [...word.readings, ...homographs] }, random);
       return {
-        ...base, view: 'word-read', word, ...(carrier && cue.before + cue.after ? { carrier } : {}), ...withAccent, cue,
-        display: wordDisplay(word, true), answer: word.kana, options: opts,
+        ...base, view: 'word-read', word, ...(inCarrier && carrier ? { carrier } : {}), ...withAccent, cue,
+        display: wordDisplay(word, true), answer: word.kana, options: opts, homographs,
       };
     }
 
@@ -352,8 +447,14 @@ export async function prepareCard(card: CardRecord, ctx: PrepareContext): Promis
       const tiles = ctx.grammarIntroduced < TYPED_BUILD_FROM;
       const plainJp = parseRuby(item.jp).map((s) => s.text).join('');
       const others = point.buildItems.filter((b) => b !== item).map((b) => parseRuby(b.jp).map((s) => s.text).join(''));
+      // Tiles and choices are plain text for checking; these give each one the readings of its kanji for display.
+      const tileRuby = piecesRuby(item.jp, item.tiles);
+      const rubyOf: Record<string, RubyText> = Object.fromEntries([
+        ...point.buildItems.map((b) => [rubyToPlain(b.jp), b.jp] as const),
+        ...item.tiles.map((t, i) => [t, tileRuby[i]] as const),
+      ]);
       return {
-        ...base, view: 'grammar-build', point, item, itemIndex, tiles, shuffledTiles: shuffleTiles(item.tiles, random),
+        ...base, view: 'grammar-build', point, item, itemIndex, tiles, shuffledTiles: shuffleTiles(item.tiles, random), rubyOf,
         answer: plainJp, options: tiles ? [] : options(plainJp, [others], random, item.alternatives),
       };
     }

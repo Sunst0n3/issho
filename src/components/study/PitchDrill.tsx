@@ -8,6 +8,7 @@ import { loadAccent, loadAudioManifest, loadWordInfo } from '../../lib/data.ts';
 import type { AccentInfo, AccentType } from '../../lib/types.ts';
 import { logFluency } from '../../srs/fluency.ts';
 import { pickPitchDrill, pitchCandidates, pitchOptions, recordPitch, type PitchItem } from '../../srs/pitch.ts';
+import { seededRandom } from '../../srs/random.ts';
 import { loadKnownWords } from '../../srs/readListen.ts';
 import { hasClip, usePlayback } from '../../speech/audio.ts';
 import { Icon } from '../ui.tsx';
@@ -22,15 +23,23 @@ export function accentType(drop: number, moraCount: number): AccentType {
   return drop === moraCount ? 'odaka' : 'nakadaka';
 }
 
-/** Today's drill items, only words whose word + が clip exists. Empty when not every picked item has one. */
+/** The items, when every one has its word + が clip on this phone; else none (the drill never uses a synthesized voice). */
+async function withClips(items: readonly PitchItem[]): Promise<PitchItem[]> {
+  const clips = await Promise.all(items.map((i) => hasClip({ ref: i.clipRef })));
+  return clips.every(Boolean) ? [...items] : [];
+}
+
+/**
+ * Today's drill items, picked as the planner picks them (seeded by the day, so the same words however often the step
+ * opens). Empty when not every picked item has its clip.
+ */
 export async function loadPitchDrill(now: Date = new Date()): Promise<PitchItem[]> {
   const [accent, manifest, known, info, boxes] = await Promise.all([
     loadAccent(), loadAudioManifest(), loadKnownWords(now), loadWordInfo(), db.pitchBoxes.toArray(),
   ]);
   const cands = pitchCandidates(accent, manifest, (ref) => known.isKnown(ref), info);
-  const items = pickPitchDrill(cands, new Map(boxes.map((b) => [b.ref, b])), dayKey(now), Math.random);
-  const clips = await Promise.all(items.map((i) => hasClip({ ref: i.clipRef })));
-  return clips.every(Boolean) ? items : [];
+  const today = dayKey(now);
+  return withClips(pickPitchDrill(cands, new Map(boxes.map((b) => [b.ref, b])), today, seededRandom(`pitch|${today}`)));
 }
 
 function Item({ item, onAnswered }: { item: PitchItem; onAnswered: (correct: boolean) => void }) {
@@ -79,11 +88,11 @@ function Item({ item, onAnswered }: { item: PitchItem; onAnswered: (correct: boo
 }
 
 export function PitchDrill({ items: given, onDone }: {
-  /** The drill's words; loaded for today when left out. */
+  /** The drill's words (the day's plan); loaded for today when left out. */
   items?: readonly PitchItem[];
   onDone: () => void;
 }) {
-  const loaded = useAsync(() => (given ? Promise.resolve([...given]) : loadPitchDrill()), [given]);
+  const loaded = useAsync(() => (given?.length ? withClips(given) : loadPitchDrill()), [given?.map((i) => i.ref).join(',') ?? '']);
   const [at, setAt] = useState(0);
   const [answered, setAnswered] = useState(false);
   const correct = useRef(0);

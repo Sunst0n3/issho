@@ -27,12 +27,16 @@ export function KanaRuleLesson({ rule, onDone }: { rule: KanaRule; onDone: () =>
           <h3 id={`pairs-${rule.id}`} className="label">Tap to hear each one</h3>
           <ul className="st-pairs">
             {rule.pairs.map((pair) => (
-              <li key={pair.to}>
-                <button type="button" className="st-pair" onClick={() => void play({ ref: clipRef.kana(pair.to) }, { fallbackText: pair.to })}
-                  aria-label={`${pair.from} becomes ${pair.to}. Listen`}>
-                  <span lang="ja" className="st-pair-from">{pair.from}</span>
-                  <span aria-hidden="true" className="st-pair-arrow">→</span>
-                  <span lang="ja" className="st-pair-to">{pair.to}</span>
+              // Both sides are their own tap target, so the learner hears the plain sound and the changed one.
+              <li key={`${pair.from}>${pair.to}`} className="st-pair">
+                <button type="button" className="st-pair-side st-pair-from" aria-label={`Hear ${pair.from}`}
+                  onClick={() => void play({ ref: clipRef.kana(pair.from) }, { fallbackText: pair.from })}>
+                  <span lang="ja">{pair.from}</span>
+                </button>
+                <span aria-hidden="true" className="st-pair-arrow">→</span>
+                <button type="button" className="st-pair-side st-pair-to" aria-label={`Hear ${pair.to}`}
+                  onClick={() => void play({ ref: clipRef.kana(pair.to) }, { fallbackText: pair.to })}>
+                  <span lang="ja">{pair.to}</span>
                 </button>
               </li>
             ))}

@@ -3,6 +3,7 @@
 // A core conversation is a script that some UnitSpec.conversation names; nothing else is.
 
 import type { RolePlay, RolePlayLine, TargetRef } from '../../src/lib/types.ts';
+import { castProblems } from './cast.ts';
 import { Checker, eachObject, isObj, labelOf, type ContentField, type ContentItem, type Obj } from './checker.ts';
 import { SCRIPT_REGISTERS, unknownTargets } from './units.ts';
 
@@ -91,8 +92,9 @@ export interface RolePlayContext {
 
 /**
  * The published role-plays: core conversations first (by the unit that names them), then the free
- * role-plays by id. Unknown targets are errors; an empty cue and a core conversation outside 4–8
- * lines are warnings. Ids were checked for duplicates when the source was read.
+ * role-plays by id. Unknown targets and a character cast against their role's voice (cast.ts) are
+ * errors; an empty cue and a core conversation outside 4–8 lines are warnings. Ids were checked
+ * for duplicates when the source was read.
  */
 export function buildRolePlays(
   raw: readonly unknown[],
@@ -104,6 +106,7 @@ export function buildRolePlays(
   const rolePlays = raw.filter(isObj).map((r) => toRolePlay(r, v1));
   for (const rp of rolePlays) {
     for (const bad of unknownTargets(rp.targets, ctx)) errors.push(`${rp.id}: target "${bad}" does not exist`);
+    for (const p of castProblems(rp.lines, rp.roles)) errors.push(`${rp.id}: ${p}`);
     if (!v1) {
       const empty = rp.lines.filter((l) => !l.cue.trim()).length;
       if (empty > 0) warnings.push(`${rp.id}: ${empty} line(s) have no cue`);

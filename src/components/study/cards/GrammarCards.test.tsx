@@ -5,7 +5,8 @@ import { cardId } from '../../../lib/db.ts';
 import type { CardRecord, CardType } from '../../../lib/types.ts';
 import { seededRandom } from '../../../srs/random.ts';
 import { audioMock, GRAMMAR, resetStudyDb } from '../test-utils.tsx';
-import { tilesMatch } from './GrammarBuildCard.tsx';
+import { db } from '../../../lib/db.ts';
+import { tilesMatch, typedBuildMatches } from './GrammarBuildCard.tsx';
 import { prepareCard, TYPED_BUILD_FROM } from './prepare.ts';
 import { ReviewCard } from './ReviewCard.tsx';
 import type { CardAnswer, PreparedCard } from './types.ts';
@@ -111,5 +112,48 @@ describe('grammar build card', () => {
   it('accepts an authored alternative as a tile order', () => {
     expect(tilesMatch(['これは', 'ほん', 'です'], POINT.buildItems[1])).toBe(true);
     expect(tilesMatch(['です', 'ほん'], POINT.buildItems[1])).toBe(false);
+  });
+});
+
+describe('grammar build with kanji (QA round 2)', () => {
+  const KANJI_ITEM = { en: 'I bought eggs.', jp: '{卵|たまご}を{買|か}いました。', tiles: ['卵を', '買いました。'], alternatives: ['卵、買いました。'], answers: ['たまごをかいました', 'たまごおかいました', 'たまごかいました'] };
+
+  async function withKanji(grammarIntroduced: number): Promise<PreparedCard> {
+    const p = await prep('build', { grammarIntroduced });
+    if (p.view !== 'grammar-build') throw new Error(p.view);
+    const plain = '卵を買いました。';
+    return {
+      ...p, item: KANJI_ITEM, shuffledTiles: ['買いました。', '卵を'], answer: plain,
+      options: grammarIntroduced >= TYPED_BUILD_FROM ? [plain, 'ほんです。'] : [],
+      rubyOf: { '卵を': '{卵|たまご}を', '買いました。': '{買|か}いました。', [plain]: KANJI_ITEM.jp },
+    };
+  }
+
+  it('puts furigana on tiles and choices for kanji the learner has not met, and none for met ones (V043)', async () => {
+    show(await withKanji(5));
+    const tray = screen.getByRole('group', { name: 'Pieces' });
+    await waitFor(() => expect(tray.querySelectorAll('rt')).toHaveLength(2));
+    expect([...tray.querySelectorAll('rt')].map((rt) => rt.textContent)).toEqual(['か', 'たまご']);
+
+    cleanup();
+    await db.items.bulkPut([{ id: 'kanji:卵', kind: 'kanji', key: '卵', introducedAt: new Date() }, { id: 'kanji:買', kind: 'kanji', key: '買', introducedAt: new Date() }]);
+    show(await withKanji(TYPED_BUILD_FROM));
+    fireEvent.click(screen.getByRole('button', { name: 'Show options' }));
+    const choices = screen.getByRole('group', { name: 'Answer choices' });
+    await waitFor(() => expect(choices.querySelectorAll('rt')).toHaveLength(0));
+    expect(within(choices).getByRole('button', { name: /卵を買いました/ })).toBeTruthy();
+  });
+
+  it('accepts a typed sentence with kanji: the canonical answer, an alternative, or mixed (V040)', async () => {
+    expect(typedBuildMatches('卵を買いました。', KANJI_ITEM)).toBe(true);
+    expect(typedBuildMatches('たまごを買いました', KANJI_ITEM)).toBe(true);
+    expect(typedBuildMatches('卵、買いました', KANJI_ITEM)).toBe(true);
+    expect(typedBuildMatches('卵を売りました。', KANJI_ITEM)).toBe(false);
+
+    const onAnswer = show(await withKanji(TYPED_BUILD_FROM));
+    const input = screen.getByLabelText('Type the sentence');
+    fireEvent.change(input, { target: { value: '卵を買いました。' } });
+    fireEvent.submit(input.closest('form')!);
+    expect(onAnswer).toHaveBeenCalledWith({ grade: Rating.Good, mode: 'typed' });
   });
 });

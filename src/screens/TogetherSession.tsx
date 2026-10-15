@@ -192,7 +192,8 @@ function Setup({ heading, steps, duoAvailable, paired, online, hasPartner, prese
     : !online ? "You're offline right now."
       : !hasPartner ? "Your partner hasn't joined the household yet."
         : presence === false ? `${partnerName} is offline right now.`
-          : `${partnerName} opens this session on their phone too.`;
+          : invite ? `${partnerName} is already in. Join them above.`
+            : `${partnerName} opens this session on their phone too.`;
   return (
     <Screen label={heading}>
       <TopBar back="/together" title="Together" heading={false} />

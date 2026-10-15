@@ -258,6 +258,26 @@ describe('play: resolution order', () => {
     await expect(play({ ref: 'core:cw-0001' }, { fallbackText: '{食|た}べる' })).resolves.toMatchObject({ via: 'server' });
   });
 
+  it('never asks the server to read a clip the audio element refused to start; the device voice reads it', async () => {
+    // NotAllowedError: iOS before the gesture unlock. AbortError: "background media was paused to save power".
+    for (const name of ['NotAllowedError', 'AbortError']) {
+      resetAudio();
+      requests.length = 0;
+      device.spoken = [];
+      vi.spyOn(HTMLMediaElement.prototype, 'play').mockRejectedValue(new DOMException('refused', name));
+      await expect(play({ ref: 'core:cw-0001' }, { fallbackText: '{食|た}べる' }), name).resolves.toMatchObject({ via: 'device' });
+      expect(requests, name).toEqual(['GET /audio/a1/taberu.m4a']);
+      expect(ttsPosts(), name).toBe(0);
+      expect(device.spoken.map((s) => s.text), name).toEqual(['{食|た}べる']);
+    }
+  });
+
+  it('still asks the server when the clip itself cannot be played (it does not decode)', async () => {
+    vi.spyOn(HTMLMediaElement.prototype, 'play').mockRejectedValueOnce(new DOMException('no supported sources', 'NotSupportedError'));
+    await expect(play({ ref: 'core:cw-0001' }, { fallbackText: '{食|た}べる' })).resolves.toMatchObject({ via: 'server' });
+    expect(requests).toEqual(['GET /audio/a1/taberu.m4a', 'GET /api/health', 'POST /api/tts']);
+  });
+
   it("never takes the app's index.html for a missing clip, nor caches it", async () => {
     // Vite's dev and preview servers answer a missing file with index.html and a 200.
     const cache = installCaches();

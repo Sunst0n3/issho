@@ -1,10 +1,11 @@
 // Building blocks shared by the review cards: the question frame, typed answers with "Show options" as a capped
 // hint, multiple choice and the two-button self-grade.
 
-import { useEffect, useId, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
+import { Fragment, useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type FormEvent, type ReactNode, type RefObject } from 'react';
 import { useSettings, useSettingsLoaded } from '../../../lib/hooks.ts';
 import { play, stopAudio, type AudioSource, type PlayOptions } from '../../../speech/audio.ts';
 import { KanaInput } from './KanaInput.tsx';
+import { BLANK } from './prepare.ts';
 import { ShowOptions } from './ShowOptions.tsx';
 
 /** Sizes a one-line Japanese prompt (class st-fit) so long words still fit the card. */
@@ -23,6 +24,35 @@ export function Question({ ask, before, children }: { ask: ReactNode; before?: R
   );
 }
 
+/**
+ * A prompt with □ where the character to write goes ('□さ', '□本'): screen readers hear "blank" instead of "white square".
+ */
+export function Blanked({ text }: { text: string }) {
+  const parts = text.split(BLANK);
+  return (
+    <>
+      {parts.map((part, i) => (
+        <Fragment key={i}>
+          {i > 0 && <><span aria-hidden="true">{BLANK}</span><span className="visually-hidden">blank</span></>}
+          {part}
+        </Fragment>
+      ))}
+    </>
+  );
+}
+
+/**
+ * On mount, when the control that had keyboard focus was just removed (a reveal button, a typed field that gave way),
+ * focus moves to `target` instead of falling back to the page: within a card, as focus.ts does between cards.
+ */
+export function useFocusWhenLost(target: RefObject<HTMLElement | null>, active = true): void {
+  useLayoutEffect(() => {
+    if (!active || (document.activeElement && document.activeElement !== document.body)) return;
+    target.current?.focus();
+    // Only when it appears.
+  }, []);
+}
+
 function isTyping(target: EventTarget | null): boolean {
   return target instanceof HTMLElement && target.closest('input, textarea, select, [contenteditable="true"]') !== null;
 }
@@ -35,16 +65,22 @@ const dialogOpen = () => document.querySelector('[aria-modal="true"]') !== null;
  * on a keyboard. Once picked, the right answer fills indigo and a wrong pick is
  * struck through in shu.
  */
-export function ChoiceGrid({ options, answer, picked, onPick, lang }: {
+export function ChoiceGrid({ options, answer, picked, onPick, lang, render, focusOnShow = false }: {
   options: readonly string[];
   answer: string;
   picked: string | null;
   onPick: (option: string) => void;
   lang?: 'ja';
+  /** How an option reads on its button (e.g. with furigana); the option string itself is what is picked. */
+  render?: (option: string) => ReactNode;
+  /** Opened in place of the control that had focus ("Show options"): focus moves to the choices. */
+  focusOnShow?: boolean;
 }) {
   const locked = picked !== null;
   const pickRef = useRef(onPick);
   pickRef.current = onPick;
+  const group = useRef<HTMLDivElement>(null);
+  useFocusWhenLost(group, focusOnShow);
 
   useEffect(() => {
     if (locked) return;
@@ -62,7 +98,7 @@ export function ChoiceGrid({ options, answer, picked, onPick, lang }: {
 
   const wide = options.some((o) => o.length > (lang === 'ja' ? 7 : 16));
   return (
-    <div className={wide ? 'choice-grid st-choices wide' : 'choice-grid st-choices'} role="group" aria-label="Answer choices">
+    <div ref={group} tabIndex={-1} className={wide ? 'choice-grid st-choices wide' : 'choice-grid st-choices'} role="group" aria-label="Answer choices">
       {options.map((option, i) => {
         const right = locked && option === answer;
         const wrong = locked && option === picked && option !== answer;
@@ -71,7 +107,7 @@ export function ChoiceGrid({ options, answer, picked, onPick, lang }: {
           <button key={option} type="button" className={`choice${state}`} lang={lang}
             aria-disabled={locked || undefined} onClick={() => !locked && onPick(option)}>
             <span className="st-key" aria-hidden="true">{i + 1}</span>
-            {option}
+            {render ? render(option) : option}
             {right && <span className="visually-hidden">, correct answer</span>}
             {wrong && <span className="visually-hidden">, your answer</span>}
           </button>
@@ -164,12 +200,14 @@ export interface AnswerResult extends TypedResult {
  * 'choice'). Hands-busy mode shows the choices at once. After a missed typed try the options stay hidden (they would
  * give a free second guess).
  */
-export function AnswerArea({ options, answer, lang, typed, handsBusy = false, onResult }: {
+export function AnswerArea({ options, answer, lang, typed, handsBusy = false, render, onResult }: {
   options: readonly string[];
   answer: string;
   lang?: 'ja';
   typed: { kind: TypedKind; label: string; check: (input: string) => boolean; katakana?: boolean };
   handsBusy?: boolean;
+  /** How a choice reads on its button. */
+  render?: (option: string) => ReactNode;
   onResult: (result: AnswerResult) => void;
 }) {
   const [choosing, setChoosing] = useState(handsBusy && options.length > 1);
@@ -182,12 +220,12 @@ export function AnswerArea({ options, answer, lang, typed, handsBusy = false, on
   return (
     <div className="st-answer">
       {choosing ? (
-        <ShowOptions options={options} answer={answer} lang={lang} open onPick={pick} />
+        <ShowOptions options={options} answer={answer} lang={lang} open focusOnShow={!handsBusy} render={render} onPick={pick} />
       ) : (
         <>
           <TypedAnswer kind={typed.kind} label={typed.label} check={typed.check} katakana={typed.katakana}
             onMiss={() => setMissed(true)} onResult={(r) => { setAnswered(true); onResult({ ...r, mode: 'typed' }); }} />
-          {!missed && !answered && <ShowOptions options={options} answer={answer} lang={lang} onOpen={() => setChoosing(true)} onPick={pick} />}
+          {!missed && !answered && <ShowOptions options={options} answer={answer} lang={lang} render={render} onOpen={() => setChoosing(true)} onPick={pick} />}
         </>
       )}
     </div>
@@ -195,13 +233,18 @@ export function AnswerArea({ options, answer, lang, typed, handsBusy = false, on
 }
 
 /** Reveal + self-grade: "Missed" and "Got it" (there is no Easy). The first tap counts; the buttons then disable. */
-export function SelfGrade({ onGrade, prompt = 'Did you get it?', missedLabel = 'Missed', gotItLabel = 'Got it' }: {
+export function SelfGrade({ onGrade, prompt = 'Did you get it?', missedLabel = 'Missed', gotItLabel = 'Got it', describedBy }: {
   onGrade: (gotIt: boolean) => void;
   prompt?: string;
   missedLabel?: string;
   gotItLabel?: string;
+  /** Id of the revealed answer: read out with the question when focus lands on the buttons' group. */
+  describedBy?: string;
 }) {
   const [chosen, setChosen] = useState<boolean | null>(null);
+  // It replaces the reveal button (or the typed field) that had focus: keyboard and screen-reader users land here.
+  const group = useRef<HTMLDivElement>(null);
+  useFocusWhenLost(group);
   // A ref too: two taps in one frame both see the state from before the first.
   const taken = useRef(false);
   const choose = (gotIt: boolean) => {
@@ -211,7 +254,7 @@ export function SelfGrade({ onGrade, prompt = 'Did you get it?', missedLabel = '
     onGrade(gotIt);
   };
   return (
-    <div className="st-selfgrade" role="group" aria-label={prompt}>
+    <div ref={group} tabIndex={-1} className="st-selfgrade" role="group" aria-label={prompt} aria-describedby={describedBy}>
       <p className="label">{prompt}</p>
       <div className="st-selfgrade-row two">
         <button type="button" className="st-grade again" disabled={chosen !== null} onClick={() => choose(false)}>{missedLabel}</button>

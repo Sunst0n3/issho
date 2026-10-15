@@ -1,5 +1,7 @@
 // Today's prompts, at most one at a time: rest token → welcome-back → travel → plan review → make-up.
 // Plus the fresh-start header and the quiet line about the make-up before today's goal is met.
+// A streak offer (token, make-up) shows only while it can still keep the streak, and the welcome-back
+// warm-up only until today counts.
 import { Link } from 'react-router-dom';
 import { updateSettings } from '../../lib/db.ts';
 import type { Settings } from '../../lib/types.ts';
@@ -26,14 +28,39 @@ export function duePlanReviews(days: readonly string[], today: string): string[]
   return days.filter((d) => d <= today).sort();
 }
 
+/**
+ * pure: a rest token for yesterday keeps the streak only when yesterday is the one uncovered day of the gap.
+ * After a longer gap the run is already over, and a token spent on yesterday would be wasted.
+ */
+export function tokenKeepsStreak(p: Pick<PromptInputs, 'comeback'>): boolean {
+  return p.comeback.missedDays <= 1;
+}
+
+/**
+ * pure: a make-up repairs a missed day only within 48 hours of it, so after a gap long enough for a fresh start
+ * (3 days or more) the oldest missed day is past repair and the streak can't be kept.
+ */
+export function makeupKeepsStreak(p: Pick<PromptInputs, 'comeback'>): boolean {
+  return p.comeback.kind !== 'fresh-start';
+}
+
+/**
+ * pure: the welcome-back card while it still offers something. Its warm-up is a way back into a minimum day,
+ * so it goes once today counts; after a longer gap the card stays for the fresh start alone.
+ */
+export function comebackOpen(p: Pick<PromptInputs, 'comeback' | 'streak'>): boolean {
+  if (p.comeback.kind === 'none') return false;
+  return !p.streak.todayMinimum || p.comeback.kind === 'fresh-start';
+}
+
 /** pure: the one prompt Today shows, in the fixed order, or null. */
 export function choosePrompt(p: PromptInputs): TodayPromptKind | null {
   const open = (kind: TodayPromptKind) => !p.dismissed.has(kind);
-  if (p.streak.offerTokenFor && open('rest-token')) return 'rest-token';
-  if (p.comeback.kind !== 'none' && open('comeback')) return 'comeback';
+  if (p.streak.offerTokenFor && tokenKeepsStreak(p) && open('rest-token')) return 'rest-token';
+  if (comebackOpen(p) && open('comeback')) return 'comeback';
   if (p.settings.travelUntil && p.settings.travelUntil >= p.today) return 'travel';
   if (duePlanReviews(p.settings.planReviewDays, p.today).length > 0) return 'plan-review';
-  if (p.streak.makeupOffer && p.streak.repairable) return 'makeup';
+  if (p.streak.makeupOffer && p.streak.repairable && makeupKeepsStreak(p)) return 'makeup';
   return null;
 }
 
@@ -71,8 +98,9 @@ function MakeupOffer({ repairable }: { repairable: NonNullable<StreakV2['repaira
 }
 
 /** Before today's goal is met: a make-up is possible, but only after today's own session. */
-export function MakeupLater({ streak }: { streak: StreakV2 }) {
+export function MakeupLater({ streak, comeback }: { streak: StreakV2; comeback?: ComebackOffer }) {
   if (!streak.repairable || streak.makeupOffer || streak.todayGoal) return null;
+  if (comeback && !makeupKeepsStreak({ comeback })) return null;
   return (
     <p className="hm-quiet">
       A 10-minute make-up for {weekdayOf(streak.repairable.date)} opens after today's session.
@@ -106,7 +134,10 @@ export function TodayPrompt({ kind, inputs, freshStart, onDismiss }: {
           onDismiss={() => onDismiss('rest-token')} />
       );
     case 'comeback':
-      return <ComebackCard offer={comeback} chosenFreshStart={freshStart} onDismiss={() => onDismiss('comeback')} />;
+      return (
+        <ComebackCard offer={comeback} chosenFreshStart={freshStart} warmUp={!streak.todayMinimum}
+          onDismiss={() => onDismiss('comeback')} />
+      );
     case 'travel':
       return <TravelBanner until={settings.travelUntil!} />;
     case 'plan-review':

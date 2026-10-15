@@ -21,6 +21,11 @@ export function sessionStatus(s: PlannedSession, today: string): SessionStatus {
   return s.day < today ? 'overdue' : 'planned';
 }
 
+/** The week's sessions in calendar order (day, then time): the monthly Saturday among the slots, not after them. */
+export function sessionsInOrder(plan: TogetherWeekPlan): PlannedSession[] {
+  return [...plan.sessions].sort((a, b) => a.day.localeCompare(b.day) || a.time.localeCompare(b.time));
+}
+
 /** The session to offer today: one scheduled today, else the earliest still open from earlier this week. */
 export function sessionToOffer(plan: TogetherWeekPlan | undefined, today: string): (PlannedSession & { status: SessionStatus }) | undefined {
   if (!plan) return undefined;

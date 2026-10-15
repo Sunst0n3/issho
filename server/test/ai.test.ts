@@ -73,6 +73,7 @@ const okReveal = {
   rule: '',
   grammarUsed: ['wa-desu'],
   words,
+  en: ' Today is… ',
 };
 const issue = (n: number, quote: string, hint = `h${n}`, fix = `f${n}`) => ({
   quote,
@@ -89,6 +90,7 @@ const fixReveal = {
   rule: 'Past tense of 飲む is 飲んだ.',
   grammarUsed: ['ta-form', 'o-object', 'passive'],
   words: [],
+  en: 'I drank water.',
 };
 
 describe('Anthropic AI service', () => {
@@ -107,6 +109,7 @@ describe('Anthropic AI service', () => {
       // Not among the learner's known grammar (none was sent).
       grammarUsed: ['other'],
       words,
+      en: 'Today is…',
       tips: [],
     });
     assert.equal(requests.length, 1);
@@ -126,6 +129,7 @@ describe('Anthropic AI service', () => {
       'rule',
       'grammarUsed',
       'words',
+      'en',
     ]);
     assert.equal('betas' in body, false);
     assert.equal('thinking' in body, false);
@@ -164,6 +168,7 @@ describe('Anthropic AI service', () => {
     assert.deepEqual(result.diff, []);
     assert.equal(result.rule, '');
     assert.deepEqual(result.words, []);
+    assert.equal(result.en, '');
     assert.deepEqual(result.tips, []);
     assert.doesNotMatch(JSON.stringify(result), /駅に行く|行った/);
   });
@@ -192,6 +197,9 @@ describe('Anthropic AI service', () => {
       { op: 'same', text: 'だ' },
     ]);
     assert.equal(result.rule, 'Past tense of 飲む is 飲んだ.');
+    // The English line of the cloze card made from the correction.
+    assert.equal(result.en, 'I drank water.');
+    assert.match(requests[0].body.system, /"en" is a short, natural English translation of "corrected"/);
     assert.deepEqual(
       result.issues.map((i) => [i.quote, i.start, i.end]),
       [
@@ -256,12 +264,12 @@ describe('Anthropic AI service', () => {
   });
 
   it('recaps a member’s lines in at most two points', async () => {
-    const point = (n: number) => ({ quote: `q${n}`, corrected: `c${n}`, rule: `r${n}`, grammarUsed: ['te-form', 'x'], words: [] });
+    const point = (n: number) => ({ quote: `q${n}`, corrected: `c${n}`, rule: `r${n}`, grammarUsed: ['te-form', 'x'], words: [], en: ` e${n} ` });
     const { client } = stubbedClient(() => message([text({ points: [point(1), point(2), point(3)], praise: 'Nice!' })]));
     const ai = createAnthropicAi({ apiKey: 'test', model: 'm', client });
     const result = await ai.recap({ goal: 'Order', lines: ['コーヒーをください'], knownGrammar: ['te-form'] });
     assert.equal(result.points.length, 2);
-    assert.deepEqual(result.points[0], { quote: 'q1', corrected: 'c1', rule: 'r1', grammarUsed: ['te-form', 'other'], words: [] });
+    assert.deepEqual(result.points[0], { quote: 'q1', corrected: 'c1', rule: 'r1', grammarUsed: ['te-form', 'other'], words: [], en: 'e1' });
     assert.equal(result.praise, 'Nice!');
   });
 

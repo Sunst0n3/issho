@@ -1,7 +1,9 @@
 // A can-do performance check (/cando/:id). Read and listen checks are 2–3 questions on real material (a menu, a
-// message, an announcement), passed with 2 of 3. Speak and write checks are judged against their rubric by the home
-// server's AI only; without it nothing is recorded. A partner never judges. Showcase mode (Session C's season finale)
-// replays a check and records nothing.
+// message, an announcement), passed with 2 of 3; the material of a listen check plays twice at most, and the marked
+// answers stay on screen after the check. Speak and write checks show their material (the line to answer, the note to
+// reply to; a speak check's lines can be played) and are judged against their rubric by the home server's AI only;
+// without it nothing is recorded. A partner never judges. Showcase mode (Session C's season finale) replays a check
+// and records nothing.
 
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -10,6 +12,7 @@ import { clipRef } from '../../shared/voicevox.ts';
 import { KanaInput } from '../components/study/cards/KanaInput.tsx';
 import { StudyDisplayProvider } from '../components/study/DisplayProvider.tsx';
 import { MixedText } from '../components/study/MixedText.tsx';
+import { checkerStatus } from '../components/study/OutputStep.tsx';
 import { useStudyTimer } from '../components/study/time.ts';
 import { useAsync } from '../components/study/useAsync.ts';
 import { Icon, Ruby, Screen, TopBar } from '../components/ui.tsx';
@@ -24,15 +27,20 @@ import { aiCanDo, ApiError } from '../sync/client.ts';
 import '../components/study/study.css';
 
 export const NEEDS_SERVER = "Needs the home server — try again when you're connected.";
+/** Connected, but the server's AI can't judge: no API key ('off'), or a key or model the API refuses ('broken'). */
+export const AI_OFF = "Needs the home server's AI checker, which is turned off there. Nothing was recorded.";
+export const AI_BROKEN = "Needs the home server's AI checker, which isn't set up right there. Nothing was recorded.";
+/** A listen check's material plays this many times at most ("You can play it twice"). */
+export const LISTEN_PLAYS = 2;
 
 function online(): boolean {
   return typeof navigator === 'undefined' || navigator.onLine !== false;
 }
 
-/** The AI can't judge right now: no server, not paired, no key, offline. */
+/** The AI can't judge right now: no server, not paired, offline. */
 function serverMissing(e: unknown): boolean {
   if (!(e instanceof ApiError)) return true;
-  return e.transient || ['ai_disabled', 'ai_misconfigured', 'unpaired', 'invalid_server_url', 'network', 'timeout'].includes(e.code);
+  return e.transient || ['unpaired', 'invalid_server_url', 'network', 'timeout'].includes(e.code);
 }
 
 function Questions({ canDo, onSubmit }: { canDo: CanDo; onSubmit: (answers: number[]) => void }) {
@@ -52,6 +60,8 @@ function Questions({ canDo, onSubmit }: { canDo: CanDo; onSubmit: (answers: numb
                   className={`choice${picked === k ? ' selected' : ''}${submitted && k === q.answer ? ' correct' : ''}${submitted && picked === k && k !== q.answer ? ' wrong' : ''}`}
                   onClick={() => setAnswers(answers.map((a, j) => (j === i ? k : a)))}>
                   <MixedText text={option} />
+                  {submitted && k === q.answer && <span className="visually-hidden">, correct answer</span>}
+                  {submitted && picked === k && k !== q.answer && <span className="visually-hidden">, your answer</span>}
                 </button>
               ))}
             </div>
@@ -112,7 +122,14 @@ type Outcome =
   | { kind: 'questions'; correct: number; total: number; passed: boolean }
   | { kind: 'ai'; result: AiCanDoResponse }
   | { kind: 'no-server' }
+  | { kind: 'ai-off'; broken: boolean }
   | { kind: 'error' };
+
+/** The material a check works on: a menu or a note to read, lines to answer (Ruby markup, one item per line). */
+function Material({ text }: { text: string }) {
+  const show = useRubyShow();
+  return <div className="card st-material"><Ruby text={text} show={show} /></div>;
+}
 
 /** One can-do check. `showcase`: a rehearsal (Session C's season finale) that records nothing. */
 export function CanDoCheckView({ canDo, unit, showcase = false, onDone }: {
@@ -121,8 +138,10 @@ export function CanDoCheckView({ canDo, unit, showcase = false, onDone }: {
   showcase?: boolean;
   onDone?: () => void;
 }) {
-  const show = useRubyShow();
-  const { play } = usePlayback();
+  const { play, playing } = usePlayback();
+  /** Times the material was played (a listen check allows LISTEN_PLAYS). */
+  const [plays, setPlays] = useState(0);
+  /** Play was tapped: a listen check's questions show from then on. */
   const [heard, setHeard] = useState(false);
   const [checking, setChecking] = useState(false);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
@@ -155,20 +174,37 @@ export function CanDoCheckView({ canDo, unit, showcase = false, onDone }: {
     }
     setChecking(true);
     try {
+      // A server without an API key would refuse the request with a 503: it is not sent.
+      const status = await checkerStatus();
+      if (status !== 'ask') {
+        setOutcome(status === 'off' ? { kind: 'ai-off', broken: false } : { kind: 'no-server' });
+        return;
+      }
       const result = await aiCanDo({ canDoId: canDo.id, kind: check.kind === 'speak' ? 'speak' : 'write', rubric: check.rubric ?? [], text });
       record(result.passed, 'ai');
       setOutcome({ kind: 'ai', result });
     } catch (e) {
-      console.warn('can-do check failed', e);
-      setOutcome(serverMissing(e) ? { kind: 'no-server' } : { kind: 'error' });
+      const code = e instanceof ApiError ? e.code : '';
+      if (code === 'ai_disabled' || code === 'ai_misconfigured') setOutcome({ kind: 'ai-off', broken: code === 'ai_misconfigured' });
+      else if (serverMissing(e)) setOutcome({ kind: 'no-server' });
+      else {
+        console.warn('can-do check failed', e);
+        setOutcome({ kind: 'error' });
+      }
     } finally {
       setChecking(false);
     }
   };
 
-  const listenMaterial = () => {
+  const limited = check.kind === 'listen';
+  const playsLeft = limited ? LISTEN_PLAYS - plays : Infinity;
+  const playMaterial = () => {
+    if (playsLeft <= 0 || playing) return;
     setHeard(true);
-    void play({ ref: clipRef.canDo(canDo.id) }, { fallbackText: check.material });
+    setPlays((n) => n + 1);
+    // Nothing could play (no clip, no voice): that one doesn't count.
+    const giveBack = () => setPlays((n) => Math.max(0, n - 1));
+    void play({ ref: clipRef.canDo(canDo.id) }, { fallbackText: check.material }).then((r) => { if (r.via === 'none') giveBack(); }, giveBack);
   };
 
   return (
@@ -179,14 +215,21 @@ export function CanDoCheckView({ canDo, unit, showcase = false, onDone }: {
         <p className="st-note"><MixedText text={check.instructions} /></p>
       </header>
 
-      {check.kind === 'read' && <div className="card st-material"><Ruby text={check.material} show={show} /></div>}
-      {check.kind === 'listen' && (
+      {check.kind !== 'listen' && check.material.trim() && <Material text={check.material} />}
+      {(check.kind === 'listen' || (check.kind === 'speak' && check.material.trim())) && (
         <div className="card st-prompt">
-          <button type="button" className="btn secondary" onClick={listenMaterial}><Icon name="speaker" size={18} />{heard ? 'Play again' : 'Play'}</button>
+          {/* aria-disabled, not disabled: a keyboard user's focus stays on the button. */}
+          <button type="button" className="btn secondary" aria-disabled={playsLeft <= 0 || undefined} onClick={playMaterial}>
+            <Icon name="speaker" size={18} />{playsLeft <= 0 ? 'Played twice' : heard ? 'Play again' : 'Play'}
+          </button>
+          {limited && plays > 0 && (
+            <p className="st-note" role="status">{playsLeft > 1 ? `${playsLeft} more plays left.` : playsLeft === 1 ? 'One more play left.' : 'That was the last play.'}</p>
+          )}
         </div>
       )}
 
-      {!outcome && (check.kind === 'read' || (check.kind === 'listen' && heard)) && <Questions canDo={canDo} onSubmit={answer} />}
+      {/* The questions stay after the check: each shows the right answer, and a wrong pick is marked. */}
+      {(check.kind === 'read' || (check.kind === 'listen' && heard)) && <Questions canDo={canDo} onSubmit={answer} />}
       {!outcome && (check.kind === 'speak' || check.kind === 'write') && (
         checking ? <div className="st-skeleton st-skeleton-card" aria-busy="true" aria-label="Checking" /> : <SpeakOrWrite canDo={canDo} onText={(t) => void judge(t)} />
       )}
@@ -212,6 +255,7 @@ export function CanDoCheckView({ canDo, unit, showcase = false, onDone }: {
         </div>
       )}
       {outcome?.kind === 'no-server' && <p className="card st-note" role="status">{NEEDS_SERVER}</p>}
+      {outcome?.kind === 'ai-off' && <p className="card st-note" role="status">{outcome.broken ? AI_BROKEN : AI_OFF}</p>}
       {outcome?.kind === 'error' && (
         <div className="card st-error" role="alert">
           <p>The check didn't work this time. Nothing was recorded.</p>

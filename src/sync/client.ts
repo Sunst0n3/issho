@@ -286,6 +286,25 @@ export function health(serverUrl?: string): Promise<HealthResponse> {
   return request('/api/health', { auth: false, serverUrl });
 }
 
+/** What aiStatus() found out about the home server's AI helper. */
+export type AiStatus = 'on' | 'off' | 'unreachable';
+
+/**
+ * Whether the home server's AI helper can answer now (GET /api/health; never rejects):
+ * - 'on': ask it;
+ * - 'off': the server has no API key (or this phone isn't paired), so an AI request could only fail
+ *   with 503 'ai_disabled': don't send one, and don't queue it for later either;
+ * - 'unreachable': the server can't be reached right now; a check can wait for it.
+ */
+export async function aiStatus(): Promise<AiStatus> {
+  try {
+    if (!isPairedSettings(await getSettings())) return 'off';
+    return (await health()).aiEnabled === true ? 'on' : 'off';
+  } catch (e) {
+    return e instanceof ApiError && e.code === 'invalid_server_url' ? 'off' : 'unreachable';
+  }
+}
+
 /** POST /api/register. Low level: prefer pair(), which also stores the result. */
 export function register(req: RegisterRequest, serverUrl?: string): Promise<RegisterResponse> {
   return request('/api/register', { method: 'POST', body: req, auth: false, serverUrl });
@@ -434,7 +453,7 @@ export function submitQuizResult(id: string, req: QuizResultRequest): Promise<Qu
   return request(`/api/quizzes/${encodeURIComponent(id)}/result`, { method: 'POST', body: req });
 }
 
-/** POST /api/ai/check. 503 'ai_disabled' when the server has no API key. */
+/** POST /api/ai/check. 503 'ai_disabled' when the server has no API key: ask aiStatus() first. */
 export function aiCheck(req: AiCheckRequest): Promise<AiCheckResponse> {
   return request('/api/ai/check', { method: 'POST', body: req, timeoutMs: SLOW_TIMEOUT_MS });
 }

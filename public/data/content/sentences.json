@@ -7370,6 +7370,1564 @@
     "unit": 1
   },
   {
+    "id": "s-k041",
+    "jp": "はい、だいじょうぶです。",
+    "en": "Yes, I'm fine.",
+    "grammar": [
+      "wa-desu"
+    ],
+    "tokens": [
+      {
+        "s": "はい",
+        "ref": "core:cw-0010",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "だいじょうぶ",
+        "ref": "core:cw-0024",
+        "k": "c"
+      },
+      {
+        "s": "です",
+        "k": "f"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0010",
+      "core:cw-0024"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k042",
+    "jp": "ほんとうですか。",
+    "en": "Is that true?",
+    "grammar": [
+      "ka-question"
+    ],
+    "tokens": [
+      {
+        "s": "ほんとう",
+        "ref": "core:cw-0033",
+        "k": "c"
+      },
+      {
+        "s": "です",
+        "k": "f"
+      },
+      {
+        "s": "か",
+        "k": "f"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0033"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k043",
+    "jp": "うん、そう。",
+    "en": "Yeah, that's it.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "うん",
+        "ref": "core:cw-0012",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "そう",
+        "ref": "core:cw-0014",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0012",
+      "core:cw-0014"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k044",
+    "jp": "ううん、ちがう。",
+    "en": "Nope, that's not it.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "ううん",
+        "ref": "core:cw-0013",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "ちがう",
+        "ref": "core:cw-0015",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0013",
+      "core:cw-0015"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k045",
+    "jp": "すみません、わかりません。",
+    "en": "Sorry, I don't understand.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "すみません",
+        "ref": "core:cw-0005",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "わかりません",
+        "ref": "core:cw-0006",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0005",
+      "core:cw-0006"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k046",
+    "jp": "ごめん、ちょっとまって。",
+    "en": "Sorry, hang on a second.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "ごめん",
+        "ref": "core:cw-0023",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "ちょっとまって",
+        "ref": "core:cw-0030",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0023",
+      "core:cw-0030"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k047",
+    "jp": "こんにちは。だいじょうぶですか。",
+    "en": "Hello. Are you all right?",
+    "grammar": [
+      "ka-question"
+    ],
+    "tokens": [
+      {
+        "s": "こんにちは",
+        "ref": "core:cw-0016",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      },
+      {
+        "s": "だいじょうぶ",
+        "ref": "core:cw-0024",
+        "k": "c"
+      },
+      {
+        "s": "です",
+        "k": "f"
+      },
+      {
+        "s": "か",
+        "k": "f"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0016",
+      "core:cw-0024"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k048",
+    "jp": "うん、おはよう。",
+    "en": "Yeah, morning.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "うん",
+        "ref": "core:cw-0012",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "おはよう",
+        "ref": "core:cw-0017",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0012",
+      "core:cw-0017"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k049",
+    "jp": "あのう、こんばんは。",
+    "en": "Um, good evening.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "あのう",
+        "ref": "core:cw-0035",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "こんばんは",
+        "ref": "core:cw-0019",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0035",
+      "core:cw-0019"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k050",
+    "jp": "ありがとう。おやすみなさい。",
+    "en": "Thank you. Good night.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "ありがとう",
+        "ref": "core:cw-0008",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      },
+      {
+        "s": "おやすみなさい",
+        "ref": "core:cw-0021",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0008",
+      "core:cw-0021"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k051",
+    "jp": "ごめんなさい、わかりません。",
+    "en": "I'm sorry, I don't know.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "ごめんなさい",
+        "ref": "core:cw-0022",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "わかりません",
+        "ref": "core:cw-0006",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0022",
+      "core:cw-0006"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k052",
+    "jp": "えっと、どういういみですか。",
+    "en": "Um, what does that mean?",
+    "grammar": [
+      "ka-question"
+    ],
+    "tokens": [
+      {
+        "s": "えっと",
+        "ref": "core:cw-0034",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "どういういみ",
+        "ref": "core:cw-0004",
+        "k": "c"
+      },
+      {
+        "s": "です",
+        "k": "f"
+      },
+      {
+        "s": "か",
+        "k": "f"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0034",
+      "core:cw-0004"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k053",
+    "jp": "すみません、もういちどおねがいします。",
+    "en": "Excuse me, could you say that again?",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "すみません",
+        "ref": "core:cw-0005",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "もういちどおねがいします",
+        "ref": "core:cw-0001",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0005",
+      "core:cw-0001"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k054",
+    "jp": "あのう、ゆっくりはなしてください。",
+    "en": "Um, please speak slowly.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "あのう",
+        "ref": "core:cw-0035",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "ゆっくりはなしてください",
+        "ref": "core:cw-0002",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0035",
+      "core:cw-0002"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k055",
+    "jp": "すみません、かいてください。",
+    "en": "Excuse me, could you write it down?",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "すみません",
+        "ref": "core:cw-0005",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "かいてください",
+        "ref": "core:cw-0029",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0005",
+      "core:cw-0029"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k056",
+    "jp": "そうですか。ありがとうございます。",
+    "en": "I see. Thank you very much.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "そうですか",
+        "ref": "core:cw-0031",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      },
+      {
+        "s": "ありがとうございます",
+        "ref": "core:cw-0009",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0031",
+      "core:cw-0009"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k057",
+    "jp": "えっと、にほんごでなんといいますか。",
+    "en": "Um, how do you say it in Japanese?",
+    "grammar": [
+      "ka-question"
+    ],
+    "tokens": [
+      {
+        "s": "えっと",
+        "ref": "core:cw-0034",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "にほんごでなんといいますか",
+        "ref": "core:cw-0028",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0034",
+      "core:cw-0028"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k058",
+    "jp": "はい、どうぞ。",
+    "en": "Here you go.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "はい",
+        "ref": "core:cw-0010",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "どうぞ",
+        "ref": "core:cw-0027",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0010",
+      "core:cw-0027"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k059",
+    "jp": "はい、ください。",
+    "en": "Yes, I'd like some, please.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "はい",
+        "ref": "core:cw-0010",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "ください",
+        "ref": "core:cw-0026",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0010",
+      "core:cw-0026"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k060",
+    "jp": "あ、おはようございます。",
+    "en": "Oh, good morning.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "あ",
+        "ref": "core:cw-0036",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "おはようございます",
+        "ref": "core:cw-0018",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0036",
+      "core:cw-0018"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k061",
+    "jp": "なるほど、そうですか。",
+    "en": "I see, so that's how it is.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "なるほど",
+        "ref": "core:cw-0037",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "そうですか",
+        "ref": "core:cw-0031",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0037",
+      "core:cw-0031"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k062",
+    "jp": "へえ、ほんとう？",
+    "en": "Wow, really?",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "へえ",
+        "ref": "core:cw-0038",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "ほんとう",
+        "ref": "core:cw-0033",
+        "k": "c"
+      },
+      {
+        "s": "？",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0038",
+      "core:cw-0033"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k063",
+    "jp": "ええ、そうです。",
+    "en": "Yes, that's right.",
+    "grammar": [
+      "wa-desu"
+    ],
+    "tokens": [
+      {
+        "s": "ええ",
+        "ref": "core:cw-0039",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "そう",
+        "ref": "core:cw-0014",
+        "k": "c"
+      },
+      {
+        "s": "です",
+        "k": "f"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0039",
+      "core:cw-0014"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k064",
+    "jp": "ええ、おねがいします。",
+    "en": "Yes, please.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "ええ",
+        "ref": "core:cw-0039",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "おねがいします",
+        "ref": "core:cw-0025",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0039",
+      "core:cw-0025"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k065",
+    "jp": "いいね！ありがとう。",
+    "en": "Sounds good! Thanks.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "いいね",
+        "ref": "core:cw-0040",
+        "k": "c"
+      },
+      {
+        "s": "！",
+        "k": "p"
+      },
+      {
+        "s": "ありがとう",
+        "ref": "core:cw-0008",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0040",
+      "core:cw-0008"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k066",
+    "jp": "もちろん！どうぞ。",
+    "en": "Of course! Go ahead.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "もちろん",
+        "ref": "core:cw-0041",
+        "k": "c"
+      },
+      {
+        "s": "！",
+        "k": "p"
+      },
+      {
+        "s": "どうぞ",
+        "ref": "core:cw-0027",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0041",
+      "core:cw-0027"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k067",
+    "jp": "はじめまして。よろしくおねがいします。",
+    "en": "Nice to meet you. I hope we get along.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "はじめまして",
+        "ref": "core:cw-0042",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      },
+      {
+        "s": "よろしくおねがいします",
+        "ref": "core:cw-0043",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0042",
+      "core:cw-0043"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k068",
+    "jp": "いいえ、どういたしまして。",
+    "en": "Not at all, you're welcome.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "いいえ",
+        "ref": "core:cw-0011",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "どういたしまして",
+        "ref": "core:cw-0044",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0011",
+      "core:cw-0044"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k069",
+    "jp": "じゃあね。またね。",
+    "en": "Bye! See you later.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "じゃあね",
+        "ref": "core:cw-0046",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      },
+      {
+        "s": "またね",
+        "ref": "core:cw-0047",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0046",
+      "core:cw-0047"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k070",
+    "jp": "はい、さようなら。",
+    "en": "Okay, goodbye.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "はい",
+        "ref": "core:cw-0010",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "さようなら",
+        "ref": "core:cw-0045",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0010",
+      "core:cw-0045"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k071",
+    "jp": "ありがとう、いただきます。",
+    "en": "Thank you, I'll gladly have some.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "ありがとう",
+        "ref": "core:cw-0008",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "いただきます",
+        "ref": "core:cw-0048",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0008",
+      "core:cw-0048"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k072",
+    "jp": "どうも、ごちそうさまでした。",
+    "en": "Thanks, that was a lovely meal.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "どうも",
+        "ref": "core:cw-0058",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "ごちそうさまでした",
+        "ref": "core:cw-0049",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0058",
+      "core:cw-0049"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k073",
+    "jp": "うん、いってきます。",
+    "en": "Yep, I'm off.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "うん",
+        "ref": "core:cw-0012",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "いってきます",
+        "ref": "core:cw-0050",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0012",
+      "core:cw-0050"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k074",
+    "jp": "はい、いってらっしゃい。",
+    "en": "Okay, have a good day.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "はい",
+        "ref": "core:cw-0010",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "いってらっしゃい",
+        "ref": "core:cw-0051",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0010",
+      "core:cw-0051"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k075",
+    "jp": "「ただいま」ってなに？",
+    "en": "What does \"tadaima\" mean?",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "「",
+        "k": "p"
+      },
+      {
+        "s": "ただいま",
+        "ref": "core:cw-0052",
+        "k": "c"
+      },
+      {
+        "s": "」",
+        "k": "p"
+      },
+      {
+        "s": "ってなに",
+        "ref": "core:cw-0003",
+        "k": "c"
+      },
+      {
+        "s": "？",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0052",
+      "core:cw-0003"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k076",
+    "jp": "おかえりなさい。おつかれさま。",
+    "en": "Welcome home. You must be tired.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "おかえりなさい",
+        "ref": "core:cw-0053",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      },
+      {
+        "s": "おつかれさま",
+        "ref": "core:cw-0054",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0053",
+      "core:cw-0054"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k077",
+    "jp": "「なるほど」はどういういみですか。",
+    "en": "What does \"naruhodo\" mean?",
+    "grammar": [
+      "wa-desu",
+      "ka-question"
+    ],
+    "tokens": [
+      {
+        "s": "「",
+        "k": "p"
+      },
+      {
+        "s": "なるほど",
+        "ref": "core:cw-0037",
+        "k": "c"
+      },
+      {
+        "s": "」",
+        "k": "p"
+      },
+      {
+        "s": "は",
+        "k": "f"
+      },
+      {
+        "s": "どういういみ",
+        "ref": "core:cw-0004",
+        "k": "c"
+      },
+      {
+        "s": "です",
+        "k": "f"
+      },
+      {
+        "s": "か",
+        "k": "f"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0037",
+      "core:cw-0004"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k078",
+    "jp": "がんばって！だいじょうぶ。",
+    "en": "Good luck! You'll be fine.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "がんばって",
+        "ref": "core:cw-0055",
+        "k": "c"
+      },
+      {
+        "s": "！",
+        "k": "p"
+      },
+      {
+        "s": "だいじょうぶ",
+        "ref": "core:cw-0024",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0055",
+      "core:cw-0024"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k079",
+    "jp": "ほんとう？おめでとう！",
+    "en": "Really? Congratulations!",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "ほんとう",
+        "ref": "core:cw-0033",
+        "k": "c"
+      },
+      {
+        "s": "？",
+        "k": "p"
+      },
+      {
+        "s": "おめでとう",
+        "ref": "core:cw-0056",
+        "k": "c"
+      },
+      {
+        "s": "！",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0033",
+      "core:cw-0056"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k080",
+    "jp": "すみません、しつれいします。",
+    "en": "Excuse me, sorry to interrupt.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "すみません",
+        "ref": "core:cw-0005",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "しつれいします",
+        "ref": "core:cw-0057",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0005",
+      "core:cw-0057"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k081",
+    "jp": "おやすみ。またね。",
+    "en": "Good night. See you.",
+    "grammar": [],
+    "tokens": [
+      {
+        "s": "おやすみ",
+        "ref": "core:cw-0020",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      },
+      {
+        "s": "またね",
+        "ref": "core:cw-0047",
+        "k": "c"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0020",
+      "core:cw-0047"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-s1-111",
+    "jp": "はい、{私|わたし}です。",
+    "en": "Yes, it's me.",
+    "grammar": [
+      "wa-desu"
+    ],
+    "tokens": [
+      {
+        "s": "はい",
+        "ref": "core:cw-0010",
+        "k": "c"
+      },
+      {
+        "s": "、",
+        "k": "p"
+      },
+      {
+        "s": "私",
+        "r": "わたし",
+        "ref": "core:cw-0059",
+        "k": "c"
+      },
+      {
+        "s": "です",
+        "k": "f"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0010",
+      "core:cw-0059"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-s1-112",
+    "jp": "{私|わたし}もです。",
+    "en": "Me too.",
+    "grammar": [
+      "mo-also"
+    ],
+    "tokens": [
+      {
+        "s": "私",
+        "r": "わたし",
+        "ref": "core:cw-0059",
+        "k": "c"
+      },
+      {
+        "s": "も",
+        "k": "f"
+      },
+      {
+        "s": "です",
+        "k": "f"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0059"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-s1-113",
+    "jp": "{私|わたし}じゃないです。",
+    "en": "It's not me.",
+    "grammar": [
+      "ja-nai-desu"
+    ],
+    "tokens": [
+      {
+        "s": "私",
+        "r": "わたし",
+        "ref": "core:cw-0059",
+        "k": "c"
+      },
+      {
+        "s": "じゃ",
+        "k": "f"
+      },
+      {
+        "s": "ない",
+        "k": "f"
+      },
+      {
+        "s": "です",
+        "k": "f"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0059"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-s1-114",
+    "jp": "{私|わたし}はだいじょうぶです。あなたは？",
+    "en": "I'm fine. How about you?",
+    "grammar": [
+      "wa-desu"
+    ],
+    "tokens": [
+      {
+        "s": "私",
+        "r": "わたし",
+        "ref": "core:cw-0059",
+        "k": "c"
+      },
+      {
+        "s": "は",
+        "k": "f"
+      },
+      {
+        "s": "だいじょうぶ",
+        "ref": "core:cw-0024",
+        "k": "c"
+      },
+      {
+        "s": "です",
+        "k": "f"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      },
+      {
+        "s": "あなた",
+        "ref": "core:cw-0060",
+        "k": "c"
+      },
+      {
+        "s": "は",
+        "k": "f"
+      },
+      {
+        "s": "？",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0059",
+      "core:cw-0024",
+      "core:cw-0060"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k082",
+    "jp": "あなたのですか。",
+    "en": "Is it yours?",
+    "grammar": [
+      "no-possession",
+      "ka-question"
+    ],
+    "tokens": [
+      {
+        "s": "あなた",
+        "ref": "core:cw-0060",
+        "k": "c"
+      },
+      {
+        "s": "の",
+        "k": "f"
+      },
+      {
+        "s": "です",
+        "k": "f"
+      },
+      {
+        "s": "か",
+        "k": "f"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0060"
+    ],
+    "unit": 1
+  },
+  {
+    "id": "s-k083",
+    "jp": "あなたもですか。",
+    "en": "You too?",
+    "grammar": [
+      "mo-also",
+      "ka-question"
+    ],
+    "tokens": [
+      {
+        "s": "あなた",
+        "ref": "core:cw-0060",
+        "k": "c"
+      },
+      {
+        "s": "も",
+        "k": "f"
+      },
+      {
+        "s": "です",
+        "k": "f"
+      },
+      {
+        "s": "か",
+        "k": "f"
+      },
+      {
+        "s": "。",
+        "k": "p"
+      }
+    ],
+    "refs": [
+      "core:cw-0060"
+    ],
+    "unit": 1
+  },
+  {
     "id": "s-s2-001",
     "jp": "{三丁目|さんちょうめ}の{本|ほん}やさんで{会|あ}いましょう。",
     "en": "Let's meet at the bookstore in 3-chōme.",

@@ -9,6 +9,10 @@ const IMMUTABLE = 'public, max-age=31536000, immutable';
 const REVALIDATE = 'no-cache';
 /** Voice clips are named by a hash of their content (public/audio/<aa>/<hash16>.m4a). */
 const CLIP_RE = /\.m4a$/i;
+/** The service worker's Workbox runtime, next to sw.js and named by its content hash (workbox-835c8c05.js). */
+const WORKBOX_RE = /^workbox-[0-9a-f]{8,}\.js(\.br|\.gz)?$/i;
+/** Browsers ask for /favicon.ico on their own (tabs, bookmarks); the build has PNG and SVG icons only. */
+const FAVICON_FALLBACK = 'icons/icon-192.png';
 
 /**
  * Serves the built PWA from `root`. Returns false (and serves nothing) when there's no build there.
@@ -24,7 +28,9 @@ export async function registerStatic(app: FastifyInstance, root: string): Promis
   const assetsDir = path.join(root, 'assets') + path.sep;
   const audioDir = path.join(root, 'audio') + path.sep;
   const immutable = (filePath: string) =>
-    filePath.startsWith(assetsDir) || (filePath.startsWith(audioDir) && CLIP_RE.test(filePath));
+    filePath.startsWith(assetsDir)
+    || (filePath.startsWith(audioDir) && CLIP_RE.test(filePath))
+    || (path.resolve(path.dirname(filePath)) === path.resolve(root) && WORKBOX_RE.test(path.basename(filePath)));
   await app.register(fastifyStatic, {
     root,
     // `send` rejects `..` segments and paths outside `root`; dotfiles are never served.
@@ -37,6 +43,11 @@ export async function registerStatic(app: FastifyInstance, root: string): Promis
       reply.header('cache-control', immutable(filePath) ? IMMUTABLE : REVALIDATE);
     },
   });
+  // Without a favicon.ico of its own, answer with the app icon (browsers accept a PNG there)
+  // instead of a 404 in the log on every page load.
+  if (!existsSync(path.join(root, 'favicon.ico')) && existsSync(path.join(root, FAVICON_FALLBACK))) {
+    app.get('/favicon.ico', (_request, reply) => reply.sendFile(FAVICON_FALLBACK));
+  }
   return true;
 }
 

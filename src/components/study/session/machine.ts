@@ -2,8 +2,8 @@
 // order, and the per-card day-0 retrieval counter. No React, no IndexedDB, so
 // the order and the cap can be tested on plain plans.
 
-import type { CardType, SessionStepId } from '../../../lib/types.ts';
-import type { NewItemPlan } from '../../../srs/course.ts';
+import type { CardType, KanaRule, SessionStepId } from '../../../lib/types.ts';
+import { taughtKanaFrom, type NewItemPlan } from '../../../srs/course.ts';
 import type { DayPlan } from '../../../srs/planner.ts';
 import { shuffle } from '../../../srs/random.ts';
 
@@ -114,13 +114,35 @@ const PRODUCTION: ReadonlySet<CardType> = new Set<CardType>(['write', 'produce',
 
 const typeOfCard = (id: string) => id.slice(id.lastIndexOf('|') + 1) as CardType;
 
-/** pure: every New card of the sitting (learned cardIds + pendingCheck, deduplicated): production types first (write,
- *  produce, build, cloze), then the rest (read, listen, comprehend, meaning); shuffled within each group with `random`. */
+/**
+ * pure: every New card of the sitting (learned cardIds + pendingCheck, deduplicated): production types first, then the
+ * rest (read, listen, comprehend, meaning); shuffled within each group with `random`. Within production the write cards
+ * come first: a kanji write card asks the kanji that its anchor word's produce and read cards would show (§3.2.4 leak
+ * guard), and its own prompt keeps the anchor's reading back while those cards are still to come.
+ */
 export function firstCheckIds(learned: readonly LearnedItem[], pendingCheck: readonly string[], random: () => number): string[] {
   const all = [...new Set([...learned.flatMap((l) => l.cardIds), ...pendingCheck])];
-  const production = all.filter((id) => PRODUCTION.has(typeOfCard(id)));
+  const write = all.filter((id) => typeOfCard(id) === 'write');
+  const production = all.filter((id) => typeOfCard(id) !== 'write' && PRODUCTION.has(typeOfCard(id)));
   const rest = all.filter((id) => !PRODUCTION.has(typeOfCard(id)));
-  return [...shuffle(production, random), ...shuffle(rest, random)];
+  return [...shuffle(write, random), ...shuffle(production, random), ...shuffle(rest, random)];
+}
+
+/**
+ * pure: the kana the romaji helper treats as taught during the sitting (§3.2.3 KanaText): those taught before it, every
+ * kana and rule taught so far in it, and the item whose lesson is on screen (its own example and practice words must
+ * not spell out the sound they teach). Returns `before` itself when the sitting adds nothing.
+ */
+export function sittingTaught(
+  before: ReadonlySet<string>,
+  learned: readonly Pick<LearnedItem, 'itemIds'>[],
+  lesson: Pick<NewItemPlan, 'itemId'> | undefined,
+  rules: readonly KanaRule[],
+): ReadonlySet<string> {
+  const ids = new Set([...learned.flatMap((l) => l.itemIds), ...(lesson ? [lesson.itemId] : [])]);
+  const added = taughtKanaFrom(rules, ids);
+  if ([...added].every((k) => before.has(k))) return before;
+  return new Set([...before, ...added]);
 }
 
 /** The step name shown in the session header. */

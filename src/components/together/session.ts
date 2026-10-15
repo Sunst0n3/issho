@@ -46,6 +46,9 @@ export const SESSION_TITLES: Record<TogetherSessionId, string> = {
   monthly: 'Monthly session',
 };
 
+/** What the monthly session holds, for lists that already name it "Monthly session". */
+export const MONTHLY_DETAIL = 'Quiz, goals & skit';
+
 /** The steps of a session, given the plan it runs. */
 export function sessionSteps(session: TogetherSessionId, plan: TogetherRunPlan): SessionStep[] {
   const steps: SessionStep[] = [];

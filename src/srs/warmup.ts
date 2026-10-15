@@ -3,6 +3,7 @@
 
 import { State } from 'ts-fsrs';
 import type { CardRecord, CardType } from '../lib/types.ts';
+import { hashString } from './random.ts';
 
 export interface WarmupCard {
   id: string;
@@ -37,14 +38,27 @@ function rank(card: WarmupCard, yesterday: string | null): number {
   return card.state === State.Review ? 2 : 3;
 }
 
-/** pure: the priority order before sibling rules. */
-function sorted(cards: readonly WarmupCard[], yesterday: string | null): WarmupCard[] {
+/**
+ * Retrievability and due times are compared in coarse steps: cards learned or reviewed together (a kana row, a lesson
+ * batch) differ only by the seconds between their answers, so exact values would replay yesterday's order, which is
+ * chart order. Within a step the order is a per-day shuffle, so the sequence gives no cue.
+ */
+export const R_STEP = 0.01;
+export const DUE_STEP_MS = 60 * 60 * 1000;
+
+const rStep = (r: number) => Math.round(r / R_STEP);
+const dueStep = (d: Date) => Math.floor(d.getTime() / DUE_STEP_MS);
+
+/** pure: the priority order before sibling rules. Ties are broken by a hash of the seed and the card id. */
+function sorted(cards: readonly WarmupCard[], yesterday: string | null, seed: string): WarmupCard[] {
+  const shuffled = new Map(cards.map((c) => [c.id, hashString(`${seed}|${c.id}`)]));
   return [...cards].sort((a, b) => {
     const ra = rank(a, yesterday);
     const rb = rank(b, yesterday);
     if (ra !== rb) return ra - rb;
-    if (ra < 2) return a.due.getTime() - b.due.getTime();
-    return a.r - b.r || b.value - a.value || a.due.getTime() - b.due.getTime();
+    const tie = shuffled.get(a.id)! - shuffled.get(b.id)! || a.id.localeCompare(b.id);
+    if (ra < 2) return dueStep(a.due) - dueStep(b.due) || tie;
+    return rStep(a.r) - rStep(b.r) || b.value - a.value || dueStep(a.due) - dueStep(b.due) || tie;
   });
 }
 
@@ -66,15 +80,16 @@ function spaced(cards: readonly WarmupCard[]): string[] {
 
 /**
  * pure. Order: Learning/Relearning cards introduced yesterday (by due), other Learning/Relearning (by due),
- * then Review by ascending r (ties: value desc, due asc). Not catch-up: a card whose group is in
- * takenGroups (reviewed earlier today) or already taken in this order is buried. Catch-up: nothing is
- * buried; cards sharing a group are kept ≥ 10 positions apart when possible (greedy deferral).
+ * then Review by ascending r (ties: value desc, due asc), r and due in coarse steps (R_STEP, DUE_STEP_MS) and
+ * remaining ties shuffled by `seed` (the day key: the same order all day, a different one tomorrow). Not catch-up:
+ * a card whose group is in takenGroups (reviewed earlier today) or already taken in this order is buried. Catch-up:
+ * nothing is buried; cards sharing a group are kept ≥ 10 positions apart when possible (greedy deferral).
  */
 export function orderWarmup(
   cards: readonly WarmupCard[],
-  opts: { yesterday: string | null; takenGroups: ReadonlySet<string>; catchUp: boolean },
+  opts: { yesterday: string | null; takenGroups: ReadonlySet<string>; catchUp: boolean; seed?: string },
 ): { order: string[]; bury: string[] } {
-  const queue = sorted(cards, opts.yesterday);
+  const queue = sorted(cards, opts.yesterday, opts.seed ?? '');
   if (opts.catchUp) return { order: spaced(queue), bury: [] };
   const taken = new Set(opts.takenGroups);
   const order: string[] = [];

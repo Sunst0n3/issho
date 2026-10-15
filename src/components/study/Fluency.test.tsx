@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { createEmptyCard } from 'ts-fsrs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cardId, db } from '../../lib/db.ts';
@@ -8,7 +8,7 @@ import type { PitchItem } from '../../srs/pitch.ts';
 import { gradeCard } from '../../srs/scheduler.ts';
 import { listen, recognitionAvailable } from '../../speech/recognition.ts';
 import { FluencySprint } from './FluencySprint.tsx';
-import { PhrasePitchLine, phraseLevels } from './PhrasePitchLine.tsx';
+import { PhrasePitchLine, phraseLabels, phraseLevels } from './PhrasePitchLine.tsx';
 import { accentType, PitchDrill } from './PitchDrill.tsx';
 import { moraLevels, PitchLine } from './PitchLine.tsx';
 import { audioMock, resetStudyDb } from './test-utils.tsx';
@@ -43,6 +43,7 @@ beforeEach(async () => {
 
 afterEach(() => {
   cleanup();
+  vi.useRealTimers();
 });
 
 describe('speed round', () => {
@@ -55,15 +56,26 @@ describe('speed round', () => {
     ]);
     const onDone = vi.fn();
     render(<FluencySprint plan={{ kind: 'speed' }} onDone={onDone} />);
-    fireEvent.click(await screen.findByRole('button', { name: 'Start' }));
+    const start = await screen.findByRole('button', { name: 'Start' });
+    // The clock stands still until the test moves it; the countdown's own ticks stay real.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    const t0 = Date.now();
+    fireEvent.click(start);
     const seen: string[] = [];
     for (let i = 0; i < 2; i++) {
       seen.push(document.querySelector('.st-prompt')!.textContent ?? '');
       fireEvent.click(screen.getByRole('button', { name: 'Next' }));
     }
     expect(seen.sort()).toEqual(['ありがとう', '水']);
-    expect(await screen.findByText('2 read in a minute')).toBeTruthy();
-    await waitFor(async () => expect((await db.fluency.toArray()).map((r) => [r.kind, r.value])).toEqual([['speed', 2]]));
+    // The round lasts the full minute: the cards come round again (V059).
+    expect(screen.getByText('2 read')).toBeTruthy();
+    expect(screen.queryByText(/read in a minute/)).toBeNull();
+    const third = document.querySelector('.st-prompt')!.textContent;
+    expect(seen).toContain(third);
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+    act(() => { vi.setSystemTime(t0 + 60_000); });
+    expect(await screen.findByText('3 read in a minute')).toBeTruthy();
+    await waitFor(async () => expect((await db.fluency.toArray()).map((r) => [r.kind, r.value])).toEqual([['speed', 3]]));
     expect(gradeCard).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
     expect(onDone).toHaveBeenCalledTimes(1);
@@ -171,7 +183,54 @@ describe('PitchLine', () => {
   });
 });
 
+describe('fluency plan items (V058)', () => {
+  const planned: PitchItem[] = [
+    { ref: 'word:w-hon', written: '本', kana: 'ほん', accent: { moras: ['ホ', 'ン'], drop: 1, type: 'atamadaka', withGa: true }, clipRef: 'pitch:word:w-hon' },
+    { ref: 'word:w-mizu', written: '水', kana: 'みず', accent: { moras: ['ミ', 'ズ'], drop: 0, type: 'heiban', withGa: true }, clipRef: 'pitch:word:w-mizu' },
+  ];
+
+  it('the pitch drill runs the plan’s words, in the plan’s order', async () => {
+    render(<FluencySprint plan={{ kind: 'pitch', pitch: planned }} onDone={() => {}} />);
+    expect(await screen.findByText('Pitch · 1 / 2')).toBeTruthy();
+    await waitFor(() => expect(audioMock.play).toHaveBeenCalledWith({ ref: 'pitch:word:w-hon' }));
+    expect(document.querySelector('.st-prompt .st-big')?.textContent).toBe('ほんが');
+  });
+
+  it('the planned pitch drill still needs every clip on this phone', async () => {
+    audioMock.hasClip.mockImplementationOnce(async () => false);
+    render(<FluencySprint plan={{ kind: 'pitch', pitch: planned }} onDone={() => {}} />);
+    expect(await screen.findByText(/No pitch drill today/)).toBeTruthy();
+  });
+
+  it('the numbers drill runs the plan’s items', async () => {
+    const numbers: NumberDrillItem[] = [{ kind: 'number', prompt: '7', answers: ['なな', 'しち'] }];
+    render(<FluencySprint plan={{ kind: 'numbers', numbers }} onDone={() => {}} />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Start' }));
+    expect(document.querySelector('.st-prompt')!.textContent).toBe('7');
+  });
+});
+
 describe('PhrasePitchLine', () => {
+  it('labels the moras in the sentence’s own spelling, not the engine’s katakana (V065, V091)', () => {
+    // は and を as written; おとうさん's う, not the オ VOICEVOX hears.
+    expect(phraseLabels([['アノ', 0], ['ヒトワ', 2], ['ダレデスカ', 1]], 'あの{人|ひと}はだれですか。'))
+      .toEqual([['あ', 'の'], ['ひ', 'と', 'は'], ['だ', 'れ', 'で', 'す', 'か']]);
+    expect(phraseLabels([['ウチデ', 0], ['バン', 1], ['ゴハンオ', 1], ['タベマス', 3]], 'うちで{晩|ばん}ご{飯|はん}を{食|た}べます。'))
+      .toEqual([['う', 'ち', 'で'], ['ば', 'ん'], ['ご', 'は', 'ん', 'を'], ['た', 'べ', 'ま', 'す']]);
+    expect(phraseLabels([['オトオサンニ', 2], ['ヨロシク', 0]], 'お{父|とう}さんによろしく。'))
+      .toEqual([['お', 'と', 'う', 'さ', 'ん', 'に'], ['よ', 'ろ', 'し', 'く']]);
+    // Katakana words keep their spelling, long-vowel mark included.
+    expect(phraseLabels([['コオヒイオ', 3]], 'コーヒーを')).toEqual([['コ', 'ー', 'ヒ', 'ー', 'を']]);
+    // A spelling that doesn't line up (an unread kanji, digits), or none: the engine's moras, in hiragana.
+    expect(phraseLabels([['キョオワ', 1]], '今日は')).toEqual([['きょ', 'お', 'わ']]);
+    expect(phraseLabels([['キョオワ', 1]])).toEqual([['きょ', 'お', 'わ']]);
+  });
+
+  it('draws the labels it is given text for', () => {
+    const { container } = render(<PhrasePitchLine phrases={[['オトオサンニ', 2], ['ヨロシク', 0]]} text="お{父|とう}さんによろしく。" />);
+    expect([...container.querySelectorAll('.st-pitch-mora')].map((t) => t.textContent).join('')).toBe('おとうさんによろしく');
+  });
+
   it('draws one small line per accent phrase (snapshot)', () => {
     expect(phraseLevels(4, 1)).toEqual([true, false, false, false]);
     expect(phraseLevels(4, 4)).toEqual([false, true, true, true]);

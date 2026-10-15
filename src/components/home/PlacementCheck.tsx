@@ -1,13 +1,16 @@
 // The kana placement check (onboarding, and Settings → re-check): 20 kana of one script. Each plays
 // its sound and the learner writes it from memory on the recall pad. 18 or more right skips that
-// script's sprint (its kana start as known reviews); otherwise the sprint teaches it.
+// script's sprint (its kana start as known reviews); otherwise the sprint teaches it. A pass taken back
+// in onboarding (the script switched off again) is undone by withdrawPlacement.
 import { useEffect, useRef, useState } from 'react';
 import { clipRef } from '../../../shared/voicevox.ts';
-import { loadKana } from '../../lib/data.ts';
-import type { KanaEntry, KanaScript } from '../../lib/types.ts';
+import { loadKana, loadKanaRules } from '../../lib/data.ts';
+import { db, itemId, updateSettings } from '../../lib/db.ts';
+import type { KanaEntry, KanaScript, Settings } from '../../lib/types.ts';
 import { play } from '../../speech/audio.ts';
 import { applyPlacement, PLACEMENT_ITEMS, PLACEMENT_PASS, placementSet } from '../../srs/course.ts';
 import { useStrokes, WritingPad, type RecallResult } from '../../writing/index.ts';
+import { kanaSoundRow } from '../study/learn/data.ts';
 import { Icon } from '../ui.tsx';
 
 export type PlacementOutcome = 'known' | 'sprint';
@@ -27,6 +30,27 @@ export function placementText(r: PlacementResult, otherKnown: boolean): string {
   return `${r.correct}/${r.total} — let's do the ${otherKnown ? '7' : '14'}-day sprint`;
 }
 
+/**
+ * Undoes a passed placement check: the script's kana and kana-rule items the check created (ItemRecord.via
+ * 'placement'), their cards and any reviews of them go, and knowsHiragana/knowsKatakana is cleared, so the
+ * sprint teaches the script. Items the course itself introduced stay. Returns the saved settings.
+ */
+export async function withdrawPlacement(script: KanaScript): Promise<Settings> {
+  const [kana, rules] = await Promise.all([loadKana(), loadKanaRules()]);
+  const ids = [
+    ...kana.filter((k) => k.script === script && k.kind === 'basic').map((k) => itemId('kana', k.char)),
+    ...rules.filter((r) => r.script === script).map((r) => itemId('kanaRule', r.id)),
+  ];
+  await db.transaction('rw', db.items, db.cards, db.reviewLogs, async () => {
+    const placed = (await db.items.bulkGet(ids)).flatMap((i) => (i?.via === 'placement' ? [i.id] : []));
+    if (!placed.length) return;
+    await db.reviewLogs.where('itemId').anyOf(placed).delete();
+    await db.cards.where('itemId').anyOf(placed).delete();
+    await db.items.bulkDelete(placed);
+  });
+  return updateSettings(script === 'hiragana' ? { knowsHiragana: false } : { knowsKatakana: false });
+}
+
 export interface PlacementSummary { title: string; detail: string }
 
 /** The result as onboarding words it: a pass skips the script's lessons, a fail leads to the sprint. */
@@ -39,8 +63,10 @@ function startSummary(r: PlacementResult, otherKnown: boolean): PlacementSummary
   };
 }
 
-function PlacementItem({ entry, index, total, onAnswer }: {
+function PlacementItem({ entry, row, index, total, onAnswer }: {
   entry: KanaEntry;
+  /** The row a sound twin is written in (を → わ), as the review card and the memory pass name it. */
+  row?: string;
   index: number;
   total: number;
   onAnswer: (ok: boolean) => void;
@@ -75,7 +101,9 @@ function PlacementItem({ entry, index, total, onAnswer }: {
           <Icon name="speaker" size={16} />Play the sound
         </button>
       </div>
-      <p className="hm-hint">Write the {SCRIPT_NAME[entry.script]} for the sound you hear, then tap Done.</p>
+      <p className="hm-hint">
+        Write the {SCRIPT_NAME[entry.script]} for the sound you hear{row && <> (<span lang="ja">{row}</span> row)</>}, then tap Done.
+      </p>
       {loading && <div className="hm-skeleton hm-pad-skeleton" aria-hidden="true" />}
       {!loading && strokes && (
         // A kana drawn after the pad's Hint showed its strokes was copied, not recalled: it doesn't count.
@@ -88,16 +116,25 @@ function PlacementItem({ entry, index, total, onAnswer }: {
   );
 }
 
-export function PlacementCheck({ script, otherKnown = false, summary, onDone, onCancel }: {
+/** What a pass does, as the intro says it before the check: onboarding's wording by default. */
+export function passNoteText(script: KanaScript): string {
+  return `${PLACEMENT_PASS} or more right and you skip the ${SCRIPT_NAME[script]} lessons.`;
+}
+
+export function PlacementCheck({ script, otherKnown = false, summary, passNote, onDone, onCancel }: {
   script: KanaScript;
   /** The other script is known: a failed check leads to a 7-day sprint. */
   otherKnown?: boolean;
   /** How the result reads; onboarding's wording (pass → skip the lessons, fail → the sprint) by default. */
   summary?: (result: PlacementResult) => PlacementSummary;
+  /** What a pass does, in the intro (passNoteText by default): a re-check after the lessons words it otherwise. */
+  passNote?: string;
   onDone: (result: PlacementResult) => void;
   onCancel?: () => void;
 }) {
   const [items, setItems] = useState<KanaEntry[]>();
+  /** Every kana, to name the row of a sound twin. */
+  const [allKana, setAllKana] = useState<KanaEntry[]>([]);
   const [loadError, setLoadError] = useState(false);
   const [started, setStarted] = useState(false);
   const [index, setIndex] = useState(0);
@@ -109,7 +146,11 @@ export function PlacementCheck({ script, otherKnown = false, summary, onDone, on
   useEffect(() => {
     let live = true;
     loadKana().then(
-      (kana) => { if (live) setItems(placementSet(kana, script)); },
+      (kana) => {
+        if (!live) return;
+        setAllKana(kana);
+        setItems(placementSet(kana, script));
+      },
       () => { if (live) setLoadError(true); },
     );
     return () => { live = false; };
@@ -159,7 +200,7 @@ export function PlacementCheck({ script, otherKnown = false, summary, onDone, on
         <h2 id="placement-intro" className="hm-notice-title">Quick {SCRIPT_NAME[script]} check</h2>
         <p className="hm-hint">
           You'll hear {items.length} sounds. Write each one from memory (one written after a hint doesn't
-          count). {PLACEMENT_PASS} or more right and you skip the {SCRIPT_NAME[script]} lessons. About 3 minutes.
+          count). {passNote ?? passNoteText(script)} About 3 minutes.
         </p>
         <div className="hm-prompt-actions">
           <button type="button" className="btn primary small" onClick={() => setStarted(true)}>Start the check</button>
@@ -171,7 +212,8 @@ export function PlacementCheck({ script, otherKnown = false, summary, onDone, on
 
   return (
     <section className="hm-placement" aria-label={`${SCRIPT_NAME[script]} check`}>
-      <PlacementItem key={index} entry={items[index]} index={index} total={items.length} onAnswer={onAnswer} />
+      <PlacementItem key={index} entry={items[index]} row={kanaSoundRow(items[index], allKana)} index={index} total={items.length}
+        onAnswer={onAnswer} />
       {saveError && (
         <p className="hm-error" role="alert">
           Couldn't save the result on this phone.{' '}

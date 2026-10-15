@@ -25,20 +25,22 @@ afterEach(() => {
 const isSheetEntry = () => Boolean((window.history.state as Record<string, unknown> | null)?.isshoSheet);
 
 describe('Kana chart', () => {
-  it('shows romaji (the one place after the sprint) and which kana are learned', async () => {
+  it('shows romaji (the one place after the sprint) and which kana are met, counting the script on its tab', async () => {
     await db.items.add({ id: 'kana:あ', kind: 'kana', key: 'あ', introducedAt: new Date() });
     renderAt('/kana', '/kana', <KanaChart />);
-    expect(await screen.findByRole('button', { name: 'あ, a, learned' })).toBeTruthy();
+    expect(await screen.findByRole('button', { name: 'あ, a, met' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'い, i' })).toBeTruthy();
-    expect(screen.getByText('1 of 6 learned. Tap one to hear it and see how it\'s written.')).toBeTruthy();
+    // The tab's own script, marks and combinations included (the Learn hub counts basic kana of both).
+    expect(screen.getByText(/^1 of 6 hiragana met so far, with marks and combinations\./)).toBeTruthy();
+    expect(screen.queryByText(/learned/)).toBeNull();
   });
 
   it('marks the kana of an introduced rule lesson as learned (they are not items of their own)', async () => {
     renderAt('/kana', '/kana', <KanaChart />);
     expect(await screen.findByRole('button', { name: 'きゃ, kya' })).toBeTruthy();
     await db.items.add({ id: 'kanaRule:hira-yoon', kind: 'kanaRule', key: 'hira-yoon', introducedAt: new Date() });
-    expect(await screen.findByRole('button', { name: 'きゃ, kya, learned' })).toBeTruthy();
-    expect(screen.getByText(/^1 of 6 learned/)).toBeTruthy();
+    expect(await screen.findByRole('button', { name: 'きゃ, kya, met' })).toBeTruthy();
+    expect(screen.getByText(/^1 of 6 hiragana met/)).toBeTruthy();
   });
 
   it('plays the kana clip on a tap and offers practice writing on its own page', async () => {

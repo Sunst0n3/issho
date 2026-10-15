@@ -2,7 +2,7 @@ import type { DayStats, MemberStats } from '../../../shared/api.ts';
 import { dayKey } from '../../lib/db.ts';
 import { weekdayLong, weekdayShort } from './household.ts';
 
-/** Paired bars of minutes studied per day (you vs. partner), with a table for screen readers. */
+/** Paired bars of minutes studied per day, solo and together (you vs. partner), with a table for screen readers. */
 export function WeekChart({ me, partner, partnerName }: {
   me?: MemberStats;
   partner?: MemberStats;
@@ -12,7 +12,11 @@ export function WeekChart({ me, partner, partnerName }: {
   const axis = (me?.days.length ? me.days : partner?.days ?? []).map((d) => d.date);
   const mine = new Map<string, DayStats>(me?.days.map((d) => [d.date, d]));
   const theirs = new Map<string, DayStats>(partner?.days.map((d) => [d.date, d]));
-  const minutes = (m: Map<string, DayStats>, date: string) => Math.max(0, Math.round(m.get(date)?.studyMinutes ?? 0));
+  // Solo study plus together sessions, the same minutes the week's totals add up.
+  const minutes = (m: Map<string, DayStats>, date: string) => {
+    const day = m.get(date);
+    return Math.max(0, Math.round((day?.studyMinutes ?? 0) + (day?.togetherMinutes ?? 0)));
+  };
   const max = Math.max(1, ...axis.flatMap((date) => [minutes(mine, date), minutes(theirs, date)]));
   const bar = (who: 'you' | 'partner', value: number) => (
     <span className={value > 0 ? `tg-bar tg-${who}` : `tg-bar tg-${who} tg-empty`}

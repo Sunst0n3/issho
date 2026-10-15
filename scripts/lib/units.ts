@@ -3,6 +3,7 @@
 // tasks out of the app.
 
 import type { CanDo, CanDoCheckKind, TaskCard, TargetRef, UnitSpec } from '../../src/lib/types.ts';
+import { castProblems } from './cast.ts';
 import { Checker, eachObject, isObj, labelOf, type ContentField, type ContentItem, type Obj } from './checker.ts';
 
 export const UNIT_LEVELS: readonly UnitSpec['level'][] = ['A1', 'A2', 'N3-path'];
@@ -166,7 +167,8 @@ function toCanDo(cd: Obj): CanDo {
  * UnitSpec[] by id, with `ready` flags, from units that passed checkUnits. Cross-checks: unit ids,
  * can-do ids and task ids are unique; the units partition the grammar ids exactly once and in
  * `order`; `coreWordCeiling` strictly increases; task
- * targets and capstone structures exist (structures from this unit or earlier, at least 6). A
+ * targets and capstone structures exist (structures from this unit or earlier, at least 6); no
+ * scripted line contradicts its role's voice (cast.ts). A
  * missing core conversation, a task naming another unit's can-do and an empty register (published
  * as 'mixed') are warnings.
  */
@@ -246,6 +248,7 @@ export function buildUnits(raw: readonly unknown[], ctx: UnitContext): UnitsResu
     };
     task.ready = taskReady(task);
     claim(task.id, 'task', tag);
+    for (const p of castProblems(task.scripted)) errors.push(`${tag}: task ${task.id} scripted ${p}`);
     if (!task.ready) warnings.push(`${tag}: task ${task.id} is not ready (goal, info halves, ≥ ${MIN_TASK_LINES} scripted lines)`);
     if (task.canDo && !canDos.some((cd) => cd.id === task.canDo)) warnings.push(`${tag}: task can-do "${task.canDo}" is not one of the unit's can-dos`);
 

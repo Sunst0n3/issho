@@ -3,14 +3,16 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Switch } from '../components/home/controls.tsx';
 import { HabitStep } from '../components/home/HabitStep.tsx';
 import { DEFAULT_MINUTES } from '../components/home/labels.ts';
-import { PlacementCheck, placementText, type PlacementResult } from '../components/home/PlacementCheck.tsx';
+import { PlacementCheck, placementText, withdrawPlacement, type PlacementResult } from '../components/home/PlacementCheck.tsx';
 import {
   completeSlots,
   cueDraft,
   cueFromDraft,
+  cueProblem,
   goalFromDraft,
   MinutesOptions,
   type CueDraft,
+  type CueProblem,
   type GoalDraft,
 } from '../components/home/planControls.tsx';
 import { reminderSeed, RemindersStep } from '../components/home/RemindersStep.tsx';
@@ -98,9 +100,12 @@ export default function Onboarding() {
   const [kanaPhase, setKanaPhase] = useState<KanaPhase>({ kind: 'ask' });
   const [placement, setPlacement] = useState<Partial<Record<KanaScript, PlacementResult>>>({});
   const [cue, setCue] = useState<CueDraft>(cueDraft(undefined));
+  /** Continue found the cue half filled (it would be dropped): shown until it is fixed. */
+  const [cueIssue, setCueIssue] = useState<CueProblem>();
   const [coping, setCoping] = useState('');
   const [slots, setSlots] = useState<TogetherSlot[]>(completeSlots(undefined));
-  const [slotsFromPartner, setSlotsFromPartner] = useState(false);
+  /** The slots shown are the household's (set earlier by either member, or by this phone before). */
+  const [slotsFromHousehold, setSlotsFromHousehold] = useState(false);
   const [goal, setGoal] = useState<GoalDraft>({ text: '', targetDate: '' });
   const [finishing, setFinishing] = useState(false);
   const [error, setError] = useState<string>();
@@ -135,10 +140,16 @@ export default function Onboarding() {
     if (!household || edited.current || !saved || saved.togetherSlots.length) return;
     if (household.slots.length) {
       setSlots(completeSlots(household.slots));
-      setSlotsFromPartner(true);
+      setSlotsFromHousehold(true);
     }
     if (household.goal && !saved.sharedGoal) setGoal(household.goal);
   }, [household, saved]);
+
+  // A placement check belongs to the kana step: leaving the step (Back, or the back gesture) ends it, so
+  // coming back shows the question and its switches again.
+  useEffect(() => {
+    if (step !== 'kana') setKanaPhase({ kind: 'ask' });
+  }, [step]);
 
   const index = STEPS.indexOf(step);
   const go = (to: Step) => {
@@ -218,17 +229,44 @@ export default function Onboarding() {
   /** A script whose check this phone already passed (an earlier run of onboarding). */
   const passedBefore = (script: KanaScript) =>
     Boolean(script === 'hiragana' ? saved?.knowsHiragana : saved?.knowsKatakana);
-  /** The other script is known (passed now or before): a failed check means its 7-day sprint only. */
-  const otherKnown = (script: KanaScript) => {
-    const other = SCRIPTS.find((s) => s !== script)!;
-    return placement[other]?.outcome === 'known' || passedBefore(other);
-  };
+  /** The check for the script was passed (now or before), whatever its switch says. */
+  const passed = (script: KanaScript) => placement[script]?.outcome === 'known' || passedBefore(script);
+  /** The script is switched on and its check passed: the sprint skips it. */
+  const knownNow = (script: KanaScript) => knows[script] && passed(script);
+  const otherOf = (script: KanaScript) => SCRIPTS.find((s) => s !== script)!;
+  /** The other script is known: a failed check means its 7-day sprint only. */
+  const otherKnown = (script: KanaScript) => knownNow(otherOf(script));
+  /** A status line already says how the script goes (its check was taken, or passed before). */
+  const settled = (script: KanaScript) => knows[script] && (placement[script] !== undefined || passedBefore(script));
 
-  const startKanaChecks = () => {
+  const startKanaChecks = async () => {
     edited.current = true;
+    setError(undefined);
+    // Switched off after its check passed: the pass is undone, so the sprint teaches the script.
+    const withdrawn = SCRIPTS.filter((s) => !knows[s] && passed(s));
+    if (withdrawn.length) {
+      try {
+        for (const script of withdrawn) setSaved(await withdrawPlacement(script));
+      } catch {
+        setError("Couldn't save that on this phone. Try again.");
+        return;
+      }
+      setPlacement((p) => Object.fromEntries(Object.entries(p).filter(([s]) => !withdrawn.includes(s as KanaScript))));
+    }
     const queue = SCRIPTS.filter((s) => knows[s] && !placement[s] && !passedBefore(s));
     if (!queue.length) go('habit');
     else setKanaPhase({ kind: 'check', script: queue[0], queue: queue.slice(1) });
+  };
+
+  /** The line under the switches about the sprint, for the scripts no status line covers yet. */
+  const sprintHint = (): string | undefined => {
+    const open = SCRIPTS.filter((s) => !settled(s));
+    if (open.length === SCRIPTS.length) return 'Not sure? Leave them off. The kana sprint takes about two weeks.';
+    if (!open.length) return undefined;
+    const [script] = open;
+    return knownNow(otherOf(script))
+      ? `Not sure about ${script}? Leave it off. Its sprint takes about a week.`
+      : `Not sure about ${script}? Leave it off. The kana sprint takes about two weeks.`;
   };
 
   const nextCheck = (queue: KanaScript[]) => {
@@ -320,7 +358,7 @@ export default function Onboarding() {
         <StepFrame
           title="Do you already know kana?"
           lead="Hiragana and katakana are the two Japanese alphabets. If you know one, a quick check lets you skip its lessons."
-          footer={<button type="button" className="btn primary block" onClick={startKanaChecks}>Continue</button>}
+          footer={<button type="button" className="btn primary block" onClick={() => void startKanaChecks()}>Continue</button>}
         >
           <div className="card onboard-switches">
             <Switch label={<>I know hiragana <span className="hm-kana-sample" lang="ja">あいう</span></>}
@@ -328,15 +366,18 @@ export default function Onboarding() {
             <Switch label={<>I know katakana <span className="hm-kana-sample" lang="ja">アイウ</span></>}
               checked={knows.katakana} onChange={(v) => { edited.current = true; setKnows((k) => ({ ...k, katakana: v })); }} />
           </div>
-          {SCRIPTS.filter((s) => placement[s]).map((s) => (
+          {SCRIPTS.filter((s) => knows[s] && placement[s]).map((s) => (
             <p key={s} className="hm-ok" role="status">
               {placementText(placement[s]!, otherKnown(s))}
             </p>
           ))}
-          {SCRIPTS.filter((s) => !placement[s] && passedBefore(s)).map((s) => (
+          {SCRIPTS.filter((s) => knows[s] && !placement[s] && passedBefore(s)).map((s) => (
             <p key={s} className="hm-ok" role="status">You're past {s} already.</p>
           ))}
-          <p className="hm-hint">Not sure? Leave them off. The kana sprint takes about two weeks.</p>
+          {SCRIPTS.filter((s) => !knows[s] && passed(s)).map((s) => (
+            <p key={s} className="hm-hint" role="status">Switched off: the sprint teaches {s} from the start.</p>
+          ))}
+          {sprintHint() && <p className="hm-hint">{sprintHint()}</p>}
         </StepFrame>
       );
       break;
@@ -348,13 +389,18 @@ export default function Onboarding() {
           lead="Pick a moment you already have every day, and what you'll do on a busy one."
           footer={
             <button type="button" className="btn primary block"
-              onClick={() => void saveAndGo({ cue: savedCue, coping: coping.trim() || undefined }, 'together')}>
+              onClick={() => {
+                // A half-filled cue would be dropped without a word: ask for what's missing instead.
+                const problem = cueProblem(cue);
+                setCueIssue(problem);
+                if (!problem) void saveAndGo({ cue: savedCue, coping: coping.trim() || undefined }, 'together');
+              }}>
               Continue
             </button>
           }
         >
-          <HabitStep cue={cue} coping={coping}
-            onCue={(d) => { edited.current = true; setCue(d); }}
+          <HabitStep cue={cue} coping={coping} cueProblem={cueIssue}
+            onCue={(d) => { edited.current = true; setCue(d); setCueIssue((was) => (was ? cueProblem(d) : undefined)); }}
             onCoping={(v) => { edited.current = true; setCoping(v); }} />
         </StepFrame>
       );
@@ -372,8 +418,8 @@ export default function Onboarding() {
             </button>
           }
         >
-          <TogetherStep slots={slotsToSave} goal={goal} today={today} fromPartner={slotsFromPartner}
-            onSlots={(s) => { edited.current = true; setSlotsFromPartner(false); setSlots(s); }}
+          <TogetherStep slots={slotsToSave} goal={goal} today={today} fromHousehold={slotsFromHousehold}
+            onSlots={(s) => { edited.current = true; setSlotsFromHousehold(false); setSlots(s); }}
             onGoal={(g) => { edited.current = true; setGoal(g); }} />
         </StepFrame>
       );
@@ -427,7 +473,10 @@ export default function Onboarding() {
         <span className="onboard-step">Step {index + 1} of {STEPS.length}</span>
       </div>
       {error && <p className="hm-error" role="alert">{error}</p>}
-      <div key={step} className="onboard-step-body">{body}</div>
+      {/* Until the saved answers are read, a tap could move on without them (and lose the saved name). */}
+      {saved
+        ? <div key={step} className="onboard-step-body">{body}</div>
+        : <div className="hm-skeleton card-sized" aria-busy="true" aria-label="Loading your setup" />}
     </Screen>
   );
 }

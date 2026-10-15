@@ -185,6 +185,14 @@ describe('pickRead', () => {
     expect(plan.minutes).toBe(3);
   });
 
+  it('plans a story in whole minutes, as Today shows them', async () => {
+    await setup(84_000); // 84 s of audio + 1 min for the gist: between 2 and 3 → 3 min, no room left for a sentence
+    const plan = await pickRead({ minutes: 3 }, NOW);
+    expect(plan.kind).toBe('story');
+    expect(plan.minutes).toBe(3);
+    expect(plan.sentences).toEqual([]);
+  });
+
   it('falls back to sentences when the story does not fit', async () => {
     await setup(150_000); // 2.5 min of audio + 1 → 3.5 min
     const plan = await pickRead({ minutes: 3 }, NOW);

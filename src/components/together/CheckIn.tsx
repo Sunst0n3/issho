@@ -1,13 +1,14 @@
 // Session C's weekly check-in: the week's numbers (filled in), one can-do each partner managed
 // (a tick for the check-in only: awarding a can-do still takes its own check), next week's slots
-// and any rest days planned ahead.
+// (filed under next week, so this week's sessions stay where they are) and the rest days planned
+// for next week (the ones already planned start ticked).
 
 import { useEffect, useId, useState } from 'react';
 import type { TogetherSlot, WeeklyCheckin } from '../../../shared/api.ts';
-import { updateSettings } from '../../lib/db.ts';
+import { db, updateSettings } from '../../lib/db.ts';
 import type { UnitSpec } from '../../lib/types.ts';
 import { addDays } from '../../srs/days.ts';
-import { spendRestToken } from '../../srs/habits.ts';
+import { cancelPlannedToken, spendRestToken } from '../../srs/habits.ts';
 import { weeklyCheckinCounts } from '../../srs/together.ts';
 import { postTogetherEvent } from '../../sync/together.ts';
 import { dateFromKey } from './household.ts';
@@ -45,7 +46,9 @@ export function CheckIn({ week, units, settledUnit, slots, shared = slots.length
    *  overwrites slots the partner's check-in changed meanwhile. */
   const [shownSlots] = useState<TogetherSlot[]>(() => (slots.length ? [...slots] : DEFAULT_SLOTS));
   const [nextSlots, setNextSlots] = useState<TogetherSlot[]>(shownSlots);
+  /** Rest days planned for next week: those already planned (here or on Today), then this form's ticks. */
   const [rest, setRest] = useState<string[]>([]);
+  const [plannedBefore, setPlannedBefore] = useState<string[]>();
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState<string>();
 
@@ -54,6 +57,20 @@ export function CheckIn({ week, units, settledUnit, slots, shared = slots.length
     weeklyCheckinCounts(week).then((c) => { if (alive) setCounts(c); }, () => {
       if (alive) setCounts({ kanji: 0, words: 0, grammar: 0, minutes: 0 });
     });
+    return () => { alive = false; };
+  }, [week]);
+
+  useEffect(() => {
+    let alive = true;
+    db.restTokens.where('week').equals(addDays(week, 7)).primaryKeys().then(
+      (dates) => {
+        if (!alive) return;
+        const planned = dates.map(String).sort();
+        setPlannedBefore(planned);
+        setRest(planned);
+      },
+      () => { if (alive) setPlannedBefore([]); },
+    );
     return () => { alive = false; };
   }, [week]);
 
@@ -69,17 +86,26 @@ export function CheckIn({ week, units, settledUnit, slots, shared = slots.length
     const checkin: WeeklyCheckin = { counts };
     if (canDo) checkin.canDo = canDo;
     if (note.trim()) checkin.note = note.trim();
+    // Unticked days give their token back first, so a moved rest day fits the two a week.
+    for (const date of plannedBefore ?? []) {
+      if (!rest.includes(date)) await cancelPlannedToken(date).catch(() => {});
+    }
     const planned: string[] = [];
-    for (const date of rest) {
+    for (const date of [...rest].sort()) {
       const result = await spendRestToken(date).catch(() => 'not-allowed' as const);
       if (result === 'ok' || result === 'already') planned.push(date);
     }
     if (planned.length) checkin.plannedRest = planned;
     try {
       await postTogetherEvent({ type: 'checkin', checkin });
-      if (!shared || !sameSlots(nextSlots, shownSlots)) {
+      if (!shared) {
+        // The couple's first slots: they plan this week too.
         await postTogetherEvent({ type: 'slots', slots: nextSlots });
         await updateSettings({ togetherSlots: nextSlots });
+      } else if (!sameSlots(nextSlots, shownSlots)) {
+        // Filed under next week: this week's sessions stay on the days they were planned, here too (Settings follow
+        // the household's slots in effect, and take these next Monday).
+        await postTogetherEvent({ type: 'slots', slots: nextSlots }, dateFromKey(nextWeek[0]));
       }
       if (planned.length < rest.length) setNotice('Some rest days could not be planned: two a week at most.');
       onSaved();
@@ -140,14 +166,14 @@ export function CheckIn({ week, units, settledUnit, slots, shared = slots.length
 
       <fieldset className="tg-option-group">
         <legend className="label">Rest days you plan for next week (up to {MAX_PLANNED_REST})</legend>
-        <div className="tg-rest-days">
-          {nextWeek.map((date) => {
+        <div className="tg-rest-days" aria-busy={!plannedBefore}>
+          {nextWeek.map((date, i) => {
             const checked = rest.includes(date);
             return (
               <label key={date} className="tg-rest-day">
-                <input type="checkbox" checked={checked} disabled={!checked && rest.length >= MAX_PLANNED_REST}
+                <input type="checkbox" checked={checked} disabled={!plannedBefore || (!checked && rest.length >= MAX_PLANNED_REST)}
                   onChange={() => setRest(checked ? rest.filter((d) => d !== date) : [...rest, date])} />
-                {dateFromKey(date).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' })}
+                {WEEKDAYS[i]} {Number(date.slice(8, 10))}
               </label>
             );
           })}

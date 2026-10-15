@@ -8,14 +8,15 @@ import { clipRef } from '../../../shared/voicevox.ts';
 import { db } from '../../lib/db.ts';
 import { loadAudioManifest } from '../../lib/data.ts';
 import { useRubyShow } from '../../lib/hooks.ts';
-import type { ClipAccentPhrase, SentenceEntry, WordRef } from '../../lib/types.ts';
+import { parseRuby, type RubySegment } from '../../lib/ruby.ts';
+import type { ClipAccentPhrase, RubyText, SentenceEntry, WordRef } from '../../lib/types.ts';
 import { logEncounters } from '../../srs/encounters.ts';
 import { loadKnownWords, markSentencesShown } from '../../srs/readListen.ts';
 import { usePlayback } from '../../speech/audio.ts';
 import { Icon, Ruby } from '../ui.tsx';
 import { AudioButton } from './AudioButton.tsx';
 import { ChoiceGrid } from './cards/parts.tsx';
-import { splitCue } from './cards/prepare.ts';
+import { tokenOffset } from './cards/prepare.ts';
 import { useFocusHeading, useScrollToTop } from './focus.ts';
 import { PhrasePitchLine } from './PhrasePitchLine.tsx';
 import { glossQuestion } from './readingQuestion.ts';
@@ -27,15 +28,47 @@ export { SAVE_FROM_COURSE_DAY } from './sentences.ts';
 
 export interface PlannedSentence { id: string; target: WordRef }
 
-/** The sentence with the target word underlined (that word never carries a reading). */
-export function SentenceText({ jp, surface }: { jp: string; surface?: string }) {
+const toMarkup = (segs: readonly RubySegment[]): RubyText =>
+  segs.map((s) => (s.reading === undefined ? s.text : `{${s.text}|${s.reading}}`)).join('');
+
+/**
+ * pure: the sentence around one occurrence of `surface` (at plain-text offset `at` when given and right, else the
+ * first), every part keeping its readings, the target's own included: this sentence is read aloud first, so a word
+ * with a kanji the learner can't read yet needs its reading here (unlike a card, which asks for it). A reading that
+ * the word's edge cuts through is dropped. Null when the word is not in the sentence.
+ */
+export function splitTarget(jp: RubyText, surface: string, at?: number): { before: RubyText; target: RubyText; after: RubyText } | null {
+  const segs = parseRuby(jp);
+  const plain = segs.map((s) => s.text).join('');
+  const start = at !== undefined && plain.startsWith(surface, at) ? at : plain.indexOf(surface);
+  if (!surface || start < 0) return null;
+  const end = start + surface.length;
+  const parts: [RubySegment[], RubySegment[], RubySegment[]] = [[], [], []];
+  let pos = 0;
+  for (const s of segs) {
+    const from = pos;
+    pos += s.text.length;
+    if (pos <= start) parts[0].push(s);
+    else if (from >= end) parts[2].push(s);
+    else if (from >= start && pos <= end) parts[1].push(s);
+    else {
+      if (from < start) parts[0].push({ text: s.text.slice(0, start - from) });
+      parts[1].push({ text: s.text.slice(Math.max(start, from) - from, Math.min(end, pos) - from) });
+      if (pos > end) parts[2].push({ text: s.text.slice(end - from) });
+    }
+  }
+  return { before: toMarkup(parts[0]), target: toMarkup(parts[1]), after: toMarkup(parts[2]) };
+}
+
+/** The sentence with the target word underlined; readings follow the learner's furigana setting throughout. */
+export function SentenceText({ jp, surface, at }: { jp: string; surface?: string; at?: number }) {
   const show = useRubyShow();
-  const cue = surface ? splitCue(jp, surface) : null;
+  const cue = surface ? splitTarget(jp, surface, at) : null;
   if (!cue) return <Ruby className="st-sentence" text={jp} show={show} />;
   return (
     <p className="st-sentence" lang="ja">
       <Ruby text={cue.before} show={show} />
-      <u className="st-target">{cue.target}</u>
+      <u className="st-target"><Ruby text={cue.target} show={show} /></u>
       <Ruby text={cue.after} show={show} />
     </p>
   );
@@ -115,8 +148,8 @@ function SentenceStep({ sentence, target, last, doneLabel, canSave, onNext }: {
           ) : 'Say it with the voice'}
         </h2>
         <div className="card st-prompt st-reading-card">
-          <SentenceText jp={sentence.jp} surface={surface} />
-          {step !== 'read' && pitch.data && <PhrasePitchLine phrases={pitch.data} />}
+          <SentenceText jp={sentence.jp} surface={surface} at={tokenOffset(sentence.tokens, target)} />
+          {step !== 'read' && pitch.data && <PhrasePitchLine phrases={pitch.data} text={sentence.jp} />}
           {(step === 'shadow' || (step === 'gloss' && !q)) && <p className="st-translation">{sentence.en}</p>}
         </div>
       </section>

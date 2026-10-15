@@ -76,9 +76,10 @@ const STATE_TEXT: Record<KanjiState, string> = {
   learning: 'learning',
   readingOnly: 'reading only',
   next: 'next up',
-  locked: 'not learned yet',
+  locked: 'not met yet',
 };
 
+/** Introduced (met), whatever its state: "learned" means 3 spaced successes, shown as "can write". */
 const learnedState = (s: KanjiState) => s === 'canWrite' || s === 'learning' || s === 'readingOnly';
 
 function Tile({ view }: { view: KanjiTileView }) {
@@ -126,7 +127,7 @@ function ChapterGroup({ chapter, views, open, onToggle, limit, onMore }: {
     <section className="lib-group">
       <h2 className="lib-group-head">
         <button type="button" aria-expanded={open} aria-controls={panelId} onClick={onToggle}
-          aria-label={`${name}, ${count} learned`}>
+          aria-label={`${name}, ${count} met`}>
           <span className="lib-group-name">{name}</span>
           <span className="lib-group-count">{count}</span>
           <span className={open ? 'lib-chevron open' : 'lib-chevron'} aria-hidden="true"><Icon name="forward" size={18} /></span>
@@ -213,14 +214,14 @@ function KanjiTab() {
       {/* Counts per chapter only: no "N of 2,136" toward the whole list (the plan drops that framing). */}
       {views && (
         <p className="muted lib-summary">
-          {plural(learnedCount, 'kanji', 'kanji')} learned so far, {writeCount.toLocaleString()} you can write
+          {plural(learnedCount, 'kanji', 'kanji')} met so far, {writeCount.toLocaleString()} you can write
           from memory. Kanji past your handwriting list stay in reading practice.
         </p>
       )}
       <Segmented label="Show" value={filter} onChange={setFilter}
         options={[
           { value: 'all', label: 'All' },
-          { value: 'learned', label: 'Learned' },
+          { value: 'learned', label: 'Met' },
         ]} />
 
       {lib.status === 'loading' && <div className="lib-grid lib-skeleton" aria-busy="true" aria-label="Loading the library">

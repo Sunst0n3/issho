@@ -40,7 +40,17 @@ services:
 
   # Optional speech engine (VOICEVOX, CPU build). No depends_on: Issho works without it.
   voicevox:
-    image: voicevox/voicevox_engine:cpu-latest
+    # The engine version the app's voice clips were made with ("engine" in public/audio/manifest.json),
+    # so what the server reads sounds like the clips. After `npm run build:audio` with a newer engine,
+    # change this tag to match.
+    image: voicevox/voicevox_engine:cpu-0.25.2
     restart: unless-stopped
     # Internal: issho reaches it at http://voicevox:50021. Not published to the network.
     expose: ["50021"]
+    # For `docker compose ps`. Loading the voices takes a while on a slow CPU.
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:50021/version"]
+      interval: 30s
+      timeout: 5s
+      start_period: 120s
+      retries: 3

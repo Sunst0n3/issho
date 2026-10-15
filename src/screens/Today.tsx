@@ -111,7 +111,7 @@ export default function Today() {
         </section>
       )}
       {today.status === 'ready' && <PlanPanel plan={today.value.plan} goalMet={goalMet} />}
-      {h && <MakeupLater streak={h.streak} />}
+      {h && <MakeupLater streak={h.streak} comeback={h.comeback} />}
 
       <TogetherTodayCard />
 

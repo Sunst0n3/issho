@@ -133,6 +133,25 @@ describe('ready flags', () => {
       'u02: task id "u1-task" is also used by u01',
     ]);
   });
+
+  it('fail on a task script whose lines contradict their role\'s voice (a female, b male)', () => {
+    const scripted = [
+      { role: 'a', jp: '{妻|つま}のケイトです。', en: 'My wife Kate.' },
+      { role: 'b', jp: '{夫|おっと}のトムです。', en: 'My husband Tom.' },
+    ];
+    const u = {
+      id: 1, title: 't', titleJp: 't', level: 'A1', topic: 't', grammar: ['a'], coreWordCeiling: 10, canDos: [], conversation: 'rp',
+      task: { id: 'u01-task', canDo: '', goal: 'g', outcomeQuestion: '', roles: { a: '', b: '' }, infoA: 'a', infoB: 'b', targets: [], register: 'polite', twist: '', scripted },
+      capstone: { title: 'c', brief: 'b', minLinesEach: 8, structures: ['a', 'a', 'a', 'a', 'a', 'a'] },
+    };
+    const ctx = { grammarOrder: new Map([['a', 1]]), coreIds: new Set<string>(), rolePlayIds: new Set(['rp']) };
+    expect(buildUnits([u], ctx).errors).toEqual([
+      'u01: task u01-task scripted lines[0] (role a, female voice) says {妻|つま}, which only a man says of their own spouse',
+      'u01: task u01-task scripted lines[1] (role b, male voice) says {夫|おっと}, which only a woman says of their own spouse',
+    ]);
+    const swapped = scripted.map((l) => ({ ...l, role: l.role === 'a' ? 'b' : 'a' }));
+    expect(buildUnits([{ ...u, task: { ...u.task, scripted: swapped } }], ctx).errors).toEqual([]);
+  });
 });
 
 describe('core conversations', () => {

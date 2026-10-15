@@ -113,7 +113,11 @@ export function totalNewSec(newSec: Partial<StreamSeconds> | undefined): number 
   return sum;
 }
 
-/** A day the learner actually studied: it counts toward the course day. */
-export function isStudyDay(day: Pick<DayRecord, 'reviews' | 'newItems' | 'studyMs' | 'togetherMs' | 'minimumDone'>): boolean {
-  return day.reviews > 0 || day.newItems > 0 || day.studyMs > 0 || (day.togetherMs ?? 0) > 0 || day.minimumDone;
+/**
+ * A day the learner actually studied: it counts toward the course day. Something was learned: a graded answer, a new
+ * item, read/output/fluency time, a together session, or the minimum day. Bare session time (studyMs) is not enough:
+ * opening a sitting with nothing in it and leaving must not move the phase gates (the streak never counted it either).
+ */
+export function isStudyDay(day: Pick<DayRecord, 'reviews' | 'newItems' | 'strandMs' | 'togetherMs' | 'minimumDone'>): boolean {
+  return day.reviews > 0 || day.newItems > 0 || (day.strandMs ?? 0) > 0 || (day.togetherMs ?? 0) > 0 || day.minimumDone;
 }

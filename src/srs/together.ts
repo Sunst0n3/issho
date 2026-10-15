@@ -94,7 +94,9 @@ export function partnerPrompt(
     }
     case 'produce': {
       const w = info.word;
-      const note = w?.note ? ` (${w.note})` : '';
+      // A note that holds the answer ('congratulations (polite: おめでとうございます)' for おめでとう) would give it away.
+      const givesAway = (note: string) => Boolean(w && ((w.kana && note.includes(w.kana)) || (w.written && note.includes(w.written))));
+      const note = w?.note && !givesAway(w.note) ? ` (${w.note})` : '';
       return { key, kind, prompt: clip(`${w?.en ?? ''}${note}`), answer: clip(w ? wordRuby(w) : '') };
     }
     case 'build': {
@@ -220,6 +222,16 @@ export async function buildQuizPool(kind: 'partner' | 'monthly' | 'dictation', n
   return roundRobin(pool, QUIZ_MAX).map((c) => promptFor(c, ctx));
 }
 
+/**
+ * pure: a partner verdict grades the card (FSRS) only within ±2 days of its due date and only when the card was not
+ * reviewed yet today: a second partner quiz, a dictation or a pass-and-play round the same day (or this morning's
+ * warm-up) already gave it today's grade, so a repeat counts as practice (an encounter), not another review.
+ */
+export function partnerGrades(card: CardRecord, now: Date): boolean {
+  if (!inPartnerWindow(card, now)) return false;
+  return !card.last_review || dayKey(card.last_review) !== dayKey(now);
+}
+
 async function applyVerdicts(
   quizId: string,
   createdAt: Date,
@@ -234,7 +246,7 @@ async function applyVerdicts(
     for (const v of verdicts) {
       const card = await db.cards.get(v.key);
       if (!card) continue;
-      if (inPartnerWindow(card, now)) {
+      if (partnerGrades(card, now)) {
         await gradeCard(card.id, PARTNER_GRADE[v.verdict], { durationMs: 0, mode: 'partner', context: 'partner', now });
         graded++;
       } else {
@@ -251,8 +263,9 @@ async function applyVerdicts(
  * Answerer side, for kinds partner, dictation and monthly. One rw transaction over [partnerQuizzes, cards, reviewLogs,
  * days, encounters, settings, items]: if partnerQuizzes[quiz.id].appliedAt is set, return the stored counts and change
  * nothing; else each verdict whose key is one of this phone's cards → gradeCard(mode 'partner', context 'partner',
- * PARTNER_GRADE) when inPartnerWindow(card, now), else logEncounters(…, 'partner'); then set appliedAt. A quiz arriving
- * twice (the 'quiz' WS event and a refresh, or two tabs) is applied once.
+ * PARTNER_GRADE) when partnerGrades(card, now) (in the ±2-day window and not reviewed yet today), else
+ * logEncounters(…, 'partner'); then set appliedAt. A quiz arriving twice (the 'quiz' WS event and a refresh, or two
+ * tabs) is applied once.
  */
 export async function applyPartnerVerdicts(quiz: Quiz, now: Date = new Date()): Promise<{ graded: number; practiced: number }> {
   if (quiz.kind === 'kanji' || !quiz.result?.verdicts) return { graded: 0, practiced: 0 };

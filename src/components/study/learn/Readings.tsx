@@ -1,4 +1,5 @@
 import type { KanaEntry } from '../../../lib/types.ts';
+import { cleanReading } from '../format.ts';
 
 /** 'た.べる' with the okurigana after the dot set apart. */
 function Reading({ reading }: { reading: string }) {
@@ -6,6 +7,20 @@ function Reading({ reading }: { reading: string }) {
   const dot = clean.indexOf('.');
   if (dot < 0) return <>{clean}</>;
   return <>{clean.slice(0, dot)}<span className="st-okuri">{clean.slice(dot + 1)}</span></>;
+}
+
+/**
+ * The readings that sound different, first spelling kept: KANJIDIC lists 'うし.ろ' and 'うしろ' (or '-び' and 'び')
+ * apart, which read the same once the okurigana dot and the affix dash are dropped.
+ */
+export function distinctReadings(readings: readonly string[]): string[] {
+  const seen = new Set<string>();
+  return readings.filter((r) => {
+    const key = cleanReading(r);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 /** KUN / ON rows in kana (kanji are taught after the kana sprint, so never with romaji). */
@@ -17,8 +32,8 @@ export function Readings({ kun, on, max = 3 }: {
   max?: number;
 }) {
   const rows = [
-    { label: 'KUN', name: 'Japanese readings', list: kun.slice(0, max) },
-    { label: 'ON', name: 'Chinese-derived readings', list: on.slice(0, max) },
+    { label: 'KUN', name: 'Japanese readings', list: distinctReadings(kun).slice(0, max) },
+    { label: 'ON', name: 'Chinese-derived readings', list: distinctReadings(on).slice(0, max) },
   ].filter((r) => r.list.length);
   if (!rows.length) return null;
   return (

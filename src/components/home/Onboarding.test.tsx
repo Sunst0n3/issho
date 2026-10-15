@@ -2,12 +2,12 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TogetherState } from '../../../shared/api.ts';
-import { dayKey, getSettings, updateSettings } from '../../lib/db.ts';
+import { dayKey, db, getSettings, updateSettings } from '../../lib/db.ts';
 import type { KanaEntry, KanaScript } from '../../lib/types.ts';
 import Onboarding from '../../screens/Onboarding.tsx';
 import { shiftDay } from './labels.ts';
 import { reminderSeed } from './RemindersStep.tsx';
-import { KANA, renderAt, resetDb } from './test-fixtures.tsx';
+import { cardOf, KANA, renderAt, resetDb } from './test-fixtures.tsx';
 
 vi.mock('../../lib/data.ts', async () => (await import('./test-fixtures.tsx')).dataMock);
 
@@ -133,8 +133,8 @@ describe('Onboarding', () => {
     next();
 
     await screen.findByRole('heading', { name: 'When will you study?' });
-    fireEvent.change(screen.getByLabelText('After I'), { target: { value: 'pour my evening tea' } });
-    fireEvent.change(screen.getByLabelText('at'), { target: { value: 'the kitchen table' } });
+    fireEvent.change(screen.getByLabelText(/^After I/), { target: { value: 'pour my evening tea' } });
+    fireEvent.change(screen.getByLabelText(/^at/), { target: { value: 'the kitchen table' } });
     fireEvent.change(screen.getByLabelText('Remind me at'), { target: { value: '21:15' } });
     fireEvent.change(screen.getByLabelText('If I miss it…'), { target: { value: 'I do 3 minutes before brushing my teeth' } });
     next();
@@ -218,6 +218,22 @@ describe('Onboarding', () => {
     expect(mocks.applyPlacement).toHaveBeenCalledWith('katakana', 17);
   });
 
+  it('names the row of a sound twin (お, with を), like the review card (V027)', async () => {
+    renderAt('/welcome', '/welcome', <Onboarding />);
+    await throughName();
+    next();
+    await screen.findByRole('heading', { name: 'Do you already know kana?' });
+    fireEvent.click(screen.getByRole('switch', { name: /I know hiragana/ }));
+    next();
+    fireEvent.click(await screen.findByRole('button', { name: 'Start the check' }));
+    // The fixture deals あいうえお in order: あ needs no row, お shares its sound with を.
+    await screen.findByText('Kana 1 of 20');
+    expect(screen.getByText(/for the sound you hear/).textContent).toBe('Write the hiragana for the sound you hear, then tap Done.');
+    for (let i = 0; i < 4; i++) fireEvent.click(screen.getByRole('button', { name: 'Write it right' }));
+    await screen.findByText('Kana 5 of 20');
+    expect(screen.getByText(/for the sound you hear/).textContent).toBe('Write the hiragana for the sound you hear (あ row), then tap Done.');
+  });
+
   it("doesn't count a kana written after the pad's hint showed its strokes", async () => {
     renderAt('/welcome', '/welcome', <Onboarding />);
     await throughName();
@@ -266,6 +282,111 @@ describe('Onboarding', () => {
     expect(mocks.applyPlacement.mock.calls).toEqual([['hiragana', 20], ['katakana', 10]]);
   });
 
+  it('shows the kana question again after leaving the step from inside a check', async () => {
+    renderAt('/welcome', '/welcome', <Onboarding />);
+    await throughName();
+    next();
+    await screen.findByRole('heading', { name: 'Do you already know kana?' });
+    fireEvent.click(screen.getByRole('switch', { name: /I know hiragana/ }));
+    fireEvent.click(screen.getByRole('switch', { name: /I know katakana/ }));
+    next();
+    await screen.findByRole('heading', { name: 'Check your hiragana' });
+    fireEvent.click(screen.getByRole('button', { name: 'Skip the check' }));
+    await screen.findByRole('heading', { name: 'Check your katakana' });
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    await screen.findByRole('heading', { name: 'How long each day?' });
+    next();
+    expect(await screen.findByRole('heading', { name: 'Do you already know kana?' })).toBeTruthy();
+    expect(screen.getByRole('switch', { name: /I know katakana/ })).toBeTruthy();
+    expect(screen.queryByText(/Quick katakana check/)).toBeNull();
+  });
+
+  it('undoes a passed check when its script is switched off again, so the sprint teaches it', async () => {
+    // The check's pass, as B's applyPlacement stores it: known items with their cards, and the flag.
+    mocks.applyPlacement.mockImplementationOnce(async (script: string, correct: number) => {
+      await db.items.bulkPut([...'あいうえお'].map((c) => ({ id: `kana:${c}`, kind: 'kana' as const, key: c, introducedAt: new Date(), via: 'placement' as const })));
+      await db.cards.put(cardOf('kana:あ', 'kana', 'read'));
+      await updateSettings({ knowsHiragana: true });
+      return correct >= 18 && script === 'hiragana' ? 'known' as const : 'sprint' as const;
+    });
+    // An item the course itself introduced stays.
+    await db.items.put({ id: 'kana:ア', kind: 'kana', key: 'ア', introducedAt: new Date() });
+    renderAt('/welcome', '/welcome', <Onboarding />);
+    await throughName();
+    next();
+    await screen.findByRole('heading', { name: 'Do you already know kana?' });
+    fireEvent.click(screen.getByRole('switch', { name: /I know hiragana/ }));
+    next();
+    await answerPlacement(20);
+    await screen.findByRole('heading', { name: "20/20 — you're past hiragana" });
+    next();
+    await screen.findByRole('heading', { name: 'When will you study?' });
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+
+    await screen.findByRole('heading', { name: 'Do you already know kana?' });
+    expect(screen.getByText("20/20 — you're past hiragana")).toBeTruthy();
+    fireEvent.click(screen.getByRole('switch', { name: /I know hiragana/ }));
+    // The switch and the line under it agree.
+    expect(screen.queryByText("20/20 — you're past hiragana")).toBeNull();
+    expect(screen.getByText('Switched off: the sprint teaches hiragana from the start.')).toBeTruthy();
+    next();
+    await screen.findByRole('heading', { name: 'When will you study?' });
+    expect((await getSettings()).knowsHiragana).toBe(false);
+    expect((await db.items.toArray()).map((i) => i.id)).toEqual(['kana:ア']);
+    expect(await db.cards.count()).toBe(0);
+  });
+
+  it('words the sprint hint by what is still open', async () => {
+    renderAt('/welcome', '/welcome', <Onboarding />);
+    await throughName();
+    next();
+    await screen.findByRole('heading', { name: 'Do you already know kana?' });
+    expect(screen.getByText('Not sure? Leave them off. The kana sprint takes about two weeks.')).toBeTruthy();
+    fireEvent.click(screen.getByRole('switch', { name: /I know katakana/ }));
+    next();
+    await answerPlacement(19);
+    await screen.findByRole('heading', { name: "19/20 — you're past katakana" });
+    next();
+    await screen.findByRole('heading', { name: 'When will you study?' });
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    await screen.findByRole('heading', { name: 'Do you already know kana?' });
+    // Past katakana: what's left is hiragana's week, not two.
+    expect(screen.getByText('Not sure about hiragana? Leave it off. Its sprint takes about a week.')).toBeTruthy();
+    expect(screen.queryByText(/about two weeks/)).toBeNull();
+
+    fireEvent.click(screen.getByRole('switch', { name: /I know hiragana/ }));
+    next();
+    await answerPlacement(0);
+    await screen.findByRole('heading', { name: "0/20 — let's do the 7-day sprint" });
+    next();
+    await screen.findByRole('heading', { name: 'When will you study?' });
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    await screen.findByRole('heading', { name: 'Do you already know kana?' });
+    // Both scripts have their line: no sprint hint that could contradict "the 7-day sprint".
+    expect(screen.getByText("0/20 — let's do the 7-day sprint")).toBeTruthy();
+    expect(screen.queryByText(/about two weeks|Leave it off|Leave them off/)).toBeNull();
+  });
+
+  it("asks for a reminder time instead of dropping the cue when it's cleared", async () => {
+    await updateSettings({ name: 'Sam' });
+    renderAt('/welcome?step=habit', '/welcome', <Onboarding />);
+    await screen.findByRole('heading', { name: 'When will you study?' });
+    fireEvent.change(screen.getByLabelText(/^After I/), { target: { value: 'make coffee' } });
+    fireEvent.change(screen.getByLabelText(/^at/), { target: { value: 'the kitchen' } });
+    fireEvent.change(screen.getByLabelText('Remind me at'), { target: { value: '' } });
+    next();
+    expect((await screen.findByRole('alert')).textContent).toBe('Pick a time for the reminder, or clear the cue.');
+    expect(screen.getByLabelText('Remind me at').getAttribute('aria-invalid')).toBe('true');
+    expect(screen.getByRole('heading', { name: 'When will you study?' })).toBeTruthy();
+    expect((await getSettings()).cue).toBeUndefined();
+
+    fireEvent.change(screen.getByLabelText('Remind me at'), { target: { value: '07:30' } });
+    expect(screen.queryByRole('alert')).toBeNull();
+    next();
+    await screen.findByRole('heading', { name: 'Time together' });
+    expect((await getSettings()).cue).toEqual({ text: 'After I make coffee at the kitchen, I open Issho', time: '07:30' });
+  });
+
   it('posts the slots and the goal when the phone is already paired (kept through the upgrade)', async () => {
     await updateSettings({ name: 'Sam', deviceToken: 'token', memberId: 'm-sam' });
     renderAt('/welcome?step=together', '/welcome', <Onboarding />);
@@ -285,7 +406,7 @@ describe('Onboarding', () => {
     expect(mocks.postTogetherEvent).toHaveBeenCalledWith({ type: 'goal', goal: { text: 'Read a menu in Osaka', targetDate: shiftDay(dayKey(), 90) } });
   });
 
-  it("starts from the partner's slots when the household has them", async () => {
+  it("starts from the household's slots when it has them, without saying who set them", async () => {
     await updateSettings({ name: 'Sam', deviceToken: 'token', memberId: 'm-sam' });
     mocks.together.state = {
       slots: [{ session: 'A', weekday: 1, time: '19:00' }, { session: 'B', weekday: 3, time: '19:00' }, { session: 'C', weekday: 6, time: '10:00' }],
@@ -294,7 +415,9 @@ describe('Onboarding', () => {
     renderAt('/welcome?step=together', '/welcome', <Onboarding />);
     await screen.findByRole('heading', { name: 'Time together' });
     await waitFor(() => expect((screen.getByLabelText('Session A day') as HTMLSelectElement).value).toBe('1'));
-    expect(screen.getByText(/Your partner picked these/)).toBeTruthy();
+    // This phone may have set them itself before a restore: no "your partner picked these".
+    expect(screen.getByText(/These are your household's sessions/)).toBeTruthy();
+    expect(screen.queryByText(/partner picked/)).toBeNull();
     expect((screen.getByLabelText('Our shared goal') as HTMLInputElement).value).toBe('Kyoto trip');
   });
 
@@ -335,8 +458,8 @@ describe('Onboarding', () => {
     await screen.findByRole('heading', { name: 'Do you already know kana?' });
     next();
     await screen.findByRole('heading', { name: 'When will you study?' });
-    expect((screen.getByLabelText('After I') as HTMLInputElement).value).toBe('get home');
-    expect((screen.getByLabelText('at') as HTMLInputElement).value).toBe('the door');
+    expect((screen.getByLabelText(/^After I/) as HTMLInputElement).value).toBe('get home');
+    expect((screen.getByLabelText(/^at/) as HTMLInputElement).value).toBe('the door');
     expect((screen.getByLabelText('Remind me at') as HTMLInputElement).value).toBe('18:30');
   });
 

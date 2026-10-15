@@ -14,6 +14,9 @@
 //   gesture until the element has played once). Clips play from Blob URLs, which avoids iOS
 //   Range-request trouble with service-worker responses.
 // - Loading a new source resets playbackRate to defaultPlaybackRate, so both are set.
+// - When the element refuses to start a clip (autoplay before the unlock, or media paused by the
+//   browser), the server is not asked for the same text: its WAV would be refused the same way,
+//   at the cost of a synthesis. The device voice reads it instead.
 // - jsdom and old browsers have no Cache Storage (`caches`), and plain-http pages have no
 //   crypto.subtle: caching is skipped, playback still works.
 
@@ -69,7 +72,13 @@ const SLOW_RATE_UNTIL_DAY = 90;
 const MIN_RATE = 0.5;
 const MAX_RATE = 2;
 
-type Outcome = 'ended' | 'interrupted' | 'failed';
+/**
+ * How a Blob played: to the end; stopped; 'failed' (this file can't be played, e.g. it doesn't
+ * decode: another source may work); or 'blocked' (the audio element refused to start at all:
+ * autoplay not unlocked yet, or the browser paused background media. Any other Blob would be
+ * refused the same way, so only the device voice is worth trying).
+ */
+type Outcome = 'ended' | 'interrupted' | 'failed' | 'blocked';
 type TtsIndexEntry = [key: string, bytes: number, at: number];
 
 let element: HTMLAudioElement | null = null;
@@ -406,9 +415,20 @@ function playBlob(blob: Blob, rate: number, timing: PhraseTiming | null, duratio
       finish('failed');
       return;
     }
-    // Autoplay refused (no gesture yet) or the source can't be decoded: try the next way.
-    started?.catch(() => finish('failed'));
+    // Autoplay refused (no gesture yet) or paused by the browser: the element itself won't start.
+    // Anything else (the source can't be decoded): this file failed, another source may play.
+    started?.catch((e: unknown) => finish(refusedToStart(e) ? 'blocked' : 'failed'));
   });
+}
+
+/**
+ * play() was rejected because the element may not play now, whatever its source: NotAllowedError
+ * (autoplay before the gesture unlock, iOS) or AbortError (the browser paused it, e.g. "background
+ * media was paused to save power"; a pause() of our own settles the playback as interrupted first).
+ */
+function refusedToStart(e: unknown): boolean {
+  const name = (e as { name?: unknown } | null)?.name;
+  return name === 'NotAllowedError' || name === 'AbortError';
 }
 
 /** Story text marks phrase breaks with '／', which a device voice would read out. */
@@ -467,21 +487,24 @@ export async function play(source: AudioSource, opts: PlayOptions = {}): Promise
 
     const clip = findClip(await manifest(), source, voice, opts.fallbackText);
     if (!isCurrent()) return result('none', true);
+    // The audio element refused to start: server speech would be refused too (and cost a synthesis).
+    let blocked = false;
     if (clip) {
       const blob = await clipBlob(clip, requests.signal);
       if (!isCurrent()) return result('none', true);
       if (blob) {
         const outcome = await playBlob(blob, rate, phraseTiming(opts, clip.phrases), clip.ms || undefined, token);
-        if (outcome !== 'failed') return result('clip', outcome === 'interrupted');
+        if (outcome === 'ended' || outcome === 'interrupted') return result('clip', outcome === 'interrupted');
+        blocked = outcome === 'blocked';
       }
     }
     if (!text?.trim()) return result('none');
 
-    const wav = await serverSpeech(text, voice, requests.signal);
+    const wav = blocked ? null : await serverSpeech(text, voice, requests.signal);
     if (!isCurrent()) return result('none', true);
     if (wav) {
       const outcome = await playBlob(wav, rate, phraseTiming(opts, undefined), undefined, token);
-      if (outcome !== 'failed') return result('server', outcome === 'interrupted');
+      if (outcome === 'ended' || outcome === 'interrupted') return result('server', outcome === 'interrupted');
     }
     if (!isCurrent()) return result('none', true);
 

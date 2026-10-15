@@ -59,9 +59,39 @@ describe('ConnectServerForm', () => {
     render(<ConnectServerForm onConnected={onConnected} />);
     await fill('nope');
 
-    expect((await screen.findByRole('alert')).textContent).toContain("That household code didn't work");
+    const alert = await screen.findByRole('alert');
+    expect(alert.textContent).toContain("That household code didn't work");
     expect(onConnected).not.toHaveBeenCalled();
-    expect(screen.getByRole('button', { name: 'Connect' })).toHaveProperty('disabled', false);
+    expect(screen.getByRole('button', { name: 'Connect' }).getAttribute('aria-disabled')).toBeNull();
+    // The code field is marked, described by the message and focused, so focus never falls to the page (V086).
+    const code = screen.getByLabelText('Household code');
+    await waitFor(() => expect(document.activeElement).toBe(code));
+    expect(code.getAttribute('aria-invalid')).toBe('true');
+    expect(code.getAttribute('aria-describedby')).toBe(alert.id);
+  });
+
+  it('keeps focus on Connect while it tries (aria-disabled, not disabled)', async () => {
+    let fail: (e: unknown) => void = () => {};
+    mocks.pair.mockReturnValue(new Promise((_, reject) => { fail = reject; }));
+    render(<ConnectServerForm onConnected={() => {}} />);
+    await screen.findByDisplayValue('Aiko');
+    fireEvent.change(screen.getByLabelText('Household code'), { target: { value: 'code' } });
+    const connect = screen.getByRole('button', { name: 'Connect' });
+    connect.focus();
+    fireEvent.click(connect);
+    const busy = await screen.findByRole('button', { name: 'Connecting…' });
+    expect(busy).toBe(connect);
+    expect(busy.getAttribute('aria-disabled')).toBe('true');
+    expect(busy).toHaveProperty('disabled', false);
+    expect(document.activeElement).toBe(busy);
+    // A second press while busy does nothing.
+    fireEvent.click(busy);
+    expect(mocks.pair).toHaveBeenCalledTimes(1);
+    fail(new ApiError(0, 'network'));
+    expect(await screen.findByRole('alert')).toBeTruthy();
+    // Not the code's fault: nothing is marked, and focus stays on Connect.
+    expect(screen.getByLabelText('Household code').getAttribute('aria-invalid')).toBeNull();
+    expect(document.activeElement).toBe(connect);
   });
 
   it('names the address it could not reach', async () => {
@@ -72,6 +102,17 @@ describe('ConnectServerForm', () => {
     const alert = await screen.findByRole('alert');
     expect(alert.textContent).toContain("Couldn't reach the home server at 192.168.1.20:8787");
     expect(mocks.pair).toHaveBeenCalledWith(expect.objectContaining({ serverUrl: '192.168.1.20:8787' }));
+  });
+
+  it('marks the address when it is not an Issho home server', async () => {
+    mocks.pair.mockRejectedValue(new ApiError(404, 'not_found'));
+    render(<ConnectServerForm onConnected={() => {}} />);
+    await fill('code', 'example.com');
+    const alert = await screen.findByRole('alert');
+    const server = screen.getByLabelText('Server address');
+    await waitFor(() => expect(document.activeElement).toBe(server));
+    expect(server.getAttribute('aria-invalid')).toBe('true');
+    expect(server.getAttribute('aria-describedby')?.split(' ')).toContain(alert.id);
   });
 
   it('does not try while offline', async () => {
@@ -89,6 +130,7 @@ describe('ConnectServerForm', () => {
 
     expect((await screen.findByRole('alert')).textContent).toContain('Enter the household code');
     expect(mocks.pair).not.toHaveBeenCalled();
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByLabelText('Household code')));
   });
 
   it('shows and hides the code, and offers to skip', async () => {

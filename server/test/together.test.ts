@@ -8,7 +8,7 @@ import type {
   WeeklyCheckin,
 } from '../../shared/api.ts';
 import type { StoredTogetherEvent } from '../src/db.ts';
-import { foldTogether } from '../src/together.ts';
+import { foldTogether, togetherQuestHistory } from '../src/together.ts';
 import { bearer, createTestServer, listen, openSocket, tick, type TestServer } from './helpers.ts';
 
 const TODAY = '2026-10-15'; // a Thursday
@@ -145,6 +145,65 @@ describe('together fold', () => {
     );
     assert.deepEqual(state.capstones, [{ unit: 3, date: '2026-10-11' }]);
   });
+
+  it('keeps slots filed under next week for next week, so this week\u2019s sessions stay put', () => {
+    const thisWeeks = [{ session: 'A', weekday: 5, time: '20:00' }] as const;
+    const nextWeeks = [{ session: 'A', weekday: 2, time: '20:00' }] as const;
+    const events: [string, TogetherEvent, string?][] = [
+      ['m-a', { type: 'slots', slots: [...thisWeeks] }, '2026-10-05'],
+      // The check-in's "next week's sessions".
+      ['m-b', { type: 'slots', slots: [...nextWeeks] }, '2026-10-19'],
+    ];
+    assert.deepEqual(fold(events).slots, thisWeeks);
+    // Meanwhile they are next week's plan, for the screens of this week.
+    assert.deepEqual(fold(events).nextSlots, nextWeeks);
+    // From next Monday on, they are the couple's slots.
+    const stored = events.map(([memberId, event, week], i) => ({
+      id: i + 1, memberId, week: week ?? WEEK, createdAt: '2026-10-15T10:00:00.000Z', event,
+    }));
+    assert.deepEqual(foldTogether(stored, ['m-a', 'm-b'], '2026-10-19').slots, nextWeeks);
+    assert.equal(foldTogether(stored, ['m-a', 'm-b'], '2026-10-19').nextSlots, undefined);
+    // A later change for this week (Settings) still applies at once.
+    assert.deepEqual(fold([...events, ['m-a', { type: 'slots', slots: [...nextWeeks] }, WEEK]]).slots, nextWeeks);
+  });
+
+  it('never lets a later change for this week undo next week\u2019s plan once that week begins', () => {
+    const planned = [{ session: 'A', weekday: 2, time: '20:00' }] as const;
+    const settingsSave = [{ session: 'A', weekday: 6, time: '09:00' }] as const;
+    const stored: StoredTogetherEvent[] = [
+      // Thursday: the check-in plans next week; Friday: a Settings save for this week (a newer event).
+      { id: 1, memberId: 'm-a', week: '2026-10-19', createdAt: '2026-10-15T20:00:00.000Z', event: { type: 'slots', slots: [...planned] } },
+      { id: 2, memberId: 'm-b', week: WEEK, createdAt: '2026-10-16T08:00:00.000Z', event: { type: 'slots', slots: [...settingsSave] } },
+    ];
+    const thisWeek = foldTogether(stored, ['m-a', 'm-b'], TODAY);
+    assert.deepEqual(thisWeek.slots, settingsSave);
+    assert.deepEqual(thisWeek.nextSlots, planned);
+    assert.deepEqual(foldTogether(stored, ['m-a', 'm-b'], '2026-10-19').slots, planned);
+  });
+
+  it('ignores events dated after today beyond a day of clock skew', () => {
+    const state = fold([
+      ['m-a', { type: 'session-done', session: 'A', date: '2099-01-05', minutes: 20 }, '2099-01-05'],
+      ['m-a', { type: 'session-done', session: 'B', date: '2026-10-17', minutes: 20 }],
+      // A phone a few hours ahead: tomorrow is fine.
+      ['m-b', { type: 'session-done', session: 'C', date: '2026-10-16', minutes: 20 }],
+      ['m-a', { type: 'task-done', taskId: 'u02-task', date: '2026-12-01', repeat: false }],
+      ['m-a', { type: 'capstone-done', unit: 2, date: '2026-12-01' }],
+      ['m-a', { type: 'checkin', checkin: checkin(60) }, '2099-01-05'],
+    ]);
+    assert.deepEqual(state.sessions, [{ week: WEEK, session: 'C', date: '2026-10-16', minutes: 20, memberId: 'm-b' }]);
+    assert.deepEqual(state.tasks, []);
+    assert.deepEqual(state.capstones, []);
+    assert.deepEqual(state.checkins, []);
+
+    // The quest never counts them either.
+    const quest = togetherQuestHistory([
+      { id: 1, memberId: 'm-a', week: '2099-01-05', createdAt: '', event: { type: 'session-done', session: 'A', date: '2099-01-05', minutes: 20 } },
+      { id: 2, memberId: 'm-a', week: WEEK, createdAt: '', event: { type: 'session-done', session: 'B', date: '2026-10-15', minutes: 20 } },
+    ], TODAY);
+    assert.deepEqual([...quest.togetherDates], ['2026-10-15']);
+    assert.deepEqual([...quest.sessionsByWeek.keys()], [WEEK]);
+  });
 });
 
 describe('together routes', () => {
@@ -230,6 +289,37 @@ describe('together routes', () => {
       const res = await post(carter.deviceToken, body);
       assert.equal(res.statusCode, 400, JSON.stringify(body));
     }
+  });
+
+  it('refuses events dated in the future, and files next week\u2019s slots for next week', async () => {
+    const future: TogetherEventRequest[] = [
+      { clientId: 'f-1', week: '2099-01-05', event: { type: 'session-done', session: 'A', date: '2099-01-05', minutes: 20 } },
+      // A plausible week, but a date two days ahead.
+      { clientId: 'f-2', week: WEEK, event: { type: 'session-done', session: 'B', date: '2026-10-17', minutes: 20 } },
+      { clientId: 'f-3', week: WEEK, event: { type: 'task-done', taskId: 'u02-task', date: '2026-11-01', repeat: false } },
+      { clientId: 'f-4', week: '2026-10-19', event: { type: 'checkin', checkin: checkin(60) } },
+      { clientId: 'f-5', week: '2026-10-26', event: { type: 'slots', slots: [{ session: 'A', weekday: 2, time: '20:00' }] } },
+    ];
+    for (const body of future) {
+      const res = await post(carter.deviceToken, body);
+      assert.equal(res.statusCode, 400, JSON.stringify(body));
+    }
+    const after = await state(carter.deviceToken);
+    assert.equal(after.sessions.some((s) => s.date > '2026-10-16'), false);
+
+    // Tomorrow is within the clock-skew allowance.
+    const skew = await post(aiko.deviceToken, {
+      clientId: 'f-6', week: WEEK, event: { type: 'session-done', session: 'C', date: '2026-10-16', minutes: 20 },
+    });
+    assert.equal(skew.statusCode, 201);
+
+    // Slots planned for next week are stored, and wait for next week.
+    const before = (await state(carter.deviceToken)).slots;
+    const next = await post(carter.deviceToken, {
+      clientId: 'f-7', week: '2026-10-19', event: { type: 'slots', slots: [{ session: 'A', weekday: 2, time: '20:00' }] },
+    });
+    assert.equal(next.statusCode, 201);
+    assert.deepEqual(next.json<TogetherState>().slots, before);
   });
 
   it('tells every device of every member, the sender’s other devices included', async () => {

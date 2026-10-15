@@ -8,7 +8,7 @@ import type {
   TogetherLiveState,
   TogetherState,
 } from '../../shared/api.ts';
-import { db, dayKey, updateSettings } from '../lib/db.ts';
+import { db, dayKey, getSettings, updateSettings } from '../lib/db.ts';
 import type { DayRecord, OutputSentenceRecord } from '../lib/types.ts';
 import { addDays } from '../srs/days.ts';
 import { connectSocket, disconnectSocket } from './socket.ts';
@@ -31,7 +31,6 @@ import { FakeSocket, installFakeSocket } from './testSocket.ts';
 const engine = vi.hoisted(() => ({
   graded: 0,
   applyCalls: 0,
-  pending: [] as OutputSentenceRecord[],
   completed: [] as { id: string; result: AiCheckResponse }[],
 }));
 
@@ -74,16 +73,20 @@ vi.mock('../srs/together.ts', async () => {
   };
 });
 
-vi.mock('../srs/output.ts', () => ({
-  pendingOutputChecks: async () => engine.pending.filter((r) => r.check === 'pending'),
-  completeOutputCheck: async (id: string, result: AiCheckResponse) => {
-    engine.completed.push({ id, result });
-    const rec = engine.pending.find((r) => r.id === id);
-    if (rec) rec.check = 'done';
-    return {};
-  },
-  learnerAiContext: async () => ({ knownKanji: ['水'], knownGrammar: ['te-form'], register: 'plain' as const }),
-}));
+vi.mock('../srs/output.ts', async () => {
+  const { db: store } = await import('../lib/db.ts');
+  return {
+    /** Contract (§3.1.10): the outputs with check 'pending', oldest first. */
+    pendingOutputChecks: async () => (await store.outputs.where('check').equals('pending').toArray())
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
+    completeOutputCheck: async (id: string, result: AiCheckResponse) => {
+      engine.completed.push({ id, result });
+      await store.outputs.update(id, { check: 'done' });
+      return {};
+    },
+    learnerAiContext: async () => ({ knownKanji: ['水'], knownGrammar: ['te-form'], register: 'plain' as const }),
+  };
+});
 
 // ---- A fake home server ----------------------------------------------------------------
 
@@ -100,7 +103,9 @@ function fakeServer() {
   const applied = new Set<string>();
   const quizzes: Quiz[] = [];
   const checks: AiCheckRequest[] = [];
+  const features = { aiEnabled: true };
   const routes = {
+    health: (): Response | Error | null => null,
     events: (_req: TogetherEventRequest): Response | Error | null => null,
     check: (_req: AiCheckRequest): Response | Error | null => null,
     together: (): Response | Error | null => null,
@@ -108,6 +113,11 @@ function fakeServer() {
   const fetchMock = vi.fn<typeof fetch>(async (input, init) => {
     const url = new URL(String(input), 'http://home:8787');
     const method = init?.method ?? 'GET';
+    if (url.pathname === '/api/health') {
+      const override = routes.health();
+      if (override instanceof Error) throw override;
+      return override ?? json({ ok: true, version: '0.2.0', aiEnabled: features.aiEnabled, ttsEnabled: false });
+    }
     if (url.pathname === '/api/together' && method === 'GET') {
       const override = routes.together();
       if (override instanceof Error) throw override;
@@ -142,7 +152,7 @@ function fakeServer() {
     }
     return json({ error: 'not_found' }, 404);
   });
-  return { state, posted, quizzes, checks, routes, fetchMock };
+  return { state, posted, quizzes, checks, features, routes, fetchMock };
 }
 
 function checkResult(text: string): AiCheckResponse {
@@ -158,7 +168,6 @@ beforeEach(async () => {
   resetTogether();
   engine.graded = 0;
   engine.applyCalls = 0;
-  engine.pending = [];
   engine.completed = [];
   installFakeSocket();
   await updateSettings({ serverUrl: 'http://home:8787', deviceToken: 'tok', memberId: 'me' });
@@ -236,6 +245,38 @@ describe('postTogetherEvent', () => {
     await expect(flushTogetherOutbox()).resolves.toBe(0);
     expect(server.fetchMock).not.toHaveBeenCalled();
     expect(await rows()).toHaveLength(1);
+  });
+});
+
+describe('the household plan in Settings (V071)', () => {
+  const slots = [{ session: 'A' as const, weekday: 2 as const, time: '20:00' }, { session: 'B' as const, weekday: 6 as const, time: '10:00' }];
+  const goal = { text: 'Order at a ramen shop', targetDate: '2026-12-01' };
+
+  it('mirrors the slots and goal the partner set, from a refresh and from a post', async () => {
+    await updateSettings({ togetherSlots: [{ session: 'A', weekday: 5, time: '19:00' }] });
+    server.state.slots.push(...slots);
+    server.state.goal = goal;
+    await refreshTogether();
+    expect((await getSettings()).togetherSlots).toEqual(slots);
+    expect((await getSettings()).sharedGoal).toEqual(goal);
+
+    const next = { text: 'Ask for directions', targetDate: '2027-01-15' };
+    await postTogetherEvent({ type: 'goal', goal: next });
+    await flushTogetherOutbox();
+    expect((await getSettings()).sharedGoal).toEqual(next);
+  });
+
+  it('keeps an offline edit that is still waiting to be sent, and never empties a field', async () => {
+    const mine = [{ session: 'A' as const, weekday: 4 as const, time: '21:00' }];
+    await updateSettings({ togetherSlots: mine, sharedGoal: goal });
+    server.routes.events = () => new TypeError('Failed to fetch');
+    await postTogetherEvent({ type: 'slots', slots: mine });
+    await flushTogetherOutbox();
+    server.state.slots.push(...slots);
+    await refreshTogether();
+    expect((await getSettings()).togetherSlots).toEqual(mine);
+    // The server has no goal yet: Settings keep this phone's.
+    expect((await getSettings()).sharedGoal).toEqual(goal);
   });
 });
 
@@ -364,8 +405,11 @@ describe('pending output checks', () => {
     createdAt: new Date('2026-10-14T20:00:00Z'),
   });
 
+  const checkStates = async () => (await db.outputs.toArray()).map((r) => [r.id, r.check]);
+  const checkRequests = () => server.fetchMock.mock.calls.filter(([input]) => String(input).endsWith('/api/ai/check')).length;
+
   it('reveals each queued check with the learner context and completes it', async () => {
-    engine.pending = [pendingCheck('o1', 'すしを食べた', 'すしが食べた'), pendingCheck('o2', 'みずをのむ')];
+    await db.outputs.bulkAdd([pendingCheck('o1', 'すしを食べた', 'すしが食べた'), pendingCheck('o2', 'みずをのむ')]);
     await expect(flushPendingOutputChecks()).resolves.toBe(2);
     expect(server.checks).toEqual([
       { knownKanji: ['水'], knownGrammar: ['te-form'], register: 'plain', text: 'すしを食べた', mode: 'reveal', target: '食べる', firstAttempt: 'すしが食べた' },
@@ -375,15 +419,50 @@ describe('pending output checks', () => {
     await expect(flushPendingOutputChecks()).resolves.toBe(0);
   });
 
-  it('keeps checks pending while the AI is off or the server unreachable', async () => {
-    engine.pending = [pendingCheck('o1', 'すしを食べた'), pendingCheck('o2', 'みずをのむ')];
-    server.routes.check = () => json({ error: 'ai_disabled' }, 503);
+  it('keeps checks pending while the server is unreachable or the AI is failing', async () => {
+    await db.outputs.bulkAdd([pendingCheck('o1', 'すしを食べた'), pendingCheck('o2', 'みずをのむ')]);
+    server.routes.health = () => new TypeError('Failed to fetch');
     await expect(flushPendingOutputChecks()).resolves.toBe(0);
-    expect(server.checks).toHaveLength(1);
+    expect(checkRequests()).toBe(0);
+
+    server.routes.health = () => null;
     server.routes.check = () => new TypeError('Failed to fetch');
     await expect(flushPendingOutputChecks()).resolves.toBe(0);
+    server.routes.check = () => json({ error: 'ai_unavailable' }, 502);
+    await expect(flushPendingOutputChecks()).resolves.toBe(0);
     expect(engine.completed).toEqual([]);
-    expect(engine.pending.every((r) => r.check === 'pending')).toBe(true);
+    expect(await checkStates()).toEqual([['o1', 'pending'], ['o2', 'pending']]);
+  });
+
+  it('never asks a server without AI (health aiEnabled false): its checks become unavailable', async () => {
+    await db.outputs.bulkAdd([pendingCheck('o1', 'くじにがっこうにいきます'), pendingCheck('o2', 'みずをのむ')]);
+    server.features.aiEnabled = false;
+    await expect(flushPendingOutputChecks()).resolves.toBe(0);
+    expect(checkRequests()).toBe(0);
+    expect(await checkStates()).toEqual([['o1', 'unavailable'], ['o2', 'unavailable']]);
+
+    // Every later reconnect: nothing left to ask about, not even the health check.
+    server.fetchMock.mockClear();
+    await expect(flushPendingOutputChecks()).resolves.toBe(0);
+    expect(server.fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("stops at 'ai_disabled' (the key was removed since the health check) and marks the rest unavailable", async () => {
+    await db.outputs.bulkAdd([pendingCheck('o1', 'すしを食べた'), pendingCheck('o2', 'みずをのむ')]);
+    server.routes.check = () => json({ error: 'ai_disabled' }, 503);
+    await expect(flushPendingOutputChecks()).resolves.toBe(0);
+    expect(checkRequests()).toBe(1);
+    expect(await checkStates()).toEqual([['o1', 'unavailable'], ['o2', 'unavailable']]);
+  });
+
+  it("treats 'ai_misconfigured' (a refused key or model) as the output step does: unavailable, not asked again", async () => {
+    await db.outputs.bulkAdd([pendingCheck('o1', 'すしを食べた'), pendingCheck('o2', 'みずをのむ')]);
+    server.routes.check = () => json({ error: 'ai_misconfigured' }, 503);
+    await expect(flushPendingOutputChecks()).resolves.toBe(0);
+    expect(checkRequests()).toBe(1);
+    expect(await checkStates()).toEqual([['o1', 'unavailable'], ['o2', 'unavailable']]);
+    await expect(flushPendingOutputChecks()).resolves.toBe(0);
+    expect(checkRequests()).toBe(1);
   });
 });
 

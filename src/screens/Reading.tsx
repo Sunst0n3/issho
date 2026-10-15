@@ -1,6 +1,6 @@
 // Reading outside the session. /read: a few study sentences at your level (read, listen, guess, shadow) and the
 // sentences you saved as cards. /read/:storyId: a story from the Library — a Stretch story with tap-for-English, or an
-// Easy story read while listening.
+// Easy story read while listening. A story below Stretch level (only reachable by its address) is not open yet.
 
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useCallback, useState } from 'react';
@@ -18,24 +18,36 @@ import { db } from '../lib/db.ts';
 import { loadStories } from '../lib/data.ts';
 import { useRubyShow } from '../lib/hooks.ts';
 import type { SavedSentenceRecord, StoryEntry } from '../lib/types.ts';
-import { EASY_COVERAGE, loadKnownWords, pickRead, storyCoverage } from '../srs/readListen.ts';
+import { EASY_COVERAGE, loadKnownWords, pickRead, storyCoverage, STRETCH_COVERAGE } from '../srs/readListen.ts';
 import '../components/study/study.css';
 
 /** Minutes of sentences offered per round on /read. */
 const ROUND_MINUTES = 5;
 
-/** A Library story opens as an Easy read-while-listening when the learner knows ≥ 98 % of its words, else as a Stretch story. */
-export function storyStepFor(story: StoryEntry, isKnown: (ref: string) => boolean): StoryStep {
-  return storyCoverage(story, isKnown) >= EASY_COVERAGE ? 'rwl' : 'library';
+export interface StoryOpening {
+  step: StoryStep;
+  /** 95–98 % known: a Stretch story, read with tap-for-English. */
+  stretch: boolean;
+}
+
+/**
+ * How a Library story opens: as an Easy read-while-listening when the learner knows ≥ 98 % of its words, as a
+ * Stretch story (tap-for-English) at 95–98 %, else not at all (null). A story already started on the ladder stays open.
+ */
+export function storyStepFor(story: StoryEntry, isKnown: (ref: string) => boolean, started = false): StoryOpening | null {
+  const known = storyCoverage(story, isKnown);
+  if (known >= EASY_COVERAGE) return { step: 'rwl', stretch: false };
+  if (known >= STRETCH_COVERAGE) return { step: 'library', stretch: true };
+  return started ? { step: 'library', stretch: false } : null;
 }
 
 function StoryScreen({ storyId }: { storyId: string }) {
   useStudyTimer('strand');
   const navigate = useNavigate();
   const data = useAsync(async () => {
-    const [stories, known] = await Promise.all([loadStories(), loadKnownWords()]);
+    const [stories, known, progress] = await Promise.all([loadStories(), loadKnownWords(), db.stories.get(storyId).catch(() => undefined)]);
     const story = stories.find((s) => s.id === storyId);
-    return story ? { story, step: storyStepFor(story, (ref) => known.isKnown(ref)) } : null;
+    return story ? { story, opening: storyStepFor(story, (ref) => known.isKnown(ref), (progress?.stage ?? 0) > 0) } : null;
   }, [storyId]);
   const back = () => navigate('/library/stories');
   if (data.loading) {
@@ -58,10 +70,23 @@ function StoryScreen({ storyId }: { storyId: string }) {
       </Screen>
     );
   }
+  const { story, opening } = data.data;
+  if (!opening) {
+    return (
+      <Screen label={story.title}>
+        <TopBar back="/library/stories" title="Story" />
+        <div className="card st-empty-card">
+          <h2>Not open yet</h2>
+          <p className="muted">This story opens once you know more of its words. It shows up in Stories when it's ready for you.</p>
+          <Link className="btn ink" to="/library/stories">All stories</Link>
+        </div>
+      </Screen>
+    );
+  }
   return (
-    <Screen label={data.data.story.title}>
-      <TopBar back="/library/stories" title={data.data.step === 'library' ? 'Stretch story' : 'Story'} />
-      <StoryReader story={data.data.story} step={data.data.step} onDone={back} />
+    <Screen label={story.title}>
+      <TopBar back="/library/stories" title={opening.stretch ? 'Stretch story' : 'Story'} />
+      <StoryReader story={story} step={opening.step} onDone={back} />
     </Screen>
   );
 }
@@ -71,7 +96,7 @@ function SavedSentence({ s, onClose }: { s: SavedSentenceRecord; onClose: () => 
   return (
     <div className="card st-start">
       <Ruby className="st-sentence" text={s.jp} show={show} />
-      <p className="st-translation">{s.en}</p>
+      {s.en && <p className="st-translation">{s.en}</p>}
       <div className="st-row">
         <AudioButton source={{ ref: clipRef.sentence(s.id) }} fallbackText={s.jp} label="Listen" />
         <button type="button" className="btn ghost small" onClick={onClose}>Close</button>
@@ -95,7 +120,7 @@ function SavedList() {
           {open === s.id ? <SavedSentence s={s} onClose={() => setOpen(null)} /> : (
             <button type="button" className="st-saved-text" onClick={() => setOpen(s.id)}>
               <Ruby className="st-saved-jp" text={s.jp} show={show} />
-              <span className="st-word-en">{s.en}</span>
+              {s.en && <span className="st-word-en">{s.en}</span>}
             </button>
           )}
         </li>

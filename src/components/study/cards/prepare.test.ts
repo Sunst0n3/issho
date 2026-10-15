@@ -11,15 +11,23 @@ import {
   blankKanji,
   CLOZE_GAP,
   cueTexts,
+  piecesRuby,
   prepareCard,
+  shownWord,
   splitCue,
   stripRubyOf,
   TYPED_BUILD_FROM,
+  writtenMatches,
   type PrepareContext,
 } from './prepare.ts';
 import type { PreparedCard } from './types.ts';
 
-vi.mock('../../../lib/data.ts', async () => (await import('../test-utils.tsx')).dataMock);
+vi.mock('../../../lib/data.ts', async () => {
+  const { CORE, dataMock } = await import('../test-utils.tsx');
+  // 人 is also じん (a suffix): a second word written like WORDS' 人 (ひと).
+  const jin = { id: 'cw-0086', order: 86, kana: 'じん', written: '人', en: '(person from a country)', pos: 'suffix' as const, register: 'both' as const, topic: 'people', use: true, kanji: ['人'], unit: 1 };
+  return { ...dataMock, loadCoreWords: async () => [...CORE, jin] };
+});
 
 const KNOWN = new Set(['word:w-mizu', 'word:w-hon', 'word:w-nihon', 'core:cw-0001']);
 const known: KnownWords = { isKnown: (ref) => KNOWN.has(ref), introducedDay: (ref) => (KNOWN.has(ref) ? '2026-10-01' : undefined) };
@@ -192,5 +200,58 @@ describe('prepareCard', () => {
     expect((await prep('kanji', '水', 'write')).customMnemonic).toBe('My hook');
     expect(await prepareCard(card('kanji', '火', 'write'), ctx())).toBeNull();
     expect(Object.keys(KANJI)).not.toContain('火');
+  });
+});
+
+describe('QA round 2 fixes', () => {
+  it('kana rule and post-sprint kana word cards have no choices: kana options would repeat the prompt (V021)', async () => {
+    expect(await prep('kanaRule', 'hira-dakuten', 'read')).toMatchObject({ view: 'kana-rule', options: [] });
+    expect(await prep('kana', 'か', 'read')).toMatchObject({ view: 'kana-read', mode: 'word', options: [] });
+    // Sprint kana cards keep their romaji choices: they test the sound.
+    expect((await prep('kana', 'か', 'read', { inSprint: true })).options.length).toBe(4);
+  });
+
+  it('a word shown alone accepts the readings of the other words written the same way, never offered as wrong choices (V036)', async () => {
+    const alone = await prep('word', 'w-hito', 'read');
+    if (alone.view !== 'word-read') throw new Error(alone.view);
+    expect(alone.carrier).toBeUndefined();
+    expect(alone.homographs).toEqual(['じん']);
+    expect(alone.options).not.toContain('じん');
+    // A word with no other spelling twin has none.
+    expect(await prep('word', 'w-ike', 'read')).toMatchObject({ homographs: [] });
+  });
+
+  it('matches answers typed with kanji: written, as their reading, or mixed (V040)', () => {
+    const build = '{疲|つか}れたからちょっと{休|やす}もう。';
+    expect(writtenMatches('疲れたからちょっと休もう。', [{ written: build }])).toBe(true);
+    expect(writtenMatches('疲れたからちょっとやすもう', [{ written: build }])).toBe(true);
+    expect(writtenMatches('疲れたからちょっと休もうか', [{ written: build }])).toBe(false);
+    expect(writtenMatches('学生', [{ written: '学生', readings: ['がくせい'] }])).toBe(true);
+    expect(writtenMatches('学せい', [{ written: '学生', readings: ['がくせい'] }])).toBe(false);
+    expect(writtenMatches('もう一度おねがいします', [{ written: 'もう一度お願いします', readings: ['もういちどおねがいします'] }])).toBe(true);
+    expect(writtenMatches('もう二度おねがいします', [{ written: 'もう一度お願いします', readings: ['もういちどおねがいします'] }])).toBe(false);
+    expect(writtenMatches('食べる', [{ written: '食べる', readings: ['たべる'] }])).toBe(true);
+    // Kana-only answers are kanaMatches' job.
+    expect(writtenMatches('たべる', [{ written: '食べる', readings: ['たべる'] }])).toBe(false);
+  });
+
+  it('gives each build tile the readings of the words it holds whole (V043)', () => {
+    expect(piecesRuby('{卵|たまご}を{買|か}いました。', ['卵を', '買いました。'])).toEqual(['{卵|たまご}を', '{買|か}いました。']);
+    expect(piecesRuby('{週末|しゅうまつ}に{映画|えいが}を{見|み}ませんか。', ['週末に', '映画を', '見', 'ませんか。']))
+      .toEqual(['{週末|しゅうまつ}に', '{映画|えいが}を', '{見|み}', 'ませんか。']);
+    // A tile that cuts through a word keeps no reading for it.
+    expect(piecesRuby('{今晩|こんばん}は', ['今', '晩は'])).toEqual(['今', '晩は']);
+  });
+
+  it('typed build cards show their choices with the sentence’s readings', async () => {
+    const typed = await prep('grammar', 'wa-desu', 'build', { grammarIntroduced: TYPED_BUILD_FROM });
+    if (typed.view !== 'grammar-build') throw new Error(typed.view);
+    for (const option of typed.options) expect(parseRuby(typed.rubyOf[option] ?? option).map((seg) => seg.text).join('')).toBe(option);
+  });
+
+  it('shows a word in kana while one of its kanji is still to be written today (V022)', () => {
+    const mask = { kanji: new Set(['食']) };
+    expect(shownWord('{食べる|たべる}', { kana: 'たべる', kanji: ['食'] }, mask)).toBe('たべる');
+    expect(shownWord('{食べる|たべる}', { kana: 'たべる', kanji: ['食'] }, { kanji: new Set() })).toBe('{食べる|たべる}');
   });
 });

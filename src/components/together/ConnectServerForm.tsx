@@ -1,7 +1,7 @@
 // Joins this phone to the household on the home server. Used by the Together
 // tab, the chat screen, onboarding and settings, so its props must stay stable.
 
-import { useId, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { useSettings } from '../../lib/hooks.ts';
 import { ApiError, INVALID_SERVER_URL_MESSAGE, pair, wasRemoved } from '../../sync/client.ts';
 import { connectFromSettings } from '../../sync/socket.ts';
@@ -46,6 +46,18 @@ export function pairErrorMessage(e: unknown, serverUrl = ''): string {
   return `Couldn't connect (${e.code}). Try again.`;
 }
 
+type Field = 'name' | 'code' | 'server';
+
+/** The field a pairing failure is about, if any: it is marked invalid and gets focus. */
+function failedField(e: unknown, serverUrl: string): Field | null {
+  if (!(e instanceof ApiError)) return null;
+  if (e.code === 'invalid_code') return 'code';
+  if (e.code === 'invalid_request') return 'name';
+  const notIssho = e.code === 'bad_response' || e.code === 'not_found' || e.status === 404 || e.status === 405;
+  if (e.code === 'invalid_server_url' || (notIssho && serverUrl.trim())) return 'server';
+  return null;
+}
+
 export function ConnectServerForm({ onConnected, onSkip, compact }: {
   onConnected(): void;
   onSkip?(): void;
@@ -59,9 +71,28 @@ export function ConnectServerForm({ onConnected, onSkip, compact }: {
   const [code, setCode] = useState('');
   const [showCode, setShowCode] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState<{ text: string; field: Field | null }>();
   const nameRef = useRef<HTMLInputElement>(null);
   const codeRef = useRef<HTMLInputElement>(null);
+  const serverRef = useRef<HTMLInputElement>(null);
+  const advancedRef = useRef<HTMLDetailsElement>(null);
+  const errorId = `${id}-error`;
+
+  // After a failed try, focus goes to the field the message is about (marked invalid and described by the message), so
+  // it never falls to the page. A failure that is no field's (offline, unreachable) leaves focus on Connect, which stays
+  // focusable while busy (aria-disabled, not disabled).
+  useEffect(() => {
+    if (!error?.field) return;
+    if (error.field === 'server' && advancedRef.current) advancedRef.current.open = true;
+    ({ name: nameRef, code: codeRef, server: serverRef })[error.field].current?.focus();
+  }, [error]);
+
+  /** aria-invalid and aria-describedby for a field, with its own hint first. */
+  const invalidProps = (field: Field, hint?: string) => {
+    const bad = error?.field === field;
+    const describedBy = [hint, bad ? errorId : undefined].filter(Boolean).join(' ');
+    return { 'aria-invalid': bad || undefined, 'aria-describedby': describedBy || undefined };
+  };
 
   const nameValue = name ?? settings.name;
   const serverValue = server ?? settings.serverUrl ?? '';
@@ -70,17 +101,15 @@ export function ConnectServerForm({ onConnected, onSkip, compact }: {
     e.preventDefault();
     if (busy) return;
     if (!nameValue.trim()) {
-      setError("Add your name so your partner knows it's you.");
-      nameRef.current?.focus();
+      setError({ text: "Add your name so your partner knows it's you.", field: 'name' });
       return;
     }
     if (!code.trim()) {
-      setError('Enter the household code from your home server.');
-      codeRef.current?.focus();
+      setError({ text: 'Enter the household code from your home server.', field: 'code' });
       return;
     }
     if (navigator.onLine === false) {
-      setError(OFFLINE);
+      setError({ text: OFFLINE, field: null });
       return;
     }
     setBusy(true);
@@ -88,7 +117,7 @@ export function ConnectServerForm({ onConnected, onSkip, compact }: {
     try {
       await pair({ serverUrl: serverValue, householdCode: code, name: nameValue });
     } catch (err) {
-      setError(pairErrorMessage(err, serverValue));
+      setError({ text: pairErrorMessage(err, serverValue), field: failedField(err, serverValue) });
       setBusy(false);
       return;
     }
@@ -112,7 +141,7 @@ export function ConnectServerForm({ onConnected, onSkip, compact }: {
       <div className="tg-field">
         <label htmlFor={`${id}-name`}>Your name</label>
         <input ref={nameRef} id={`${id}-name`} className="text-input" value={nameValue} maxLength={40}
-          autoComplete="given-name" onChange={(e) => setName(e.target.value)} aria-describedby={`${id}-name-hint`} />
+          autoComplete="given-name" onChange={(e) => setName(e.target.value)} {...invalidProps('name', `${id}-name-hint`)} />
         <span id={`${id}-name-hint`} className="tg-field-hint">This is how your partner sees you.</span>
       </div>
       <div className="tg-field">
@@ -120,27 +149,27 @@ export function ConnectServerForm({ onConnected, onSkip, compact }: {
         <div className="tg-input-with-button">
           <input ref={codeRef} id={`${id}-code`} className="text-input" type={showCode ? 'text' : 'password'}
             value={code} onChange={(e) => setCode(e.target.value)} autoComplete="off" autoCapitalize="none"
-            autoCorrect="off" spellCheck={false} />
+            autoCorrect="off" spellCheck={false} {...invalidProps('code')} />
           <button type="button" className="icon-btn" aria-pressed={showCode}
             aria-label={showCode ? 'Hide household code' : 'Show household code'} onClick={() => setShowCode((v) => !v)}>
             {showCode ? <TIcon name="eyeOff" /> : <Icon name="eye" />}
           </button>
         </div>
       </div>
-      <details className="tg-advanced" open={Boolean(settings.serverUrl) || undefined}>
+      <details ref={advancedRef} className="tg-advanced" open={Boolean(settings.serverUrl) || undefined}>
         <summary>Advanced: server address</summary>
         <div className="tg-field">
           <label htmlFor={`${id}-server`}>Server address</label>
-          <input id={`${id}-server`} className="text-input" value={serverValue} inputMode="url" autoComplete="url"
+          <input ref={serverRef} id={`${id}-server`} className="text-input" value={serverValue} inputMode="url" autoComplete="url"
             autoCapitalize="none" autoCorrect="off" spellCheck={false} placeholder="192.168.1.20:8787"
-            onChange={(e) => setServer(e.target.value)} aria-describedby={`${id}-server-hint`} />
+            onChange={(e) => setServer(e.target.value)} {...invalidProps('server', `${id}-server-hint`)} />
           <span id={`${id}-server-hint`} className="tg-field-hint">
             Leave this empty when you opened Issho from your home server.
           </span>
         </div>
       </details>
-      {error && <p className="tg-form-error" role="alert"><TIcon name="alert" size={18} />{error}</p>}
-      <button type="submit" className="btn primary block" disabled={busy}>
+      {error && <p id={errorId} className="tg-form-error" role="alert"><TIcon name="alert" size={18} />{error.text}</p>}
+      <button type="submit" className="btn primary block" aria-disabled={busy || undefined}>
         {busy ? 'Connecting…' : 'Connect'}
       </button>
       {onSkip && (

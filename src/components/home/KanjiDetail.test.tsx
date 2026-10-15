@@ -101,6 +101,9 @@ describe('KanjiDetail', () => {
     renderKanji('日');
     const status = await screen.findByRole('region', { name: 'Your progress' });
     expect(status.textContent).toContain('Reading only');
+    // The date it was introduced, not a claim that it is learned.
+    expect(status.textContent).toContain('First met');
+    expect(status.textContent).not.toMatch(/Learned/);
   });
 
   it('shows the stock hook with its sound hook, and keeps a learner\'s own', async () => {

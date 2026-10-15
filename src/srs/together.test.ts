@@ -2,6 +2,7 @@ import { Rating, State } from 'ts-fsrs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Quiz, TogetherState } from '../../shared/api.ts';
 import { db } from '../lib/db.ts';
+import type { WordInfo } from '../lib/data.ts';
 import type { CardRecord, CardType, ItemKind, RolePlay, StoryEntry, UnitSpec } from '../lib/types.ts';
 import { DAY_MS, emptyDay } from './days.ts';
 import {
@@ -58,6 +59,18 @@ describe('partnerPrompt', () => {
     const word = wordInfoOf('word:1002')!;
     expect(partnerPrompt({ id: 'word:1002|read', itemId: 'word:1002', kind: 'word', type: 'read' }, { word })).toMatchObject({ kind: 'read', prompt: '日本', answer: 'にほん' });
     expect(partnerPrompt({ id: 'word:1002|produce', itemId: 'word:1002', kind: 'word', type: 'produce' }, { word })).toMatchObject({ kind: 'produce', prompt: 'Japan', answer: '{日本|にほん}' });
+  });
+
+  it('leaves out a produce note that holds the answer, and keeps one that does not', () => {
+    const congrats = {
+      ref: 'core:cw-0056', written: 'おめでとう', kana: 'おめでとう', en: 'congratulations', kanji: [], use: true, readings: ['おめでとう'],
+      note: 'polite: おめでとうございます',
+    } as WordInfo;
+    const produce = { id: 'core:cw-0056|produce', itemId: 'core:cw-0056', kind: 'core', type: 'produce' } as const;
+    expect(partnerPrompt(produce, { word: congrats })).toMatchObject({ prompt: 'congratulations', answer: 'おめでとう' });
+    const written = { ...congrats, written: '日本', kana: 'にほん', en: 'Japan', note: 'also read 日本 (にっぽん)' } as WordInfo;
+    expect(partnerPrompt(produce, { word: written }).prompt).toBe('Japan');
+    expect(partnerPrompt(produce, { word: { ...congrats, note: 'said to friends' } }).prompt).toBe('congratulations (said to friends)');
   });
 });
 
@@ -147,6 +160,23 @@ describe('applyPartnerVerdicts', () => {
     const items = [{ key: 'word:1|read', kind: 'read' as const, prompt: '', answer: '' }];
     expect(await applyLocalVerdicts('local-1', items, [{ key: 'word:1|read', verdict: 'close' }, { key: 'kanji:日|write', verdict: 'right' }], NOW)).toEqual({ graded: 1, practiced: 0 });
     expect(await applyLocalVerdicts('local-1', items, [{ key: 'word:1|read', verdict: 'close' }], NOW)).toEqual({ graded: 1, practiced: 0 });
+  });
+
+  it('grades a card once a day: later quizzes, dictation and pass-and-play that day count as practice (QA V078)', async () => {
+    await card('kanji:車', 'write', { introducedDaysAgo: 9, dueIn: 1 });
+    const key = 'kanji:車|write';
+    expect(await applyPartnerVerdicts(quiz('a1', result([[key, 'right']])), NOW)).toEqual({ graded: 1, practiced: 0 });
+    const later = new Date(NOW.getTime() + 30 * 60_000);
+    expect(await applyPartnerVerdicts(quiz('a2', result([[key, 'right']])), later)).toEqual({ graded: 0, practiced: 1 });
+    expect(await applyPartnerVerdicts({ ...quiz('c1', result([[key, 'wrong']])), kind: 'dictation' }, later)).toEqual({ graded: 0, practiced: 1 });
+    const items = [{ key, kind: 'write' as const, prompt: '', answer: '' }];
+    expect(await applyLocalVerdicts('local-a', items, [{ key, verdict: 'right' }], later)).toEqual({ graded: 0, practiced: 1 });
+    expect(await db.reviewLogs.where('cardId').equals(key).count()).toBe(1);
+    expect((await db.cards.get(key))?.reps).toBe(3);
+    // The next day it is gradable again (when still near its due date).
+    const tomorrow = new Date(NOW.getTime() + DAY_MS);
+    await db.cards.update(key, { due: new Date(tomorrow.getTime() + DAY_MS) });
+    expect(await applyPartnerVerdicts(quiz('a3', result([[key, 'right']])), tomorrow)).toEqual({ graded: 1, practiced: 0 });
   });
 
   it('ignores v1 kanji quizzes', async () => {

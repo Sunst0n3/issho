@@ -82,7 +82,8 @@ const tileNames = (root: HTMLElement = document.body) =>
 describe('Library: kanji', () => {
   it('groups kanji by chapter, opens the current one, and marks each tile', async () => {
     renderAt('/library', '/library', <Library />);
-    const chapter1 = await screen.findByRole('button', { name: 'Chapter 1, 3 of 8 kanji learned' });
+    // "Met": introduced. "Learned" means 3 spaced successes, which only 日 has ("can write").
+    const chapter1 = await screen.findByRole('button', { name: 'Chapter 1, 3 of 8 kanji met' });
     expect(chapter1.getAttribute('aria-expanded')).toBe('true');
     const chapter2 = screen.getByRole('button', { name: /^Chapter 2/ });
     expect(chapter2.getAttribute('aria-expanded')).toBe('false');
@@ -98,13 +99,15 @@ describe('Library: kanji', () => {
     ]);
     expect(screen.getByRole('link', { name: '火, fire, next up' }).getAttribute('href')).toBe(`/kanji/${encodeURIComponent('火')}`);
     fireEvent.click(chapter2);
-    expect(tileNames()).toContain('山, mountain, not learned yet');
+    expect(tileNames()).toContain('山, mountain, not met yet');
   });
 
-  it('filters to the kanji learned so far', async () => {
+  it('filters to the kanji met so far', async () => {
     renderAt('/library/kanji', '/library/:tab', <Library />);
     await screen.findByRole('button', { name: /^Chapter 1/ });
-    fireEvent.click(screen.getByRole('radio', { name: 'Learned' }));
+    expect(screen.getByText(/^3 kanji met so far, 1 you can write from memory/)).toBeTruthy();
+    expect(screen.queryByText(/kanji learned so far/)).toBeNull();
+    fireEvent.click(screen.getByRole('radio', { name: 'Met' }));
     expect(tileNames()).toEqual(['日, day, can write', '一, one, learning, pinned', '水, water, reading only']);
   });
 

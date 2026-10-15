@@ -122,7 +122,7 @@ ruby rt { font-size: 0.5em; color: var(--muted); font-family: var(--font-body); 
   min-height: 52px; padding: 0 20px; border-radius: 14px; border: 1px solid transparent;
   font-size: 16px; font-weight: 700; cursor: pointer; text-decoration: none; text-align: center;
 }
-.btn[disabled] { opacity: 0.5; cursor: default; }
+.btn[disabled], .btn[aria-disabled="true"] { opacity: 0.5; cursor: default; }
 .btn.block { width: 100%; }
 .btn.small { min-height: var(--tap); font-size: 14px; padding: 0 14px; border-radius: 12px; }
 .btn.primary { background: var(--shu); color: var(--on-accent); }

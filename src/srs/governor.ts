@@ -14,6 +14,17 @@ import type { TimingKey } from './timing.ts';
 export const MISS_EXTRA_SEC = 8;
 /** kana 53 = the plan's 35-s lesson + its first-check cards (read 6 + write 12); other prices already include the check. */
 export const PRICE_SEC = { kanji: 160, anchor: 28, core: 35, staged: 28, grammar: 200, kana: 53, kanaRule: 150 } as const;
+/** First-check seconds a staged release adds when it is a core word not yet introduced: it gets the core word's listen
+ *  card (7) and, with `use`, its produce card (12) besides the read card PRICE_SEC.staged already covers (the
+ *  DEFAULT_SECONDS of timing.ts). */
+export const STAGED_NEW_CORE_SEC = { listen: 7, produce: 12 } as const;
+
+/** pure: the price of a staged release. A spelling upgrade (read card only) or a JMdict word costs PRICE_SEC.staged; a
+ *  core word not yet introduced also pays for its listen (+ produce) first-check cards, so it never costs less than a
+ *  core lesson (QA V041: 八つ made 3 cards but was priced 28 s). */
+export function stagedPriceSec(newCore: boolean, use: boolean): number {
+  return PRICE_SEC.staged + (newCore ? STAGED_NEW_CORE_SEC.listen + (use ? STAGED_NEW_CORE_SEC.produce : 0) : 0);
+}
 export type SharedStream = 'kanji' | 'core' | 'grammar';
 export const SHARED_STREAMS: readonly SharedStream[] = ['kanji', 'core', 'grammar'];
 export const STREAM_TARGETS: Record<SharedStream, number> = { kanji: 0.6, core: 0.2, grammar: 0.2 };

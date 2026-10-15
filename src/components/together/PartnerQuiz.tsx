@@ -5,8 +5,9 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import type { PartnerQuizItem, Quiz, QuizItemVerdict, QuizVerdict } from '../../../shared/api.ts';
-import { loadKanji } from '../../lib/data.ts';
+import { loadCurriculum, loadKanji, loadWordInfo } from '../../lib/data.ts';
 import { itemIdOfCard, parseItemId } from '../../lib/db.ts';
+import { kanjiIn, rubyToKana, rubyToPlain } from '../../lib/ruby.ts';
 import { applyLocalVerdicts, buildQuizPool } from '../../srs/together.ts';
 import { createQuiz } from '../../sync/client.ts';
 import { uuid } from '../../sync/outbox.ts';
@@ -24,12 +25,45 @@ export interface QuizPerson {
   name: string;
 }
 
+/** What the answerer does, on the answerer's phone. */
 const KIND_HINT: Record<PartnerQuizItem['kind'], string> = {
   write: 'Write it',
-  read: 'Read it aloud',
+  read: 'Read this word aloud',
   produce: 'Say it in Japanese',
-  build: 'Make the sentence',
+  build: 'Make the sentence in Japanese',
 };
+
+/** What the asker does with the prompt. A read item's prompt is the word to read: never said aloud. */
+export function askerInstruction(item: Pick<PartnerQuizItem, 'kind'>, kind: TogetherQuizKind, duo: boolean): string {
+  if (kind === 'dictation') return 'Read the kana aloud. They write the whole word in kanji.';
+  switch (item.kind) {
+    case 'write':
+      return 'Read this out. They write the kanji.';
+    case 'read':
+      return duo
+        ? "They read this word aloud from their phone. Don't say it for them."
+        : 'Show them the word, not the answer. They read it aloud.';
+    case 'produce':
+      return 'Read the English out. They say it in Japanese.';
+    case 'build':
+      return 'Read the English out. They say the sentence in Japanese.';
+  }
+}
+
+/**
+ * The prompt as the asker reads it out. A note that holds the answer ('congratulations (polite:
+ * おめでとうございます)' for おめでとう) would give it away, so it is dropped, and any other
+ * occurrence of the answer is blanked.
+ */
+export function askerPrompt(item: Pick<PartnerQuizItem, 'kind' | 'prompt' | 'answer'>): string {
+  if (item.kind !== 'produce' && item.kind !== 'build') return item.prompt;
+  const forms = [...new Set([rubyToPlain(item.answer), rubyToKana(item.answer)].map((f) => f.trim()).filter(Boolean))];
+  const givesAway = (text: string) => forms.some((f) => text.includes(f));
+  if (!givesAway(item.prompt)) return item.prompt;
+  let out = item.prompt.replace(/\s*[(（][^()（）]*[)）]/g, (note) => (givesAway(note) ? '' : note));
+  for (const f of forms) out = out.split(f).join('…');
+  return out.trim() || '…';
+}
 
 const VERDICTS: { verdict: QuizVerdict; label: string; className: string }[] = [
   { verdict: 'right', label: 'Right', className: 'btn primary' },
@@ -42,6 +76,19 @@ export function writeCharOf(item: Pick<PartnerQuizItem, 'key' | 'kind'>): string
   if (item.kind !== 'write') return undefined;
   const parsed = parseItemId(itemIdOfCard(item.key));
   return parsed?.kind === 'kanji' || parsed?.kind === 'kana' ? parsed.key : undefined;
+}
+
+/**
+ * The characters the answerer writes on the pad, in order: every kanji of the answer (a dictation
+ * word like 会社員 is written whole, not just the 員 its card is for), else the write card's own
+ * character (a kana).
+ */
+export function padCharsOf(item: Pick<PartnerQuizItem, 'key' | 'kind' | 'answer'>): string[] {
+  if (item.kind !== 'write') return [];
+  const kanji = kanjiIn(item.answer);
+  if (kanji.length) return kanji;
+  const char = writeCharOf(item);
+  return char ? [char] : [];
 }
 
 /** The result a list of verdicts makes (correct = right, missed = everything else). */
@@ -58,30 +105,41 @@ export function resultOf(items: readonly PartnerQuizItem[], verdicts: readonly Q
 
 // ---- The two views ---------------------------------------------------------------------
 
-/** The asker's phone: the prompt and the answer, and the three verdicts. */
-export function QuizAsker({ items, index, answererName, kind, onVerdict }: {
+/**
+ * The asker's phone: the prompt and the answer, and the three verdicts. A read item's word is for
+ * the answerer to read: in duo their phone shows it; on one phone the asker shows this screen, so
+ * its answer stays covered until asked for.
+ */
+export function QuizAsker({ items, index, answererName, kind, duo = false, onVerdict }: {
   items: readonly PartnerQuizItem[];
   index: number;
   answererName: string;
   kind: TogetherQuizKind;
+  /** The answerer has their own phone, in step with this one. */
+  duo?: boolean;
   onVerdict(verdict: QuizVerdict): void;
 }) {
   const id = useId();
-  const item = items[Math.min(index, items.length - 1)];
+  const [shownAt, setShownAt] = useState<number>();
+  const at = Math.min(index, items.length - 1);
+  const item = items[at];
   if (!item) return null;
+  const covered = item.kind === 'read' && !duo && shownAt !== at;
   return (
     <section className="card tg-quiz-asker" aria-labelledby={`${id}-head`}>
       <ProgressBar value={index / items.length} label="Quiz progress" />
       <p className="label" id={`${id}-head`}>
         You ask {midSentence(answererName)} · {index + 1} of {items.length}
       </p>
-      <p className="tg-quiz-instruction">
-        {kind === 'dictation' ? 'Read the word aloud. They write it in kanji.' : `${KIND_HINT[item.kind]}: read this out.`}
-      </p>
-      <p className="tg-quiz-prompt"><Ruby text={item.prompt} show="all" /></p>
+      <p className="tg-quiz-instruction">{askerInstruction(item, kind, duo)}</p>
+      <p className="tg-quiz-prompt" lang={item.kind === 'read' ? 'ja' : undefined}><Ruby text={askerPrompt(item)} show="all" /></p>
       <div className="tg-quiz-answer">
         <span className="label">Answer</span>
-        <span className="tg-quiz-answer-text" lang="ja"><Ruby text={item.answer} show="all" /></span>
+        {covered ? (
+          <button type="button" className="tg-link-btn" onClick={() => setShownAt(at)}>Show the answer</button>
+        ) : (
+          <span className="tg-quiz-answer-text" lang="ja"><Ruby text={item.answer} show="all" /></span>
+        )}
       </div>
       <div className="tg-verdicts" role="group" aria-label="How did they do?">
         {VERDICTS.map((v) => (
@@ -95,24 +153,48 @@ export function QuizAsker({ items, index, answererName, kind, onVerdict }: {
   );
 }
 
-/** The answerer's phone: never the answer. A pad for writing items; paper is fine too. */
-export function QuizAnswerer({ item, index, total, askerName }: {
+/**
+ * The answerer's phone: never the answer. A read item shows the word to read (that is the
+ * question, not the answer); write items get a pad, one kanji at a time for a dictation word.
+ */
+export function QuizAnswerer({ item, index, total, askerName, kind = 'partner' }: {
   item?: PartnerQuizItem;
   index: number;
   total: number;
   askerName: string;
+  kind?: TogetherQuizKind;
 }) {
-  const char = item ? writeCharOf(item) : undefined;
+  const chars = item ? padCharsOf(item) : [];
+  const dictation = kind === 'dictation';
+  const hint = !item ? `${askerName} has the question and the answer.`
+    : dictation ? `${askerName} reads a word aloud. Write the whole word in kanji, here or on paper.`
+      : item.kind === 'read' ? `${KIND_HINT.read}. ${askerName} has the answer.`
+        : item.kind === 'write' ? `${KIND_HINT.write}. ${askerName} reads you the question and has the answer.`
+          : `${KIND_HINT[item.kind]}. ${askerName} reads you the English and has the answer.`;
   return (
     <section className="card tg-quiz-answerer" aria-live="polite">
       <ProgressBar value={total ? index / total : 0} label="Quiz progress" />
       <p className="label">{total ? `${Math.min(index + 1, total)} of ${total}` : 'Your turn'}</p>
-      <h2 className="tg-quiz-turn">Your turn: answer out loud or write</h2>
-      <p className="muted">
-        {item ? `${KIND_HINT[item.kind]}. ` : ''}{askerName} has the question and the answer.
-      </p>
-      {char && <AnswerPad key={`${index}:${char}`} char={char} />}
+      <h2 className="tg-quiz-turn">{dictation ? 'Your turn: write the word you hear' : 'Your turn: answer out loud or write'}</h2>
+      <p className="muted">{hint}</p>
+      {item?.kind === 'read' && <p className="tg-quiz-answer-text tg-quiz-read" lang="ja">{item.prompt}</p>}
+      {chars.length > 0 && <WordPads key={`${index}:${chars.join('')}`} chars={chars} />}
     </section>
+  );
+}
+
+/** The word's characters on the pad, one at a time; the kana around them are fine on paper. */
+function WordPads({ chars }: { chars: readonly string[] }) {
+  const [at, setAt] = useState(0);
+  const several = chars.length > 1;
+  return (
+    <div className="tg-quiz-pads">
+      {several && <p className="label">Kanji {at + 1} of {chars.length}</p>}
+      <AnswerPad key={`${at}:${chars[at]}`} char={chars[at]} />
+      {several && at + 1 < chars.length && (
+        <button type="button" className="btn secondary small" onClick={() => setAt(at + 1)}>Next kanji</button>
+      )}
+    </div>
   );
 }
 
@@ -287,7 +369,7 @@ export function PartnerQuizStep({ kind, duo, me, partner, partnerRecentKanji, ru
     }
     return (
       <>
-        <QuizAnswerer item={myItems[index]} index={index} total={myItems.length} askerName={partner.name} />
+        <QuizAnswerer item={myItems[index]} index={index} total={myItems.length} askerName={partner.name} kind={kind} />
         {notice && <p className="tg-composer-notice" role="status">{notice}</p>}
       </>
     );
@@ -331,21 +413,45 @@ export function PartnerQuizStep({ kind, duo, me, partner, partnerRecentKanji, ru
           {direction.practice && ' Practice round: it only counts for fun.'}
         </p>
       )}
-      <QuizAsker items={direction.items} index={index} answererName={asking.name} kind={kind}
+      {/* Keyed by direction: an answer shown in one direction never shows uncovered in the other. */}
+      <QuizAsker key={asking.id} items={direction.items} index={index} answererName={asking.name} kind={kind} duo={duo}
         onVerdict={(v) => void onVerdict(direction.items!, v)} />
       {notice && <p className="tg-composer-notice" role="status">{notice}</p>}
     </>
   );
 }
 
-/** Pass-and-play without a quiz from the partner: their recent kanji to write, practice only. */
-async function practiceItems(chars: readonly string[], kind: TogetherQuizKind): Promise<PartnerQuizItem[]> {
+/**
+ * Pass-and-play without a quiz from the partner: their recent kanji, practice only. For a
+ * dictation, each kanji's anchor word (the word it was taught with) is read aloud as kana and
+ * written in kanji, as in the partner's own dictation; kanji without one are left out.
+ */
+export async function practiceItems(chars: readonly string[], kind: TogetherQuizKind): Promise<PartnerQuizItem[]> {
+  if (kind === 'dictation') return dictationPractice(chars);
   const kanji = await loadKanji().catch(() => ({} as Record<string, { meanings: string[] }>));
-  const max = kind === 'dictation' ? 5 : kind === 'monthly' ? 20 : 10;
+  const max = kind === 'monthly' ? 20 : 10;
   return chars.slice(0, max).map((char) => ({
     key: `kanji:${char}|write`,
     kind: 'write' as const,
     prompt: `Write the kanji for "${kanji[char]?.meanings[0] ?? '?'}"`,
     answer: char,
   }));
+}
+
+const DICTATION_WORDS = 5;
+
+async function dictationPractice(chars: readonly string[]): Promise<PartnerQuizItem[]> {
+  const [curriculum, word] = await Promise.all([loadCurriculum(), loadWordInfo()]).catch(() => [undefined, undefined] as const);
+  if (!curriculum || !word) return [];
+  const anchors = new Map(curriculum.units.map((u) => [u.char, u.anchor]));
+  const items: PartnerQuizItem[] = [];
+  for (const char of chars) {
+    const ref = anchors.get(char);
+    const anchor = ref ? word(ref) : undefined;
+    if (!anchor || !anchor.kanji.includes(char)) continue;
+    const en = anchor.en.split(';')[0].trim();
+    items.push({ key: `kanji:${char}|write`, kind: 'write', prompt: en ? `${anchor.kana} · ${en}` : anchor.kana, answer: anchor.written });
+    if (items.length >= DICTATION_WORDS) break;
+  }
+  return items;
 }

@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
+import type { KanaRule } from '../../../lib/types.ts';
 import type { NewItemPlan } from '../../../srs/course.ts';
 import type { DayPlan } from '../../../srs/planner.ts';
 import { seededRandom } from '../../../srs/random.ts';
@@ -10,6 +11,7 @@ import {
   MAX_DAY0_RETRIEVALS,
   sessionReducer,
   sessionSteps,
+  sittingTaught,
   stepLabel,
   type LearnedItem,
   type SessionState,
@@ -145,6 +147,36 @@ describe('firstCheckIds', () => {
     const b = firstCheckIds(many, [], seededRandom(2));
     expect(a).not.toEqual(b);
     expect(a.slice(0, 8).every((id) => id.endsWith('|write'))).toBe(true);
+  });
+});
+
+describe('firstCheckIds: write cards first (V022, V039)', () => {
+  it('asks every write card before the produce, build and cloze cards, then the rest', () => {
+    const anchor: LearnedItem = {
+      plan: item('core', 'cw-0215'), itemIds: ['core:cw-0215'], cardIds: ['core:cw-0215|produce', 'core:cw-0215|read'], memoryCardId: 'core:cw-0215|produce',
+    };
+    const one: LearnedItem = { plan: item('kanji', '一'), itemIds: ['kanji:一'], cardIds: ['kanji:一|write'], memoryCardId: 'kanji:一|write' };
+    for (let seed = 1; seed <= 20; seed++) {
+      const out = firstCheckIds([anchor, one, grammar], [], seededRandom(seed));
+      expect(out[0]).toBe('kanji:一|write');
+      expect(new Set(out.slice(1, 3))).toEqual(new Set(['core:cw-0215|produce', 'grammar:wa-desu|build']));
+    }
+  });
+});
+
+describe('sittingTaught (V019)', () => {
+  const rules: KanaRule[] = [{ id: 'hira-dakuten', day: 6, script: 'hiragana', title: '', explanation: '', pairs: [{ from: 'か', to: 'が', romaji: 'ga' }], practiceWords: [] }];
+  const before = new Set(['あ']);
+
+  it('adds the kana and rules taught so far in the sitting, and the item whose lesson is on screen', () => {
+    const learned = [{ itemIds: ['kana:い'] }, { itemIds: ['kanaRule:hira-dakuten'] }];
+    expect([...sittingTaught(before, learned, undefined, rules)].sort()).toEqual(['あ', 'い', 'が'].sort());
+    expect([...sittingTaught(before, [], { itemId: 'kana:う' }, rules)].sort()).toEqual(['あ', 'う']);
+    expect([...sittingTaught(before, [], { itemId: 'kanaRule:hira-dakuten' }, rules)].sort()).toEqual(['あ', 'が']);
+  });
+
+  it('keeps the same set when the sitting adds no kana', () => {
+    expect(sittingTaught(before, [{ itemIds: ['kanji:水', 'word:w'] }], { itemId: 'kana:あ' }, rules)).toBe(before);
   });
 });
 

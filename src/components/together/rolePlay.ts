@@ -2,7 +2,7 @@
 // tonight's pick, the conversation stages S1–S4 of a core conversation, and the
 // run state that two phones keep in step over the socket.
 
-import type { RolePlaySyncState } from '../../../shared/api.ts';
+import type { RolePlaySyncState, VoiceId } from '../../../shared/api.ts';
 import { clipRef } from '../../../shared/voicevox.ts';
 import type { RolePlay, RolePlayLine } from '../../lib/types.ts';
 
@@ -101,6 +101,17 @@ export function cueOf(line: Pick<RolePlayLine, 'cue' | 'en'>): string {
 /** The clip of a role-play line: role a speaks with the main voice, role b with the second. */
 export function lineClip(scriptId: string, index: number, line: Pick<RolePlayLine, 'role' | 'jp'>) {
   return { ref: clipRef.rolePlay(scriptId, index), voice: line.role === 'a' ? ('f' as const) : ('m' as const), text: line.jp };
+}
+
+/** Words in a task's AI role that make the persona a woman ('The party host, Ms. Yamada, … herself', 'Yuki, … she'). */
+const WOMAN_RE = /\b(?:Ms|Mrs|Miss)\b\.?|\b(?:she|her|hers|herself|woman|lady|girl|mother|wife|sister|aunt|grandmother)\b/i;
+
+/**
+ * The voice of the AI persona in Session B: the woman's voice ('f') for a persona the task describes as a woman, the
+ * man's ('m') otherwise, so Ms. Yamada and Yuki don't speak in a man's voice.
+ */
+export function personaVoice(aiRole: string | undefined): VoiceId {
+  return aiRole && WOMAN_RE.test(aiRole) ? 'f' : 'm';
 }
 
 // ---- A run -------------------------------------------------------------------

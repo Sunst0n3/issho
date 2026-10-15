@@ -42,6 +42,60 @@ describe('imeConvert', () => {
     expect(imeConvert('ko-hi-', { katakana: true })).toBe('コーヒー');
     expect(imeConvert('kar', { katakana: true })).toBe('カr');
   });
+
+  it("types ー and Japanese punctuation in a hiragana field, as an IME does (QA V061)", () => {
+    expect(imeConvert('kono ke-ki ha oishikunaidesu.')).toBe('この けーき は おいしくないです。');
+    expect(imeConvert('hai, sou desu ka?')).toBe('はい、 そう です か？');
+    expect(imeConvert('sugoi!')).toBe('すごい！');
+    // Numbers keep their separators.
+    expect(toKana('1,500en')).toBe('1,500えん');
+    expect(imeConvert('3.5')).toBe('3.5');
+  });
+
+  it('types katakana for syllables written in capitals, so loanwords can be written in a hiragana field', () => {
+    expect(imeConvert('kono KE-KI ha oishikunaidesu.')).toBe('この ケーキ は おいしくないです。');
+    expect(imeConvert('KO-HI- wo nomu')).toBe('コーヒー を のむ');
+    expect(toKana('PAN')).toBe('パン');
+    expect(imeConvert('PAN')).toBe('パN');
+    expect(imeConvert('KITTE')).toBe('キッテ');
+    expect(imeConvert('E-RU')).toBe('エール');
+    // A capitalized word is not katakana.
+    expect(imeConvert('Ano hito')).toBe('あの ひと');
+    expect(imeConvert('Watashi')).toBe('わたし');
+    expect(toKana('A')).toBe('あ');
+  });
+
+  it('converts capitals live, key by key, without losing the case of an unfinished syllable', () => {
+    let field = '';
+    for (const key of 'KE-KI desu') field = imeConvert(field + key);
+    expect(field).toBe('ケーキ です');
+    field = '';
+    for (const key of 'AISU') field = imeConvert(field + key);
+    expect(field).toBe('アイス');
+    field = '';
+    for (const key of 'Ano') field = imeConvert(field + key);
+    expect(field).toBe('あの');
+    expect(imeConvert('K')).toBe('K');
+    expect(imeConvert('A')).toBe('A');
+  });
+
+  it('keeps a katakana word in katakana when its last capital is a lone syllable typed after the rest', () => {
+    const typeKeys = (text: string) => [...text].reduce((field, key) => imeConvert(field + key), '');
+    expect(typeKeys('kono PAN ha oishii.')).toBe('この パン は おいしい。');
+    expect(typeKeys('RA-MEN ga suki')).toBe('ラーメン が すき');
+    expect(typeKeys('WAIN wo nomu')).toBe('ワイン を のむ');
+    expect(typeKeys('KAI desu')).toBe('カイ です');
+    expect(typeKeys('Ano hito')).toBe('あの ひと');
+  });
+
+  it('keeps number separators while typing key by key', () => {
+    const typeKeys = (text: string) => [...text].reduce((field, key) => imeConvert(field + key), '');
+    expect(typeKeys('1,500en desu.')).toBe('1,500えん です。');
+    expect(typeKeys('3.5')).toBe('3.5');
+    expect(typeKeys('3, 4')).toBe('3、 4');
+    expect(imeConvert('3.')).toBe('3.');
+    expect(toKana('3.')).toBe('3。');
+  });
 });
 
 describe('typed readings', () => {

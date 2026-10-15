@@ -8,6 +8,7 @@ import {
   initialRun,
   initialStage,
   lineClip,
+  personaVoice,
   pickTonight,
   runReducer,
   stageReducer,
@@ -151,5 +152,19 @@ describe('runReducer', () => {
     expect(s.step).toBe('done');
     s = runReducer(s, { type: 'again', swap: true });
     expect(s).toMatchObject({ step: 'active', lineIndex: 0, part: 'a' });
+  });
+});
+
+describe('personaVoice', () => {
+  it('voices a persona the task describes as a woman with the woman\'s voice, any other with the man\'s', () => {
+    // The two women among the task AI roles (u01, u05), and others as authored.
+    expect(personaVoice('The party host, Ms. Yamada, who greets you both, introduces herself and asks whose umbrella is by the door')).toBe('f');
+    expect(personaVoice('Your friend Yuki, who calls to ask whether she can come along and what time to meet')).toBe('f');
+    expect(personaVoice('Café clerk who greets you, takes your order, tells you the total and gives you your change')).toBe('m');
+    expect(personaVoice('A friendly passer-by near the station, whom the partner on the street can stop and ask the way in polite Japanese (すみません、〜はどこですか).')).toBe('m');
+    expect(personaVoice('Restaurant staff on the phone, using polite service Japanese, so that both of you can practise being the caller')).toBe('m');
+    // "there", "other" and "together" are not "her".
+    expect(personaVoice('Estate agent who answers your other questions there, together')).toBe('m');
+    expect(personaVoice(undefined)).toBe('m');
   });
 });

@@ -1,6 +1,6 @@
 import { Rating, State } from 'ts-fsrs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { dayKey, db } from '../lib/db.ts';
+import { dayKey, db, updateSettings } from '../lib/db.ts';
 import type { CardRecord, CardType, ItemKind, ItemRecord, SentenceEntry } from '../lib/types.ts';
 import { applyPlacement, introducePlanItem } from './course.ts';
 import { addDays, DAY_MS, emptyDay, getDay } from './days.ts';
@@ -276,9 +276,17 @@ describe('planToday', () => {
     expect(open.read).not.toBeNull();
     expect(open.output).not.toBeNull();
     const newSec = open.teach.flatMap((b) => b.items).reduce((s, i) => s + i.priceSec, 0);
-    expect(open.estimateMin).toBe(Math.ceil((newSec + 4 * 60 - 90) / 60));
+    // What the open steps take: one sentence (1 min) and the output (1 min), within the 150 s left of the reserve.
+    expect(open.read?.minutes).toBe(1);
+    expect(open.estimateMin).toBe(Math.ceil((newSec + 120) / 60));
 
+    // Read done, output left: only the output's minute, not the rest of the reserve (QA V050).
     await finishStep('read', NOW);
+    const outputLeft = await planToday(daysAgo(0, 19));
+    expect(outputLeft).toMatchObject({ read: null, fluency: null });
+    expect(outputLeft.output).not.toBeNull();
+    expect(outputLeft.estimateMin).toBe(Math.ceil((newSec + 60) / 60));
+
     await finishStep('output', NOW);
     const done = await planToday(daysAgo(0, 19));
     expect(done).toMatchObject({ read: null, output: null, fluency: null });
@@ -291,7 +299,8 @@ describe('planToday', () => {
     expect(plan.mode).toBe('sprint');
     expect(plan.courseDay).toBe(1);
     expect(plan.teach.map((b) => b.items.map((i) => i.key).join(''))).toEqual(['あいうえお', 'かきくけこ']);
-    expect(plan.estimateMin).toBe(11);
+    // 10 kana × 53 s, plus the read block's 1 minute (two words) of the 2-minute strand reserve.
+    expect(plan.estimateMin).toBe(10);
     expect(plan.read?.kind).toBe('kana-words');
     expect(plan.read?.kanaWords.map((w) => w.ref)).toEqual(['kanaEx:あ', 'kanaEx:か']);
     expect(plan.output).toBeNull();
@@ -330,6 +339,28 @@ describe('micro and make-up plans', () => {
     expect((await planMicro(NOW)).mode).toBe('micro');
   });
 
+  it('on a catch-up day shows no counts, and keeps the day in catch-up after the short sitting (V008)', async () => {
+    await seedCourseDay(40);
+    for (let i = 0; i < 120; i++) await addCard(`kanji:${String.fromCodePoint(0x5000 + i)}`, 'write', { dueDaysAgo: 3 + (i % 5) });
+    for (let i = 0; i < 40; i++) await addCard(`word:${5000 + i}`, 'read', { dueDaysAgo: 1 + i });
+    expect((await planToday(NOW)).mode).toBe('catch-up');
+    const plan = await planMicro(NOW, { welcomeBack: true });
+    expect(plan.mode).toBe('welcome-back');
+    expect(plan.counts).toBeUndefined();
+    await startSitting(plan, NOW);
+    expect((await getDay(TODAY)).catchUp).toBe(true);
+    expect((await planMicro(NOW)).counts).toBeUndefined();
+  });
+
+  it('counts the cards of a short sitting on a normal day, and leaves the day as it was', async () => {
+    await seedCourseDay(20);
+    await addCard('word:5000', 'read', { dueDaysAgo: 1 });
+    const plan = await planMicro(NOW);
+    expect(plan.counts).toEqual({ reviews: plan.warmup.length, newItems: 0 });
+    await startSitting(plan, NOW);
+    expect((await getDay(TODAY)).catchUp ?? false).toBe(false);
+  });
+
   it('plans a make-up of review-ahead without today’s items', async () => {
     await seedCourseDay(20);
     await addCard('word:1004', 'read', { dueDaysAgo: -1 });
@@ -351,9 +382,163 @@ describe('leakMask', () => {
     await addCard('word:1004', 'read', { dueDaysAgo: -3 });
     await addCard('word:1005', 'read', { dueDaysAgo: 1 });
     await gradeCard('word:1005|read', Rating.Good, { durationMs: 1000, mode: 'typed', now: daysAgo(0, 8) });
+    // A produce card asks the word's kana (V039), even when it is due in another sitting the same day.
+    await addCard('core:cw-0041', 'produce', { dueDaysAgo: -0.2 });
     const mask = await leakMask(NOW);
-    expect([...mask.readings]).toEqual(['word:1002']);
+    expect([...mask.readings].sort()).toEqual(['core:cw-0041', 'word:1002']);
     expect([...mask.meanings]).toEqual(['core:cw-0040']);
     expect([...mask.kanji]).toEqual(['日']);
+  });
+});
+
+describe('QA round 2: warm-up order, read block and estimates', () => {
+  const warm = (id: string, patch: Partial<WarmupCard>): WarmupCard => ({
+    id, itemId: id.slice(0, id.indexOf('|')), type: 'read', state: State.Review, r: 0.9, due: NOW, introducedDay: '2026-01-01',
+    groups: [`item:${id.slice(0, id.indexOf('|'))}`], value: 0, ...patch,
+  });
+  const ROW = ['あ', 'い', 'う', 'え', 'お', 'か', 'き', 'く', 'け', 'こ'];
+
+  it('does not replay chart order when cards tie, and keeps one order all day (QA V031)', () => {
+    // Read cards reviewed together yesterday in chart order: r and due differ only by the seconds between answers.
+    const reviews = ROW.map((c, i) => warm(`kana:${c}|read`, { r: 0.9 + i * 1e-6, due: new Date(NOW.getTime() - (60 - i) * 1000) }));
+    const chart = reviews.map((c) => c.id);
+    const opts = (seed: string) => ({ yesterday: null, takenGroups: new Set<string>(), catchUp: false, seed });
+    const day3 = orderWarmup(reviews, opts('2026-03-20')).order;
+    expect([...day3].sort()).toEqual([...chart].sort());
+    expect(day3).not.toEqual(chart);
+    expect(day3).not.toEqual([...chart].reverse());
+    expect(orderWarmup(reviews, opts('2026-03-20')).order).toEqual(day3);
+    expect(orderWarmup(reviews, opts('2026-03-21')).order).not.toEqual(day3);
+    // Learning cards first-checked in chart order a few seconds apart: the same.
+    const learning = reviews.map((c) => ({ ...c, state: State.Learning, introducedDay: '2026-03-19' }));
+    expect(orderWarmup(learning, { ...opts('2026-03-20'), yesterday: '2026-03-19' }).order).not.toEqual(chart);
+    // A real difference in retrievability still comes first.
+    const weak = warm('kana:さ|read', { r: 0.5 });
+    expect(orderWarmup([...reviews, weak], opts('2026-03-20')).order[0]).toBe('kana:さ|read');
+  });
+
+  it("reads a word for every kana taught today when the examples allow it (QA V032)", async () => {
+    fixtures.kanaExamples = {
+      あ: { kana: 'あい', en: 'love' }, い: { kana: 'いい', en: 'good' }, う: { kana: 'あう', en: 'to meet' },
+      え: { kana: 'いえ', en: 'house' }, お: { kana: 'あお', en: 'blue' }, か: { kana: 'かお', en: 'face' },
+      き: { kana: 'えき', en: 'station' }, く: { kana: 'いく', en: 'to go' }, け: { kana: 'いけ', en: 'pond' },
+      こ: { kana: 'ここ', en: 'here' },
+    };
+    const plan = await planToday(NOW);
+    const words = plan.read!.kanaWords.map((w) => w.kana);
+    expect(words).toHaveLength(6);
+    const read = new Set(words.flatMap((w) => [...w]));
+    // Six two-kana words can read at most 9 of these 10 (う and こ each come in one word only); き, く and け were never read.
+    expect(ROW.filter((c) => read.has(c))).toHaveLength(9);
+    for (const c of ['き', 'く', 'け']) expect(read.has(c)).toBe(true);
+  });
+
+  /** Core word cw-NNNN with one listen card. */
+  const coreId = (n: number) => `core:cw-${String(n).padStart(4, '0')}`;
+
+  it('gives days 15–25 a 3-minute read & listen block of recent words when no sentence qualifies (QA V005, V054)', async () => {
+    await seedCourseDay(18);
+    for (let n = 1; n <= 14; n++) await addCard(coreId(n), 'listen', { introducedDaysAgo: 2 + (n % 5), dueDaysAgo: -3 });
+    await addCard(coreId(15), 'listen', { introducedDaysAgo: 3, dueDaysAgo: 0 }); // due now: reviewed in the warm-up first
+    await addCard(coreId(16), 'listen', { introducedDaysAgo: 3, dueDaysAgo: -3 });
+    await addCard(coreId(16), 'produce', { introducedDaysAgo: 3, state: State.New }); // never checked: left out
+    await addCard(coreId(17), 'listen', { introducedDaysAgo: 0, dueDaysAgo: -1, state: State.Learning }); // today's
+    await addCard(coreId(42), 'listen', { introducedDaysAgo: 4, dueDaysAgo: -3 });
+    await db.items.update(coreId(42), { spelledAt: daysAgo(2) }); // known spelled now: not a kana word
+    const plan = await planToday(NOW);
+    expect(plan.mode).toBe('normal');
+    expect(plan.warmup).toContain(`${coreId(15)}|listen`);
+    expect(plan.output).not.toBeNull();
+    // Strand 4 min − 1 for the output = 3 minutes of words at 15 s.
+    expect(plan.read).toMatchObject({ kind: 'kana-words', sentences: [], minutes: 3 });
+    const refs = plan.read!.kanaWords.map((w) => w.ref);
+    expect(refs).toHaveLength(12);
+    expect(refs.every((r) => r.startsWith('core:'))).toBe(true);
+    for (const id of [coreId(16), coreId(17), coreId(42)]) expect(refs).not.toContain(id);
+    expect(plan.read!.kanaWords[0]).toMatchObject({ kana: expect.any(String), en: expect.any(String) });
+  });
+
+  it('fills the minutes one sentence leaves with words (QA V005)', async () => {
+    await seedCourseDay(30);
+    fixtures.sentences = [{
+      id: 's-1', jp: '{日本|にほん}', en: 'Japan', grammar: [], unit: 1, refs: ['word:1002'],
+      tokens: [{ s: '日本', r: 'にほん', ref: 'word:1002', k: 'c' }],
+    } satisfies SentenceEntry];
+    await addCard('word:1002', 'read', { introducedDaysAgo: 3, dueDaysAgo: -5 });
+    for (let n = 1; n <= 10; n++) await addCard(coreId(n), 'listen', { introducedDaysAgo: 2 + (n % 6), dueDaysAgo: -4 });
+    const plan = await planToday(NOW);
+    expect(plan.read?.sentences).toEqual([{ id: 's-1', target: 'word:1002' }]);
+    expect(plan.read?.kanaWords).toHaveLength(8);
+    expect(plan.read?.minutes).toBe(3);
+  });
+
+  it("estimates tomorrow during the sprint from tomorrow's row and today's cards (QA V006, V029)", async () => {
+    fixtures.kanaExamples = {
+      あ: { kana: 'あい', en: 'love' }, い: { kana: 'いい', en: 'good' }, う: { kana: 'あう', en: 'to meet' },
+      え: { kana: 'いえ', en: 'house' }, お: { kana: 'あお', en: 'blue' }, か: { kana: 'かお', en: 'face' },
+      き: { kana: 'えき', en: 'station' }, く: { kana: 'いく', en: 'to go' }, け: { kana: 'いけ', en: 'pond' },
+      こ: { kana: 'ここ', en: 'here' }, さ: { kana: 'さけ', en: 'salmon' }, し: { kana: 'しお', en: 'salt' },
+      す: { kana: 'すし', en: 'sushi' }, せ: { kana: 'せき', en: 'seat' }, そ: { kana: 'そこ', en: 'there' },
+      た: { kana: 'たこ', en: 'octopus' }, ち: { kana: 'ちかい', en: 'near' }, つ: { kana: 'つき', en: 'moon' },
+      て: { kana: 'てき', en: 'enemy' }, と: { kana: 'とけい', en: 'clock' },
+    };
+    const day1 = await planToday(NOW);
+    // Do day 1: both lessons, the first check, the read.
+    for (const item of day1.teach.flatMap((b) => b.items)) await introducePlanItem(item, daysAgo(0, 9.2));
+    for (const id of (await planToday(daysAgo(0, 9.4))).pendingCheck) {
+      await gradeCard(id, Rating.Good, { durationMs: 5000, mode: 'typed', context: 'first-check', now: daysAgo(0, 9.5) });
+    }
+    await finishStep('read', daysAgo(0, 9.6));
+    const day2 = await planToday(new Date(NOW.getTime() + DAY_MS));
+    expect(day2.courseDay).toBe(2);
+    expect(day2.teach.flatMap((b) => b.items).map((i) => i.key).join('')).toBe('さしすせそたちつてと');
+    expect(day1.tomorrowMin).toBeGreaterThanOrEqual(12);
+    expect(Math.abs(day1.tomorrowMin - day2.estimateMin)).toBeLessThanOrEqual(1);
+  });
+
+  it('estimates tomorrow as tomorrow will plan it, within the 1.1 × budget cap (QA V038)', async () => {
+    await seedCourseDay(30);
+    for (let i = 0; i < 40; i++) await addCard(`word:${7000 + i}`, 'read', { dueDaysAgo: -0.6 - (i % 3) * 0.1, stability: 6 });
+    for (let n = 1; n <= 14; n++) await addCard(coreId(n), 'listen', { introducedDaysAgo: 3 + (n % 6), dueDaysAgo: -4 });
+    const today = await planToday(NOW);
+    expect(today.mode).toBe('normal');
+    for (const item of today.teach.flatMap((b) => b.items)) await introducePlanItem(item, daysAgo(0, 9.2));
+    for (const id of (await planToday(daysAgo(0, 9.4))).pendingCheck) {
+      await gradeCard(id, Rating.Good, { durationMs: 5000, mode: 'typed', context: 'first-check', now: daysAgo(0, 9.5) });
+    }
+    await finishStep('read', daysAgo(0, 9.6));
+    await finishStep('output', daysAgo(0, 9.6));
+    const tomorrow = await planToday(new Date(NOW.getTime() + DAY_MS));
+    expect(today.tomorrowMin).toBeLessThanOrEqual(27.5);
+    expect(today.tomorrowMin).toBeLessThan(28);
+    expect(Math.abs(today.tomorrowMin - tomorrow.estimateMin)).toBeLessThanOrEqual(2);
+  });
+
+  it('says reviews only for a travel day tomorrow (QA V006)', async () => {
+    await seedCourseDay(30);
+    await updateSettings({ travelUntil: addDays(TODAY, 1) });
+    await addCard('word:1004', 'read', { dueDaysAgo: -0.5 });
+    const plan = await planToday(NOW);
+    expect(plan.mode).toBe('travel');
+    expect(plan.tomorrowMin).toBe(1);
+  });
+
+  it('counts staged releases today by row, whatever their price (QA V041)', async () => {
+    await seedCourseDay(20);
+    await db.items.put({ id: 'kanji:本', kind: 'kanji', key: '本', introducedAt: daysAgo(8), via: 'lesson' });
+    await db.staged.bulkPut([
+      { itemId: 'core:cw-0042', kanji: '本', releaseDay: addDays(TODAY, -2), slot: 2 },
+      { itemId: 'word:1006', kanji: '本', releaseDay: addDays(TODAY, -1), slot: 2 },
+      { itemId: 'word:1008', kanji: '本', releaseDay: addDays(TODAY, -1), slot: 3 },
+      { itemId: 'word:1002', kanji: '日', releaseDay: TODAY, slot: 2 },
+      { itemId: 'word:1005', kanji: '末', releaseDay: TODAY, slot: 3 },
+    ]);
+    const morning = await planToday(NOW);
+    const staged = morning.teach.flatMap((b) => b.items).filter((i) => i.kind === 'staged');
+    expect(staged.map((i) => [i.itemId, i.priceSec])).toEqual([['core:cw-0042', 47], ['word:1006', 28], ['word:1008', 28], ['word:1002', 28]]);
+    await introducePlanItem(staged[0], daysAgo(0, 9.2));
+    // 47 s were spent on one release: three more fit the ceiling of 4 (47 / 28 would have counted two).
+    const later = await planToday(daysAgo(0, 19));
+    expect(later.teach.flatMap((b) => b.items).filter((i) => i.kind === 'staged').map((i) => i.itemId)).toEqual(['word:1006', 'word:1008', 'word:1002']);
   });
 });

@@ -78,8 +78,12 @@ describe.skipIf(!generated)('generated audio, through the app playback code', ()
     const speech = (written: string | undefined, kanaText: string) => (written && written !== kanaText ? `{${written}|${kanaText}}` : kanaText);
     const f = (ref: string, fallbackText: string): Request => ({ ref, fallbackText, voice: 'f' });
     const byRole = (role: string): VoiceId => (role === 'b' ? 'm' : 'f');
+    // The rule lessons' pair grids play both sides of a pair (テ→ティ, おと→おっと); sides that are basic kana are above.
+    const kanaChars = new Set(kana.map((k) => k.char));
+    const pairSides = [...new Set(kanaRules.flatMap((r) => r.pairs.flatMap((p) => [p.from, p.to])))].filter((s) => !kanaChars.has(s));
     requests = [
       ...kana.map((k) => f(clipRef.kana(k.char), k.char)),
+      ...pairSides.map((side) => f(clipRef.kana(side), side)),
       ...Object.entries(kanaExamples).map(([char, ex]) => f(clipRef.kanaEx(char), ex.kana)),
       ...kanaRules.flatMap((r) => r.practiceWords.map((w, n) => f(clipRef.kanaRule(r.id, n), w.kana))),
       ...coreWords.map((c) => f(clipRef.word(`core:${c.id}`), speech(c.written, c.kana))),
@@ -158,6 +162,12 @@ describe.skipIf(!generated)('generated audio, through the app playback code', ()
     expect(missing.length, `refs without a clip: ${missing.slice(0, 20).join(', ')}`).toBeLessThanOrEqual(Math.floor(requests.length * MAX_MISSING));
     expect(stale.slice(0, 20)).toEqual([]);
   }, 120_000);
+
+  it('has a clip for every kana sound and for both sides of every rule pair (no device-voice fallback in the sprint)', () => {
+    const kanaRefs = requests.filter((r) => r.ref.startsWith('kana:')).map((r) => r.ref);
+    expect(kanaRefs.length).toBeGreaterThan(208);
+    expect(kanaRefs.filter((ref) => !(ref in manifest.byRef))).toEqual([]);
+  });
 
   it('gives each role-play and task line the voice of its role', () => {
     const wrong = requests

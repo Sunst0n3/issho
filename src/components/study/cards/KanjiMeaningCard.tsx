@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { selfGrade } from '../../../srs/answers.ts';
 import { Glyph } from '../../Glyph.tsx';
 import { cleanReading } from '../format.ts';
@@ -18,20 +18,21 @@ export function readingSample(kun: readonly string[], on: readonly string[], max
 export function KanjiMeaningCard({ prepared, onAnswer }: CardProps<'kanji-meaning'>) {
   const { kanji } = prepared;
   const [revealed, setRevealed] = useState(false);
+  const revealId = useId();
   const readings = readingSample(kanji.kun, kanji.on);
   return (
     <>
       <Question ask="What does this kanji mean?">
         <div className="st-big-glyph"><Glyph char={kanji.char} size={96} /></div>
         {revealed && (
-          <div className="st-reveal">
+          <div className="st-reveal" id={revealId}>
             <p className="st-english">{kanji.meanings.join(', ')}</p>
             {readings.length > 0 && <p className="st-reveal-kana" lang="ja">{readings.join('・')}</p>}
           </div>
         )}
       </Question>
       {revealed ? (
-        <SelfGrade onGrade={(gotIt) => onAnswer({ grade: selfGrade(gotIt), mode: 'self', revealed: true })} />
+        <SelfGrade describedBy={revealId} onGrade={(gotIt) => onAnswer({ grade: selfGrade(gotIt), mode: 'self', revealed: true })} />
       ) : (
         <button type="button" className="btn ink block" onClick={() => setRevealed(true)}>Show the meaning</button>
       )}

@@ -193,11 +193,13 @@ describe('Session', () => {
     expect(counter()).toBe('Warm-up 1 / 1');
     await answerWordRead(true);
 
-    // Teach: the kanji lesson, then a guided copy.
+    // Teach: the kanji lesson, then a trace (水 has no listed parts, so its whole shape is new) and a guided copy.
     expect(await screen.findByRole('heading', { name: 'water' })).toBeTruthy();
     expect(counter()).toBe('New');
-    fireEvent.click(screen.getByRole('button', { name: 'Copy it' }));
-    expect(screen.getByRole('img', { name: /guided/ })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Trace it' }));
+    expect(screen.getByRole('img', { name: /trace/ })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Finish writing' }));
+    expect(await screen.findByRole('img', { name: /guided/ }, { timeout: 2000 })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Finish writing' }));
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
@@ -256,14 +258,17 @@ describe('Session', () => {
     for (const meaning of ['water', 'day', 'tree', 'person']) {
       expect(await screen.findByRole('heading', { name: meaning })).toBeTruthy();
       expect(screen.queryByText(/From memory/)).toBeNull();
-      fireEvent.click(screen.getByRole('button', { name: 'Copy it' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Trace it' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Finish writing' }));
+      await screen.findByRole('img', { name: /guided/ }, { timeout: 2000 });
+      expect(screen.queryByText(/From memory/)).toBeNull();
       fireEvent.click(screen.getByRole('button', { name: 'Finish writing' }));
       expect(screen.queryByText(/From memory/)).toBeNull();
       fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
     }
     expect(await screen.findByText('From memory 1 / 4')).toBeTruthy();
     expect(introducePlanItem).toHaveBeenCalledTimes(4);
-  });
+  }, 15_000);
 
   it('re-asks a missed warm-up card after at least 5 others, graded again as a re-ask', async () => {
     const ids = ['w-mizu', 'w-sui', 'w-nihon', 'w-hon', 'w-ki', 'w-hito', 'w-ike'];

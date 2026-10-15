@@ -12,13 +12,23 @@ const STATUS_TEXT: Record<HabitDayStatus, string> = {
   missed: 'no study',
   today: 'today',
   future: 'coming up',
-  before: 'before this week began',
+  before: 'before you started',
 };
 
+/** A day of this week before the fresh start the learner chose. */
+const BEFORE_FRESH_START = 'before your fresh start';
+
+/** Spoken after "today, ". */
 function todayText(info: StreakV2): string {
-  if (info.todayGoal) return "today's goal met";
-  if (info.todayMinimum) return 'studied today';
-  return 'not yet today';
+  if (info.todayGoal) return 'goal met';
+  if (info.todayMinimum) return 'studied';
+  return 'not studied yet';
+}
+
+/** pure: the visually hidden label of one day of the week, e.g. "Thursday: today, not studied yet". */
+function dayStatusText(day: string, status: HabitDayStatus, info: StreakV2, beforeFreshStart = false): string {
+  if (beforeFreshStart) return `${day}: ${BEFORE_FRESH_START}`;
+  return `${day}: ${status === 'today' ? `today, ${todayText(info)}` : STATUS_TEXT[status]}`;
 }
 
 function title(info: StreakV2): string {
@@ -52,14 +62,14 @@ export function StreakCard({ info, freshStart }: { info: StreakV2; freshStart?: 
       </div>
       <ol className="streak-week" aria-label="This week">
         {info.week.map(({ date, status: raw }) => {
-          const status: HabitDayStatus = freshStart && date < freshStart && raw !== 'today' ? 'before' : raw;
+          const beforeFresh = Boolean(freshStart && date < freshStart && raw !== 'today' && raw !== 'before');
+          const status: HabitDayStatus = beforeFresh ? 'before' : raw;
           const day = WEEKDAYS_EN[dateOfKey(date).getDay()];
-          const spoken = status === 'today' ? `today, ${todayText(info)}` : STATUS_TEXT[status];
           return (
             <li key={date} className={`streak-day ${status}`}>
               <span className="streak-dot" aria-hidden="true" />
               <span className="streak-letter" aria-hidden="true">{day[0]}</span>
-              <span className="visually-hidden">{`${day}: ${spoken}`}</span>
+              <span className="visually-hidden">{dayStatusText(day, status, info, beforeFresh)}</span>
             </li>
           );
         })}

@@ -1,20 +1,22 @@
 import { act, cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { HouseholdResponse, MemberStats } from '../../../shared/api.ts';
+import type { HouseholdResponse, MemberStats, TogetherState } from '../../../shared/api.ts';
 import { dayKey, db, getSettings, updateSettings } from '../../lib/db.ts';
 import Settings from '../../screens/Settings.tsx';
 import { markAiBroken, resetAiAvailability } from '../together/ai.ts';
 import { shiftDay } from './labels.ts';
 import { resetNameSync } from './nameSync.ts';
 import { RESET_TABLES } from './SettingsData.tsx';
-import { cueDraft, cueFromDraft } from './planControls.tsx';
-import { recheckSummary, voiceLabel, writeListAt, writeListStop } from './SettingsStudy.tsx';
-import { addLearned, renderAt, resetDb } from './test-fixtures.tsx';
+import { currentPlan } from './householdPlan.ts';
+import { cueDraft, cueFromDraft, cueProblem } from './planControls.tsx';
+import { pinnedBeyond, recheckPassNote, recheckSummary, scriptTaught, voiceLabel, writeListAt, writeListStop } from './SettingsStudy.tsx';
+import { addLearned, KANA, renderAt, resetDb } from './test-fixtures.tsx';
 
 const server = vi.hoisted(() => ({
   renameMember: vi.fn(async (name: string) => ({ id: 'm-sam', name, joinedAt: '2026-09-01T00:00:00Z', lastSeenAt: null })),
   household: undefined as HouseholdResponse | undefined,
   aiEnabled: false,
+  together: null as TogetherState | null,
 }));
 
 const mocks = vi.hoisted(() => ({
@@ -41,14 +43,18 @@ vi.mock('../../srs/course.ts', () => ({
   PLACEMENT_PASS: 18,
   placementSet: () => [],
 }));
-vi.mock('../../srs/habits.ts', () => ({
+vi.mock('../../srs/habits.ts', async (importOriginal) => ({
+  planReviewDays: (await importOriginal<typeof import('../../srs/habits.ts')>()).planReviewDays,
   TOKENS_PER_WEEK: 2,
   TRAVEL_MAX_DAYS: 60,
   spendRestToken: mocks.spendRestToken,
   cancelPlannedToken: mocks.cancelPlannedToken,
   setTravel: mocks.setTravel,
 }));
-vi.mock('../../sync/together.ts', () => ({ postTogetherEvent: mocks.postTogetherEvent }));
+vi.mock('../../sync/together.ts', () => ({
+  postTogetherEvent: mocks.postTogetherEvent,
+  useTogetherState: () => ({ state: server.together, offline: false, refresh: async () => {} }),
+}));
 vi.mock('../../lib/ics.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../lib/ics.ts')>()),
   downloadIcs: mocks.downloadIcs,
@@ -98,6 +104,7 @@ afterEach(() => {
   delete document.documentElement.dataset.theme;
   server.renameMember.mockClear();
   server.household = undefined;
+  server.together = null;
   mocks.backup.progressDropped = false;
   resetNameSync();
   vi.clearAllMocks();
@@ -162,10 +169,24 @@ describe('Settings: study', () => {
     expect(writeListAt(99)).toBe(2136);
   });
 
-  it('shows the pinned count with the handwriting list', async () => {
+  it('counts only the pinned kanji beyond the handwriting list', async () => {
+    // 日 is the first kanji of the course: inside a list of 500 its pin changes nothing.
     await db.items.update('kanji:日', { pinned: true });
     renderAt('/settings', '/settings', <Settings />);
-    expect(await within(await section('Study')).findByText(/500 kanji kept in handwriting, plus 1 pinned/)).toBeTruthy();
+    const study = await section('Study');
+    expect(await within(study).findByText(/^500 kanji kept in handwriting\. Kanji beyond it/)).toBeTruthy();
+    cleanup();
+    await updateSettings({ writeList: 0 });
+    renderAt('/settings', '/settings', <Settings />);
+    expect(await within(await section('Study')).findByText(/^0 kanji kept in handwriting, plus 1 pinned/)).toBeTruthy();
+  });
+
+  it('counts a pin as beyond the list by its curriculum rank', () => {
+    // Ranks 1 and 16, and one outside the curriculum.
+    expect(pinnedBeyond([1, 16, undefined], 2136)).toBe(1);
+    expect(pinnedBeyond([1, 16, undefined], 15)).toBe(2);
+    expect(pinnedBeyond([1, 16, undefined], 0)).toBe(3);
+    expect(pinnedBeyond([], 500)).toBe(0);
   });
 
   it('offers exactly 85, 88, 90 and 93 % recall for reading and listening', async () => {
@@ -213,6 +234,28 @@ describe('Settings: study', () => {
       title: "19/20 — you're past katakana",
       detail: 'Your katakana move into your reviews, and the course skips their lessons.',
     });
+    // Taught by the course already: nothing moves, and no lessons are left to skip.
+    expect(recheckSummary(pass, false, 'all').detail).toBe('Your katakana stay in your reviews.');
+    expect(recheckSummary(fail, false, 'all').detail).toBe('Your hiragana stay in your reviews, which keep them fresh.');
+    expect(recheckSummary(pass, false, 'some').detail).toBe('The rest of your katakana move into your reviews, and the course skips their lessons.');
+  });
+
+  it("doesn't promise to skip lessons the course has already taught", async () => {
+    expect(recheckPassNote('katakana', 'none')).toBe('18 or more right and you skip the katakana lessons.');
+    expect(recheckPassNote('katakana', 'some')).toBe('18 or more right and the course skips the katakana lessons still to come.');
+    expect(recheckPassNote('katakana', 'all')).not.toMatch(/skip/);
+    const hira = new Set([...'あいうえお'].map((c) => `kana:${c}`));
+    expect(scriptTaught(KANA, hira, 'hiragana')).toBe('all');
+    expect(scriptTaught(KANA, new Set(['kana:あ']), 'hiragana')).toBe('some');
+    expect(scriptTaught(KANA, hira, 'katakana')).toBe('none');
+
+    // Day 180: every katakana is in the course. The re-check's intro says so.
+    await db.items.bulkPut([...'アイウエオ'].map((c) => ({ id: `kana:${c}`, kind: 'kana' as const, key: c, introducedAt: new Date(2026, 3, 1) })));
+    renderAt('/settings', '/settings', <Settings />);
+    fireEvent.click(within(await section('Study')).getByRole('button', { name: 'Check katakana' }));
+    const intro = (await screen.findByRole('heading', { name: 'Quick katakana check' })).closest('section')!;
+    expect(intro.textContent).toContain('All your katakana are in your course already');
+    expect(intro.textContent).not.toMatch(/skip the katakana lessons/);
   });
 
   it('shortens voice names for the picker', () => {
@@ -227,8 +270,8 @@ describe('Settings: habits', () => {
   it('saves the cue sentence, its time and the coping plan', async () => {
     renderAt('/settings', '/settings', <Settings />);
     const habits = await section('Habits');
-    fireEvent.change(within(habits).getByLabelText('After I'), { target: { value: 'brush my teeth' } });
-    fireEvent.change(within(habits).getByLabelText('at'), { target: { value: 'the sink' } });
+    fireEvent.change(within(habits).getByLabelText(/^After I/), { target: { value: 'brush my teeth' } });
+    fireEvent.change(within(habits).getByLabelText(/^at/), { target: { value: 'the sink' } });
     fireEvent.change(within(habits).getByLabelText('Remind me at'), { target: { value: '22:00' } });
     fireEvent.change(within(habits).getByLabelText('If I miss it…'), { target: { value: '3 minutes on the train' } });
     await waitFor(async () => expect(await getSettings()).toMatchObject({
@@ -240,7 +283,7 @@ describe('Settings: habits', () => {
   it('keeps the cue and the coping plan as typed when their tidied save comes back', async () => {
     renderAt('/settings', '/settings', <Settings />);
     const habits = await section('Habits');
-    const action = within(habits).getByLabelText('After I') as HTMLInputElement;
+    const action = within(habits).getByLabelText(/^After I/) as HTMLInputElement;
     const coping = within(habits).getByLabelText('If I miss it…') as HTMLInputElement;
     // No place, and a pause after a space: both are saved tidied up.
     fireEvent.change(action, { target: { value: 'brush my teeth' } });
@@ -252,7 +295,7 @@ describe('Settings: habits', () => {
     // The live settings have come back by now; the fields still hold what was typed.
     await act(() => new Promise((resolve) => setTimeout(resolve, 100)));
     expect(action.value).toBe('brush my teeth');
-    expect((within(habits).getByLabelText('at') as HTMLInputElement).value).toBe('');
+    expect((within(habits).getByLabelText(/^at/) as HTMLInputElement).value).toBe('');
     expect(coping.value).toBe('3 minutes ');
     fireEvent.change(coping, { target: { value: '3 minutes on the train' } });
     await waitFor(async () => expect((await getSettings()).coping).toBe('3 minutes on the train'), { timeout: 2000 });
@@ -263,9 +306,31 @@ describe('Settings: habits', () => {
     renderAt('/settings', '/settings', <Settings />);
     const habits = await section('Habits');
     await act(() => updateSettings({ cue: { text: 'After I get home at the door, I open Issho', time: '18:30' } }));
-    await waitFor(() => expect((within(habits).getByLabelText('After I') as HTMLInputElement).value).toBe('get home'));
-    expect((within(habits).getByLabelText('at') as HTMLInputElement).value).toBe('the door');
+    await waitFor(() => expect((within(habits).getByLabelText(/^After I/) as HTMLInputElement).value).toBe('get home'));
+    expect((within(habits).getByLabelText(/^at/) as HTMLInputElement).value).toBe('the door');
     expect((within(habits).getByLabelText('Remind me at') as HTMLInputElement).value).toBe('18:30');
+  });
+
+  it('says what a half-filled cue is missing instead of dropping it', async () => {
+    expect(cueProblem({ action: 'make coffee', place: 'the kitchen', time: '' })).toBe('time');
+    expect(cueProblem({ action: '', place: 'the kitchen', time: '07:00' })).toBe('action');
+    expect(cueProblem({ action: 'make coffee', place: '', time: '07:00' })).toBeUndefined();
+    expect(cueProblem({ action: '', place: '', time: '' })).toBeUndefined();
+
+    await updateSettings({ cue: { text: 'After I make coffee at the kitchen, I open Issho', time: '07:00' } });
+    renderAt('/settings', '/settings', <Settings />);
+    const habits = await section('Habits');
+    fireEvent.change(within(habits).getByLabelText('Remind me at'), { target: { value: '' } });
+    expect((await within(habits).findByRole('alert')).textContent).toBe('Pick a time for the reminder, or clear the cue.');
+    // The last whole cue stays saved meanwhile.
+    expect((await getSettings()).cue).toEqual({ text: 'After I make coffee at the kitchen, I open Issho', time: '07:00' });
+  });
+
+  it('names the cue blanks so they read on their own', async () => {
+    renderAt('/settings', '/settings', <Settings />);
+    const habits = await section('Habits');
+    expect(within(habits).getByRole('textbox', { name: 'After I: something you already do every day' })).toBeTruthy();
+    expect(within(habits).getByRole('textbox', { name: 'at: the place, optional' })).toBeTruthy();
   });
 
   it('reads a saved cue back into its blanks, with or without a place', () => {
@@ -351,6 +416,62 @@ describe('Settings: together', () => {
     ];
     expect((await getSettings()).togetherSlots).toEqual(slots);
     expect(mocks.postTogetherEvent).toHaveBeenCalledWith({ type: 'slots', slots });
+  });
+
+  it("shows the household's current plan, and a goal-only save doesn't send this phone's older slots", async () => {
+    // This phone still has Friday for Session A; the partner moved it to Tuesday and set a goal.
+    await updateSettings({
+      deviceToken: 'token', memberId: 'm-aiko', householdName: 'Our home',
+      togetherSlots: [{ session: 'A', weekday: 5, time: '20:00' }, { session: 'B', weekday: 4, time: '20:00' }, { session: 'C', weekday: 7, time: '20:00' }],
+      cue: { text: 'After I wake up, I open Issho', time: '07:00' },
+    });
+    const household = [{ session: 'A' as const, weekday: 2 as const, time: '20:00' }, { session: 'B' as const, weekday: 4 as const, time: '20:00' }, { session: 'C' as const, weekday: 7 as const, time: '20:00' }];
+    server.together = {
+      slots: household, goal: { text: 'Order coffee and cake in Japanese', targetDate: '2026-12-01' },
+      stages: {}, smooth: {}, sessions: [], tasks: [], checkins: [], capstones: [],
+    };
+    renderAt('/settings', '/settings', <Settings />);
+    const together = await section('Together');
+    expect((within(together).getByLabelText('Session A day') as HTMLSelectElement).value).toBe('2');
+    expect((within(together).getByLabelText('Our shared goal') as HTMLInputElement).value).toBe('Order coffee and cake in Japanese');
+
+    fireEvent.change(within(together).getByLabelText('Our shared goal'), { target: { value: 'Read a menu together' } });
+    fireEvent.change(within(together).getByLabelText('By'), { target: { value: '2026-11-30' } });
+    fireEvent.click(within(together).getByRole('button', { name: 'Save sessions and goal' }));
+    expect(await within(together).findByText('Saved, and shared with your partner.')).toBeTruthy();
+    expect(mocks.postTogetherEvent).toHaveBeenCalledTimes(1);
+    expect(mocks.postTogetherEvent).toHaveBeenCalledWith({ type: 'goal', goal: { text: 'Read a menu together', targetDate: '2026-11-30' } });
+    expect((await getSettings()).togetherSlots).toEqual(household);
+
+    // The calendar file has the household's Tuesday, not this phone's old Friday.
+    fireEvent.click(within(await section('Habits')).getByRole('button', { name: /Download reminders/ }));
+    const ics = (mocks.downloadIcs.mock.calls[0] as unknown as [string])[0];
+    expect(ics).toContain('BYDAY=TU');
+    expect(ics).not.toContain('BYDAY=FR');
+  });
+
+  it('says which sessions a check-in planned for next week (V077)', async () => {
+    await updateSettings({ deviceToken: 'token', memberId: 'm-sam', householdName: 'Our home' });
+    const thisWeek = [{ session: 'A' as const, weekday: 5 as const, time: '20:00' }, { session: 'B' as const, weekday: 4 as const, time: '20:00' }, { session: 'C' as const, weekday: 7 as const, time: '19:30' }];
+    server.together = {
+      slots: thisWeek, nextSlots: [{ ...thisWeek[0], weekday: 2 }, thisWeek[1], thisWeek[2]], goal: null,
+      stages: {}, smooth: {}, sessions: [], tasks: [], checkins: [], capstones: [],
+    };
+    renderAt('/settings', '/settings', <Settings />);
+    const together = await section('Together');
+    expect((within(together).getByLabelText('Session A day') as HTMLSelectElement).value).toBe('5');
+    expect(within(together).getByRole('note').textContent)
+      .toBe('From next week, as planned in your check-in: A Tuesday 20:00 · B Thursday 20:00 · C Sunday 19:30. Changes saved here are for this week.');
+  });
+
+  it("prefers this phone's queued change, and its own plan when unpaired", () => {
+    const own = { togetherSlots: [{ session: 'A' as const, weekday: 5 as const, time: '20:00' }], sharedGoal: { text: 'Mine', targetDate: '2026-12-01' } };
+    const house = { slots: [{ session: 'A' as const, weekday: 2 as const, time: '20:00' }], goal: { text: 'Ours', targetDate: '2026-12-24' } };
+    expect(currentPlan(own, house)).toEqual({ slots: house.slots, goal: house.goal });
+    expect(currentPlan(own, house, { slots: true, goal: false })).toEqual({ slots: own.togetherSlots, goal: house.goal });
+    expect(currentPlan(own, null)).toEqual({ slots: own.togetherSlots, goal: own.sharedGoal });
+    // A household that hasn't set slots or a goal yet keeps this phone's.
+    expect(currentPlan(own, { slots: [], goal: null })).toEqual({ slots: own.togetherSlots, goal: own.sharedGoal });
   });
 
   it('keeps accuracy private by default and shares it on request', async () => {
@@ -457,6 +578,18 @@ describe('Settings: data', () => {
     expect(mocks.applyPlacement).not.toHaveBeenCalled();
   });
 
+  it('ends travel mode and counts the plan reviews from the new start', async () => {
+    await updateSettings({ travelUntil: shiftDay(dayKey(), 2), planReviewDays: ['2026-01-01', '2026-01-29'], freshStart: dayKey() });
+    const data = await openReset();
+    fireEvent.change(within(data).getByLabelText('Type “reset” to confirm'), { target: { value: 'reset' } });
+    fireEvent.click(within(data).getByRole('button', { name: 'Delete all progress' }));
+    await within(data).findByText('All progress was reset. Today starts fresh.');
+    const s = await getSettings();
+    expect(s.travelUntil).toBeUndefined();
+    expect(s.freshStart).toBeUndefined();
+    expect(s.planReviewDays).toEqual([shiftDay(dayKey(), 28), shiftDay(dayKey(), 56)]);
+  });
+
   it('starts a script the learner passed the check for as known again', async () => {
     await updateSettings({ knowsHiragana: true });
     const data = await openReset();
@@ -473,8 +606,29 @@ describe('Settings: data', () => {
     expect(await db.items.count()).toBe(2);
   });
 
+  it("warns plainly that a v1 backup deletes this phone's progress and runs setup again", async () => {
+    mocks.backup.progressDropped = true;
+    await db.reviewLogs.add({
+      cardId: 'kanji:日|write', itemId: 'kanji:日', kind: 'kanji', type: 'write', grade: 3, reviewedAt: new Date(), durationMs: 4000,
+      mode: 'written', prevState: 2, elapsedDays: 3, context: 'review',
+    });
+    renderAt('/settings', '/settings', <Settings />);
+    const data = await section('Data');
+    const input = within(data).getByLabelText('Backup file') as HTMLInputElement;
+    fireEvent.change(input, { target: { files: [new File(['{}'], 'old.json', { type: 'application/json' })] } });
+    expect(await within(data).findByText(/earlier version of Issho/)).toBeTruthy();
+    expect(within(data).getByText(/Restoring it deletes all progress on this phone \(2 items, 1 review\)/)).toBeTruthy();
+    expect(within(data).getByText(/takes you through setup again/)).toBeTruthy();
+    expect(within(data).queryByRole('button', { name: 'Restore settings and chat' })).toBeNull();
+    fireEvent.click(within(data).getByRole('button', { name: 'Delete my progress and restore' }));
+    await waitFor(() => expect(mocks.apply).toHaveBeenCalledTimes(1));
+  });
+
   it('says why a v1 backup brings back only settings and chat', async () => {
     mocks.backup.progressDropped = true;
+    // A phone with nothing learned yet: nothing to lose.
+    await db.items.clear();
+    await db.cards.clear();
     renderAt('/settings', '/settings', <Settings />);
     const data = await section('Data');
     const input = within(data).getByLabelText('Backup file') as HTMLInputElement;

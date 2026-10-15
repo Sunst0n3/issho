@@ -10,7 +10,7 @@ export interface SummaryData {
   canNow?: string;
   /** Today's study minutes, every sitting together. */
   minutesToday: number;
-  /** "Tomorrow about N min". */
+  /** "Tomorrow about N min"; 0 (a travel day with nothing due) reads "Nothing planned". */
   tomorrowMin?: number;
   /** Shown on the first sitting of each ISO week. */
   retention?: RetentionStat[];
@@ -79,7 +79,9 @@ export function SessionSummary({ data, onDone, onMakeup }: {
           {data.canNow && <p className="card st-can-now">{data.canNow}</p>}
           <dl className="st-stats two">
             <div><dt>Today</dt><dd>{data.minutesToday} min</dd></div>
-            {data.tomorrowMin !== undefined && <div><dt>Tomorrow</dt><dd>about {data.tomorrowMin} min</dd></div>}
+            {data.tomorrowMin !== undefined && (
+              <div><dt>Tomorrow</dt><dd>{data.tomorrowMin > 0 ? `about ${data.tomorrowMin} min` : 'Nothing planned'}</dd></div>
+            )}
           </dl>
           {data.streak?.alive && data.streak.current > 1 && (
             <div className="card st-streak">
@@ -109,13 +111,43 @@ export function SessionSummary({ data, onDone, onMakeup }: {
   );
 }
 
-/** Nothing left to do in this sitting: say so, and point to what is always open. */
-export function SessionEmpty() {
+/**
+ * Why a sitting has nothing to do: 'done' (nothing due and today's new items are done), 'desk' (a phone-only sitting
+ * with no reviews due while today's lessons, reading or first check still wait for a desk sitting), 'short' (a short
+ * session from Today with nothing due; it never holds new items).
+ */
+export type EmptyReason = 'done' | 'desk' | 'short';
+
+const EMPTY_TEXT: Record<EmptyReason, { title: string; text: string }> = {
+  done: {
+    title: "You're all caught up",
+    text: "Nothing is due right now and today's new items are done. Cards come back as they are due. Until then:",
+  },
+  desk: {
+    title: 'No reviews right now',
+    text: "Nothing is due for a phone-only sitting. Today's lessons, reading and first check need a pen: choose \"At my desk\" or \"All of it\" when you can.",
+  },
+  short: {
+    title: "You're all caught up",
+    text: 'Nothing is due right now. Cards come back as they are due. Until then:',
+  },
+};
+
+/** Nothing left to do in this sitting: say why, and point to what is open (another sitting, reading, grammar). */
+export function SessionEmpty({ reason = 'done', onChooseSitting }: {
+  reason?: EmptyReason;
+  /** 'desk': back to the sitting choice. */
+  onChooseSitting?: () => void;
+}) {
+  const copy = EMPTY_TEXT[reason];
   return (
     <section className="st-summary st-empty" aria-labelledby="st-empty-title">
       <p className="st-eyebrow" lang="ja">よくできました</p>
-      <h1 id="st-empty-title" className="st-summary-title">You're all caught up</h1>
-      <p className="muted">Nothing is due right now and today's new items are done. Cards come back as they are due. Until then:</p>
+      <h1 id="st-empty-title" className="st-summary-title">{copy.title}</h1>
+      <p className="muted">{copy.text}</p>
+      {reason === 'desk' && onChooseSitting && (
+        <button type="button" className="btn primary block" onClick={onChooseSitting}>Choose another sitting</button>
+      )}
       <div className="st-links">
         <Link className="card st-link" to="/read">
           <Icon name="book" size={22} />

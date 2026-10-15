@@ -171,8 +171,8 @@
       "a": "Guest with name card A (your name, your partner's name, a few things you brought)",
       "b": "Guest with name card B (a different name, partner and things)"
     },
-    "infoA": "Your name card: you are Sam (サム), British (イギリスじん), an office worker (かいしゃいん). You came with your wife Kate (つまのケイト), who is a doctor (いしゃ). Find out the other guest's name, where they're from, and who they came with. There's a book on the table that isn't yours: find out whose it is (だれのほんですか).",
-    "infoB": "Your name card: you are Lisa (リサ), American (アメリカじん), an English teacher (えいごのせんせい). You came with your husband Tom (おっとのトム), who is a student of Japanese (にほんごのがくせい). The book on the table is Tom's (おっとのほん), not yours. Find out the other guest's name, where they're from, and who they came with.",
+    "infoA": "Your name card: you are Kate (ケイト), British (イギリスじん), an office worker (かいしゃいん). You came with your husband Sam (おっとのサム), who is a doctor (いしゃ). Find out the other guest's name, where they're from, and who they came with. There's a book on the table that isn't yours: find out whose it is (だれのほんですか).",
+    "infoB": "Your name card: you are Tom (トム), American (アメリカじん), an English teacher (えいごのせんせい). You came with your wife Lisa (つまのリサ), who is a student of Japanese (にほんごのがくせい). The book on the table is Lisa's (つまのほん), not yours. Find out the other guest's name, where they're from, and who they came with.",
     "targets": [
       "core:cw-0042",
       "core:cw-0043",
@@ -189,43 +189,43 @@
     "scripted": [
       {
         "role": "a",
-        "jp": "こんばんは。はじめまして。サムです。",
-        "en": "Good evening. Nice to meet you. I'm Sam."
+        "jp": "こんばんは。はじめまして。ケイトです。",
+        "en": "Good evening. Nice to meet you. I'm Kate."
       },
       {
         "role": "b",
-        "jp": "はじめまして。リサです。よろしくお{願|ねが}いします。",
-        "en": "Nice to meet you. I'm Lisa. Pleased to meet you."
+        "jp": "はじめまして。トムです。よろしくお{願|ねが}いします。",
+        "en": "Nice to meet you. I'm Tom. Pleased to meet you."
       },
       {
         "role": "a",
-        "jp": "よろしくお{願|ねが}いします。リサさんはアメリカ{人|じん}ですか。",
-        "en": "Pleased to meet you too. Are you American, Lisa?"
+        "jp": "よろしくお{願|ねが}いします。トムさんはアメリカ{人|じん}ですか。",
+        "en": "Pleased to meet you too. Are you American, Tom?"
       },
       {
         "role": "b",
-        "jp": "はい、そうです。サムさんもアメリカ{人|じん}ですか。",
-        "en": "Yes, I am. Are you American too, Sam?"
+        "jp": "はい、そうです。ケイトさんもアメリカ{人|じん}ですか。",
+        "en": "Yes, I am. Are you American too, Kate?"
       },
       {
         "role": "a",
-        "jp": "いいえ、アメリカ{人|じん}じゃないです。イギリス{人|じん}です。{妻|つま}のケイトもイギリス{人|じん}です。",
-        "en": "No, I'm not American. I'm British. My wife Kate is British too."
+        "jp": "いいえ、アメリカ{人|じん}じゃないです。イギリス{人|じん}です。{夫|おっと}のサムもイギリス{人|じん}です。",
+        "en": "No, I'm not American. I'm British. My husband Sam is British too."
       },
       {
         "role": "b",
-        "jp": "そうですか。ケイトさんのお{仕事|しごと}は{何|なん}ですか。",
-        "en": "I see. What does Kate do?"
+        "jp": "そうですか。サムさんのお{仕事|しごと}は{何|なん}ですか。",
+        "en": "I see. What does Sam do?"
       },
       {
         "role": "a",
-        "jp": "{医者|いしゃ}です。{私|わたし}は{会社員|かいしゃいん}です。リサさんは？",
-        "en": "She's a doctor. I'm an office worker. And you, Lisa?"
+        "jp": "{医者|いしゃ}です。{私|わたし}は{会社員|かいしゃいん}です。トムさんは？",
+        "en": "He's a doctor. I'm an office worker. And you, Tom?"
       },
       {
         "role": "b",
-        "jp": "{私|わたし}は{英語|えいご}の{先生|せんせい}です。{夫|おっと}のトムは{日本語|にほんご}の{学生|がくせい}です。",
-        "en": "I'm an English teacher. My husband Tom is a student of Japanese."
+        "jp": "{私|わたし}は{英語|えいご}の{先生|せんせい}です。{妻|つま}のリサは{日本語|にほんご}の{学生|がくせい}です。",
+        "en": "I'm an English teacher. My wife Lisa is a student of Japanese."
       },
       {
         "role": "a",
@@ -239,13 +239,13 @@
       },
       {
         "role": "a",
-        "jp": "あのう、この{本|ほん}はだれのですか。リサさんのですか。",
-        "en": "Um, whose book is this? Is it yours, Lisa?"
+        "jp": "あのう、この{本|ほん}はだれのですか。トムさんのですか。",
+        "en": "Um, whose book is this? Is it yours, Tom?"
       },
       {
         "role": "b",
-        "jp": "いいえ、{私|わたし}のじゃないです。{夫|おっと}のです。",
-        "en": "No, it isn't mine. It's my husband's."
+        "jp": "いいえ、{私|わたし}のじゃないです。{妻|つま}のです。",
+        "en": "No, it isn't mine. It's my wife's."
       }
     ]
   },

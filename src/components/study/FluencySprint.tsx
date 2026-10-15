@@ -1,5 +1,6 @@
 // The two-minute fluency slot (never graded into FSRS): a timed re-read of a story, a 60-second speed round over
 // well-known cards (read each aloud, tap Next), a numbers/time/price drill against the clock, or the pitch-ear drill.
+// Each runs the plan's own items (seeded by the day), so leaving the step and coming back gives the same ones.
 
 import { useEffect, useRef, useState } from 'react';
 import { dayKey, db } from '../../lib/db.ts';
@@ -64,7 +65,8 @@ function SpeedRound({ cardIds, onDone }: { cardIds?: readonly string[]; onDone: 
   const left = useCountdown(SPEED_ROUND_MS, started);
   const logged = useRef(false);
   const list = cards.data ?? [];
-  const over = started && (left <= 0 || count >= list.length);
+  // Always the full minute: a quick reader goes round the cards again, so the count stays "read in a minute".
+  const over = started && left <= 0;
 
   useEffect(() => {
     if (!over || logged.current) return;
@@ -101,14 +103,14 @@ function SpeedRound({ cardIds, onDone }: { cardIds?: readonly string[]; onDone: 
   return (
     <div className="st-reading">
       <p className="label st-speed-head"><span>{count} read</span><span>{Math.ceil(left / 1000)} s</span></p>
-      <div className="card st-prompt"><SpeedPrompt prepared={list[count]} /></div>
+      <div className="card st-prompt"><SpeedPrompt prepared={list[count % list.length]} /></div>
       <div className="st-footer"><button type="button" className="btn ink st-grow" onClick={() => setCount(count + 1)}>Next</button></div>
     </div>
   );
 }
 
-function NumbersRound({ onDone }: { onDone: () => void }) {
-  const items = useAsync(() => numbersDrillToday(), [dayKey()]);
+function NumbersRound({ items: planned, onDone }: { items?: readonly NumberDrillItem[]; onDone: () => void }) {
+  const items = useAsync(async () => (planned?.length ? [...planned] : numbersDrillToday()), [planned ? JSON.stringify(planned) : dayKey()]);
   const [started, setStarted] = useState(false);
   const [at, setAt] = useState(0);
   const [value, setValue] = useState('');
@@ -224,7 +226,7 @@ export function FluencySprint({ plan, onDone }: { plan: FluencyPlan; onDone: () 
   switch (plan.kind) {
     case 'reread': return <Reread storyId={plan.storyId} onDone={onDone} />;
     case 'speed': return <SpeedRound cardIds={plan.cardIds} onDone={onDone} />;
-    case 'numbers': return <NumbersRound onDone={onDone} />;
-    case 'pitch': return <PitchDrill onDone={onDone} />;
+    case 'numbers': return <NumbersRound items={plan.numbers} onDone={onDone} />;
+    case 'pitch': return <PitchDrill items={plan.pitch} onDone={onDone} />;
   }
 }

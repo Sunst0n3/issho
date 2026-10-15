@@ -87,7 +87,8 @@ export interface MemberProgress {
   readyStories: string[];
   /** Kanji introduced 2–21 days ago, newest first (max 20): partner-side games without the server pool. */
   recentKanji: string[];
-  /** Item ids (core:, word:, grammar:, kanji:) introduced 2–21 days ago, newest first (max 20): task-card targets. */
+  /** Item ids (core:, word:, grammar:, kanji:) introduced 2–21 days ago (max 20): task-card targets. The units' authored
+   *  task targets come first, then the rest, newest first within each, so a target learned two weeks ago is not cut. */
   recentItems: string[];
   /** Highest unit whose grammar points were all introduced ≥ 2 days ago (0 = none): together tasks and stages. */
   settledUnit: number;
@@ -282,8 +283,10 @@ export interface TogetherEventRequest {
 
 // GET /api/together → TogetherState
 export interface TogetherState {
-  /** Latest 'slots' event ([] until set). */
+  /** The slots in effect this week: the latest 'slots' event filed under this week or earlier ([] until set). */
   slots: TogetherSlot[];
+  /** Slots a check-in filed under next week: they take over next Monday. Absent when none are waiting. */
+  nextSlots?: TogetherSlot[];
   goal: SharedGoal | null;
   /** scriptId → current stage 1–4, or 5 when finished. Missing = 1. */
   stages: Record<string, number>;
@@ -376,6 +379,9 @@ export interface AiCheckResponse {
   grammarUsed: string[];
   /** Reveal mode: the corrected text as words. */
   words: AiWord[];
+  /** Reveal mode: a natural English translation of `corrected` ('' in prompt mode). Optional: a server without it
+   *  (older build) leaves it out, and the cloze card made from the correction then has no English line. */
+  en?: string;
   /** v1 compatibility. */
   tips: AiTip[];
 }
@@ -418,6 +424,8 @@ export interface AiRecapPoint {
   rule: string;
   grammarUsed: string[];
   words: AiWord[];
+  /** A natural English translation of `corrected`. Optional like AiCheckResponse.en: an older server leaves it out. */
+  en?: string;
 }
 export interface AiRecapResponse { points: AiRecapPoint[] /* max 2 */; praise: string }
 

@@ -3,15 +3,23 @@ import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { version } from '../../../package.json';
 import { BackupError, backupFileName, exportBackup, importBackup, type BackupImport } from '../../lib/backup.ts';
 import { loadAudioManifest } from '../../lib/data.ts';
-import { db, updateSettings, type IsshoDB } from '../../lib/db.ts';
+import { dayKey, db, updateSettings, type IsshoDB } from '../../lib/db.ts';
 import type { KanaScript } from '../../lib/types.ts';
 import { applyPlacement, PLACEMENT_ITEMS } from '../../srs/course.ts';
+import { planReviewDays } from '../../srs/habits.ts';
 import { pushStats } from '../../sync/stats.ts';
 import { useLive } from './useLive.ts';
 import { SettingsSection } from './SettingsStudy.tsx';
 import { plural } from './labels.ts';
 
 type Message = { ok: boolean; text: string };
+
+/** A checked backup waiting for confirmation, with what this phone has now (a v1 file deletes it). */
+interface PendingRestore {
+  backup: BackupImport;
+  /** Items and reviews on this phone now. */
+  here: { items: number; reviewLogs: number };
+}
 
 /** Every table of learning progress. Settings, chat (messages, outbox) and queued together events stay. */
 export const RESET_TABLES = [
@@ -25,13 +33,14 @@ export const RESET_TABLES = [
  * together plans. Settings, the home-server pairing, chat and queued together events stay. A script the
  * learner passed the placement check for starts as known again, as it did after onboarding.
  */
-export async function resetProgress(): Promise<void> {
+export async function resetProgress(now: Date = new Date()): Promise<void> {
   const tables = RESET_TABLES.map((name) => db.table(name));
   await db.transaction('rw', tables, async () => {
     await Promise.all(tables.map((t) => t.clear()));
   });
-  // A fresh start chosen for the old progress means nothing now.
-  const s = await updateSettings({ freshStart: undefined });
+  // Settings that belong to the old progress: a fresh start chosen for it, travel mode (its days are gone,
+  // and day 1 must teach), and the plan reviews counted from its first day (weeks 4 and 8 of the new course).
+  const s = await updateSettings({ freshStart: undefined, travelUntil: undefined, planReviewDays: planReviewDays(dayKey(now)) });
   const known: KanaScript[] = [
     ...(s.knowsHiragana ? ['hiragana' as const] : []),
     ...(s.knowsKatakana ? ['katakana' as const] : []),
@@ -57,11 +66,42 @@ function download(blob: Blob, fileName: string) {
 
 const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
+/** This phone has learning progress a restore would delete. */
+const hasProgress = (here: PendingRestore['here']) => here.items > 0 || here.reviewLogs > 0;
+
+function restoreLabel({ backup, here }: PendingRestore): string {
+  if (!backup.progressDropped) return 'Replace my progress';
+  return hasProgress(here) ? 'Delete my progress and restore' : 'Restore settings and chat';
+}
+
+/**
+ * A v1 backup: only its settings and chat come back, and restoring still clears this phone's progress and
+ * sends the learner through setup again (its settings are the earlier course's). Said plainly before the tap,
+ * since the app goes straight to setup afterwards.
+ */
+function V1RestoreNotice({ here }: { here: PendingRestore['here'] }) {
+  return (
+    <>
+      <p className="hm-hint">
+        This backup is from the earlier version of Issho. Its settings and chat come back, but its learning
+        progress can't carry over to the new course.
+      </p>
+      {hasProgress(here) && (
+        <p className="hm-error">
+          Restoring it deletes all progress on this phone ({plural(here.items, 'item')},{' '}
+          {plural(here.reviewLogs, 'review')}), and it can't be undone. Export a backup first if you might want it back.
+        </p>
+      )}
+      <p className="hm-hint">Afterwards Issho takes you through setup again. Your home server connection stays as it is.</p>
+    </>
+  );
+}
+
 export function DataSection() {
   const fileInput = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<Message>();
-  const [restore, setRestore] = useState<BackupImport>();
+  const [restore, setRestore] = useState<PendingRestore>();
   const [resetOpen, setResetOpen] = useState(false);
   const [typed, setTyped] = useState('');
   const resetWord = useRef<HTMLInputElement>(null);
@@ -106,7 +146,9 @@ export function DataSection() {
     if (!file) return;
     setResetOpen(false);
     void run(async () => {
-      setRestore(await importBackup(file));
+      const backup = await importBackup(file);
+      const [items, reviewLogs] = await Promise.all([db.items.count(), db.reviewLogs.count()]);
+      setRestore({ backup, here: { items, reviewLogs } });
       return { ok: true, text: 'Backup checked. Confirm below to restore it.' };
     });
   };
@@ -152,23 +194,20 @@ export function DataSection() {
       {restore && (
         <div className="set-row set-confirm" role="group" aria-labelledby="set-restore-title">
           <p id="set-restore-title" ref={restoreTitle} tabIndex={-1} className="hm-field-label set-confirm-title">
-            Restore the backup from {DATE.format(restore.exportedAt)}?
+            Restore the backup from {DATE.format(restore.backup.exportedAt)}?
           </p>
-          {restore.progressDropped ? (
-            <p className="hm-hint">
-              This backup is from the earlier version of Issho. Its settings and chat come back, but its learning
-              progress can't carry over to the new course.
-            </p>
+          {restore.backup.progressDropped ? (
+            <V1RestoreNotice here={restore.here} />
           ) : (
             <p className="hm-hint">
               This replaces all progress on this phone with the backup
-              ({plural(restore.counts.items ?? 0, 'item')}, {plural(restore.counts.reviewLogs ?? 0, 'review')}).
+              ({plural(restore.backup.counts.items ?? 0, 'item')}, {plural(restore.backup.counts.reviewLogs ?? 0, 'review')}).
               Your home server connection stays as it is.
             </p>
           )}
           <div className="set-confirm-actions">
-            <button type="button" className="btn primary small" onClick={() => void onRestore(restore)} disabled={busy}>
-              {restore.progressDropped ? 'Restore settings and chat' : 'Replace my progress'}
+            <button type="button" className="btn primary small" onClick={() => void onRestore(restore.backup)} disabled={busy}>
+              {restoreLabel(restore)}
             </button>
             <button type="button" className="btn secondary small" onClick={() => { setRestore(undefined); setMessage(undefined); }} disabled={busy}>
               Cancel
@@ -183,7 +222,8 @@ export function DataSection() {
             <p id="set-reset-title" className="hm-field-label">Reset all progress?</p>
             <p className="hm-hint">
               This deletes everything you've learned on this phone: reviews, streak, rest days, stories, can-dos and
-              milestones. Settings and chat stay. It can't be undone, so export a backup first if you might want it back.
+              milestones, and ends travel mode. Settings and chat stay. It can't be undone, so export a backup first if
+              you might want it back.
             </p>
             <div className="hm-field">
               <label className="hm-field-label" htmlFor="set-reset-word">Type “reset” to confirm</label>

@@ -90,6 +90,37 @@ describe('streakFromHabitDays', () => {
     expect(s.repairable).toEqual({ date: '2026-03-19', deadline: repairDeadline('2026-03-19') });
   });
 
+  it('offers no token for yesterday when it is not the gap’s only missed day: a token could not keep the run (V004)', () => {
+    // Six days missed, Saturday the 14th to Thursday the 19th, with tokens left this week.
+    const s = streakFromHabitDays([studied('2026-03-13')], '2026-03-20', '2026-03-13', now);
+    expect(s.tokensLeftThisWeek).toBe(2);
+    expect(s.offerTokenFor).toBeUndefined();
+    // One day missed: the token keeps the run.
+    expect(streakFromHabitDays([studied('2026-03-13'), studied('2026-03-18')], '2026-03-20', '2026-03-13', now).offerTokenFor).toBe('2026-03-19');
+    // A token day inside the gap is covered: yesterday is still the only missed day.
+    const covered = [studied('2026-03-16'), habit('2026-03-17', { token: true }), studied('2026-03-18')];
+    expect(streakFromHabitDays(covered, '2026-03-20', '2026-03-16', now).offerTokenFor).toBe('2026-03-19');
+  });
+
+  it('offers no make-up after a 3-day gap with the tokens used: the oldest day is past repair (V004)', () => {
+    // Week of the 16th: tokens on Mon and Tue already spent elsewhere; Wed, Thu and Fri missed; today Saturday.
+    const saturday = at(2026, 3, 21, 20);
+    const days = [
+      studied('2026-03-15'), habit('2026-03-16', { token: true }), habit('2026-03-17', { token: true }),
+      habit('2026-03-21', { minimumDone: true, goalMet: true }),
+    ];
+    const gap3 = streakFromHabitDays(days.filter((d) => d.date !== '2026-03-17'), '2026-03-21', '2026-03-15', saturday);
+    expect(gap3.offerTokenFor).toBeUndefined();
+    const spent = streakFromHabitDays([...days, habit('2026-03-18', { minimumDone: false })], '2026-03-21', '2026-03-15', saturday);
+    expect(spent.repairable).toBeUndefined();
+    expect(spent.makeupOffer).toBe(false);
+    // Two missed days, both within their 48 hours: the make-up is offered.
+    const twoDays = [...days, studied('2026-03-18')];
+    const s = streakFromHabitDays(twoDays, '2026-03-21', '2026-03-15', saturday);
+    expect(s.repairable?.date).toBe('2026-03-20');
+    expect(s.makeupOffer).toBe(true);
+  });
+
   it('has no repairable day while the missed day’s week still has a token', () => {
     const s = streakFromHabitDays([studied('2026-03-18')], '2026-03-20', '2026-03-18', now);
     expect(s.repairable).toBeUndefined();

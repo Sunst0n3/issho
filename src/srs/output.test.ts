@@ -82,6 +82,23 @@ describe('the output check', () => {
     expect(await pendingOutputChecks()).toEqual([]);
   });
 
+  it("gives the cloze card the sentence's translation, never the day's target gloss (QA V052)", async () => {
+    await introduceItem('word', '1002', ago(10));
+    await introduceItem('word', '1006', ago(3));
+    await gradeCard('word:1002|read', Rating.Good, { durationMs: 1, mode: 'typed', now: ago(9) });
+    const target = { ref: 'word:1006', label: '{本|ほん}', en: '〜ました・〜ませんでした — "did", "didn\'t"' };
+    const translated = await saveOutput({ day: TODAY, target, draft: '日本本です', text: '日本本です', check: 'pending' }, NOW);
+    await completeOutputCheck(translated.id, response({ en: " It's a book about Japan. " }), NOW);
+    expect((await db.savedSentences.toArray()).map((s) => s.en)).toEqual(["It's a book about Japan."]);
+
+    // An older server sends no translation: the card has no English line rather than a wrong one.
+    await db.savedSentences.clear();
+    await db.items.where('kind').equals('sentence').delete();
+    const bare = await saveOutput({ day: TODAY, target, draft: 'x', text: 'x', check: 'pending' }, NOW);
+    await completeOutputCheck(bare.id, response(), NOW);
+    expect((await db.savedSentences.toArray()).map((s) => s.en)).toEqual(['']);
+  });
+
   it('saves a send once, even when saved twice (double tap or a StrictMode re-run)', async () => {
     const target = { ref: 'word:1006', label: '本', en: 'book' };
     const sent = { day: TODAY, target, draft: '本です', text: '本です', check: 'pending' as const, chatClientId: 'client-1' };

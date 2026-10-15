@@ -23,8 +23,8 @@
         "nameJp": "{田中|たなか}"
       },
       "b": {
-        "name": "Emma",
-        "nameJp": "エマ"
+        "name": "Ken",
+        "nameJp": "ケン"
       }
     },
     "lines": [
@@ -37,15 +37,15 @@
       },
       {
         "role": "b",
-        "jp": "あ、はじめまして。エマです。よろしくお{願|ねが}いします。",
-        "en": "Oh, nice to meet you. I'm Emma. Pleased to meet you.",
+        "jp": "あ、はじめまして。ケンです。よろしくお{願|ねが}いします。",
+        "en": "Oh, nice to meet you. I'm Ken. Pleased to meet you.",
         "hint": "Never put さん after your own name.",
-        "cue": "nice to meet you · Emma · pleased"
+        "cue": "nice to meet you · Ken · pleased"
       },
       {
         "role": "a",
-        "jp": "よろしくお{願|ねが}いします。エマさんはイギリス{人|じん}ですか。",
-        "en": "Pleased to meet you too. Are you British, Emma?",
+        "jp": "よろしくお{願|ねが}いします。ケンさんはイギリス{人|じん}ですか。",
+        "en": "Pleased to meet you too. Are you British, Ken?",
         "cue": "pleased · British?"
       },
       {
@@ -78,9 +78,9 @@
       },
       {
         "role": "b",
-        "jp": "ほんとうですか！ {夫|おっと}は{日本語|にほんご}の{学生|がくせい}です。",
-        "en": "Really? My husband is a student of Japanese!",
-        "cue": "really? · husband · Japanese student"
+        "jp": "ほんとうですか！ {妻|つま}は{日本語|にほんご}の{学生|がくせい}です。",
+        "en": "Really? My wife is a student of Japanese!",
+        "cue": "really? · wife · Japanese student"
       }
     ]
   },

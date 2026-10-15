@@ -6,7 +6,7 @@ import type { CardRecord, CardType, ItemKind } from '../../../lib/types.ts';
 import type { LeakMask } from '../../../srs/planner.ts';
 import { seededRandom } from '../../../srs/random.ts';
 import { audioMock, MNEMONICS, resetStudyDb } from '../test-utils.tsx';
-import { FAST_AUTO_ADVANCE_MS, FeedbackPanel } from './FeedbackPanel.tsx';
+import { backText, FAST_AUTO_ADVANCE_MS, FeedbackPanel } from './FeedbackPanel.tsx';
 import { prepareCard } from './prepare.ts';
 import { ReviewCard } from './ReviewCard.tsx';
 import type { PreparedCard } from './types.ts';
@@ -26,10 +26,11 @@ async function prep(kind: ItemKind, key: string, type: CardType): Promise<Prepar
   return p;
 }
 
-function panel(prepared: PreparedCard, { grade = Rating.Again as Grade, durationMs = 9000, medianMs = 8000, surprise = false, mask = NO_MASK } = {}) {
+function panel(prepared: PreparedCard, { grade = Rating.Again as Grade, durationMs = 9000, medianMs = 8000, surprise = false, mask = NO_MASK,
+  due = new Date(Date.now() + 4 * 86_400_000), reasked = false, hold = false } = {}) {
   const onContinue = vi.fn();
   render(<FeedbackPanel prepared={prepared} grade={grade} durationMs={durationMs} medianMs={medianMs} surprise={surprise}
-    due={new Date(Date.now() + 4 * 86_400_000)} mask={mask} onContinue={onContinue} />);
+    due={due} reasked={reasked} hold={hold} mask={mask} onContinue={onContinue} />);
   return onContinue;
 }
 
@@ -118,5 +119,72 @@ describe('FeedbackPanel', () => {
     await db.reviewLogs.bulkAdd(Array.from({ length: 20 }, (_, i) => ({ ...base, reviewedAt: new Date(Date.now() - i * 60_000), ...(i < 3 ? { override: true as const } : {}) })));
     panel(await prep('kanji', '水', 'write'));
     expect(await screen.findByText(/"I wrote it right" taps are above 10 %/)).toBeTruthy();
+  });
+});
+
+describe('FeedbackPanel, QA round 2', () => {
+  const introduce = (id: string, kind: 'kanji' | 'core', key: string, extra: object = {}) =>
+    db.items.put({ id, kind, key, introducedAt: new Date(), ...extra });
+
+  it('shows a produce answer in kana, with no parts, while its kanji is still to be written today (V022)', async () => {
+    await introduce('core:cw-0002', 'core', 'cw-0002', { spelledAt: new Date() });
+    await introduce('kanji:食', 'kanji', '食');
+    const prepared = await prep('core', 'cw-0002', 'produce');
+    panel(prepared, { mask: { ...NO_MASK, kanji: new Set(['食']) } });
+    expect(await screen.findByText('Not quite')).toBeTruthy();
+    expect(document.querySelector('.st-fb-answer')?.textContent).toContain('たべる');
+    expect(document.body.textContent).not.toContain('食');
+    expect(audioMock.play).toHaveBeenCalledWith({ ref: 'core:cw-0002' }, { fallbackText: 'たべる' });
+
+    cleanup();
+    // Once the write card is answered the spelling and its parts come back.
+    panel(prepared);
+    expect(await screen.findByText('Parts')).toBeTruthy();
+    expect(document.querySelector('.st-fb-answer')?.textContent).toContain('食べる');
+  });
+
+  it('lists parts only for kanji the learner has met, and none for a word still in kana (V042)', async () => {
+    // げんき is a core word not yet spelled: 元気 is not on screen, so no parts.
+    panel(await prep('core', 'cw-0004', 'listen'));
+    expect(await screen.findByText('Not quite')).toBeTruthy();
+    await waitFor(() => expect(document.querySelector('.st-fb-teach')).toBeTruthy());
+    await new Promise((r) => setTimeout(r, 20));
+    expect(screen.queryByText('Parts')).toBeNull();
+
+    cleanup();
+    // 水曜日 with only 水 introduced: 水 is listed, 曜 and 日 are not.
+    await introduce('kanji:水', 'kanji', '水');
+    panel(await prep('word', 'w-sui', 'read'));
+    const parts = (await screen.findByText('Parts')).closest('section')!;
+    expect(parts.textContent).toContain('水');
+    expect(parts.textContent).not.toContain('曜');
+    expect(parts.textContent).not.toContain('日');
+  });
+
+  it('says when the card is really back: once more in this block, else not before the next study day (V030)', async () => {
+    const now = new Date('2026-10-15T20:00:00');
+    expect(backText(new Date('2026-10-15T20:10:00'), false, now)).toBe('Back tomorrow');
+    expect(backText(new Date('2026-10-16T02:00:00'), false, now)).toBe('Back tomorrow');
+    expect(backText(new Date('2026-10-19T20:00:00'), false, now)).toBe('Back in 4 days');
+    expect(backText(new Date('2026-10-15T20:01:00'), true, now)).toBe('Back once more in a few cards');
+
+    panel(await prep('word', 'w-ike', 'read'), { due: new Date(Date.now() + 60_000), reasked: true });
+    expect(screen.getByText('Back once more in a few cards')).toBeTruthy();
+  });
+
+  it('a fast correct write with stroke-order coaching waits for Continue (V024)', async () => {
+    const prepared = await prep('kanji', '人', 'write');
+    vi.useFakeTimers();
+    const onContinue = panel(prepared, { grade: Rating.Good, durationMs: 2000, medianMs: 8000, hold: true });
+    act(() => vi.advanceTimersByTime(FAST_AUTO_ADVANCE_MS * 3));
+    expect(onContinue).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(onContinue).toHaveBeenCalledTimes(1);
+  });
+
+  it('gives a cloze answer’s reading only when it is written differently (V051)', async () => {
+    await db.savedSentences.put({ id: 's-w', jp: 'わたしです。', en: 'It is me.', savedAt: new Date(), source: 'reading', blank: { surface: 'わたし', reading: 'わたし', ref: 'core:cw-0001' } });
+    panel(await prep('sentence', 's-w', 'cloze'));
+    expect(document.querySelector('.st-fb-text')?.textContent).toBe('わたし');
   });
 });

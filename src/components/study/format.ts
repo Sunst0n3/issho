@@ -1,5 +1,6 @@
 // Small text helpers for the study screens.
 
+import { rubyToPlain } from '../../lib/ruby.ts';
 import type { GrammarPoint, KanaEntry } from '../../lib/types.ts';
 import { toHiragana } from '../../srs/answers.ts';
 
@@ -149,9 +150,10 @@ export function longVowelsSpelledOut(kana: string): string {
  * A grammar title without a repeat of its pattern: '〜は〜です — "X is Y"' →
  * '"X is Y"', and '〜まえに・〜あとで — "before", "after"' → '"before", "after"'
  * (the pattern is shown above it). A name in English words ('い-adjectives',
- * 'Dictionary form') says something the pattern doesn't, so it stays.
+ * 'Dictionary form') says something the pattern doesn't, so it stays, unless the
+ * name is the pattern itself ('AかB・〜にします').
  */
 export function grammarGloss(point: Pick<GrammarPoint, 'title' | 'pattern'>): string {
   const [name, gloss] = point.title.split(' — ');
-  return gloss && !/[A-Za-z]/.test(name) ? gloss : point.title;
+  return gloss && (name.trim() === rubyToPlain(point.pattern).trim() || !/[A-Za-z]/.test(name)) ? gloss : point.title;
 }

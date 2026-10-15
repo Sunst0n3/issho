@@ -15,8 +15,12 @@ ARG NODE_IMAGE=node:24-slim
 # reads Japanese with the server's VOICEVOX service, or the phone's own voice.
 FROM ${NODE_IMAGE} AS web
 WORKDIR /app
+# The server's packages too: `npm run build` type-checks the app's integration tests, which run the
+# home server in process (src/sync/test-server.ts imports server/src), so tsc needs fastify, zod and
+# the rest. The image itself still gets only the server's production packages (stage 2).
 COPY package.json package-lock.json ./
-RUN npm ci
+COPY server/package.json server/package-lock.json ./server/
+RUN npm ci && npm ci --prefix server
 COPY . .
 RUN if [ -s public/data/curriculum.json ]; then \
       echo "Using the committed public/data/"; \

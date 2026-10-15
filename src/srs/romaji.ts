@@ -111,7 +111,7 @@ export function toKatakana(s: string): string {
 }
 
 export interface ToKanaOptions {
-  /** Output katakana, and turn '-' into the long-vowel mark ー. */
+  /** Output katakana only. */
   katakana?: boolean;
   /**
    * The text is still being typed: keep a trailing unfinished syllable ("k",
@@ -120,14 +120,56 @@ export interface ToKanaOptions {
   partial?: boolean;
 }
 
+/** Punctuation an IME turns into its Japanese form; '-' is the long-vowel mark in both scripts (けーき, ケーキ). */
+const PUNCTUATION: Record<string, string> = { '-': 'ー', '.': '。', ',': '、', '?': '？', '!': '！' };
+const isDigit = (c: string | undefined) => c !== undefined && c >= '0' && c <= '9';
+
+/**
+ * Capital letters type katakana, as in WanaKana: a syllable written in capitals is katakana when its capitals run is at
+ * least two letters long ('KE-KI' → ケーキ, 'kono PAN' → このパン). A single capital ('Ano', a capitalized sentence
+ * start) stays hiragana. '-' and an apostrophe join a run ('E-RU' → エール). A run right after katakana continues that
+ * word: typed key by key, the earlier capitals are already katakana, so 'PA' + 'N' is パン, not パん. Per position: the
+ * run's letter count (0 outside a run), where the run ends, and whether it follows katakana.
+ */
+function capitalRuns(cased: string): { letters: number[]; end: number[]; afterKatakana: boolean[] } {
+  const letters = new Array<number>(cased.length).fill(0);
+  const end = new Array<number>(cased.length).fill(0);
+  const afterKatakana = new Array<boolean>(cased.length).fill(false);
+  for (const m of cased.matchAll(/[A-Z'-]+/g)) {
+    const n = (m[0].match(/[A-Z]/g) ?? []).length;
+    const continues = m.index > 0 && /[ァ-ヺー]/.test(cased[m.index - 1]);
+    for (let i = m.index; i < m.index + m[0].length; i++) {
+      letters[i] = n;
+      end[i] = m.index + m[0].length;
+      afterKatakana[i] = continues;
+    }
+  }
+  return { letters, end, afterKatakana };
+}
+
 /**
  * Converts romaji to kana the way a Japanese IME does: double consonants → っ,
- * n'/nn → ん, shi/chi/tsu/fu/ja…, kya/sha/cha…, x/l prefix for small kana.
- * Hepburn long vowels are written out (gakkō → がっこう). Kana and other
- * characters pass through unchanged.
+ * n'/nn → ん, shi/chi/tsu/fu/ja…, kya/sha/cha…, x/l prefix for small kana,
+ * '-' → ー and . , ? ! → 。、？！ (not between digits: 1,500 and 3.5 stay).
+ * Hepburn long vowels are written out (gakkō → がっこう). Syllables typed in
+ * capitals become katakana (see capitalRuns). Kana and other characters pass
+ * through unchanged.
  */
 export function toKana(input: string, { katakana = false, partial = false }: ToKanaOptions = {}): string {
-  const s = input.normalize('NFKC').toLowerCase().replace(/[‘’`]/g, "'").replace(/[āīūēōâîûêô]/g, (v) => LONG_VOWELS[v]);
+  // `s` is lower case for the table; `cased` keeps each letter's case at the same index.
+  let s = '';
+  let cased = '';
+  for (const ch of input.normalize('NFKC').replace(/[‘’`]/g, "'")) {
+    const lower = ch.toLowerCase();
+    const expanded = LONG_VOWELS[lower] ?? lower;
+    const upper = expanded.toUpperCase();
+    s += expanded;
+    cased += ch === lower || upper.length !== expanded.length ? expanded : upper;
+  }
+  const runs = capitalRuns(cased);
+  /** Every letter in [i, j) is a capital (and there is one). */
+  const capitals = (i: number, j: number) => /^[A-Z'-]*[A-Z][A-Z'-]*$/.test(cased.slice(i, j));
+
   let out = '';
   let i = 0;
   while (i < s.length) {
@@ -137,18 +179,34 @@ export function toKana(input: string, { katakana = false, partial = false }: ToK
     if (c === 'n') step = stepN(s, i, partial);
     else if (DOUBLING.includes(c) && (next === c || (c === 't' && next === 'c' && s[i + 2] === 'h'))) step = { kana: 'っ', length: 1 };
     else if (c === 'm' && (next === 'b' || next === 'p')) step = { kana: 'ん', length: 1 }; // Hepburn "shimbun"
-    else if (c === '-') step = { kana: katakana ? 'ー' : '-', length: 1 };
+    else if (partial && (c === '.' || c === ',') && isDigit(s[i - 1]) && next === undefined) {
+      // Typed after a digit, '.' or ',' may still be a separator ('1,500', '3.5'): wait for the next key.
+      out += c;
+      break;
+    } else if (PUNCTUATION[c] && !(isDigit(s[i - 1]) && isDigit(next))) step = { kana: PUNCTUATION[c], length: 1 };
     else step = lookup(s, i);
 
     if (!step) {
       const rest = s.slice(i);
       if (partial && PREFIXES.has(rest)) {
-        out += rest;
+        out += cased.slice(i);
         break;
       }
-      step = { kana: c === "'" ? '' : c, length: 1 };
+      step = { kana: c === "'" ? '' : cased[i], length: 1 };
     }
-    out += step.kana;
+    if (/^[a-z']+$/.test(step.kana)) {
+      // An unfinished syllable kept as typed.
+      out += cased.slice(i, i + step.length);
+    } else if (!katakana && capitals(i, i + step.length) && /[ぁ-ゖ]/.test(step.kana)) {
+      // A lone capital at the end of the field may still start a run ('A' → 'AI' アイ): wait for the next letter.
+      if (partial && runs.letters[i] === 1 && runs.end[i] === s.length && !runs.afterKatakana[i]) {
+        out += cased.slice(i);
+        break;
+      }
+      out += runs.letters[i] >= 2 || runs.afterKatakana[i] ? toKatakana(step.kana) : step.kana;
+    } else {
+      out += step.kana;
+    }
     i += step.length;
   }
   return katakana ? toKatakana(out) : out;
@@ -157,7 +215,8 @@ export function toKana(input: string, { katakana = false, partial = false }: ToK
 /**
  * The in-field IME: live conversion while the learner types. Complete syllables
  * become kana and an unfinished tail stays as letters ('kit' → 'きt'); "n'" and
- * "nn" → ん; a doubled consonant → っ ('kitte' → 'きって'). Kana already in the
+ * "nn" → ん; a doubled consonant → っ ('kitte' → 'きって'); '-' → ー and '.' → 。
+ * in hiragana too; capitals type katakana ('KE-KI' → ケーキ). Kana already in the
  * field pass through, so converting the field's whole value again is safe.
  */
 export function imeConvert(raw: string, opts: { katakana?: boolean } = {}): string {

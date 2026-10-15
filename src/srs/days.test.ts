@@ -52,10 +52,18 @@ describe('DayRecord helpers', () => {
     expect(isStudyDay(emptyDay('2026-10-14'))).toBe(false);
     const travelDay: DayRecord = { ...emptyDay('2026-10-14'), travel: true };
     expect(isStudyDay(travelDay)).toBe(false);
-    expect(isStudyDay({ ...emptyDay('2026-10-14'), studyMs: 1 })).toBe(true);
+    const reading: DayRecord = { ...emptyDay('2026-10-14'), strandMs: 30_000, studyMs: 30_000 };
+    expect(isStudyDay(reading)).toBe(true);
+    expect(isStudyDay({ ...emptyDay('2026-10-14'), reviews: 1 })).toBe(true);
     expect(isStudyDay({ ...emptyDay('2026-10-14'), togetherMs: 1 })).toBe(true);
     expect(isStudyDay({ ...emptyDay('2026-10-14'), minimumDone: true })).toBe(true);
     expect(isStudyDay({ ...emptyDay('2026-10-14'), newItems: 1 })).toBe(true);
+  });
+
+  it('does not count a sitting opened and left with nothing in it (QA V026)', () => {
+    // An empty Anywhere sitting open for about a second: studyMs only, no review, no lesson, no reading.
+    const empty: DayRecord = { ...emptyDay('2026-10-14'), studyMs: 1176 };
+    expect(isStudyDay(empty)).toBe(false);
   });
 
   it('starts every v2 counter at zero', () => {
