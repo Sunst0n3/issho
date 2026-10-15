@@ -31,7 +31,7 @@
       "role": "a",
       "jp": "こんにちは。{隣|となり}の{田中|たなか}です。",
       "en": "Hello. I'm Tanaka, from next door.",
-      "hint": "隣の + your name is how neighbours introduce themselves.",
+      "hint": "となりの + your name is how neighbours introduce themselves.",
       "cue": "hello · next door · Tanaka"
     },
     {
@@ -39,40 +39,41 @@
       "jp": "あ、はじめまして。エマです。よろしくお{願|ねが}いします。",
       "en": "Oh, nice to meet you. I'm Emma. Pleased to meet you.",
       "hint": "Never put さん after your own name.",
-      "cue": "nice to meet you · Emma"
+      "cue": "nice to meet you · Emma · pleased"
     },
     {
       "role": "a",
-      "jp": "よろしくお{願|ねが}いします。エマさんはアメリカ{人|じん}ですか。",
-      "en": "Pleased to meet you too. Are you American, Emma?",
-      "cue": "pleased · American?"
+      "jp": "よろしくお{願|ねが}いします。エマさんはイギリス{人|じん}ですか。",
+      "en": "Pleased to meet you too. Are you British, Emma?",
+      "cue": "pleased · British?"
     },
     {
       "role": "b",
-      "jp": "いいえ、アメリカ{人|じん}じゃないです。イギリス{人|じん}です。",
-      "en": "No, I'm not American. I'm British.",
+      "jp": "いいえ、イギリス{人|じん}じゃないです。アメリカ{人|じん}です。",
+      "en": "No, I'm not British. I'm American.",
       "hint": "じゃないです is the negative of です.",
-      "cue": "no · not American · British"
+      "cue": "no · not British · American"
     },
     {
       "role": "a",
       "jp": "そうですか。お{仕事|しごと}は？",
       "en": "I see. What do you do?",
-      "hint": "お仕事は？ is a short, polite way to ask about someone's job.",
+      "hint": "おしごとは？ is a short, polite way to ask about someone's job.",
       "cue": "I see · your job?"
     },
     {
       "role": "b",
-      "jp": "{英語|えいご}の{先生|せんせい}です。",
-      "en": "I'm an English teacher.",
-      "cue": "English · teacher"
+      "jp": "{会社員|かいしゃいん}です。{田中|たなか}さんは？",
+      "en": "I'm an office worker. And you, Ms. Tanaka?",
+      "hint": "Name + は？ turns the question back: たなかさんは？ = and you?",
+      "cue": "office worker · and you?"
     },
     {
       "role": "a",
-      "jp": "へえ、{私|わたし}も{先生|せんせい}です。{日本語|にほんご}の{先生|せんせい}です。",
-      "en": "Oh, I'm a teacher too. I teach Japanese.",
-      "hint": "も replaces は: 私も = me too.",
-      "cue": "oh · me too · Japanese teacher"
+      "jp": "あ、{私|わたし}も{会社員|かいしゃいん}です。{夫|おっと}は{日本語|にほんご}の{先生|せんせい}です。",
+      "en": "Oh, I'm an office worker too. My husband teaches Japanese.",
+      "hint": "も replaces は: わたしも = me too.",
+      "cue": "me too · husband · Japanese teacher"
     },
     {
       "role": "b",

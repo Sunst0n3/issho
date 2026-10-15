@@ -3,7 +3,7 @@
   "unit": 6,
   "title": "What are you having?",
   "titleJp": "{何|なに}にする？",
-  "setting": "A Sunday afternoon at a small café near home. You each choose a drink and a cake, and talk about what you like.",
+  "setting": "A Sunday afternoon at a small café near home. Hikaru sometimes drops in alone, but it is Aoi's first visit. You each choose a drink and a cake, and talk about what you like.",
   "level": 1,
   "register": "plain",
   "targets": [
@@ -63,7 +63,7 @@
     {
       "role": "b",
       "jp": "いいね。ここ、よく{来|く}る？",
-      "en": "Nice. Do you come here often?",
+      "en": "Nice. So, do you come here often?",
       "cue": "nice · come here often?"
     },
     {

@@ -33,7 +33,7 @@
       "check": {
         "kind": "listen",
         "instructions": "Listen to a teacher introducing a weekend class (you can play it twice), then answer the questions.",
-        "material": "こんにちは。{土曜日|どようび}の{料理|りょうり}のクラスへようこそ。\nこのクラスでは、{日本|にほん}の{家|いえ}の{料理|りょうり}を{作|つく}ることができます。みそ{汁|しる}や{天|てん}ぷらなどを{作|つく}ります。\n{一回|いっかい}{二時間|にじかん}で、{作|つく}った{料理|りょうり}はみんなで{食|た}べます。\n{初|はじ}めての{人|ひと}も{大丈夫|だいじょうぶ}です。{包丁|ほうちょう}が{苦手|にがて}な{人|ひと}は、ゆっくり{練習|れんしゅう}しましょう。\nエプロンとタオルを{持|も}ってきてください。\n{最初|さいしょ}の{一回|いっかい}は{無料|むりょう}です。ぜひ{来|き}てみてください！",
+        "material": "こんにちは。{土曜日|どようび}の{料理|りょうり}のクラスへようこそ。\nこのクラスでは、{日本|にほん}の{家|いえ}でよく{作|つく}る{料理|りょうり}を{習|なら}うことができます。みそ{汁|しる}や{天|てん}ぷらなどを{作|つく}ります。\n{一回|いっかい}{二時間|にじかん}で、{作|つく}った{料理|りょうり}はみんなで{食|た}べます。\n{初|はじ}めての{人|ひと}も{大丈夫|だいじょうぶ}です。{包丁|ほうちょう}が{苦手|にがて}な{人|ひと}は、ゆっくり{練習|れんしゅう}しましょう。\nタオルを{持|も}ってきてください。\n{最初|さいしょ}の{一回|いっかい}は{無料|むりょう}です。ぜひ{来|き}てみてください！",
         "questions": [
           {
             "q": "What do you make in this class?",
@@ -58,7 +58,7 @@
             "options": [
               "A knife; ¥1,000",
               "Nothing; ¥500",
-              "An apron and a towel; it is free"
+              "A towel; it is free"
             ],
             "answer": 2
           }
@@ -125,7 +125,7 @@
       "check": {
         "kind": "write",
         "instructions": "Your friend sent the message below. Reply in 3–5 sentences: a hobby you'd like to try and why, something you can already do, and something you can't do yet.",
-        "material": "{今度|こんど}、{何|なに}か{一緒|いっしょ}に{始|はじ}めない？どんなことがしてみたい？",
+        "material": "{今度|こんど}、{何|なに}か{一緒|いっしょ}に{始|はじ}めない？どんなことをしてみたい？",
         "questions": [],
         "rubric": [
           "Names a hobby with 〜てみたい (ギターを ひいてみたい)",
@@ -147,7 +147,7 @@
       "b": "Has listings for a yoga class and a guitar class, and your free evenings (card B)"
     },
     "infoA": "Card A: two class listings. Cooking class (りょうりの クラス): Saturdays 10:00–12:00; ¥3,000 per person per lesson; Japanese home cooking, and you eat what you make; beginners welcome. Dance class (ダンス): Thursdays 20:00–21:00; ¥1,000 per person per lesson; dancing in couples (カップル), no experience needed (はじめての ひとも おどる ことが できる). About you: you love food but you're not good with knives (ほうちょうが にがて), and dancing in front of people feels a bit embarrassing (はずかしい).",
-    "infoB": "Card B: two class listings. Yoga (ヨガ): Tuesdays 19:00–20:00; ¥1,000 per person; you can borrow mats. Guitar (ギター): Sundays 14:00–16:00; ¥2,500 per person; you need your own guitar (about ¥15,000). Your free evenings this month: Thursdays and Fridays only (you always work late on Tuesdays: かようびは ざんぎょう). Saturdays you're both free. Budget for the new hobby: ¥10,000 a month for the two of you (ふたりで いちまんえん). About you: your body is stiff (からだが かたい) and you can't play any instrument.",
+    "infoB": "Card B: two class listings. Yoga (ヨガ): Tuesdays 19:00–20:00; ¥1,000 per person; you can borrow mats. Guitar (ギター): Sundays 14:00–16:00; ¥2,500 per person; you need your own guitar (about ¥15,000). Your free evenings this month: Thursdays and Fridays only (you often work late on Tuesdays: かようびは よく ざんぎょうが ある). Saturdays you're both free. Budget for the new hobby: ¥10,000 a month for the two of you (ふたりで いちまんえん). About you: your body is stiff (からだが かたい) and you can't play any instrument.",
     "targets": [
       "grammar:te-miru",
       "grammar:kamoshirenai",
@@ -187,8 +187,8 @@
       },
       {
         "role": "b",
-        "jp": "{火曜日|かようび}の{七時|しちじ}から。でも、{火曜日|かようび}はいつも{残業|ざんぎょう}だから、{行|い}くことができないかもしれない。",
-        "en": "Tuesdays from seven. But I always work late on Tuesdays, so I might not be able to go."
+        "jp": "{火曜日|かようび}の{七時|しちじ}から。でも、{火曜日|かようび}はよく{残業|ざんぎょう}があるから、{行|い}くことができないかもしれない。",
+        "en": "Tuesdays from seven. But I often work late on Tuesdays, so I might not be able to go."
       },
       {
         "role": "a",

@@ -27,6 +27,10 @@
       "en": "There are lots of old temples and shrines in this town."
     },
     {
+      "jp": "{外国|がいこく}から／{観光|かんこう}に／{来|く}る／{人|ひと}も／{多|おお}いです。",
+      "en": "Lots of people come from abroad to see the sights, too."
+    },
+    {
       "jp": "{今日|きょう}は、／{有名|ゆうめい}な／お{寺|てら}を／{見|み}に／{行|い}く／つもりです。",
       "en": "Today they plan to go and see a famous temple."
     },
@@ -35,8 +39,8 @@
       "en": "They walked from the station to the temple."
     },
     {
-      "jp": "ケンは／スマホの／{地図|ちず}を／{見|み}て、／ミキは／{町|まち}の／{写真|しゃしん}を／{撮|と}りました。",
-      "en": "Ken looked at the map on his phone, and Miki took photos of the town."
+      "jp": "ケンは／スマホの／{地図|ちず}を／{見|み}て、／ミキは／{古|ふる}い／{町|まち}の／{景色|けしき}を／{楽|たの}しみました。",
+      "en": "Ken looked at the map on his phone, and Miki enjoyed the views of the old town."
     },
     {
       "jp": "お{寺|てら}は／{大|おお}きくて、／とても／きれいでした。",
@@ -51,11 +55,11 @@
       "en": "\"Oh no! My phone's battery is dead!\""
     },
     {
-      "jp": "「え？／{私|わたし}の／スマホは／ホテルだよ。」",
-      "en": "\"What? My phone is at the hotel.\""
+      "jp": "「え？／{私|わたし}の／スマホは／{旅館|りょかん}に／あるよ。」",
+      "en": "\"What? My phone is back at the inn.\""
     },
     {
-      "jp": "{地図|ちず}は／ケンの／スマホの／{中|なか}に／しか／ありません。",
+      "jp": "{地図|ちず}は／ケンの／スマホにしか／ありません。",
       "en": "The only map was on Ken's phone."
     },
     {
@@ -71,20 +75,24 @@
       "en": "Just then, an old lady came out of a small shop."
     },
     {
-      "jp": "ミキは／{日本語|にほんご}で／{聞|き}きました。",
-      "en": "Miki asked her in Japanese."
+      "jp": "ミキが／おばあさんに／{聞|き}きました。",
+      "en": "Miki asked her the way."
     },
     {
       "jp": "「すみません、／{駅|えき}は／どちらですか。／{初|はじ}めて／{来|き}たので、／{道|みち}が／わからないんです。」",
       "en": "\"Excuse me, which way is the station? It's our first time here, so we don't know the way.\""
     },
     {
-      "jp": "おばあさんは／{笑|わら}って、／「{駅|えき}は／ちょっと／{遠|とお}いですよ。／{一緒|いっしょ}に／{行|い}きましょう。」と／{言|い}いました。",
-      "en": "The old lady smiled and said, \"The station is a bit far. Let's go together.\""
+      "jp": "おばあさんは／{笑|わら}って、／「{駅|えき}は／ちょっと／{遠|とお}いですよ。／{私|わたし}が／{案内|あんない}しましょう。」と／{言|い}いました。",
+      "en": "The old lady smiled and said, \"The station is a bit far. Let me show you the way.\""
     },
     {
       "jp": "「いいんですか。／ありがとうございます！」",
       "en": "\"Are you sure? Thank you so much!\""
+    },
+    {
+      "jp": "{二人|ふたり}は／{安心|あんしん}しました。",
+      "en": "The two of them felt relieved."
     },
     {
       "jp": "{三人|さんにん}は／{一緒|いっしょ}に／{駅|えき}へ／{歩|ある}きました。",
@@ -96,11 +104,11 @@
     },
     {
       "jp": "「この／{町|まち}は／{秋|あき}が／いちばん／きれいですよ。」",
-      "en": "\"This town is most beautiful in autumn.\""
+      "en": "\"This town is at its most beautiful in autumn.\""
     },
     {
-      "jp": "「{秋|あき}は／{人|ひと}が／{多|おお}いけど、／{冬|ふゆ}は／{静|しず}かです。」",
-      "en": "\"In autumn there are lots of people, but in winter it's quiet.\""
+      "jp": "「{秋|あき}は／{人|ひと}が／{多|おお}いけど、／{冬|ふゆ}は／{静|しず}かで／いいですよ。」",
+      "en": "\"In autumn there are lots of people, but in winter it's nice and quiet.\""
     },
     {
       "jp": "{駅|えき}の／{前|まえ}で、／おばあさんは／かばんから／お{菓子|かし}を／{二|ふた}つ／{出|だ}しました。",
@@ -111,12 +119,20 @@
       "en": "\"Here you are. These are sweets from this town.\""
     },
     {
+      "jp": "{二人|ふたり}は／びっくりして、／とても／{喜|よろこ}びました。",
+      "en": "They were surprised and very pleased."
+    },
+    {
       "jp": "「ありがとうございます！／{今度|こんど}は、／{秋|あき}に／{来|く}る／つもりです。」",
       "en": "\"Thank you! Next time, we plan to come in autumn.\""
     },
     {
-      "jp": "{帰|かえ}りの／{電車|でんしゃ}で、／{二人|ふたり}は／お{菓子|かし}を／{食|た}べました。／{甘|あま}くて、／おいしかったです。",
-      "en": "On the train home, they ate the sweets. They were sweet and delicious."
+      "jp": "{帰|かえ}りの／{電車|でんしゃ}で、／{二人|ふたり}は／お{菓子|かし}を／{食|た}べました。",
+      "en": "On the train back, they ate the sweets."
+    },
+    {
+      "jp": "{甘|あま}くて、／おいしかったです。",
+      "en": "They were sweet and delicious."
     },
     {
       "jp": "「スマホの／{地図|ちず}より、／あの／おばあさんのほうが／ずっと／よかったね。」と／ケンが／{言|い}いました。",

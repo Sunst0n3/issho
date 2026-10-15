@@ -15,28 +15,29 @@
     "koto-ga-dekiru",
     "relative-clauses",
     "yori-hou",
-    "kara-because"
+    "kara-because",
+    "adjectives-te"
   ],
   "sentences": [
     {
-      "jp": "{八月|はちがつ}の／{土曜日|どようび}、／{町|まち}で／お{祭|まつ}りが／あります。",
-      "en": "One Saturday in August, there is a festival in town."
+      "jp": "{八月|はちがつ}の／{初|はじ}め、／{町|まち}で／お{祭|まつ}りが／あります。",
+      "en": "At the beginning of August, there is a festival in town."
     },
     {
-      "jp": "{夜|よる}は／{花火|はなび}も／あります。",
-      "en": "In the evening there are fireworks too."
+      "jp": "{毎年|まいとし}、／{夜|よる}は／{花火|はなび}も／あります。",
+      "en": "Every year there are fireworks in the evening, too."
     },
     {
-      "jp": "ミキは／{浴衣|ゆかた}を／{着|き}て／{行|い}きたいです。",
-      "en": "Miki wants to wear a yukata to it."
+      "jp": "ミキは／{浴衣|ゆかた}を／{着|き}て／{行|い}きたいと／{思|おも}っています。",
+      "en": "Miki would like to wear a yukata to it."
     },
     {
-      "jp": "でも、／{一人|ひとり}で／{着|き}る／ことが／できません。",
-      "en": "But she can't put it on by herself."
+      "jp": "でも、／{浴衣|ゆかた}を／{着|き}るのは／{難|むずか}しくて、／{一人|ひとり}で／{着|き}る／ことが／できません。",
+      "en": "But putting on a yukata is difficult, and she can't do it by herself."
     },
     {
-      "jp": "ケンの／お{母|かあ}さんが／{来|き}て、／{手伝|てつだ}って／くれました。",
-      "en": "Ken's mother came over and helped her."
+      "jp": "お{祭|まつ}りの／{日|ひ}、／ケンの／お{母|かあ}さんが／{来|き}て、／{手伝|てつだ}って／くれました。",
+      "en": "On the day of the festival, Ken's mother came over and helped her."
     },
     {
       "jp": "ミキの／{浴衣|ゆかた}は、／{白|しろ}に／{青|あお}い／{花|はな}です。",
@@ -47,12 +48,12 @@
       "en": "\"Beautiful! It really suits you,\" Ken said."
     },
     {
-      "jp": "ケンも／{浴衣|ゆかた}を／{着|き}て／みました。／{黒|くろ}いのです。",
-      "en": "Ken tried his yukata on too. His is a black one."
+      "jp": "ケンも／{黒|くろ}い／{浴衣|ゆかた}を／{着|き}て／みました。",
+      "en": "Ken tried on his black yukata too."
     },
     {
-      "jp": "でも、／ケンの／{浴衣|ゆかた}は／{小|ちい}さすぎました。／{足|あし}が／{見|み}えます。",
-      "en": "But Ken's yukata was too small. You could see his legs."
+      "jp": "でも、／{小|ちい}さすぎて、／{足|あし}が／{出|で}ていました。",
+      "en": "But it was too small, and his legs stuck out."
     },
     {
       "jp": "「お{父|とう}さんのを／{着|き}て／みたら？」と／お{母|かあ}さんが／{言|い}いました。",
@@ -100,10 +101,14 @@
     },
     {
       "jp": "ケンは／{花火|はなび}より、／{花火|はなび}を／{見|み}ている／ミキを／{見|み}ていました。",
-      "en": "Ken was looking at Miki watching the fireworks more than at the fireworks."
+      "en": "Ken was watching Miki watch the fireworks more than the fireworks themselves."
     },
     {
-      "jp": "{帰|かえ}る／とき、／ミキが／{言|い}いました。",
+      "jp": "{最後|さいご}の／{花火|はなび}は、／いちばん／{大|おお}きくて、／{素晴|すば}らしかったです。",
+      "en": "The last firework was the biggest of all, and it was wonderful."
+    },
+    {
+      "jp": "{帰|かえ}る／{途中|とちゅう}で、／ミキが／{言|い}いました。",
       "en": "On the way home, Miki said:"
     },
     {
@@ -111,8 +116,12 @@
       "en": "\"It turned into a lovely night because your mum helped us.\""
     },
     {
+      "jp": "「うん。／{明日|あした}、／お{礼|れい}の／{電話|でんわ}を／しよう。」",
+      "en": "\"Yeah. Let's call her tomorrow to say thank you.\""
+    },
+    {
       "jp": "「{来年|らいねん}は、／{自分|じぶん}で／{着|き}たいな。／お{母|かあ}さんに／{教|おし}えて／もらおう。」",
-      "en": "\"Next year I want to put it on myself. I'll get your mum to teach me.\""
+      "en": "\"Next year I want to put it on myself. I'll ask your mum to teach me.\""
     }
   ],
   "gist": {

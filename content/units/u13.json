@@ -34,17 +34,17 @@
       "text": "Read a simple recipe and put the steps in order.",
       "check": {
         "kind": "read",
-        "instructions": "This recipe card got shuffled. Read steps A–D, work out the right order, and answer the questions.",
-        "material": "{親子丼|おやこどん}を{作|つく}ろう！（{二人|ふたり}・{二十分|にじゅっぷん}）\n{鶏肉|とりにく}200グラム・{玉|たま}ねぎ{一|ひと}つ・{卵|たまご}{三|みっ}つ・ご{飯|はん}・しょうゆ・{砂糖|さとう}\n\nA　{卵|たまご}を{混|ま}ぜてから、{鍋|なべ}に{入|い}れます。{入|い}れてから、あまり{混|ま}ぜないでください。\nB　{鍋|なべ}に{水|みず}としょうゆと{砂糖|さとう}を{入|い}れて、{温|あたた}めます。\nC　まず、{鶏肉|とりにく}と{玉|たま}ねぎを{切|き}ります。\nD　{鶏肉|とりにく}と{玉|たま}ねぎを{鍋|なべ}に{入|い}れて、{五分|ごふん}ぐらい{待|ま}ちます。\n{最後|さいご}に、ご{飯|はん}にかけて{食|た}べましょう！",
+        "instructions": "This recipe card for oyakodon (chicken and egg on rice) got shuffled. Read steps A–D, work out the right order, and answer the questions.",
+        "material": "{鶏肉|とりにく}と{卵|たまご}のご{飯|はん}を{作|つく}ろう！（{二人|ふたり}・{二十分|にじゅっぷん}）\n{鶏肉|とりにく}200グラム・{玉|たま}ねぎ{一|ひと}つ・{卵|たまご}{三|みっ}つ・ご{飯|はん}・しょうゆ・{砂糖|さとう}\n\nA　{卵|たまご}を{混|ま}ぜてから、{鍋|なべ}に{入|い}れます。{入|い}れてから、あまり{混|ま}ぜないでください。\nB　{鍋|なべ}に{水|みず}としょうゆと{砂糖|さとう}を{入|い}れて、{温|あたた}めます。\nC　まず、{鶏肉|とりにく}と{玉|たま}ねぎを{切|き}ります。\nD　{鶏肉|とりにく}と{玉|たま}ねぎを{鍋|なべ}に{入|い}れて、{五分|ごふん}ぐらい{待|ま}ちます。\n{最後|さいご}に、ご{飯|はん}にかけて{食|た}べましょう！",
         "questions": [
           {
             "q": "What is the right order of steps A–D?",
             "options": [
-              "C → B → D → A",
               "B → C → A → D",
-              "C → D → B → A"
+              "C → A → B → D",
+              "C → B → D → A"
             ],
-            "answer": 0
+            "answer": 2
           },
           {
             "q": "What does the recipe tell you not to do once the eggs are in?",
@@ -58,11 +58,11 @@
           {
             "q": "How many eggs do you need?",
             "options": [
+              "Three",
               "One",
-              "Two",
-              "Three"
+              "Two"
             ],
-            "answer": 2
+            "answer": 0
           }
         ]
       }
@@ -78,20 +78,20 @@
           {
             "q": "What does your partner ask you to do first?",
             "options": [
-              "Wash and cut the carrots and potatoes",
               "Cut the onions",
+              "Wash and cut the carrots and potatoes",
               "Heat the frying pan"
             ],
-            "answer": 0
+            "answer": 1
           },
           {
             "q": "Which two things should you not do?",
             "options": [
-              "Open the fridge, or cut the onions",
               "Pick up the frying pan, or add the salt now",
+              "Open the fridge, or cut the onions",
               "Wash the vegetables, or take out the tomatoes"
             ],
-            "answer": 1
+            "answer": 0
           },
           {
             "q": "Why shouldn't the salt go in yet?",
@@ -146,10 +146,10 @@
     "outcomeQuestion": "What are you having for dinner, who's cooking which part, and what does someone need to buy?",
     "roles": {
       "a": "Knows what's in the fridge and the cupboard (card A)",
-      "b": "Knows what you both had for lunch and what's on special at the supermarket (card B)"
+      "b": "Knows what they had for lunch and what's on special at the supermarket (card B)"
     },
     "infoA": "What's at home (card A):\n• Fridge (れいぞうこ): six eggs (たまご), onions (たまねぎ), carrots (にんじん), cheese (チーズ), a little milk. No meat or fish (にくも さかなも ない).\n• Cupboard: rice (こめ), pasta (パスタ), curry roux (カレー), a tin of tomatoes.\nYou're tired, so you'd like something easy (かんたん). You can do the rice and a salad.\nSuggest with 〜よう, compare with 〜より〜のほうが, and ask if your partner needs anything (なにか いる？).",
-    "infoB": "What you know (card B):\n• You both had pasta for lunch at work today (ひるに パスタを たべた), so not pasta again.\n• The supermarket by the station: chicken (とりにく) is half price until 8 p.m., and potatoes (じゃがいも) are cheap. You can stop there on the way home.\n• It's cold today and you'd like something warm, like curry or soup.\nYou don't know what's at home, so ask (なにが ある？) and explain your reasons with 〜んだ.",
+    "infoB": "What you know (card B):\n• You had pasta for lunch at work today (ひるに パスタを たべた), so you'd rather not have it again. Your partner doesn't know this.\n• The supermarket by the station: chicken (とりにく) is half price until 8 p.m., and potatoes (じゃがいも) are cheap. You can stop there on the way home.\n• It's cold today and you'd like something warm, like curry or soup.\nYou don't know what's at home, so ask (なにが ある？) and explain your reasons with 〜んだ.",
     "targets": [
       "grammar:volitional",
       "grammar:yori-hou",

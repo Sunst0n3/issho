@@ -2,105 +2,109 @@
   "id": "st-l0-22",
   "level": "L0",
   "unit": 13,
-  "title": "Tom's Curry",
-  "titleJp": "トムの カレー",
+  "title": "Ken Cooks Tonight",
+  "titleJp": "{今日|きょう}は ケンが {作|つく}る",
   "topic": "food",
   "grammar": [
     "naide-kudasai",
     "n-desu",
-    "volitional",
-    "mou-mada",
     "te-kudasai",
     "kara-because",
     "kedo-but",
+    "to-iu",
     "te-form",
-    "casual-speech"
+    "casual-speech",
+    "adverbs-frequency"
   ],
   "sentences": [
     {
-      "jp": "{今日|きょう}は／エマの／{誕生日|たんじょうび}です。",
-      "en": "Today is Emma's birthday."
+      "jp": "{金曜日|きんようび}の／{晩|ばん}ご{飯|はん}は、／いつも／エマが／{作|つく}ります。",
+      "en": "Emma always makes dinner on Fridays."
     },
     {
-      "jp": "{晩|ばん}ご{飯|はん}は／トムが／{作|つく}ります。",
-      "en": "Tom is making dinner."
+      "jp": "でも、／{今日|きょう}は／ケンが／「ぼくが／{作|つく}るよ。」と／{言|い}いました。",
+      "en": "But today, Ken said, \"I'll cook.\""
     },
     {
-      "jp": "でも、／トムは／{料理|りょうり}が／{苦手|にがて}です。",
-      "en": "But Tom is bad at cooking."
+      "jp": "メニューは、／{魚|さかな}と／みそしるです。",
+      "en": "On the menu: fish and miso soup."
     },
     {
-      "jp": "「{僕|ぼく}が／カレーを／{作|つく}るよ。／エマは／{座|すわ}っていて。」",
-      "en": "\"I'll make curry. You just sit down.\""
+      "jp": "ケンは／りょうりが／にがてです。",
+      "en": "Ken isn't much of a cook."
     },
     {
-      "jp": "エマは／ソファーに／{座|すわ}りました。",
-      "en": "Emma sat down on the sofa."
+      "jp": "「エマは／すわっていて。」",
+      "en": "\"You just sit down.\""
     },
     {
-      "jp": "でも、／{台所|だいどころ}が／{心配|しんぱい}でした。",
-      "en": "But she was worried about the kitchen."
+      "jp": "でも、／エマは／しんぱいでした。",
+      "en": "But Emma was worried."
     },
     {
-      "jp": "「よし、／{作|つく}ろう！」",
-      "en": "\"Right, let's do this!\""
+      "jp": "ケンは／とうふを／{切|き}りました。",
+      "en": "Ken cut up the tofu."
     },
     {
-      "jp": "トムは／{包丁|ほうちょう}で／じゃがいもと／にんじんを／{切|き}りました。",
-      "en": "Tom cut up the potatoes and carrots with a knife."
+      "jp": "エマは／つい／だいどころに／{来|き}ました。",
+      "en": "Emma couldn't help coming into the kitchen."
     },
     {
-      "jp": "エマが／{台所|だいどころ}に／{来|き}ました。",
-      "en": "Emma came into the kitchen."
+      "jp": "「{指|ゆび}を／{切|き}らないでね！」",
+      "en": "\"Don't cut your finger!\""
     },
     {
-      "jp": "「あ、／{指|ゆび}を／{切|き}らないでね！」",
-      "en": "\"Oh, don't cut your finger!\""
-    },
-    {
-      "jp": "それから、／トムは／フライパンで／{肉|にく}を／{焼|や}きました。",
-      "en": "Then Tom browned the meat in a frying pan."
+      "jp": "それから、／ケンは／フライパンで／{魚|さかな}を／やきました。",
+      "en": "Then Ken cooked the fish in the frying pan."
     },
     {
       "jp": "「その／フライパン、／{熱|あつ}いから、／{気|き}をつけてね！」",
       "en": "\"That pan is hot, so be careful!\""
     },
     {
-      "jp": "トムが／{塩|しお}を／{取|と}りました。",
-      "en": "Tom picked up the salt."
+      "jp": "ケンが／みそを／{取|と}りました。",
+      "en": "Ken picked up the miso."
     },
     {
-      "jp": "「まだ／{塩|しお}を／{入|い}れないで！／{最後|さいご}に／{入|い}れるんだよ。」",
-      "en": "\"Don't add the salt yet! It goes in at the end.\""
+      "jp": "「まだ／みそを／{入|い}れないで！／みそは／{最後|さいご}に／{入|い}れるんだよ。」",
+      "en": "\"Don't put the miso in yet! Miso goes in at the end.\""
     },
     {
-      "jp": "「エマ、／{今日|きょう}は／{僕|ぼく}が／{作|つく}るんだよ！」",
-      "en": "\"Emma, I'm the one cooking today!\""
+      "jp": "「エマ、／おねがい！／だいどころに／{来|こ}ないで！」",
+      "en": "\"Emma, please! Don't come into the kitchen!\""
     },
     {
-      "jp": "{二人|ふたり}は／{笑|わら}いました。",
-      "en": "They both laughed."
+      "jp": "「{今日|きょう}は／ぼくが／{作|つく}るんだよ！」",
+      "en": "\"I'm the one cooking today!\""
     },
     {
-      "jp": "{八時|はちじ}に、／カレーが／できました。",
-      "en": "At eight, the curry was ready."
+      "jp": "エマは／わらって、／ソファーに／もどりました。",
+      "en": "Emma laughed and went back to the sofa."
     },
     {
-      "jp": "{少|すこ}し／{辛|から}かったけど、／エマは／{全部|ぜんぶ}／{食|た}べました。",
-      "en": "It was a little spicy, but Emma ate it all."
+      "jp": "だいどころで／ケンが／「あ、／しまった！」と／{言|い}いました。",
+      "en": "In the kitchen, Ken cried, \"Oh no!\""
     },
     {
-      "jp": "「おいしい！／また／{作|つく}ってね。」",
-      "en": "\"Delicious! Make it again sometime.\""
+      "jp": "{八時|はちじ}に、／ご{飯|はん}が／できました。",
+      "en": "At eight, dinner was ready."
+    },
+    {
+      "jp": "{魚|さかな}は／{少|すこ}し／{黒|くろ}かったけど、／みそしるは／とても／おいしかったです。",
+      "en": "The fish was a little burnt, but the miso soup was delicious."
+    },
+    {
+      "jp": "「さいこう！／また／{作|つく}ってね。」",
+      "en": "\"Amazing! Make it again sometime.\""
     }
   ],
   "gist": {
-    "q": "Why did Tom make dinner?",
+    "q": "Why did Ken ask Emma not to come into the kitchen?",
     "options": [
-      "Emma was sick",
-      "He loves cooking",
-      "It was Emma's birthday"
+      "He wanted to do the cooking himself",
+      "The kitchen was too hot",
+      "He was making her a surprise cake"
     ],
-    "answer": 2
+    "answer": 0
   }
 }

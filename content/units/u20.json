@@ -17,7 +17,7 @@
       "text": "Shop for clothes: say what's too big, too long or too expensive, and ask for a different one (a smaller one, the blue one).",
       "check": {
         "kind": "speak",
-        "instructions": "You're trying on clothes in a shop. The clerk (the AI or your partner) says the three lines below. Answer each politely: say what's wrong with 〜すぎる and ask for a different one with の.",
+        "instructions": "You're trying on clothes in a shop. The clerk (the AI or your partner) says the three lines below. Answer politely: say what's wrong with 〜すぎる, ask for a different one with の, and say which colour you'd like.",
         "material": "いかがですか。\nこちらのコートは{三万円|さんまんえん}です。\n{色|いろ}は{何色|なにいろ}がいいですか。",
         "questions": [],
         "rubric": [
@@ -102,7 +102,7 @@
       "check": {
         "kind": "read",
         "instructions": "You're 170 cm tall and usually wear a size M. Read the size chart and care label on a coat you like, then answer the questions.",
-        "material": "コートのサイズ\nS：{背|せ} 155〜165cm\nM：{背|せ} 165〜175cm\nL：{背|せ} 175〜185cm\n※このコートは{少|すこ}し{小|ちい}さいので、いつもより{一|ひと}つ{大|おお}きいサイズを{選|えら}んでください。\n【{洗|あら}うとき】\n{洗濯機|せんたくき}は{使|つか}わないでください。{水|みず}で、{手|て}で{洗|あら}ってください。\n{白|しろ}い{服|ふく}と{一緒|いっしょ}に{洗|あら}わないでください。",
+        "material": "コートのサイズ\nS：{背|せ} 155〜165cm\nM：{背|せ} 165〜175cm\nL：{背|せ} 175〜185cm\n※このコートは{少|すこ}し{小|ちい}さいので、いつもより{一|ひと}つ{大|おお}きいサイズを{選|えら}んでください。\n【{洗|あら}うとき】\n{洗濯機|せんたくき}は{使|つか}わないでください。{手|て}で{洗|あら}ってください。\n{白|しろ}い{服|ふく}と{一緒|いっしょ}に{洗|あら}わないでください。",
         "questions": [
           {
             "q": "Which size should you buy?",
@@ -117,7 +117,7 @@
             "q": "How should you wash this coat?",
             "options": [
               "In the washing machine on a gentle setting",
-              "By hand, in water",
+              "By hand",
               "Only at the dry cleaner's"
             ],
             "answer": 1
@@ -158,7 +158,7 @@
       "core:cw-1222"
     ],
     "register": "mixed",
-    "twist": "Now B is the buyer and you're shopping for shoes (くつ) with a ¥8,000 budget. The clerk says the size B wants is sold out (うりきれ), so ask for a different one; A gives the honest advice.",
+    "twist": "Now B is the buyer and you're shopping for shoes (くつ) with a ¥8,000 budget. The clerk says they no longer have the size B wants (その サイズは もう ありません), so ask for a different one; A gives the honest advice.",
     "aiRole": "Clothes-shop clerk (てんいん): welcomes you, suggests coats, says きてみてください (please try it on), offers a bigger, smaller or different-coloured one, mentions the 20% sale, and answers questions about price and size in polite shop Japanese.",
     "scripted": [
       {

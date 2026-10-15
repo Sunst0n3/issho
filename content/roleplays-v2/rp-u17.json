@@ -57,7 +57,7 @@
       "jp": "じゃあ、お{茶|ちゃ}を{飲|の}みながら{書|か}いて。{温|あたた}かいお{茶|ちゃ}、{入|い}れるね。",
       "en": "Then drink some tea while you write it. I'll make you a hot cup.",
       "hint": "〜ながら = while: one person doing two things at once.",
-      "cue": "tea · while writing · I’ll make"
+      "cue": "tea · while writing · I'll make"
     },
     {
       "role": "b",
@@ -67,7 +67,7 @@
     },
     {
       "role": "a",
-      "jp": "うん。{無理|むり}しないでね。お{大事|だいじ}に。",
+      "jp": "うん。{無理|むり}しないでね。お{大事|だいじ}にね。",
       "en": "Okay. Don't overdo it. Take care of yourself.",
       "cue": "don't overdo it · take care"
     }

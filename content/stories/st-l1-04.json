@@ -13,9 +13,10 @@
     "tte-quote",
     "hou-ga-ii",
     "naide-kudasai",
-    "no-ga-suki",
     "volitional",
-    "yori-hou"
+    "yori-hou",
+    "adj-naru",
+    "n-desu"
   ],
   "sentences": [
     {
@@ -39,8 +40,12 @@
       "en": "Sometimes he gets headaches too."
     },
     {
+      "jp": "{仕事|しごと}の／ストレスも／{増|ふ}えました。",
+      "en": "His stress at work has gone up, too."
+    },
+    {
       "jp": "ミキは／{心配|しんぱい}して、／「{一度|いちど}／{病院|びょういん}に／{行|い}ったほうが／いいよ。」と／{言|い}いました。",
-      "en": "Miki was worried and said, \"You should go to the doctor once.\""
+      "en": "Miki was worried and said, \"You should go to the doctor.\""
     },
     {
       "jp": "{土曜日|どようび}、／ケンは／{病院|びょういん}に／{行|い}きました。",
@@ -51,8 +56,12 @@
       "en": "The doctor listened to Ken and said:"
     },
     {
-      "jp": "「{病気|びょうき}では／ないでしょう。／でも、／もっと／{運動|うんどう}しなければなりませんね。」",
-      "en": "\"It's probably not an illness. But you need to get more exercise.\""
+      "jp": "「{病気|びょうき}では／ないでしょう。／でも、／{運動|うんどう}が／{足|た}りないんですね。」",
+      "en": "\"It's probably not an illness. But you're not getting enough exercise.\""
+    },
+    {
+      "jp": "「もっと／{運動|うんどう}しなければなりません。」",
+      "en": "\"You need to exercise more.\""
     },
     {
       "jp": "「それから、／{夜|よる}は／{早|はや}く／{寝|ね}て／ください。」",
@@ -67,12 +76,12 @@
       "en": "\"You don't need medicine. Walking every day is the best medicine.\""
     },
     {
-      "jp": "{家|いえ}に／{帰|かえ}って、／ケンは／ミキに／{話|はな}しました。",
-      "en": "When he got home, Ken told Miki."
+      "jp": "{家|いえ}に／{帰|かえ}って、／ケンは／ミキに／{伝|つた}えました。",
+      "en": "When he got home, Ken told Miki what the doctor had said."
     },
     {
-      "jp": "「{毎日|まいにち}／{歩|ある}かなければならないって。」",
-      "en": "\"He says I have to walk every day.\""
+      "jp": "「{毎日|まいにち}／{歩|ある}かなければならないって。／めんどうくさいなあ。」",
+      "en": "\"He says I have to walk every day. What a pain.\""
     },
     {
       "jp": "「じゃあ、／{一緒|いっしょ}に／{歩|ある}こう！／{晩|ばん}ご{飯|はん}の／{後|あと}で。」",
@@ -87,32 +96,40 @@
       "en": "When they go for their walk, they leave their phones at home."
     },
     {
-      "jp": "{川|かわ}の／{横|よこ}の／{道|みち}を／ゆっくり／{歩|ある}きます。",
-      "en": "They walk slowly along the river."
+      "jp": "{川|かわ}の／そばの／{道|みち}を／ゆっくり／{歩|ある}きます。",
+      "en": "They walk slowly along the path by the river."
     },
     {
       "jp": "{歩|ある}きながら、／{仕事|しごと}の／{話|はなし}や／{週末|しゅうまつ}の／{予定|よてい}を／{話|はな}します。",
       "en": "While they walk, they talk about work and their plans for the weekend."
     },
     {
-      "jp": "ときどき／{猫|ねこ}に／{会|あ}います。／{月|つき}も／きれいです。",
-      "en": "Sometimes they meet a cat. The moon is beautiful, too."
+      "jp": "ときどき／{猫|ねこ}に／{会|あ}います。",
+      "en": "Sometimes they meet a cat."
     },
     {
-      "jp": "{一|いっ}か{月|げつ}／{歩|ある}いて、／ケンの／{肩|かた}と／{腰|こし}は／{前|まえ}より／ずっと／よく／なりました。",
-      "en": "After a month of walking, Ken's shoulders and back were much better than before."
+      "jp": "{川|かわ}の／{上|うえ}に、／{月|つき}が／きれいに／{見|み}えます。",
+      "en": "The moon looks beautiful above the river."
     },
     {
-      "jp": "{夜|よる}も／ぐっすり／{寝|ね}ています。",
-      "en": "He sleeps soundly at night, too."
+      "jp": "{一|いっ}か{月|げつ}／{続|つづ}けて、／ケンの／{体|からだ}は／{変|か}わりました。",
+      "en": "After keeping it up for a month, Ken's body had changed."
+    },
+    {
+      "jp": "{肩|かた}と／{腰|こし}は／{前|まえ}より／ずっと／よく／なりました。",
+      "en": "His shoulders and back were much better than before."
+    },
+    {
+      "jp": "{少|すこ}し／{痩|や}せて、／{夜|よる}も／ぐっすり／{眠|ねむ}っています。",
+      "en": "He has lost a little weight, and he sleeps soundly at night."
     },
     {
       "jp": "「あの／{先生|せんせい}は／すごいね。」と／ケンが／{言|い}いました。",
       "en": "\"That doctor is amazing,\" Ken said."
     },
     {
-      "jp": "「うん。／でも、／いちばんの／{薬|くすり}は、／{二人|ふたり}の／{散歩|さんぽ}だね。」",
-      "en": "\"Yes. But the best medicine is our walks together.\""
+      "jp": "「うん。／でも、／いちばんの／{薬|くすり}は、／{二人|ふたり}の／{散歩|さんぽ}だね。／これからも／{続|つづ}けよう。」",
+      "en": "\"Yes. But the best medicine is our walks together. Let's keep them up.\""
     }
   ],
   "gist": {

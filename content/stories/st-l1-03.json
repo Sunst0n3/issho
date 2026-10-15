@@ -11,6 +11,7 @@
     "deshou",
     "nagara",
     "hou-ga-ii",
+    "naide-kudasai",
     "temo-ii",
     "dake-shika",
     "adj-naru",
@@ -23,24 +24,32 @@
       "en": "On Monday morning, Miki just wouldn't get up."
     },
     {
-      "jp": "「ミキ、／{大丈夫|だいじょうぶ}？／{顔|かお}が／{赤|あか}いよ。」",
-      "en": "\"Miki, are you okay? Your face is red.\""
+      "jp": "「ミキ、／{寝坊|ねぼう}したの？／{遅刻|ちこく}するよ。」",
+      "en": "\"Miki, did you oversleep? You'll be late.\""
     },
     {
-      "jp": "「{頭|あたま}が／{痛|いた}い…。／{喉|のど}も／{痛|いた}い。」",
-      "en": "\"My head hurts... My throat hurts too.\""
+      "jp": "「{気分|きぶん}が／{悪|わる}い…。／{頭|あたま}も／{喉|のど}も／{痛|いた}い。」",
+      "en": "\"I feel awful... My head and my throat hurt.\""
     },
     {
-      "jp": "{熱|ねつ}も／ありました。／{三十八度|さんじゅうはちど}です。",
-      "en": "She had a fever too: thirty-eight degrees."
+      "jp": "ミキの／{顔|かお}は／{赤|あか}くて、／{熱|ねつ}も／ありました。",
+      "en": "Miki's face was red, and she had a fever too."
     },
     {
-      "jp": "「たぶん／{風邪|かぜ}だろうね。／{今日|きょう}は／{休|やす}んだほうが／いいよ。」",
-      "en": "\"It's probably a cold. You should rest today.\""
+      "jp": "{三十八度|さんじゅうはちど}でした。",
+      "en": "It was thirty-eight degrees."
     },
     {
-      "jp": "ミキは／{会社|かいしゃ}に／{電話|でんわ}しなければなりませんでした。",
-      "en": "Miki had to phone her office."
+      "jp": "「たぶん／{風邪|かぜ}だろうね。／{我慢|がまん}しないで、／{今日|きょう}は／{休|やす}んだほうが／いいよ。」",
+      "en": "\"It's probably a cold. Don't push yourself — you should rest today.\""
+    },
+    {
+      "jp": "{会社|かいしゃ}にも／{連絡|れんらく}しなければ／なりませんでした。",
+      "en": "They also had to let her office know."
+    },
+    {
+      "jp": "ケンが／{電話|でんわ}を／かけて、／ミキの／{上司|じょうし}に／{伝|つた}えました。",
+      "en": "Ken made the call and passed the message on to Miki's boss."
     },
     {
       "jp": "ケンは／{今日|きょう}、／うちで／{仕事|しごと}を／します。",
@@ -51,8 +60,8 @@
       "en": "Ken went quietly to the kitchen and made some warm udon."
     },
     {
-      "jp": "「ゆっくり／{食|た}べてね。」",
-      "en": "\"Eat slowly, okay?\""
+      "jp": "「ゆっくり／{食|た}べてね。／{残|のこ}しても／いいよ。」",
+      "en": "\"Eat slowly. It's okay to leave some.\""
     },
     {
       "jp": "ミキは／{少|すこ}し／{食|た}べて、／ベッドに／{戻|もど}りました。",
@@ -63,6 +72,10 @@
       "en": "In the afternoon, they went to a clinic nearby."
     },
     {
+      "jp": "{病院|びょういん}では／{人|ひと}が／たくさん／{待|ま}っていました。",
+      "en": "Lots of people were waiting at the clinic."
+    },
+    {
       "jp": "{先生|せんせい}は／「{風邪|かぜ}でしょう。／{三日|みっか}ぐらいで／{治|なお}りますよ。」と／{言|い}いました。",
       "en": "The doctor said, \"It's probably a cold. It should get better in about three days.\""
     },
@@ -71,7 +84,7 @@
       "en": "\"Please take this medicine three times a day, after meals.\""
     },
     {
-      "jp": "「それから、／{暖|あたた}かく／して、／よく／{寝|ね}なければなりません。」",
+      "jp": "「それから、／{暖|あたた}かく／して、／よく／{眠|ねむ}らなければなりません。」",
       "en": "\"Also, you must keep warm and get plenty of sleep.\""
     },
     {
@@ -79,16 +92,16 @@
       "en": "\"Is it okay to have a bath?\" Miki asked."
     },
     {
-      "jp": "「{今日|きょう}は／{入|はい}らないほうが／いいでしょう。」",
-      "en": "\"It's probably better not to today.\""
+      "jp": "「{熱|ねつ}が／{下|さ}がるまで、／{入|はい}らないほうが／いいでしょう。」",
+      "en": "\"It's probably better not to until your fever goes down.\""
     },
     {
-      "jp": "{家|いえ}に／{帰|かえ}って、／ミキは／{薬|くすり}を／{飲|の}んで、／すぐ／{寝|ね}ました。",
-      "en": "When they got home, Miki took her medicine and went straight to sleep."
+      "jp": "{家|いえ}に／{帰|かえ}って、／ミキは／{薬|くすり}を／{飲|の}んで、／すぐ／{眠|ねむ}りました。",
+      "en": "When they got home, Miki took her medicine and fell asleep straight away."
     },
     {
-      "jp": "ケンは／パソコンで／{仕事|しごと}を／しながら、／ときどき／ミキの／{部屋|へや}を／{見|み}に／{行|い}きました。",
-      "en": "While Ken worked on his computer, he went to check on Miki's room now and then."
+      "jp": "ケンは／パソコンで／{仕事|しごと}を／しながら、／ときどき／ミキの／{顔|かお}を／{見|み}に／{行|い}きました。",
+      "en": "While Ken worked on his computer, he went to check on Miki now and then."
     },
     {
       "jp": "{夜|よる}、／ミキが／{起|お}きてきました。",
@@ -99,8 +112,8 @@
       "en": "\"I'm hungry...\""
     },
     {
-      "jp": "「よかった！／{少|すこ}し／{元気|げんき}に／なったね。」",
-      "en": "\"That's great! You're feeling a bit better.\""
+      "jp": "「よかった！／{熱|ねつ}が／{下|さ}がって、／{少|すこ}し／{元気|げんき}に／なったね。」",
+      "en": "\"That's great! Your fever's gone down and you're a bit better.\""
     },
     {
       "jp": "ケンは／また／うどんを／{作|つく}りました。",
@@ -115,8 +128,8 @@
       "en": "\"Sorry. Udon is the only dish I'm good at.\""
     },
     {
-      "jp": "ミキは／{笑|わら}って、／{全部|ぜんぶ}／{食|た}べました。",
-      "en": "Miki laughed and ate it all."
+      "jp": "ミキは／{笑|わら}って、／{今度|こんど}は／{全部|ぜんぶ}／{食|た}べました。",
+      "en": "Miki laughed, and this time she ate it all."
     },
     {
       "jp": "{木曜日|もくようび}、／ミキの／{風邪|かぜ}は／{治|なお}りました。",
@@ -127,8 +140,8 @@
       "en": "But now Ken is coughing."
     },
     {
-      "jp": "「ケン、／{大丈夫|だいじょうぶ}？／{今日|きょう}は／{私|わたし}が／うどんを／{作|つく}るね。」",
-      "en": "\"Ken, are you okay? Today I'll make the udon.\""
+      "jp": "「かわいそうに…。／{今日|きょう}は／{私|わたし}が／うどんを／{作|つく}るね。」",
+      "en": "\"Poor thing... Today I'll make the udon.\""
     }
   ],
   "gist": {

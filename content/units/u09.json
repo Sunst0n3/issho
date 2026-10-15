@@ -35,7 +35,7 @@
       "check": {
         "kind": "read",
         "instructions": "A friend sent you and your partner this message. Read it and answer the questions.",
-        "material": "こんにちは！ {来月|らいげつ}の{十四日|じゅうよっか}（{土曜日|どようび}）は{夫|おっと}の{誕生日|たんじょうび}です。\n{夜|よる}{七時|しちじ}から、うちで{晩|ばん}ご{飯|はん}を{食|た}べます。ケーキもありますよ。\n{二人|ふたり}も{来|き}ませんか。{駅|えき}から{歩|ある}いて{五分|ごふん}です。\n{来|く}る？ {来|こ}ない？ メッセージ{待|ま}ってるね！",
+        "material": "こんにちは！ {来月|らいげつ}の{十四日|じゅうよっか}（{土曜日|どようび}）は{夫|おっと}の{誕生日|たんじょうび}！\n{夜|よる}{七時|しちじ}から、うちで{晩|ばん}ご{飯|はん}を{食|た}べるよ。ケーキもある。\n{二人|ふたり}も{来|こ}ない？ うちは{駅|えき}から{歩|ある}いて{五分|ごふん}だよ。\nメッセージ{待|ま}ってるね！",
         "questions": [
           {
             "q": "What day of the week is the dinner?",
@@ -56,11 +56,11 @@
             "answer": 0
           },
           {
-            "q": "What time does dinner start?",
+            "q": "What date is the dinner?",
             "options": [
-              "6:00",
-              "8:00",
-              "7:00"
+              "The 4th of next month",
+              "The 14th of this month",
+              "The 14th of next month"
             ],
             "answer": 2
           }
@@ -89,7 +89,7 @@
       "check": {
         "kind": "listen",
         "instructions": "Your partner is telling you about their day. Listen (twice if you like) and answer the questions.",
-        "material": "{今日|きょう}は{大変|たいへん}だった！ {朝|あさ}、{雨|あめ}が{降|ふ}ってたから、バスで{会社|かいしゃ}に{行|い}った。でも、バスがすごく{遅|おそ}かった。{昼|ひる}は{忙|いそが}しかったから、{昼|ひる}ご{飯|はん}を{食|た}べなかった。{仕事|しごと}の{後|あと}、{駅|えき}のコンビニにおにぎりを{買|か}いに{行|い}った。{今|いま}はちょっと{元気|げんき}だよ！",
+        "material": "{今日|きょう}は{大変|たいへん}だった！ {朝|あさ}、{雨|あめ}が{降|ふ}ってたから、バスで{会社|かいしゃ}に{行|い}った。でも、バスがすごく{遅|おそ}かった。{昼|ひる}は{忙|いそが}しかったから、{昼|ひる}ご{飯|はん}を{食|た}べなかった。{夕方|ゆうがた}、{駅|えき}のコンビニにおにぎりを{買|か}いに{行|い}った。でも、{今|いま}は{元気|げんき}だよ！",
         "questions": [
           {
             "q": "How did they get to work, and why?",
@@ -110,7 +110,7 @@
             "answer": 1
           },
           {
-            "q": "What did they do after work?",
+            "q": "What did they do in the early evening?",
             "options": [
               "Met a friend at the station",
               "Took a taxi home",
@@ -145,7 +145,7 @@
       "core:cw-0447"
     ],
     "register": "plain",
-    "twist": "Repeat it 2–7 days later for a birthday instead: card A's free days change (the 17th is now taken by work), card B's restaurant list adds a new closing day, and you also decide what present to go out and buy (プレゼントを買いに行く).",
+    "twist": "Repeat it 2–7 days later for a birthday dinner instead: on card A the 17th is now taken by work (仕事), so find another evening you are both free and a restaurant that is open that day. Also decide what present to go out and buy first (プレゼントを買いに行く).",
     "scripted": [
       {
         "role": "a",
@@ -184,7 +184,7 @@
       },
       {
         "role": "b",
-        "jp": "{駅|えき}の{近|ちか}くの{寿司|すし}の{店|みせ}は、{金曜日|きんようび}が{定休日|ていきゅうび}だよ。",
+        "jp": "{駅|えき}の{近|ちか}くの{寿司|すし}の{店|みせ}、{定休日|ていきゅうび}は{金曜日|きんようび}だよ。",
         "en": "The sushi place near the station is closed on Fridays."
       },
       {
@@ -194,8 +194,8 @@
       },
       {
         "role": "b",
-        "jp": "{天|てん}ぷらの{店|みせ}は{土曜日|どようび}と{日曜日|にちようび}が{休|やす}み。{金曜日|きんようび}は{大丈夫|だいじょうぶ}。",
-        "en": "The tempura place is closed on Saturdays and Sundays, so Friday's fine."
+        "jp": "{休|やす}みは{土曜日|どようび}と{日曜日|にちようび}。{金曜日|きんようび}は{大丈夫|だいじょうぶ}だよ。",
+        "en": "It's closed on Saturdays and Sundays, so Friday's fine."
       },
       {
         "role": "a",

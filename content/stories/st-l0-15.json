@@ -3,105 +3,119 @@
   "level": "L0",
   "unit": 11,
   "title": "Two Kinds of Sunday",
-  "titleJp": "{日曜日|にちようび}の {朝|あさ}",
-  "topic": "free time",
+  "titleJp": "ふたりの {日曜日|にちようび}",
+  "topic": "hobbies",
   "grammar": [
     "no-ga-suki",
+    "tewa-ikenai",
     "te-kara",
     "relative-clauses",
     "kedo-but",
     "casual-speech",
     "nai-form",
-    "he-direction",
     "ni-iku-purpose",
-    "te-imasu",
     "tai-want",
-    "adjective-past"
+    "te-imasu",
+    "adjective-past",
+    "casual-past",
+    "te-form"
   ],
   "sentences": [
     {
-      "jp": "{日曜日|にちようび}の／{朝|あさ}です。",
-      "en": "It's Sunday morning."
+      "jp": "ケンは／{走|はし}るのが／{大好|だいす}きです。",
+      "en": "Ken loves running."
     },
     {
-      "jp": "{夫|おっと}は／{走|はし}るのが／{好|す}きです。",
-      "en": "My husband likes running."
+      "jp": "{毎週|まいしゅう}／{日曜日|にちようび}の{朝|あさ}、／こうえんを／{走|はし}ります。",
+      "en": "Every Sunday morning, he runs in the park."
     },
     {
-      "jp": "{毎週|まいしゅう}、／{日曜日|にちようび}の{朝|あさ}は／{公園|こうえん}を／{走|はし}ります。",
-      "en": "Every Sunday morning he goes running in the park."
+      "jp": "エマは／ねるのが／{大好|だいす}きです。",
+      "en": "Emma loves sleeping."
     },
     {
-      "jp": "わたしは／{寝|ね}るのが／{好|す}きです。",
-      "en": "I like sleeping."
+      "jp": "{日曜日|にちようび}の{朝|あさ}は、／{十時|じゅうじ}まで／ねます。",
+      "en": "On Sunday mornings, she sleeps until ten."
     },
     {
-      "jp": "{日曜日|にちようび}の{朝|あさ}は、／ベッドで／ゆっくり／{寝|ね}ます。",
-      "en": "On Sunday mornings I have a nice long sleep in bed."
+      "jp": "{日曜日|にちようび}の{朝|あさ}、／エマを／おこしては／いけません。",
+      "en": "On a Sunday morning, you must not wake Emma up."
     },
     {
-      "jp": "「いっしょに／{走|はし}らない？」",
-      "en": "\"Want to come running with me?\""
+      "jp": "ふたりの／やくそくです。",
+      "en": "That's the deal between them."
     },
     {
-      "jp": "「{走|はし}るのは／ちょっと……。／でも、／{走|はし}ってから、／カフェに／{行|い}かない？」",
-      "en": "\"Running's not really my thing… But after your run, shall we go to a café?\""
+      "jp": "でも、／{先週|せんしゅう}の／{日曜日|にちようび}、／ケンは／{八時|はちじ}に／エマを／おこしました。",
+      "en": "But last Sunday, Ken woke Emma at eight."
     },
     {
-      "jp": "「いいね！」",
-      "en": "\"Sounds good!\""
+      "jp": "「エマ、／{今日|きょう}は／{天気|てんき}が／いいよ。／いっしょに／{走|はし}らない？」",
+      "en": "\"Emma, it's a lovely day. Want to come running with me?\""
     },
     {
-      "jp": "{夫|おっと}は／{公園|こうえん}へ／{行|い}きました。",
-      "en": "My husband set off for the park."
+      "jp": "「やくそくは？／{走|はし}るのは／にがて……。」",
+      "en": "\"What about our deal? Running isn't my thing...\""
     },
     {
-      "jp": "わたしは／もう{少|すこ}し／{寝|ね}ました。",
-      "en": "I slept a little longer."
+      "jp": "「じゃあ、／ぼくが／{走|はし}ってから、／パン{屋|や}に／{行|い}かない？」",
+      "en": "\"Okay, then after my run, shall we go to the bakery?\""
     },
     {
-      "jp": "{夫|おっと}が／{帰|かえ}ってから、／{駅|えき}の{近|ちか}くの／カフェに／{行|い}きました。",
-      "en": "After he got home, we went to a café near the station."
+      "jp": "「……いいよ。」",
+      "en": "\"...Fine.\""
     },
     {
-      "jp": "{先月|せんげつ}／{見|み}つけた／{小|ちい}さい／カフェです。",
-      "en": "It's a little café we found last month."
+      "jp": "ケンは／{新|あたら}しい／くつで／{走|はし}りに／{行|い}きました。",
+      "en": "Ken went off for his run in his new shoes."
     },
     {
-      "jp": "{夫|おっと}は／パンを／{三|みっ}つ／{食|た}べました。",
-      "en": "My husband ate three rolls."
+      "jp": "エマは／もう{少|すこ}し／ねました。",
+      "en": "Emma slept a little longer."
     },
     {
-      "jp": "それから、／わたしが／{見|み}たかった／{映画|えいが}を／{見|み}に／{行|い}きました。",
-      "en": "After that, we went to see a movie I had wanted to see."
+      "jp": "ケンが／{帰|かえ}ってから、／ふたりは／{駅|えき}の{前|まえ}の／パン{屋|や}に／{行|い}きました。",
+      "en": "After Ken got back, they went to the bakery in front of the station."
     },
     {
-      "jp": "{映画|えいが}は／{少|すこ}し／{長|なが}かったけど、／とても／{面白|おもしろ}かったです。",
-      "en": "The movie was a little long, but really good."
+      "jp": "「のどが／かわいた！」",
+      "en": "\"I'm so thirsty!\""
     },
     {
-      "jp": "でも、／{夫|おっと}は／ずっと／{静|しず}かでした。",
-      "en": "But my husband was quiet the whole time."
+      "jp": "ケンは／{水|みず}を／たくさん／{飲|の}んで、／パンを／{三|みっ}つ／{食|た}べました。",
+      "en": "Ken drank lots of water and ate three rolls."
     },
     {
-      "jp": "{横|よこ}を／{見|み}ました。",
-      "en": "I looked over at him."
+      "jp": "それから、／エマが／{見|み}たかった／えいがを／{見|み}に／{行|い}きました。",
+      "en": "After that, they went to see a movie Emma had wanted to see."
     },
     {
-      "jp": "{夫|おっと}は／{寝|ね}ていました。",
-      "en": "He was asleep."
+      "jp": "えいがは／{長|なが}かったけど、／とても／おもしろかったです。",
+      "en": "The movie was long, but it was really good."
     },
     {
-      "jp": "{走|はし}るのが／{好|す}きな／{夫|おっと}も、／{寝|ね}るのが／{好|す}きです。",
-      "en": "So my husband, who loves running, likes sleeping too!"
+      "jp": "でも、／ケンは／ずっと／しずかでした。",
+      "en": "But Ken was quiet the whole time."
+    },
+    {
+      "jp": "エマは／よこを／{見|み}ました。",
+      "en": "Emma looked over at him."
+    },
+    {
+      "jp": "ケンは／ねていました！",
+      "en": "He was asleep!"
+    },
+    {
+      "jp": "{走|はし}るのが／{好|す}きな／ケンも、／ねるのが／{好|す}きです。",
+      "en": "Ken, who loves running, loves sleeping too."
     }
   ],
   "gist": {
     "q": "What happened at the movie?",
     "options": [
-      "The husband went running",
-      "The husband fell asleep",
-      "The wife said the movie was boring"
+      "Emma fell asleep",
+      "Ken fell asleep",
+      "Ken went running"
     ],
     "answer": 1
   }

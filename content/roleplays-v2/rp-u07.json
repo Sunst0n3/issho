@@ -30,7 +30,7 @@
       "role": "a",
       "jp": "ただいま！",
       "en": "I'm home!",
-      "cue": "I'm home"
+      "cue": "walk in · I'm home"
     },
     {
       "role": "b",
@@ -54,10 +54,10 @@
     },
     {
       "role": "a",
-      "jp": "ありがとう！ シャワーを{浴|あ}びて、すぐ{来|く}るね。",
-      "en": "Thanks! I'll have a quick shower and be right back.",
+      "jp": "ありがとう！ シャワーを{浴|あ}びて、すぐ{行|い}くね。",
+      "en": "Thanks! I'll have a quick shower and be right there.",
       "hint": "The て-form joins actions in order; the last verb sets the tense.",
-      "cue": "thanks · shower · right back"
+      "cue": "thanks · shower · right there"
     },
     {
       "role": "b",
@@ -76,7 +76,7 @@
       "jp": "ソファーの{上|うえ}にあるよ。",
       "en": "It's on the sofa.",
       "hint": "Reference point + の + position word + に ある.",
-      "cue": "on the sofa"
+      "cue": "phone · on the sofa"
     }
   ]
 }

@@ -31,7 +31,7 @@
       "role": "a",
       "jp": "ここ、いいですね。",
       "en": "This place is nice, isn't it?",
-      "hint": "ね asks your partner to agree.",
+      "hint": "ね asks your partner to agree. Couples usually talk casually; you will switch to casual forms in Units 6–7, and until then です and ます are fine.",
       "cue": "this place · nice"
     },
     {
@@ -50,14 +50,14 @@
     {
       "role": "b",
       "jp": "{四百円|よんひゃくえん}です。{食|た}べますか。",
-      "en": "It's 400 yen. Shall we have some?",
+      "en": "It's 400 yen. Do you want some?",
       "cue": "400 yen · eat?"
     },
     {
       "role": "a",
       "jp": "はい！ すみません、コーヒー、ふたつお{願|ねが}いします。ケーキもふたつ。",
       "en": "Yes! Excuse me, two coffees, please. And two pieces of cake.",
-      "hint": "At a counter, just say the item, the number and お願いします.",
+      "hint": "At a counter, just say the item, the number and おねがいします.",
       "cue": "yes · two coffees · two cakes"
     },
     {

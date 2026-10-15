@@ -15,7 +15,8 @@
     "shi-reasons",
     "ageru-morau",
     "te-imasu",
-    "ni-iku-purpose"
+    "ya-nado",
+    "node"
   ],
   "sentences": [
     {
@@ -23,8 +24,12 @@
       "en": "Last spring, a white cat came into the garden."
     },
     {
-      "jp": "{少|すこ}し／{太|ふと}った／{猫|ねこ}です。／{近所|きんじょ}の／{猫|ねこ}の／ようです。",
-      "en": "It was a slightly chubby cat. It seemed to be a cat from the neighbourhood."
+      "jp": "{少|すこ}し／{太|ふと}った／{猫|ねこ}です。",
+      "en": "It was a slightly chubby cat."
+    },
+    {
+      "jp": "{近所|きんじょ}の／{猫|ねこ}の／ようです。",
+      "en": "It seemed to be a cat from the neighbourhood."
     },
     {
       "jp": "{最初|さいしょ}、／{猫|ねこ}は／{庭|にわ}の／{木|き}の／{下|した}で／{寝|ね}る／だけでした。",
@@ -43,6 +48,10 @@
       "en": "When summer came, the cat started coming every day."
     },
     {
+      "jp": "ミキが／{庭|にわ}に／シャツや／タオルを／{干|ほ}すと、／{猫|ねこ}は／その／{下|した}で／{寝|ね}ます。",
+      "en": "When Miki hangs shirts and towels out to dry in the garden, the cat sleeps underneath them."
+    },
+    {
       "jp": "{秋|あき}には、／{窓|まど}の／{前|まえ}で／{待|ま}つように／なりました。",
       "en": "By autumn, it had started waiting in front of the window."
     },
@@ -53,6 +62,10 @@
     {
       "jp": "そして、／{冬|ふゆ}の／{寒|さむ}い／{日|ひ}、／{猫|ねこ}は／{初|はじ}めて／{家|いえ}の／{中|なか}に／{入|はい}ってきました。",
       "en": "Then, on a cold winter day, the cat came inside the house for the first time."
+    },
+    {
+      "jp": "{足|あし}が／{汚|よご}れていたので、／ミキが／タオルで／{拭|ふ}きました。",
+      "en": "Its paws were dirty, so Miki wiped them with a towel."
     },
     {
       "jp": "{猫|ねこ}は／こたつが／{大好|だいす}きな／ようです。",
@@ -71,7 +84,7 @@
       "en": "Because it is white, like snow."
     },
     {
-      "jp": "ある／{晩|ばん}、／ケンが／{言|い}いました。／「ユキに／{何|なに}か／{食|た}べ{物|もの}を／あげようか。」",
+      "jp": "ある／{晩|ばん}、／ケンが／「ユキに／{何|なに}か／{食|た}べ{物|もの}を／あげようか。」と／{言|い}いました。",
       "en": "One evening, Ken said, \"Shall we give Yuki something to eat?\""
     },
     {
@@ -83,20 +96,20 @@
       "en": "\"True. She is chubby, after all.\""
     },
     {
-      "jp": "{春|はる}に／なって、／ミキは／{近所|きんじょ}の／おばあさんの／{家|いえ}の／{前|まえ}を／{通|とお}りました。",
-      "en": "When spring came, Miki walked past an old lady's house in the neighbourhood."
+      "jp": "{春|はる}に／なって、／ミキは／{商店街|しょうてんがい}の／{八百屋|やおや}の／{前|まえ}を／{通|とお}りました。",
+      "en": "When spring came, Miki walked past the greengrocer's on the shopping street."
     },
     {
-      "jp": "{家|いえ}の／{前|まえ}に、／ユキが／いました。",
-      "en": "Yuki was in front of the house."
+      "jp": "{店|みせ}の／{真|ま}ん{中|なか}に、／ユキが／いました。",
+      "en": "Yuki was sitting right in the middle of the shop."
     },
     {
       "jp": "「あ、／その／{猫|ねこ}…。」",
       "en": "\"Oh, that cat...\""
     },
     {
-      "jp": "「うちの／{猫|ねこ}の／シロです。／{毎晩|まいばん}、／どこかへ／{行|い}くんですよ。」と／おばあさんが／{言|い}いました。",
-      "en": "\"This is our cat, Shiro. She goes off somewhere every night,\" the old lady said."
+      "jp": "「うちの／{猫|ねこ}の／シロです。／{毎晩|まいばん}、／どこかへ／{行|い}くんですよ。」と／{八百屋|やおや}の／おばあさんが／{言|い}いました。",
+      "en": "\"This is our cat, Shiro. She goes off somewhere every night,\" said the old lady who runs the shop."
     },
     {
       "jp": "ミキは／{笑|わら}って、／「{毎晩|まいばん}、／うちの／こたつで／{寝|ね}ていますよ。」と／{言|い}いました。",
@@ -123,7 +136,7 @@
     "q": "Who does the white cat really belong to?",
     "options": [
       "Ken and Miki",
-      "An old lady in the neighbourhood",
+      "The old lady at the greengrocer's",
       "Nobody — it is a stray cat"
     ],
     "answer": 1

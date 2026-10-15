@@ -23,6 +23,10 @@
       "en": "Next week is Ken and Miki's wedding anniversary."
     },
     {
+      "jp": "{結婚式|けっこんしき}から、／ちょうど／{一年|いちねん}です。",
+      "en": "It will be exactly one year since their wedding."
+    },
+    {
       "jp": "{先週|せんしゅう}、／ミキは／{大好|だいす}きな／カップを／{割|わ}ってしまいました。",
       "en": "Last week, Miki broke her favourite mug."
     },
@@ -35,20 +39,24 @@
       "en": "\"I'll give Miki a new mug for our anniversary,\" Ken thought."
     },
     {
-      "jp": "{次|つぎ}の／{日|ひ}、／ケンは／{駅|えき}の／{近|ちか}くの／{小|ちい}さい／{店|みせ}に／{行|い}きました。",
-      "en": "The next day, Ken went to a small shop near the station."
+      "jp": "{土曜日|どようび}の／{朝|あさ}、／ケンは／{一人|ひとり}で／{駅|えき}の／{近|ちか}くの／{小|ちい}さい／{店|みせ}に／{寄|よ}りました。",
+      "en": "On Saturday morning, Ken dropped by a small shop near the station on his own."
     },
     {
       "jp": "{青|あお}くて／きれいな／カップが／ありました。",
       "en": "There was a pretty blue mug."
     },
     {
-      "jp": "「これを／ください。／プレゼントです。」",
+      "jp": "「これを／ください。／プレゼントなんです。」",
       "en": "\"I'll take this one, please. It's a present.\""
     },
     {
-      "jp": "その／{日|ひ}の／{午後|ごご}、／ミキも／{同|おな}じ／{店|みせ}に／{来|き}ました。",
-      "en": "That same afternoon, Miki came to the same shop."
+      "jp": "{店員|てんいん}さんは／カップを／きれいな／{箱|はこ}に／{入|い}れました。",
+      "en": "The shop assistant put the mug in a pretty box."
+    },
+    {
+      "jp": "その／{日|ひ}の／{午後|ごご}、／ミキも／{買|か}い{物|もの}の／{帰|かえ}りに、／{同|おな}じ／{店|みせ}に／{寄|よ}りました。",
+      "en": "That afternoon, on her way back from shopping, Miki dropped by the same shop."
     },
     {
       "jp": "ケンの／カップは、／もう／とても／{古|ふる}いです。",
@@ -103,8 +111,8 @@
       "en": "\"The mug I gave you, and the mug you gave me.\""
     },
     {
-      "jp": "「{二|ふた}つで／ちょうど／いいね。」",
-      "en": "\"Two of them — that's just right.\""
+      "jp": "「{両方|りょうほう}／{同|おな}じだけど、／{二|ふた}つで／ちょうど／いいね。」",
+      "en": "\"They're exactly the same, but as a pair they're just right.\""
     },
     {
       "jp": "「これで、／{毎朝|まいあさ}／{同|おな}じ／カップで／コーヒーが／{飲|の}めるね。」",

@@ -15,7 +15,9 @@
     "shi-reasons",
     "sugiru",
     "temo-ii",
-    "potential-form"
+    "potential-form",
+    "node",
+    "te-shimau"
   ],
   "sentences": [
     {
@@ -23,8 +25,8 @@
       "en": "Ken and Miki's apartment is close to the station and convenient."
     },
     {
-      "jp": "でも、／とても／{狭|せま}いです。",
-      "en": "But it is very small."
+      "jp": "でも、／かなり／{狭|せま}いです。",
+      "en": "But it is quite small."
     },
     {
       "jp": "{最近|さいきん}、／ミキは／うちで／{仕事|しごと}を／するように／なりました。",
@@ -63,7 +65,7 @@
       "en": "The first place was five minutes from the station."
     },
     {
-      "jp": "でも、／{家賃|やちん}が／{十五万円|じゅうごまんえん}です。",
+      "jp": "でも、／{家賃|やちん}が／{十五万円|じゅうごまんえん}でした。",
       "en": "But the rent was 150,000 yen."
     },
     {
@@ -71,16 +73,20 @@
       "en": "\"That's too expensive.\""
     },
     {
-      "jp": "{次|つぎ}の／{家|いえ}は／{安|やす}かったですが、／{暗|くら}くて、／{古|ふる}かったです。",
-      "en": "The next place was cheap, but it was dark and old."
+      "jp": "{次|つぎ}の／{家|いえ}は／{割|わり}と／{安|やす}かったですが、／{暗|くら}くて、／{古|ふる}かったです。",
+      "en": "The next place was fairly cheap, but it was dark and old."
     },
     {
       "jp": "{最後|さいご}の／{家|いえ}は、／{駅|えき}から／{歩|ある}いて／{二十分|にじゅっぷん}でした。",
       "en": "The last place was a twenty-minute walk from the station."
     },
     {
-      "jp": "{行|い}く／{途中|とちゅう}で、／{二人|ふたり}は／{雨|あめ}に／{降|ふ}られて、／{濡|ぬ}れてしまいました。",
-      "en": "On the way there, they got caught in the rain and got wet."
+      "jp": "{行|い}く／{途中|とちゅう}で、／{急|きゅう}に／{雨|あめ}が／{降|ふ}ってきました。",
+      "en": "On the way there, it suddenly started to rain."
+    },
+    {
+      "jp": "{二人|ふたり}は／{雨|あめ}に／{降|ふ}られて、／すっかり／{濡|ぬ}れてしまいました。",
+      "en": "They got caught in the rain and were soaked through."
     },
     {
       "jp": "でも、／その／{家|いえ}は／{明|あか}るくて、／{部屋|へや}が／{三|みっ}つ／ありました。",
@@ -92,7 +98,7 @@
     },
     {
       "jp": "「ここなら、／ミキの／{仕事|しごと}の／{部屋|へや}も／あるね。」",
-      "en": "\"If it's here, you'd have a room for your work too.\""
+      "en": "\"Here, you'd have a room for your work too.\""
     },
     {
       "jp": "「でも、／{駅|えき}まで／{二十分|にじゅっぷん}だよ。／{毎朝|まいあさ}、／{大変|たいへん}じゃない？」",
@@ -101,6 +107,14 @@
     {
       "jp": "「{雨|あめ}が／{降|ふ}っても、／{歩|ある}くよ。／いい／{運動|うんどう}になるし。」",
       "en": "\"I'll walk even if it rains. It'll be good exercise, too.\""
+    },
+    {
+      "jp": "{二人|ふたり}は／しばらく／{悩|なや}みました。",
+      "en": "The two of them thought it over for a while."
+    },
+    {
+      "jp": "でも、／{心|こころ}の／{中|なか}では、／もう／{決|き}まっていました。",
+      "en": "But in their hearts, they had already decided."
     },
     {
       "jp": "{二人|ふたり}は、／その／{家|いえ}に／{引|ひ}っ{越|こ}すことに／しました。",
@@ -115,12 +129,12 @@
       "en": "\"You're welcome to grow vegetables in the garden,\" the landlord said."
     },
     {
-      "jp": "{帰|かえ}りの／{電車|でんしゃ}で、／ミキが／{言|い}いました。／「{駅|えき}から／{遠|とお}くても、／いい／{家|いえ}だね。」",
-      "en": "On the train home, Miki said, \"Even if it's far from the station, it's a nice place.\""
+      "jp": "{帰|かえ}りの／{電車|でんしゃ}で、／ミキが／「{駅|えき}から／{遠|とお}くても、／いい／{家|いえ}だね。」と／{言|い}いました。",
+      "en": "On the train home, Miki said, \"It may be far from the station, but it's a nice place.\""
     },
     {
-      "jp": "「うん。／{新|あたら}しい／{自転車|じてんしゃ}も／{買|か}おう。／{今度|こんど}は／{庭|にわ}に／{置|お}けるね。」",
-      "en": "\"Yes. Let's buy a new bike too. This time we can keep it in the garden.\""
+      "jp": "「うん。／{新|あたら}しい／{自転車|じてんしゃ}も／{買|か}おう。／{今度|こんど}は／{庭|にわ}に／{置|お}けるから、／{盗|ぬす}まれないね。」",
+      "en": "\"Yes. Let's buy a new bike too. This time we can keep it in the garden, so it won't get stolen.\""
     }
   ],
   "gist": {

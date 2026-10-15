@@ -44,20 +44,20 @@
       "role": "b",
       "jp": "もう？ {七時半|しちじはん}にうちを{出|で}ます！",
       "en": "Already? I'm leaving home at seven thirty!",
-      "hint": "に after a clock time: 七時半に = at 7:30.",
+      "hint": "に after a clock time: しちじはんに = at 7:30.",
       "cue": "already · leave · 7:30"
     },
     {
       "role": "a",
-      "jp": "{朝|あさ}ご{飯|はん}は？ パン、{食|た}べますか。",
+      "jp": "{朝|あさ}ご{飯|はん}は？ パンを{食|た}べますか。",
       "en": "What about breakfast? Want some bread?",
       "cue": "breakfast · bread?"
     },
     {
       "role": "b",
-      "jp": "はい、ひとつください。コーヒーもお{願|ねが}いします。",
-      "en": "Yes, one, please. And a coffee, please.",
-      "cue": "yes · one · coffee too"
+      "jp": "はい、ひとつお{願|ねが}いします。あ、コーヒーも！",
+      "en": "Yes, one, please. Oh, and a coffee too!",
+      "cue": "yes · one please · coffee too"
     },
     {
       "role": "a",

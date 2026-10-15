@@ -34,7 +34,7 @@
       "text": "Write a few lines about your week: what you always, often, sometimes and never do.",
       "check": {
         "kind": "write",
-        "instructions": "Your partner sent you the message below. Reply with 4–5 sentences about your own week. Use at least three of いつも, よく, 時々 and たまに, and say one thing you hardly or never do (あまり / 全然 + 〜ません).",
+        "instructions": "A friend from your Japanese class sent you the message below. Reply with 4–5 sentences about your own week. Use at least three of いつも, よく, 時々 and たまに, and say one thing you hardly or never do (あまり / 全然 + 〜ません).",
         "material": "{私|わたし}は{毎朝|まいあさ}コーヒーを{飲|の}みます。{週末|しゅうまつ}はよく{散歩|さんぽ}します。{時々|ときどき}{映画|えいが}を{見|み}ます。ゲームは{全然|ぜんぜん}しません。あなたは？",
         "questions": [],
         "rubric": [
@@ -51,7 +51,7 @@
       "check": {
         "kind": "listen",
         "instructions": "Listen to a friend talking about a place she likes. You can play it twice. Then answer the questions.",
-        "material": "{私|わたし}の{家|いえ}の{近|ちか}くに{公園|こうえん}があります。あまり{大|おお}きくないです。でも、とてもきれいな{公園|こうえん}です。{朝|あさ}は{静|しず}かです。{私|わたし}は{毎朝|まいあさ}そこで{散歩|さんぽ}します。{週末|しゅうまつ}は{子|こ}どもがたくさんいます。{時々|ときどき}、{夫|おっと}と{一緒|いっしょ}にそこでお{弁当|べんとう}を{食|た}べます。{夏|なつ}はとても{暑|あつ}いです。{私|わたし}は{秋|あき}の{公園|こうえん}が{大好|だいす}きです。",
+        "material": "{私|わたし}の{家|いえ}の{近|ちか}くに{公園|こうえん}があります。{小|ちい}さいです。でも、きれいな{公園|こうえん}ですよ。{朝|あさ}は{静|しず}かです。{私|わたし}は{毎朝|まいあさ}そこで{散歩|さんぽ}します。{週末|しゅうまつ}は{子|こ}どもがたくさんいます。{時々|ときどき}、{夫|おっと}と{一緒|いっしょ}にそこでお{弁当|べんとう}を{食|た}べます。{夏|なつ}は{暑|あつ}いです。{私|わたし}は{秋|あき}の{公園|こうえん}が{大好|だいす}きです。",
         "questions": [
           {
             "q": "What is the park like in the morning?",
@@ -169,8 +169,8 @@
       },
       {
         "role": "b",
-        "jp": "えっと…ラーメンかカレーがいい。うちに{何|なに}がある？",
-        "en": "Hmm… ramen or curry. What have we got at home?"
+        "jp": "えっと…ラーメンかカレーを{食|た}べたい。うちに{何|なに}がある？",
+        "en": "Hmm… I feel like ramen or curry. What have we got at home?"
       },
       {
         "role": "a",

@@ -11,11 +11,12 @@
     "embedded-questions",
     "keigo-set-phrases",
     "koto-ni-suru",
+    "passive",
     "nagara",
     "node",
     "temo-ii",
     "potential-form",
-    "te-imasu"
+    "te-kureru"
   ],
   "sentences": [
     {
@@ -25,6 +26,10 @@
     {
       "jp": "ケンは、／{町|まち}で／{人気|にんき}の／レストランを／{予約|よやく}することに／しました。",
       "en": "Ken decided to book a popular restaurant in town."
+    },
+    {
+      "jp": "{同僚|どうりょう}が／{紹介|しょうかい}して／くれた／お{店|みせ}です。",
+      "en": "It's a place a coworker recommended to him."
     },
     {
       "jp": "ケンは／{少|すこ}し／{緊張|きんちょう}しながら、／{電話|でんわ}を／かけました。",
@@ -55,8 +60,8 @@
       "en": "\"Thank you for waiting. We have a table at seven.\""
     },
     {
-      "jp": "「よかった！／それから、／ケーキを／{持|も}って／{行|い}っても／いいか、／{聞|き}きたいんですが…。」",
-      "en": "\"Great! Also, I wanted to ask whether it's okay to bring a cake...\""
+      "jp": "「よかった！／それから、／ケーキを／{持|も}って／{行|い}っても／いいか、／{伺|うかが}いたいんですが…。」",
+      "en": "\"Great! Also, I wanted to ask whether it's all right to bring a cake...\""
     },
     {
       "jp": "「はい、／{大丈夫|だいじょうぶ}です。／{記念日|きねんび}で／いらっしゃいますか。」",
@@ -79,7 +84,7 @@
       "en": "\"Mr Yamada, the tenth at seven, for two people. Is that right?\""
     },
     {
-      "jp": "「はい。／あ、／{何時|なんじ}に／{閉|し}まるか、／{教|おし}えていただけますか。」",
+      "jp": "「はい。／あ、／{何時|なんじ}に／{閉|し}まるか、／{教|おし}えて／いただけますか。」",
       "en": "\"Yes. Oh, could you tell me what time you close?\""
     },
     {
@@ -107,7 +112,7 @@
       "en": "\"Sorry! I'm just about to leave the office!\""
     },
     {
-      "jp": "{少|すこ}し／{後|あと}で、／また／メッセージが／{来|き}ました。",
+      "jp": "{少|すこ}し／して、／また／メッセージが／{来|き}ました。",
       "en": "A little later, another message came."
     },
     {
@@ -123,12 +128,24 @@
       "en": "\"Someone else is coming, so I'll wait a little.\""
     },
     {
-      "jp": "{七時|しちじ}{半|はん}、／ミキが／{走|はし}って／{来|き}ました。／「お{待|ま}たせ！」",
-      "en": "At half past seven, Miki came running in. \"Sorry to keep you waiting!\""
+      "jp": "「かしこまりました。」",
+      "en": "\"Certainly.\""
+    },
+    {
+      "jp": "{七時|しちじ}{半|はん}、／ミキが／{走|はし}って／{来|き}ました。",
+      "en": "At half past seven, Miki came running in."
+    },
+    {
+      "jp": "「お{待|ま}たせ！／{本当|ほんとう}に／ごめんね。」",
+      "en": "\"Sorry to keep you waiting! I'm really sorry.\""
     },
     {
       "jp": "{二人|ふたり}は／ワインで／{乾杯|かんぱい}しました。",
       "en": "They toasted with wine."
+    },
+    {
+      "jp": "{料理|りょうり}は／どれも／{丁寧|ていねい}に／{作|つく}られていて、／とても／おいしかったです。",
+      "en": "Every dish was carefully made and delicious."
     },
     {
       "jp": "{最後|さいご}に、／{店員|てんいん}さんが／あの／ケーキを／{持|も}ってきました。",

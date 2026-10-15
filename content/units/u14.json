@@ -19,7 +19,7 @@
       "check": {
         "kind": "speak",
         "instructions": "The AI asks you how you get to the station. Answer in polite Japanese: explain the way step by step with the て-form and say how long it takes. Then swap: ask the AI how to get to the library and how long it takes.",
-        "material": "1. {家|いえ}から{駅|えき}まで、どうやって{行|い}きますか。\n2. {歩|ある}いて、どのくらいかかりますか。\n3. {駅|えき}まで{一番|いちばん}{近|ちか}い{道|みち}を{教|おし}えてください。",
+        "material": "1. {家|いえ}から{駅|えき}まで、どうやって{行|い}きますか。\n2. {歩|ある}いて、どのくらいかかりますか。\n3. {駅|えき}までの{一番|いちばん}{近|ちか}い{道|みち}を{教|おし}えてください。",
         "questions": [],
         "rubric": [
           "Explains the way in steps with the て-form (まっすぐ行って、二つ目の角を右に曲がって…)",
@@ -174,7 +174,7 @@
       },
       {
         "role": "b",
-        "jp": "{川|かわ}の{横|よこ}の{道|みち}を{五分|ごふん}ぐらい{歩|ある}いて。この{道|みち}が{一番|いちばん}{近|ちか}いよ。",
+        "jp": "{川|かわ}の{横|よこ}の{道|みち}を{五分|ごふん}ぐらい{歩|ある}いて。その{道|みち}が{一番|いちばん}{近|ちか}いよ。",
         "en": "Walk along the road by the river for about five minutes. That's the quickest way."
       },
       {
@@ -194,7 +194,7 @@
       },
       {
         "role": "b",
-        "jp": "{全部|ぜんぶ}で{十分|じゅっぷん}ぐらいだよ。",
+        "jp": "{全部|ぜんぶ}で{十分|じゅっぷん}ぐらいかかるよ。",
         "en": "About ten minutes in all."
       },
       {

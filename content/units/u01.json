@@ -62,8 +62,8 @@
         "questions": [],
         "rubric": [
           "Says はじめまして and their own name with です, with no さん after their own name",
-          "Introduces their partner with 夫の… or 妻の… (for example 妻のエマです)",
-          "Finishes with よろしくお願いします",
+          "Introduces their partner with おっとの… or つまの… (for example つまのエマです)",
+          "Finishes with よろしくおねがいします",
           "Speaks in complete sentences ending in です"
         ]
       }
@@ -73,14 +73,14 @@
       "text": "Point at things and ask what they are and whose they are, and say when something isn't yours.",
       "check": {
         "kind": "speak",
-        "instructions": "A party is over and the host is tidying up. Answer her three questions out loud: the umbrella is yours; the bag isn't yours, it's your partner's; and you're holding a Japanese textbook. Then point at something across the room and ask what it is.",
+        "instructions": "A party is over and the host is tidying up. Answer her three questions out loud: the umbrella is yours; the bag isn't yours, it's your partner's; and you're holding a Japanese textbook. Then point at something across the room and ask what it is, or whose it is.",
         "material": "「この{傘|かさ}はだれのですか。」\n「このかばんもですか。」\n「それは{何|なん}ですか。」",
         "questions": [],
         "rubric": [
           "Claims the umbrella with わたしのです",
-          "Says the bag isn't theirs with …じゃないです and names the owner (夫のです／妻のです)",
-          "Answers about the book in their hand with これは日本語の本です (これ, not それ)",
-          "Points across the room and asks あれは何ですか"
+          "Says the bag isn't theirs with …じゃないです and names the owner (おっとのです／つまのです)",
+          "Answers about the book in their hand with これはにほんごのほんです (これ, not それ)",
+          "Points across the room and asks about it with あれ (あれはなんですか or あれはだれのですか)"
         ]
       }
     },
@@ -89,33 +89,33 @@
       "text": "Read a short welcome note from a new neighbour and work out their names and who is who.",
       "check": {
         "kind": "read",
-        "instructions": "Your neighbours next door left this note in your mailbox with a small welcome gift. Read it and answer the questions.",
-        "material": "はじめまして。\n{隣|となり}の{田中|たなか}です。\n{私|わたし}は{田中|たなか}{美咲|みさき}です。{会社員|かいしゃいん}です。\n{夫|おっと}は{大輔|だいすけ}です。{日本語|にほんご}の{先生|せんせい}です。\n{趣味|しゅみ}は{料理|りょうり}です。{夫|おっと}の{趣味|しゅみ}も{料理|りょうり}です。\nどうぞよろしくお{願|ねが}いします。",
+        "instructions": "The couple who live on your other side left this note in your mailbox with a small welcome gift. Read it and answer the questions.",
+        "material": "はじめまして。\n{隣|となり}の{鈴木|すずき}です。\n{私|わたし}は{鈴木|すずき}{浩|ひろし}です。{医者|いしゃ}です。\n{妻|つま}は{恵子|けいこ}です。{英語|えいご}の{先生|せんせい}です。\n{趣味|しゅみ}は{料理|りょうり}です。{妻|つま}の{趣味|しゅみ}も{料理|りょうり}です。\nどうぞよろしくお{願|ねが}いします。",
         "questions": [
           {
             "q": "Who wrote the note?",
             "options": [
-              "Daisuke, a teacher",
-              "Misaki, an office worker",
-              "Misaki, a teacher"
+              "Keiko, an English teacher",
+              "Hiroshi, a doctor",
+              "Hiroshi, an English teacher"
             ],
             "answer": 1
           },
           {
-            "q": "Who is Daisuke?",
+            "q": "Who is Keiko?",
             "options": [
-              "Misaki's husband, who is an office worker",
-              "Misaki's friend, who is a doctor",
-              "Misaki's husband, who teaches Japanese"
+              "Hiroshi's wife, who is a doctor",
+              "Hiroshi's friend, who is a teacher",
+              "Hiroshi's wife, who teaches English"
             ],
             "answer": 2
           },
           {
-            "q": "What do Misaki and Daisuke have in common?",
+            "q": "What do Hiroshi and Keiko have in common?",
             "options": [
               "They both like cooking",
               "They're both teachers",
-              "They both work for the same company"
+              "They both work at the same hospital"
             ],
             "answer": 0
           }
@@ -128,10 +128,10 @@
       "check": {
         "kind": "listen",
         "instructions": "Listen to Emma meeting someone at a party. You can play it twice. Then answer the questions.",
-        "material": "「はじめまして。{中村|なかむら}です。」\n「すみません、もう{一度|いちど}お{願|ねが}いします。」\n「{中村|なかむら}です。」\n「あ、{中村|なかむら}さん。はじめまして。エマです。」\n「エマさんのお{仕事|しごと}は{何|なん}ですか。」\n「すみません、ゆっくり{話|はな}してください。」\n「お{仕事|しごと}は、{何|なん}ですか。」\n「あ、{仕事|しごと}…。{医者|いしゃ}です。」",
+        "material": "「はじめまして。{中村|なかむら}です。」\n「すみません、もう{一度|いちど}お{願|ねが}いします。」\n「{中村|なかむら}です。」\n「あ、{中村|なかむら}さん。はじめまして。エマです。」\n「エマさんのお{仕事|しごと}は{何|なん}ですか。」\n「すみません、ゆっくり{話|はな}してください。」\n「お{仕事|しごと}は、{何|なん}ですか。」\n「あ、{仕事|しごと}…。{会社員|かいしゃいん}です。{中村|なかむら}さんは？」\n「{私|わたし}は{医者|いしゃ}です。」",
         "questions": [
           {
-            "q": "Why does Emma say もう一度お願いします?",
+            "q": "Why does Emma say もういちどおねがいします?",
             "options": [
               "She wants him to speak more slowly",
               "She didn't catch his name",
@@ -149,11 +149,11 @@
             "answer": 2
           },
           {
-            "q": "What does Emma do for work?",
+            "q": "Suppose you heard Nakamura's last line clearly but didn't know the word いしゃ. What do you say?",
             "options": [
-              "She's a doctor",
-              "She's a teacher",
-              "She's an office worker"
+              "いしゃってなんですか。",
+              "ゆっくりはなしてください。",
+              "いしゃじゃないです。"
             ],
             "answer": 0
           }
@@ -171,8 +171,8 @@
       "a": "Guest with name card A (your name, your partner's name, a few things you brought)",
       "b": "Guest with name card B (a different name, partner and things)"
     },
-    "infoA": "Your name card: you are Sam (サム), British (イギリス人), an office worker (会社員). You came with your wife Emma (妻のエマ), who is a doctor (医者). Find out the other guest's name, where they're from, and who they came with. There's a book on the table that isn't yours: find out whose it is (だれの本ですか).",
-    "infoB": "Your name card: you are Lisa (リサ), American (アメリカ人), an English teacher (英語の先生). You came with your husband Tom (夫のトム), who is a student of Japanese (日本語の学生). The book on the table is Tom's (夫の本), not yours. Find out the other guest's name, where they're from, and who they came with.",
+    "infoA": "Your name card: you are Sam (サム), British (イギリスじん), an office worker (かいしゃいん). You came with your wife Kate (つまのケイト), who is a doctor (いしゃ). Find out the other guest's name, where they're from, and who they came with. There's a book on the table that isn't yours: find out whose it is (だれのほんですか).",
+    "infoB": "Your name card: you are Lisa (リサ), American (アメリカじん), an English teacher (えいごのせんせい). You came with your husband Tom (おっとのトム), who is a student of Japanese (にほんごのがくせい). The book on the table is Tom's (おっとのほん), not yours. Find out the other guest's name, where they're from, and who they came with.",
     "targets": [
       "core:cw-0042",
       "core:cw-0043",
@@ -184,7 +184,7 @@
       "grammar:ja-nai-desu"
     ],
     "register": "polite",
-    "twist": "Swap name cards and change one detail each (a new job, or a different name for your partner). This time the other guest guesses your nationality wrong first (アメリカ人ですか？), so correct them with …じゃないです.",
+    "twist": "Swap name cards and change one detail each (a new job, or a different name for your partner). This time the other guest guesses your nationality wrong first (アメリカじんですか？), so correct them with …じゃないです.",
     "aiRole": "The party host, Ms. Yamada, who greets you both, introduces herself and asks whose umbrella is by the door",
     "scripted": [
       {
@@ -209,13 +209,13 @@
       },
       {
         "role": "a",
-        "jp": "いいえ、アメリカ{人|じん}じゃないです。イギリス{人|じん}です。{妻|つま}のエマもイギリス{人|じん}です。",
-        "en": "No, I'm not American. I'm British. My wife Emma is British too."
+        "jp": "いいえ、アメリカ{人|じん}じゃないです。イギリス{人|じん}です。{妻|つま}のケイトもイギリス{人|じん}です。",
+        "en": "No, I'm not American. I'm British. My wife Kate is British too."
       },
       {
         "role": "b",
-        "jp": "そうですか。エマさんのお{仕事|しごと}は{何|なん}ですか。",
-        "en": "I see. What does Emma do?"
+        "jp": "そうですか。ケイトさんのお{仕事|しごと}は{何|なん}ですか。",
+        "en": "I see. What does Kate do?"
       },
       {
         "role": "a",
@@ -239,8 +239,8 @@
       },
       {
         "role": "a",
-        "jp": "あのう、この{本|ほん}はリサさんのですか。",
-        "en": "Um, is this book yours, Lisa?"
+        "jp": "あのう、この{本|ほん}はだれのですか。リサさんのですか。",
+        "en": "Um, whose book is this? Is it yours, Lisa?"
       },
       {
         "role": "b",

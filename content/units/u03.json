@@ -22,10 +22,10 @@
         "material": "「{平日|へいじつ}は{何時|なんじ}に{起|お}きますか。」\n「{何時|なんじ}にうちを{出|で}ますか。」\n「{夜|よる}は{何時|なんじ}に{寝|ね}ますか。」",
         "questions": [],
         "rubric": [
-          "Answers each question with a clock time (七時, 七時半, 六時四十五分)",
-          "Puts に after the time: 七時に起きます",
-          "Uses the right verb each time: 起きます, 出ます, 寝ます",
-          "Asks at least one question back (…は何時に寝ますか？)"
+          "Answers each question with a clock time (しちじ, しちじはん, ろくじよんじゅうごふん)",
+          "Puts に after the time: しちじにおきます",
+          "Uses the right verb each time: おきます, でます, ねます",
+          "Asks at least one question back (…はなんじにねますか？)"
         ]
       }
     },
@@ -76,24 +76,24 @@
         "material": "あしたは{何時|なんじ}にうちを{出|で}ますか？\nどこに{行|い}きますか？\n{何時|なんじ}ごろ{帰|かえ}りますか？",
         "questions": [],
         "rubric": [
-          "Gives a leaving time with 〜時に出ます (or 〜時にうちを出ます)",
-          "Says where they're going with 〜に行きます",
-          "Says when they'll be back with 〜時ごろ帰ります",
+          "Gives a leaving time with 〜じにでます (or 〜じにうちをでます)",
+          "Says where they're going with 〜にいきます",
+          "Says when they'll be back with 〜じごろかえります",
           "Uses polite ます forms throughout"
         ]
       }
     },
     {
       "id": "u03-cd4",
-      "text": "Buy things at a bakery or convenience store, asking for one, two or three of something.",
+      "text": "Buy things at a shop counter or food stand, asking for one, two or three of something.",
       "check": {
         "kind": "speak",
-        "instructions": "You're buying lunch for both of you at a convenience store. Check the prices, then ask the clerk (the app) for three rice balls and two teas, and ask how much it comes to.",
+        "instructions": "You're buying lunch for both of you at a small food stand in the station, where everything is behind the counter. Check the prices, then ask the clerk (the app) for three rice balls and two teas, and ask how much it comes to.",
         "material": "おにぎり　150{円|えん}\nお{茶|ちゃ}　130{円|えん}\n{水|みず}　100{円|えん}\nパン　180{円|えん}\nりんご　120{円|えん}",
         "questions": [],
         "rubric": [
-          "Names each item with を and a number: おにぎりをみっつ、お茶をふたつ",
-          "Asks with ください or お願いします",
+          "Names each item with を and a number: おにぎりをみっつ、おちゃをふたつ",
+          "Asks with ください or おねがいします",
           "Uses the counting words ひとつ, ふたつ, みっつ (not いち, に, さん)",
           "Asks the total with いくらですか"
         ]
@@ -110,8 +110,8 @@
       "a": "Starts early tomorrow (schedule card A)",
       "b": "Works late tomorrow (schedule card B)"
     },
-    "infoA": "Schedule card A (tomorrow): you get up at 5:30 (五時半に起きます) and leave home at 6:30. You finish early and get home around 5:00 (五時ごろ帰ります). You must be in bed by 10:00 (十時に寝ます). You'll cook dinner, but you need six eggs (卵をむっつ) and three apples (りんごをみっつ): ask your partner to buy them.",
-    "infoB": "Schedule card B (tomorrow): you get up at 8:00 (八時に起きます) and leave home at 9:00. Work runs late: you leave the office at 7:30 (七時半に会社を出ます) and get home around 8:15. There's a supermarket by the station, so you can shop on the way home (帰りに). Find out when your partner goes to bed, and agree a dinner time.",
+    "infoA": "Schedule card A (tomorrow): you get up at 5:30 (ごじはんにおきます) and leave home at 6:30. You finish early and get home around 5:00 (ごじごろかえります). You must be in bed by 10:00 (じゅうじにねます). You'll cook dinner, but you need six eggs (たまごをむっつ) and three apples (りんごをみっつ): ask your partner to buy them.",
+    "infoB": "Schedule card B (tomorrow): you get up at 8:00 (はちじにおきます) and leave home at 9:00. Work runs late: you leave the office at 7:30 (しちじはんにかいしゃをでます) and get home around 8:15. There's a supermarket by the station, so you can shop on the way home (かえりに). Find out when your partner goes to bed, and agree a dinner time.",
     "targets": [
       "core:cw-0303",
       "core:cw-0184",
@@ -123,7 +123,7 @@
       "grammar:counting-tsu"
     ],
     "register": "polite",
-    "twist": "Swap cards. This time the late partner gets home at 9:00 (九時に帰ります), so agree a new dinner time or move it to breakfast together (朝ご飯), and change the shopping list (four apples, よっつ).",
+    "twist": "Swap cards. This time the late partner gets home at 9:00 (くじにかえります), so agree a new dinner time or move it to breakfast together (あさごはん), and change the shopping list (four apples, よっつ).",
     "scripted": [
       {
         "role": "a",
@@ -177,7 +177,7 @@
       },
       {
         "role": "a",
-        "jp": "ありがとう！ {卵|たまご}をむっつ、お{願|ねが}いします。それから、りんごもみっつください。",
+        "jp": "ありがとう！ {卵|たまご}をむっつ、お{願|ねが}いします。それから、りんごもみっつ。",
         "en": "Thanks! Six eggs, please. And three apples, too."
       },
       {

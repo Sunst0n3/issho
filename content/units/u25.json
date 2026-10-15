@@ -13,15 +13,15 @@
   "canDos": [
     {
       "id": "u25-cd1",
-      "text": "Tell your partner kindly what you'd like them to do, or not do, more often.",
+      "text": "Tell your partner kindly what you'd like them to do more often, and what you'd rather they didn't do.",
       "check": {
         "kind": "speak",
         "instructions": "Your partner asks you this (the audio plays it). Answer kindly for 45–60 seconds: one thing you'd like them to do more often and one thing you'd like them not to do, each with a reason. It's a request, not a complaint.",
-        "material": "ねえ、{私|わたし}にもっとしてほしいこと、ある？ してほしくないことも、{本当|ほんとう}のことを{言|い}ってね。",
+        "material": "ねえ、{私|わたし}にもっとしてほしいこと、ある？ してほしくないことも、なんでも{言|い}ってね。",
         "questions": [],
         "rubric": [
           "Makes at least one request with 〜てほしい and one with 〜ないでほしい",
-          "Softens it kindly (できれば, ちょっと, 〜と嬉しい)",
+          "Softens it kindly (できれば, ちょっと, 〜と うれしい)",
           "Gives a reason for each request",
           "Thanks or reassures your partner at the end (いつもありがとう)"
         ]
@@ -32,14 +32,14 @@
       "text": "Express disappointment without blaming ('I waited, and yet…'), listen to your partner's side, and make up.",
       "check": {
         "kind": "speak",
-        "instructions": "Your partner came home two hours late without messaging, and the dinner you made has gone cold. They've just walked in (the audio plays their line). Tell them how you felt using 〜のに, without blaming them; ask what happened; then make up.",
-        "material": "（{夜|よる}{十時|じゅうじ}。{晩|ばん}ご{飯|はん}は{冷|つめ}たくなっている。）\nただいま…。ごめん、{遅|おそ}くなっちゃった。",
+        "instructions": "You and your partner planned to see a film tonight, and you've already bought the tickets. Your partner has just come to talk to you (the audio plays their line). Tell them how you feel using 〜のに, without blaming them; ask what happened; then make up and say what you'd like next time.",
+        "material": "（{土曜日|どようび}の{夕方|ゆうがた}。{今夜|こんや}は{二人|ふたり}で{映画|えいが}を{見|み}に{行|い}く{約束|やくそく}。チケットも、もう{買|か}った。）\nごめん…。{今日|きょう}の{映画|えいが}のこと、{忘|わす}れてて…。{会社|かいしゃ}の{人|ひと}と{飲|の}みに{行|い}く{約束|やくそく}、しちゃったんだ。",
         "questions": [],
         "rubric": [
-          "Expresses disappointment with 〜のに (作って待っていたのに…)",
-          "Says how you felt rather than blaming (寂しかった / 心配した)",
-          "Asks for and listens to your partner's side (何があったの？)",
-          "Makes up: accepts the apology and says what you'd like next time with 〜てほしい"
+          "Expresses disappointment with 〜のに (チケットも かったのに… / たのしみに していたのに…)",
+          "Says how you feel rather than blaming (ざんねん / さびしい)",
+          "Asks for and listens to your partner's side (どうして？ / なにが あったの？)",
+          "Makes up: accepts the apology and says what you'd like next time with 〜てほしい (つぎは はやく いってほしい)"
         ]
       }
     },
@@ -103,7 +103,7 @@
       "check": {
         "kind": "read",
         "instructions": "Read this advice column from a magazine, then answer the questions.",
-        "material": "【{相談|そうだん}】\n{夫|おっと}は{毎晩|まいばん}、{寝|ね}るまでスマホでゲームをしています。{話|はな}しても、{返事|へんじ}をしてくれません。{二人|ふたり}で{住|す}んでいるのに、とても{寂|さび}しいです。（{妻|つま}・{三十二歳|さんじゅうにさい}）\n【{答|こた}え】\nまず、{自分|じぶん}の{気持|きも}ちを{伝|つた}えてみましょう。「どうしていつもゲームをするの？」と{聞|き}くと、{相手|あいて}は{怒|おこ}られたと{感|かん}じます。「{夜|よる}は{少|すこ}しでも{話|はな}したいな」と、してほしいことを{言|い}うのがいいです。それから、{相手|あいて}の{話|はなし}も{聞|き}いてください。{仕事|しごと}で{疲|つか}れていて、{一人|ひとり}の{時間|じかん}が{欲|ほ}しいのかもしれません。「ゲームは{十時|じゅうじ}まで」など、{二人|ふたり}で{決|き}めるのもいいですね。",
+        "material": "【{相談|そうだん}】\n{夫|おっと}は{毎晩|まいばん}、{寝|ね}るまでスマホでゲームをしています。{私|わたし}が{何|なに}か{言|い}っても、{返事|へんじ}をしてくれません。{一緒|いっしょ}に{住|す}んでいるのに、とても{寂|さび}しいです。（{妻|つま}・{三十二歳|さんじゅうにさい}）\n【{答|こた}え】\nまず、{自分|じぶん}の{気持|きも}ちを{伝|つた}えてみましょう。「どうしていつもゲームをするの？」と{聞|き}くと、{相手|あいて}は{怒|おこ}られたと{感|かん}じます。「{夜|よる}は{少|すこ}しでいいから、{私|わたし}と{話|はな}してほしいな」と、してほしいことを{言|い}うのがいいです。それから、{相手|あいて}の{話|はなし}も{聞|き}いてください。{仕事|しごと}で{疲|つか}れていて、{一人|ひとり}の{時間|じかん}が{欲|ほ}しいのかもしれません。「ゲームは{十時|じゅうじ}まで」など、{二人|ふたり}で{決|き}めるのもいいですね。",
         "questions": [
           {
             "q": "What is the writer's problem?",
@@ -146,8 +146,8 @@
       "a": "Wants a quiet hot-spring trip and has reasons (card A)",
       "b": "Wants to see friends in the city and has reasons (card B)"
     },
-    "infoA": "You want a quiet hot-spring trip (温泉) over the long weekend (連休, Saturday to Monday). Your reasons: you've done overtime (残業) every week and you're exhausted; you already went to Tokyo twice last month; you two haven't had time alone together for ages. What you'd like your partner to understand (〜てほしい): you're not against their friends — you just need rest. Start by saying how you feel, not what they did wrong. You could accept: seeing the friends on one day, if you still get at least one night at a hot spring.",
-    "infoB": "You want to see friends in Tokyo over the long weekend (連休). Your reasons: your best friend is visiting from abroad and flies home on Monday; months ago you promised (約束) to join a dinner on Saturday; a chance (機会) like this is rare. What you'd like your partner to understand (〜てほしい): you weren't ignoring how tired they are — you didn't know it was this bad. Use 〜のに once to say how you feel, without blaming. You could accept: seeing your friend only on Saturday and Sunday morning, if your partner comes to the Saturday dinner.",
+    "infoA": "You want a quiet hot-spring trip (おんせん) over the long weekend (れんきゅう, Saturday to Monday). Your reasons: you've done overtime (ざんぎょう) every week and you're exhausted; you already went to Tokyo twice last month; you two haven't had time alone together for ages. What you'd like your partner to understand (〜てほしい): you're not against their friends — you just need rest. Start by saying how you feel, not what they did wrong. You could accept: seeing the friends on one day, if you still get at least one night at a hot spring.",
+    "infoB": "You want to see friends in Tokyo over the long weekend (れんきゅう). Your reasons: your best friend is visiting from abroad and flies home on Monday; months ago you promised (やくそく) to join a dinner on Saturday; a chance (きかい) like this is rare. What you'd like your partner to understand (〜てほしい): you weren't ignoring how tired they are — you didn't know it was this bad. Use 〜のに once to say how you feel, without blaming. You could accept: seeing your friend only on Saturday and Sunday morning, if your partner comes to the Saturday dinner.",
     "targets": [
       "grammar:te-hoshii",
       "grammar:noni",
@@ -178,8 +178,8 @@
       },
       {
         "role": "b",
-        "jp": "わかるけど、{一番|いちばん}の{友達|ともだち}が{外国|がいこく}から{来|く}るんだよ。{月曜日|げつようび}には{帰|かえ}っちゃうから、{今|いま}しか{会|あ}えないんだ。",
-        "en": "I get that, but my best friend is coming from abroad. She goes home on Monday, so it's now or never."
+        "jp": "わかるけど、{一番|いちばん}の{友達|ともだち}が{外国|がいこく}から{来|く}るんだよ。{月曜日|げつようび}にはもう{帰|かえ}るから、こんな{機会|きかい}、なかなかないんだ。",
+        "en": "I get that, but my best friend is coming from abroad. She flies home on Monday, so a chance like this doesn't come along often."
       },
       {
         "role": "a",

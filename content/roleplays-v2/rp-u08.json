@@ -41,9 +41,9 @@
     },
     {
       "role": "a",
-      "jp": "{十時|じゅうじ}までだよ。まだ{大丈夫|だいじょうぶ}。",
-      "en": "Until ten. We've still got time.",
-      "cue": "until ten · still fine"
+      "jp": "{十時|じゅうじ}までだよ。{今|いま}、{八時|はちじ}。{大丈夫|だいじょうぶ}！",
+      "en": "Until ten. It's eight now, so we're fine!",
+      "cue": "until ten · eight now · fine"
     },
     {
       "role": "b",

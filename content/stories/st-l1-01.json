@@ -12,9 +12,8 @@
     "tte-quote",
     "wa-contrast",
     "volitional",
-    "te-kara",
-    "casual-speech",
-    "n-desu"
+    "n-desu",
+    "casual-speech"
   ],
   "sentences": [
     {
@@ -34,8 +33,8 @@
       "en": "One evening, Miki said:"
     },
     {
-      "jp": "「ねえ、／{来月|らいげつ}、／{温泉|おんせん}に／{行|い}かない？」",
-      "en": "\"Hey, why don't we go to a hot spring next month?\""
+      "jp": "「ねえ、／{来月|らいげつ}、／{温泉|おんせん}に／{行|い}かない？／{二人|ふたり}で／のんびり／したいな。」",
+      "en": "\"Hey, why don't we go to a hot spring next month? I'd love for the two of us to relax.\""
     },
     {
       "jp": "「いいね！／どこの／{温泉|おんせん}？」",
@@ -50,12 +49,12 @@
       "en": "\"Oh yeah? What about the baths?\""
     },
     {
-      "jp": "「{外|そと}に／お{風呂|ふろ}が／あって、／{景色|けしき}が／とても／きれいだって。」",
-      "en": "\"There's an outdoor bath, and she says the view is beautiful.\""
+      "jp": "「{外|そと}にも／お{風呂|ふろ}が／あって、／{景色|けしき}が／とても／きれいだって。」",
+      "en": "\"There's an outdoor bath too, and she says the view is beautiful.\""
     },
     {
-      "jp": "ケンは／すぐ／スマホで／{旅館|りょかん}を／{調|しら}べました。",
-      "en": "Ken looked the ryokan up on his phone right away."
+      "jp": "ケンは／すぐ／スマホで／{旅館|りょかん}の／{値段|ねだん}を／{調|しら}べました。",
+      "en": "Ken looked up the ryokan's prices on his phone right away."
     },
     {
       "jp": "「あ、／{高|たか}い！／{一人|ひとり}／{二万円|にまんえん}だよ。」",
@@ -66,16 +65,20 @@
       "en": "\"But dinner and breakfast are included.\""
     },
     {
-      "jp": "{二人|ふたり}は／{貯金|ちょきん}を／{見|み}ました。",
-      "en": "The two of them looked at their savings."
+      "jp": "「それに、／{来月|らいげつ}は／{割引|わりびき}が／あるって。」",
+      "en": "\"And they say there's a discount next month.\""
+    },
+    {
+      "jp": "{二人|ふたり}は／{貯金|ちょきん}を／{見|み}て、／{相談|そうだん}しました。",
+      "en": "They looked at their savings and talked it over."
     },
     {
       "jp": "「じゃあ、／{土曜日|どようび}の／{夜|よる}だけ／{泊|と}まろう。」",
       "en": "\"Okay, let's just stay on Saturday night.\""
     },
     {
-      "jp": "「{日曜日|にちようび}は／{町|まち}を／{観光|かんこう}して、／{夜|よる}／{帰|かえ}ろう。」",
-      "en": "\"On Sunday, let's look around the town and come home in the evening.\""
+      "jp": "「{日曜日|にちようび}は／{町|まち}を／{観光|かんこう}して、／{夜|よる}に／{帰|かえ}ろう。」",
+      "en": "\"On Sunday, let's go sightseeing in the town and come home in the evening.\""
     },
     {
       "jp": "「{新幹線|しんかんせん}は／{高|たか}いので、／{普通|ふつう}の／{電車|でんしゃ}で／{行|い}こう。」",
@@ -86,28 +89,32 @@
       "en": "\"It takes three hours, but we can eat bentos on the train.\""
     },
     {
-      "jp": "{二人|ふたり}は／{土曜日|どようび}の／{朝|あさ}に／{行|い}って、／{日曜日|にちようび}の／{夜|よる}に／{帰|かえ}る／つもりです。",
+      "jp": "{二人|ふたり}は／{土曜日|どようび}の／{朝|あさ}に／{出|で}て、／{日曜日|にちようび}の／{夜|よる}に／{帰|かえ}る／つもりです。",
       "en": "They plan to leave on Saturday morning and come back on Sunday night."
     },
     {
-      "jp": "{旅行|りょこう}の／{日|ひ}、／ケンは／{大|おお}きい／スーツケースを／{持|も}ってきました。",
-      "en": "On the day of the trip, Ken brought a big suitcase."
+      "jp": "{旅行|りょこう}の／{前|まえ}の／{晩|ばん}、／ケンは／{大|おお}きい／スーツケースを／{出|だ}しました。",
+      "en": "The night before the trip, Ken got out a big suitcase."
+    },
+    {
+      "jp": "ミキは／びっくりしました。",
+      "en": "Miki was surprised."
+    },
+    {
+      "jp": "「{土曜日|どようび}の／{夜|よる}だけ／{泊|と}まるんだよ。／かばん／{一|ひと}つで／{大丈夫|だいじょうぶ}。」",
+      "en": "\"We're only staying one night. One bag is plenty.\""
+    },
+    {
+      "jp": "「でも、／お{土産|みやげ}を／たくさん／{買|か}いたいから。」",
+      "en": "\"But I want to buy lots of souvenirs.\""
     },
     {
       "jp": "ミキは／{笑|わら}いました。",
       "en": "Miki laughed."
     },
     {
-      "jp": "「{土曜日|どようび}と／{日曜日|にちようび}だけだよ。／かばん／{一|ひと}つで／{大丈夫|だいじょうぶ}。」",
-      "en": "\"It's only Saturday and Sunday. One bag is plenty.\""
-    },
-    {
-      "jp": "ケンは／{少|すこ}し／{恥|は}ずかしかったです。",
-      "en": "Ken felt a little embarrassed."
-    },
-    {
-      "jp": "{電車|でんしゃ}の／{中|なか}で、／{二人|ふたり}は／お{弁当|べんとう}を／{食|た}べて、／たくさん／{話|はな}しました。",
-      "en": "On the train, they ate their bentos and talked a lot."
+      "jp": "{電車|でんしゃ}の／{中|なか}で、／{二人|ふたり}は／お{弁当|べんとう}を／{食|た}べて、／たくさん／おしゃべりしました。",
+      "en": "On the train, they ate their bentos and chatted a lot."
     },
     {
       "jp": "{旅館|りょかん}は／{静|しず}かな／{山|やま}の／{中|なか}に／ありました。",
@@ -122,19 +129,31 @@
       "en": "At night, they got into the outdoor bath and looked at the stars."
     },
     {
+      "jp": "その／{夜|よる}は、／{二人|ふたり}とも／ぐっすり／{寝|ね}ました。",
+      "en": "That night, they both slept soundly."
+    },
+    {
+      "jp": "{日曜日|にちようび}は／{町|まち}を／{観光|かんこう}して、／お{土産|みやげ}を／{選|えら}びました。",
+      "en": "On Sunday, they went sightseeing in the town and chose souvenirs."
+    },
+    {
+      "jp": "{帰|かえ}る／とき、／ケンの／スーツケースは／お{土産|みやげ}で／いっぱいでした。",
+      "en": "When they set off home, Ken's suitcase was full of souvenirs."
+    },
+    {
       "jp": "「{友達|ともだち}の／{話|はなし}は／{本当|ほんとう}だったね。」",
       "en": "\"What your friend said was true.\""
     },
     {
-      "jp": "「うん。／{料理|りょうり}も／{温泉|おんせん}も／{最高|さいこう}！」",
-      "en": "\"Yes. The food and the hot spring are both amazing!\""
+      "jp": "「うん。／{料理|りょうり}も／{温泉|おんせん}も／{最高|さいこう}！／すごく／{気|き}に{入|い}った。」",
+      "en": "\"Yes. The food and the hot spring were both amazing! I loved it.\""
     },
     {
       "jp": "「また／{来|く}る？」",
       "en": "\"Shall we come again?\""
     },
     {
-      "jp": "「もちろん！／でも、／{次|つぎ}は／もう{少|すこ}し／{貯金|ちょきん}して／から／ね。」",
+      "jp": "「もちろん！／でも、／{次|つぎ}は／もう{少|すこ}し／{貯金|ちょきん}してからね。」",
       "en": "\"Of course! But next time, after we've saved up a little more.\""
     }
   ],

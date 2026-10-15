@@ -14,7 +14,9 @@
     "tai-want",
     "tte-quote",
     "adverb-form",
-    "wa-contrast",
+    "node",
+    "naide-kudasai",
+    "ka-or-ni-suru",
     "volitional"
   ],
   "sentences": [
@@ -23,28 +25,36 @@
       "en": "Lately, Miki has been wanting to start something new."
     },
     {
-      "jp": "「ねえ、／ケン。／どんな／ことを／やって／みたい？」",
-      "en": "\"Hey, Ken. What kind of thing would you like to try?\""
+      "jp": "いろいろ／{考|かんが}えて、／ヨガに／しました。",
+      "en": "After thinking about lots of things, she chose yoga."
     },
     {
-      "jp": "「そうだね…。／{僕|ぼく}は／{体|からだ}が／{硬|かた}いから、／スポーツは／ちょっと…。」",
-      "en": "\"Hmm... My body is stiff, so sports are a bit...\""
+      "jp": "ある／{日|ひ}、／ミキは／ケンを／{誘|さそ}いました。",
+      "en": "One day, Miki asked Ken to come along."
     },
     {
-      "jp": "「じゃあ、／ヨガは／どう？／{駅|えき}の／{近|ちか}くに／ヨガの／クラスが／あるよ。」",
-      "en": "\"Then how about yoga? There's a yoga class near the station.\""
+      "jp": "「ねえ、／ケン。／{一緒|いっしょ}に／ヨガを／やって／みない？」",
+      "en": "\"Hey, Ken. Do you want to try yoga with me?\""
     },
     {
-      "jp": "「ヨガ？／{僕|ぼく}に／できるかな。」",
-      "en": "\"Yoga? I wonder if I can do it.\""
+      "jp": "「ヨガ？／{僕|ぼく}は／{体|からだ}が／{硬|かた}いから、／ちょっと…。」",
+      "en": "\"Yoga? I'm not very flexible, so... I don't know.\""
     },
     {
-      "jp": "「{初|はじ}めての／{人|ひと}も／{大丈夫|だいじょうぶ}だって。」",
-      "en": "\"They say beginners are welcome too.\""
+      "jp": "「{大丈夫|だいじょうぶ}。／{初|はじ}めての／{人|ひと}が／{多|おお}い／クラスだって。」",
+      "en": "\"It's fine. They say lots of people in the class are beginners.\""
     },
     {
-      "jp": "「{一回|いっかい}／やって／みようよ。／{楽|たの}しいかもしれないよ。」",
-      "en": "\"Let's try it once. It might be fun.\""
+      "jp": "「どんな／{先生|せんせい}？／{厳|きび}しい？」",
+      "en": "\"What's the teacher like? Strict?\""
+    },
+    {
+      "jp": "「すごく／{親切|しんせつ}な／{先生|せんせい}だって。／{一回|いっかい}だけ／やって／みようよ。／{楽|たの}しいかもしれないよ。」",
+      "en": "\"They say she's really kind. Let's try it just once. It might be fun.\""
+    },
+    {
+      "jp": "ケンは／{断|ことわ}る／ことが／できませんでした。",
+      "en": "Ken couldn't say no."
     },
     {
       "jp": "{土曜日|どようび}の／{朝|あさ}、／{二人|ふたり}は／ヨガの／クラスに／{行|い}きました。",
@@ -56,10 +66,10 @@
     },
     {
       "jp": "「{今日|きょう}は、／{木|き}に／なって／みましょう。」",
-      "en": "\"Today, let's try becoming a tree.\""
+      "en": "\"Today, let's try being a tree.\""
     },
     {
-      "jp": "「{右|みぎ}の／{足|あし}だけで／{立|た}って／ください。」",
+      "jp": "「{右|みぎ}{足|あし}だけで／{立|た}って／ください。」",
       "en": "\"Please stand on just your right foot.\""
     },
     {
@@ -91,20 +101,24 @@
       "en": "The teacher laughed too and said, \"That's okay. Nobody can do it at first.\""
     },
     {
-      "jp": "{次|つぎ}は、／{座|すわ}って、／{手|て}で／{足|あし}を／{触|さわ}って／みました。",
-      "en": "Next, they sat down and tried touching their feet with their hands."
+      "jp": "{次|つぎ}は、／{座|すわ}って、／{手|て}で／{足|あし}の／{先|さき}を／{触|さわ}って／みました。",
+      "en": "Next, they sat down and tried touching their toes."
     },
     {
-      "jp": "ミキの／{手|て}は／すぐ／{足|あし}に／{届|とど}きました。",
-      "en": "Miki's hands reached her feet right away."
+      "jp": "ミキは／{体|からだ}が／{柔|やわ}らかいので、／{手|て}が／すぐ／{足|あし}に／{届|とど}きました。",
+      "en": "Miki's body is supple, so her hands reached her feet right away."
     },
     {
       "jp": "ケンの／{手|て}は、／{足|あし}まで／{届|とど}きませんでした。",
       "en": "Ken's hands didn't reach his feet."
     },
     {
+      "jp": "「{無理|むり}を／しないで／ください。／{少|すこ}しずつで／いいですよ。」と／{先生|せんせい}が／{言|い}いました。",
+      "en": "\"Don't push yourself. A little at a time is fine,\" said the teacher."
+    },
+    {
       "jp": "クラスの／{後|あと}、／ケンは／「{体|からだ}が／{痛|いた}い…。／でも、／{気持|きも}ちが／いいね。」と／{言|い}いました。",
-      "en": "After the class, Ken said, \"My body hurts... But it feels good.\""
+      "en": "After the class, Ken said, \"My body aches... But it feels good.\""
     },
     {
       "jp": "「{来週|らいしゅう}も／{来|く}る？」と／ミキが／{聞|き}きました。",
@@ -112,7 +126,7 @@
     },
     {
       "jp": "「うん。／{来週|らいしゅう}は、／{僕|ぼく}も／{木|き}に／なる／ことが／できるかもしれない。」",
-      "en": "\"Yes. Next week, maybe I can become a tree too.\""
+      "en": "\"Yes. Next week, maybe I'll be able to be a tree too.\""
     }
   ],
   "gist": {

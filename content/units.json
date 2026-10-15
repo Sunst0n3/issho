@@ -63,8 +63,8 @@
           "questions": [],
           "rubric": [
             "Says はじめまして and their own name with です, with no さん after their own name",
-            "Introduces their partner with 夫の… or 妻の… (for example 妻のエマです)",
-            "Finishes with よろしくお願いします",
+            "Introduces their partner with おっとの… or つまの… (for example つまのエマです)",
+            "Finishes with よろしくおねがいします",
             "Speaks in complete sentences ending in です"
           ]
         }
@@ -74,14 +74,14 @@
         "text": "Point at things and ask what they are and whose they are, and say when something isn't yours.",
         "check": {
           "kind": "speak",
-          "instructions": "A party is over and the host is tidying up. Answer her three questions out loud: the umbrella is yours; the bag isn't yours, it's your partner's; and you're holding a Japanese textbook. Then point at something across the room and ask what it is.",
+          "instructions": "A party is over and the host is tidying up. Answer her three questions out loud: the umbrella is yours; the bag isn't yours, it's your partner's; and you're holding a Japanese textbook. Then point at something across the room and ask what it is, or whose it is.",
           "material": "「この{傘|かさ}はだれのですか。」\n「このかばんもですか。」\n「それは{何|なん}ですか。」",
           "questions": [],
           "rubric": [
             "Claims the umbrella with わたしのです",
-            "Says the bag isn't theirs with …じゃないです and names the owner (夫のです／妻のです)",
-            "Answers about the book in their hand with これは日本語の本です (これ, not それ)",
-            "Points across the room and asks あれは何ですか"
+            "Says the bag isn't theirs with …じゃないです and names the owner (おっとのです／つまのです)",
+            "Answers about the book in their hand with これはにほんごのほんです (これ, not それ)",
+            "Points across the room and asks about it with あれ (あれはなんですか or あれはだれのですか)"
           ]
         }
       },
@@ -90,33 +90,33 @@
         "text": "Read a short welcome note from a new neighbour and work out their names and who is who.",
         "check": {
           "kind": "read",
-          "instructions": "Your neighbours next door left this note in your mailbox with a small welcome gift. Read it and answer the questions.",
-          "material": "はじめまして。\n{隣|となり}の{田中|たなか}です。\n{私|わたし}は{田中|たなか}{美咲|みさき}です。{会社員|かいしゃいん}です。\n{夫|おっと}は{大輔|だいすけ}です。{日本語|にほんご}の{先生|せんせい}です。\n{趣味|しゅみ}は{料理|りょうり}です。{夫|おっと}の{趣味|しゅみ}も{料理|りょうり}です。\nどうぞよろしくお{願|ねが}いします。",
+          "instructions": "The couple who live on your other side left this note in your mailbox with a small welcome gift. Read it and answer the questions.",
+          "material": "はじめまして。\n{隣|となり}の{鈴木|すずき}です。\n{私|わたし}は{鈴木|すずき}{浩|ひろし}です。{医者|いしゃ}です。\n{妻|つま}は{恵子|けいこ}です。{英語|えいご}の{先生|せんせい}です。\n{趣味|しゅみ}は{料理|りょうり}です。{妻|つま}の{趣味|しゅみ}も{料理|りょうり}です。\nどうぞよろしくお{願|ねが}いします。",
           "questions": [
             {
               "q": "Who wrote the note?",
               "options": [
-                "Daisuke, a teacher",
-                "Misaki, an office worker",
-                "Misaki, a teacher"
+                "Keiko, an English teacher",
+                "Hiroshi, a doctor",
+                "Hiroshi, an English teacher"
               ],
               "answer": 1
             },
             {
-              "q": "Who is Daisuke?",
+              "q": "Who is Keiko?",
               "options": [
-                "Misaki's husband, who is an office worker",
-                "Misaki's friend, who is a doctor",
-                "Misaki's husband, who teaches Japanese"
+                "Hiroshi's wife, who is a doctor",
+                "Hiroshi's friend, who is a teacher",
+                "Hiroshi's wife, who teaches English"
               ],
               "answer": 2
             },
             {
-              "q": "What do Misaki and Daisuke have in common?",
+              "q": "What do Hiroshi and Keiko have in common?",
               "options": [
                 "They both like cooking",
                 "They're both teachers",
-                "They both work for the same company"
+                "They both work at the same hospital"
               ],
               "answer": 0
             }
@@ -129,10 +129,10 @@
         "check": {
           "kind": "listen",
           "instructions": "Listen to Emma meeting someone at a party. You can play it twice. Then answer the questions.",
-          "material": "「はじめまして。{中村|なかむら}です。」\n「すみません、もう{一度|いちど}お{願|ねが}いします。」\n「{中村|なかむら}です。」\n「あ、{中村|なかむら}さん。はじめまして。エマです。」\n「エマさんのお{仕事|しごと}は{何|なん}ですか。」\n「すみません、ゆっくり{話|はな}してください。」\n「お{仕事|しごと}は、{何|なん}ですか。」\n「あ、{仕事|しごと}…。{医者|いしゃ}です。」",
+          "material": "「はじめまして。{中村|なかむら}です。」\n「すみません、もう{一度|いちど}お{願|ねが}いします。」\n「{中村|なかむら}です。」\n「あ、{中村|なかむら}さん。はじめまして。エマです。」\n「エマさんのお{仕事|しごと}は{何|なん}ですか。」\n「すみません、ゆっくり{話|はな}してください。」\n「お{仕事|しごと}は、{何|なん}ですか。」\n「あ、{仕事|しごと}…。{会社員|かいしゃいん}です。{中村|なかむら}さんは？」\n「{私|わたし}は{医者|いしゃ}です。」",
           "questions": [
             {
-              "q": "Why does Emma say もう一度お願いします?",
+              "q": "Why does Emma say もういちどおねがいします?",
               "options": [
                 "She wants him to speak more slowly",
                 "She didn't catch his name",
@@ -150,11 +150,11 @@
               "answer": 2
             },
             {
-              "q": "What does Emma do for work?",
+              "q": "Suppose you heard Nakamura's last line clearly but didn't know the word いしゃ. What do you say?",
               "options": [
-                "She's a doctor",
-                "She's a teacher",
-                "She's an office worker"
+                "いしゃってなんですか。",
+                "ゆっくりはなしてください。",
+                "いしゃじゃないです。"
               ],
               "answer": 0
             }
@@ -172,8 +172,8 @@
         "a": "Guest with name card A (your name, your partner's name, a few things you brought)",
         "b": "Guest with name card B (a different name, partner and things)"
       },
-      "infoA": "Your name card: you are Sam (サム), British (イギリス人), an office worker (会社員). You came with your wife Emma (妻のエマ), who is a doctor (医者). Find out the other guest's name, where they're from, and who they came with. There's a book on the table that isn't yours: find out whose it is (だれの本ですか).",
-      "infoB": "Your name card: you are Lisa (リサ), American (アメリカ人), an English teacher (英語の先生). You came with your husband Tom (夫のトム), who is a student of Japanese (日本語の学生). The book on the table is Tom's (夫の本), not yours. Find out the other guest's name, where they're from, and who they came with.",
+      "infoA": "Your name card: you are Sam (サム), British (イギリスじん), an office worker (かいしゃいん). You came with your wife Kate (つまのケイト), who is a doctor (いしゃ). Find out the other guest's name, where they're from, and who they came with. There's a book on the table that isn't yours: find out whose it is (だれのほんですか).",
+      "infoB": "Your name card: you are Lisa (リサ), American (アメリカじん), an English teacher (えいごのせんせい). You came with your husband Tom (おっとのトム), who is a student of Japanese (にほんごのがくせい). The book on the table is Tom's (おっとのほん), not yours. Find out the other guest's name, where they're from, and who they came with.",
       "targets": [
         "core:cw-0042",
         "core:cw-0043",
@@ -185,7 +185,7 @@
         "grammar:ja-nai-desu"
       ],
       "register": "polite",
-      "twist": "Swap name cards and change one detail each (a new job, or a different name for your partner). This time the other guest guesses your nationality wrong first (アメリカ人ですか？), so correct them with …じゃないです.",
+      "twist": "Swap name cards and change one detail each (a new job, or a different name for your partner). This time the other guest guesses your nationality wrong first (アメリカじんですか？), so correct them with …じゃないです.",
       "aiRole": "The party host, Ms. Yamada, who greets you both, introduces herself and asks whose umbrella is by the door",
       "scripted": [
         {
@@ -210,13 +210,13 @@
         },
         {
           "role": "a",
-          "jp": "いいえ、アメリカ{人|じん}じゃないです。イギリス{人|じん}です。{妻|つま}のエマもイギリス{人|じん}です。",
-          "en": "No, I'm not American. I'm British. My wife Emma is British too."
+          "jp": "いいえ、アメリカ{人|じん}じゃないです。イギリス{人|じん}です。{妻|つま}のケイトもイギリス{人|じん}です。",
+          "en": "No, I'm not American. I'm British. My wife Kate is British too."
         },
         {
           "role": "b",
-          "jp": "そうですか。エマさんのお{仕事|しごと}は{何|なん}ですか。",
-          "en": "I see. What does Emma do?"
+          "jp": "そうですか。ケイトさんのお{仕事|しごと}は{何|なん}ですか。",
+          "en": "I see. What does Kate do?"
         },
         {
           "role": "a",
@@ -240,8 +240,8 @@
         },
         {
           "role": "a",
-          "jp": "あのう、この{本|ほん}はリサさんのですか。",
-          "en": "Um, is this book yours, Lisa?"
+          "jp": "あのう、この{本|ほん}はだれのですか。リサさんのですか。",
+          "en": "Um, whose book is this? Is it yours, Lisa?"
         },
         {
           "role": "b",
@@ -288,8 +288,8 @@
           "questions": [],
           "rubric": [
             "Gets the clerk's attention with すみません",
-            "Orders two different drinks, e.g. コーヒー、お願いします。紅茶もお願いします。",
-            "Orders something to eat for each of you, e.g. ケーキ、ふたつお願いします",
+            "Orders two different drinks, e.g. コーヒー、おねがいします。こうちゃもおねがいします。",
+            "Orders something to eat for each of you, e.g. ケーキ、ふたつおねがいします",
             "Thanks the clerk with ありがとうございます"
           ]
         }
@@ -397,13 +397,13 @@
               "answer": 0
             },
             {
-              "q": "What two things does the customer ask about?",
+              "q": "Now you want to ask a clerk where the toilet is. What do you say?",
               "options": [
-                "The menu and the toilet",
-                "The water and the station",
-                "The water and the toilet"
+                "すみません、トイレはどれですか。",
+                "すみません、トイレはどこですか。",
+                "すみません、トイレはいくらですか。"
               ],
-              "answer": 2
+              "answer": 1
             }
           ]
         }
@@ -417,10 +417,10 @@
           "material": "「{朝|あさ}はコーヒーですか、{紅茶|こうちゃ}ですか。」\n「コーヒーは{毎日|まいにち}{飲|の}みますか。」\n「このケーキ、おいしいですね。」\n「この{店|みせ}はパンもおいしいですよ。」",
           "questions": [],
           "rubric": [
-            "Says what they drink, using a ます or ません verb at least once (紅茶は毎日飲みます／コーヒーは飲みません)",
+            "Says what they drink, using a ます or ません verb at least once (こうちゃはまいにちのみます／コーヒーはのみません)",
             "Agrees about the cake with そうですね or おいしいですね",
             "Reacts to the news about the bread with そうですか or へえ",
-            "Adds a fact of their own with よ (e.g. ここはコーヒーも安いですよ)"
+            "Adds a fact of their own with よ (e.g. ここはコーヒーもやすいですよ)"
           ]
         }
       }
@@ -435,8 +435,8 @@
         "a": "Reads the menu and does the ordering",
         "b": "Holds the 1,000 yen and knows what you both want"
       },
-      "infoA": "You have the menu: コーヒー 350円, 紅茶 400円, ジュース 300円, ケーキ 450円, パン 250円. You don't know what your partner wants, so ask (コーヒーですか、紅茶ですか？) and tell them the prices they ask about. Then you order at the counter (〜、お願いします).",
-      "infoB": "You can't see the menu, but you hold the money: exactly 1,000 yen (千円). You want black tea (紅茶); your partner always has coffee. You'd love to share a piece of cake (ケーキ), but bread (パン) is fine too. Ask what things cost (いくらですか) and make sure the total is 1,000 yen or less.",
+      "infoA": "You have the menu: コーヒー ¥350, こうちゃ ¥400, ジュース ¥300, ケーキ ¥450, パン ¥250. You always have coffee. You don't know what your partner wants, so ask (コーヒーですか、こうちゃですか？) and tell them the prices they ask about. Then you order at the counter (〜、おねがいします).",
+      "infoB": "You can't see the menu, but you hold the money: exactly 1,000 yen (せんえん). You want black tea (こうちゃ); your partner always has coffee. You'd love to share a piece of cake (ケーキ), but bread (パン) is fine too. Ask what things cost (いくらですか) and make sure the total is 1,000 yen or less.",
       "targets": [
         "core:cw-0105",
         "core:cw-0141",
@@ -448,7 +448,7 @@
         "grammar:mo-also"
       ],
       "register": "polite",
-      "twist": "On the repeat, B has only 900 yen (九百円) and wants juice (ジュース) instead of tea. Work out the order again before you reach the counter.",
+      "twist": "On the repeat, B has only 900 yen (きゅうひゃくえん) and wants juice (ジュース) instead of tea. Work out the order again before you reach the counter.",
       "aiRole": "Café clerk who greets you, takes your order, tells you the total and gives you your change",
       "scripted": [
         {
@@ -488,8 +488,8 @@
         },
         {
           "role": "b",
-          "jp": "じゃあ、パンはどうですか。{千円|せんえん}ですよ。",
-          "en": "Then how about the bread? That makes 1,000 yen."
+          "jp": "じゃあ、パンはどうですか。{全部|ぜんぶ}で{千円|せんえん}ですよ。",
+          "en": "Then how about the bread? That makes 1,000 yen altogether."
         },
         {
           "role": "a",
@@ -543,10 +543,10 @@
           "material": "「{平日|へいじつ}は{何時|なんじ}に{起|お}きますか。」\n「{何時|なんじ}にうちを{出|で}ますか。」\n「{夜|よる}は{何時|なんじ}に{寝|ね}ますか。」",
           "questions": [],
           "rubric": [
-            "Answers each question with a clock time (七時, 七時半, 六時四十五分)",
-            "Puts に after the time: 七時に起きます",
-            "Uses the right verb each time: 起きます, 出ます, 寝ます",
-            "Asks at least one question back (…は何時に寝ますか？)"
+            "Answers each question with a clock time (しちじ, しちじはん, ろくじよんじゅうごふん)",
+            "Puts に after the time: しちじにおきます",
+            "Uses the right verb each time: おきます, でます, ねます",
+            "Asks at least one question back (…はなんじにねますか？)"
           ]
         }
       },
@@ -597,24 +597,24 @@
           "material": "あしたは{何時|なんじ}にうちを{出|で}ますか？\nどこに{行|い}きますか？\n{何時|なんじ}ごろ{帰|かえ}りますか？",
           "questions": [],
           "rubric": [
-            "Gives a leaving time with 〜時に出ます (or 〜時にうちを出ます)",
-            "Says where they're going with 〜に行きます",
-            "Says when they'll be back with 〜時ごろ帰ります",
+            "Gives a leaving time with 〜じにでます (or 〜じにうちをでます)",
+            "Says where they're going with 〜にいきます",
+            "Says when they'll be back with 〜じごろかえります",
             "Uses polite ます forms throughout"
           ]
         }
       },
       {
         "id": "u03-cd4",
-        "text": "Buy things at a bakery or convenience store, asking for one, two or three of something.",
+        "text": "Buy things at a shop counter or food stand, asking for one, two or three of something.",
         "check": {
           "kind": "speak",
-          "instructions": "You're buying lunch for both of you at a convenience store. Check the prices, then ask the clerk (the app) for three rice balls and two teas, and ask how much it comes to.",
+          "instructions": "You're buying lunch for both of you at a small food stand in the station, where everything is behind the counter. Check the prices, then ask the clerk (the app) for three rice balls and two teas, and ask how much it comes to.",
           "material": "おにぎり　150{円|えん}\nお{茶|ちゃ}　130{円|えん}\n{水|みず}　100{円|えん}\nパン　180{円|えん}\nりんご　120{円|えん}",
           "questions": [],
           "rubric": [
-            "Names each item with を and a number: おにぎりをみっつ、お茶をふたつ",
-            "Asks with ください or お願いします",
+            "Names each item with を and a number: おにぎりをみっつ、おちゃをふたつ",
+            "Asks with ください or おねがいします",
             "Uses the counting words ひとつ, ふたつ, みっつ (not いち, に, さん)",
             "Asks the total with いくらですか"
           ]
@@ -631,8 +631,8 @@
         "a": "Starts early tomorrow (schedule card A)",
         "b": "Works late tomorrow (schedule card B)"
       },
-      "infoA": "Schedule card A (tomorrow): you get up at 5:30 (五時半に起きます) and leave home at 6:30. You finish early and get home around 5:00 (五時ごろ帰ります). You must be in bed by 10:00 (十時に寝ます). You'll cook dinner, but you need six eggs (卵をむっつ) and three apples (りんごをみっつ): ask your partner to buy them.",
-      "infoB": "Schedule card B (tomorrow): you get up at 8:00 (八時に起きます) and leave home at 9:00. Work runs late: you leave the office at 7:30 (七時半に会社を出ます) and get home around 8:15. There's a supermarket by the station, so you can shop on the way home (帰りに). Find out when your partner goes to bed, and agree a dinner time.",
+      "infoA": "Schedule card A (tomorrow): you get up at 5:30 (ごじはんにおきます) and leave home at 6:30. You finish early and get home around 5:00 (ごじごろかえります). You must be in bed by 10:00 (じゅうじにねます). You'll cook dinner, but you need six eggs (たまごをむっつ) and three apples (りんごをみっつ): ask your partner to buy them.",
+      "infoB": "Schedule card B (tomorrow): you get up at 8:00 (はちじにおきます) and leave home at 9:00. Work runs late: you leave the office at 7:30 (しちじはんにかいしゃをでます) and get home around 8:15. There's a supermarket by the station, so you can shop on the way home (かえりに). Find out when your partner goes to bed, and agree a dinner time.",
       "targets": [
         "core:cw-0303",
         "core:cw-0184",
@@ -644,7 +644,7 @@
         "grammar:counting-tsu"
       ],
       "register": "polite",
-      "twist": "Swap cards. This time the late partner gets home at 9:00 (九時に帰ります), so agree a new dinner time or move it to breakfast together (朝ご飯), and change the shopping list (four apples, よっつ).",
+      "twist": "Swap cards. This time the late partner gets home at 9:00 (くじにかえります), so agree a new dinner time or move it to breakfast together (あさごはん), and change the shopping list (four apples, よっつ).",
       "scripted": [
         {
           "role": "a",
@@ -698,7 +698,7 @@
         },
         {
           "role": "a",
-          "jp": "ありがとう！ {卵|たまご}をむっつ、お{願|ねが}いします。それから、りんごもみっつください。",
+          "jp": "ありがとう！ {卵|たまご}をむっつ、お{願|ねが}いします。それから、りんごもみっつ。",
           "en": "Thanks! Six eggs, please. And three apples, too."
         },
         {
@@ -787,7 +787,7 @@
           "rubric": [
             "Says how many with ふたりです",
             "Orders a dish for each person with を and a number (カレーをひとつ、ラーメンをひとつ)",
-            "Orders a drink for each person with ください or お願いします",
+            "Orders a drink for each person with ください or おねがいします",
             "Gets the server's attention or starts the order with すみません"
           ]
         }
@@ -797,7 +797,7 @@
         "text": "Say what your food is like (tasty, spicy, sweet, not hot) and ask your partner about theirs.",
         "check": {
           "kind": "speak",
-          "instructions": "You're eating dinner out with your partner. Answer their questions about your food out loud, react to what they say, then ask about their food.",
+          "instructions": "You're eating dinner out with your partner. Your curry is tasty and not spicy. Answer their questions about your food out loud, react to what they say, then ask about their food.",
           "material": "「そのカレー、どうですか。」\n「{辛|から}いですか。」\n「{私|わたし}のラーメンはちょっと{熱|あつ}いです。でも、おいしいですよ。」",
           "questions": [],
           "rubric": [
@@ -852,12 +852,12 @@
         "check": {
           "kind": "write",
           "instructions": "A friend sends you this message. Reply in 2–4 sentences: where you ate yesterday, what you had, and how you got there.",
-          "material": "こんばんは！ きのうの{夜|よる}、{晩|ばん}ご{飯|はん}はどこで{食|た}べましたか？ {何|なに}を{食|た}べましたか？",
+          "material": "こんばんは！ きのうの{晩|ばん}ご{飯|はん}は、どこで{食|た}べましたか？ {何|なに}を{食|た}べましたか？",
           "questions": [],
           "rubric": [
-            "Says where they ate with 〜で食べました",
-            "Says what they had with 〜を食べました or 〜を飲みました",
-            "Says how they got there with 電車で, バスで or 車で行きました",
+            "Says where they ate with 〜でたべました",
+            "Says what they had with 〜をたべました or 〜をのみました",
+            "Says how they got there with でんしゃで, バスで or くるまでいきました",
             "Uses past ました forms throughout"
           ]
         }
@@ -873,8 +873,8 @@
         "a": "Knows what you both feel like eating",
         "b": "Has the menu with prices and the budget"
       },
-      "infoA": "You know what you both feel like tonight. You want something spicy (辛いラーメン) and a cold beer (冷たいビール). Your partner wants vegetables (野菜ラーメン), nothing spicy, and a juice. You can't see the prices: ask. When the server comes, say how many you are (ふたりです) and order.",
-      "infoB": "You have the menu and the budget: 2,500 yen in total (二千五百円), and the total must stay under it. Menu: ラーメン 800円, 辛いラーメン 950円, 野菜ラーメン 1,000円, ご飯 200円, ビール 600円, ジュース 300円; water is free (お水). Tell your partner the prices and agree what to drop.",
+      "infoA": "You know what you both feel like tonight. You want something spicy (からいラーメン) and a cold beer (つめたいビール). Your partner wants vegetables (やさいラーメン), nothing spicy, and a juice. You can't see the prices: ask. When the server comes, you order. At the end, ask for the bill (おかいけいをおねがいします).",
+      "infoB": "You have the menu and the budget: 2,500 yen in total (にせんごひゃくえん), and the total must stay under it. Menu: ラーメン ¥800, からいラーメン ¥950, やさいラーメン ¥1,000, ごはん ¥200, ビール ¥600, ジュース ¥300; water is free (おみず). You walk in first, so tell the server how many you are (ふたりです). Tell your partner the prices and agree what to drop.",
       "targets": [
         "core:cw-0069",
         "core:cw-0356",
@@ -886,13 +886,18 @@
         "grammar:numbers-prices"
       ],
       "register": "polite",
-      "twist": "On the repeat, the server recommends today's special (おすすめ) at 1,200 yen and one of you wants it; the shop also takes cash only (現金だけ) and you have just 2,000 yen. Re-plan the order.",
+      "twist": "On the repeat, the server recommends today's special (おすすめ) at 1,200 yen and one of you wants it; the shop also takes cash only (げんきんだけ) and you have just 2,000 yen. Re-plan the order.",
       "aiRole": "Ramen shop server who welcomes you, asks how many you are, takes your order and tells you the total",
       "scripted": [
         {
+          "role": "b",
+          "jp": "すみません、ふたりです。",
+          "en": "Excuse me, there are two of us."
+        },
+        {
           "role": "a",
           "jp": "おなかがすきましたね。{私|わたし}は{辛|から}いラーメンです。いくらですか。",
-          "en": "I'm so hungry. I'll have the spicy ramen. How much is it?"
+          "en": "I'm hungry, aren't you? I'll have the spicy ramen. How much is it?"
         },
         {
           "role": "b",
@@ -948,6 +953,11 @@
           "role": "b",
           "jp": "{私|わたし}のは{辛|から}くないです。おいしいですよ。",
           "en": "Mine isn't spicy. It's delicious."
+        },
+        {
+          "role": "a",
+          "jp": "ごちそうさまでした。すみません、お{会計|かいけい}をお{願|ねが}いします。",
+          "en": "That was great, thank you. Excuse me, could we have the bill, please?"
         }
       ]
     },
@@ -990,10 +1000,10 @@
           "material": "「{土曜日|どようび}、{映画|えいが}を{見|み}ませんか。」\n「じゃあ、{日曜日|にちようび}はどうですか。{公園|こうえん}を{散歩|さんぽ}しませんか。」",
           "questions": [],
           "rubric": [
-            "Turns down softly with すみません or ちょっと… and a short reason (土曜日は仕事があります)",
-            "Accepts with いいですね and a ましょう sentence (行きましょう)",
+            "Turns down softly with すみません or ちょっと… and a short reason (どようびはしごとがあります)",
+            "Accepts with いいですね and a ましょう sentence (いきましょう)",
             "Makes their own invitation with 〜ませんか",
-            "Names a day or time with に (日曜日に, 十時に)"
+            "Names a day or time with に (にちようびに, じゅうじに)"
           ]
         }
       },
@@ -1006,9 +1016,9 @@
           "material": "「{週末|しゅうまつ}、どこに{行|い}きたいですか。」\n「{何|なに}をしたいですか。」",
           "questions": [],
           "rubric": [
-            "Says a place they want to go with 〜に行きたいです",
+            "Says a place they want to go with 〜にいきたいです",
             "Says what they want to do there with 〜を〜たいです",
-            "Asks their partner with どこに行きたいですか or 何をしたいですか"
+            "Asks their partner with どこにいきたいですか or なにをしたいですか"
           ]
         }
       },
@@ -1018,7 +1028,7 @@
         "check": {
           "kind": "read",
           "instructions": "Your neighbour sends you this message. Read it and answer the questions.",
-          "material": "エマさん、サムさん、こんにちは！\n{来週|らいしゅう}の{土曜日|どようび}は{夫|おっと}の{誕生日|たんじょうび}です。\n{六時半|ろくじはん}に、うちで{一緒|いっしょ}に{晩|ばん}ご{飯|はん}を{食|た}べませんか。\n{山田|やまだ}さんと{奥|おく}さんも{来|き}ます。\nケーキもありますよ！\n{田中|たなか}{美咲|みさき}",
+          "material": "エマさん、ケンさん、こんにちは！\n{来週|らいしゅう}の{土曜日|どようび}は{夫|おっと}の{誕生日|たんじょうび}です。\n{六時半|ろくじはん}に、うちで{一緒|いっしょ}に{晩|ばん}ご{飯|はん}を{食|た}べませんか。\n{鈴木|すずき}さんと{奥|おく}さんも{来|き}ます。\nケーキもありますよ！\n{田中|たなか}{美咲|みさき}",
           "questions": [
             {
               "q": "Where is the dinner?",
@@ -1041,8 +1051,8 @@
             {
               "q": "Who else is coming?",
               "options": [
-                "Mr. Yamada and his wife",
-                "Mr. Yamada's friend",
+                "Mr. Suzuki and his wife",
+                "Mr. Suzuki's friend",
                 "Nobody else"
               ],
               "answer": 0
@@ -1055,11 +1065,11 @@
         "text": "Understand a short voicemail from a friend about their plans: when, where and who they're going with.",
         "check": {
           "kind": "listen",
-          "instructions": "Listen to a voicemail from your friend Kenta. You can play it twice. Then answer the questions.",
-          "material": "「あ、{健太|けんた}です。{日曜日|にちようび}に{妹|いもうと}と{鎌倉|かまくら}に{行|い}きます。{朝|あさ}{九時|くじ}の{電車|でんしゃ}です。{二人|ふたり}も{一緒|いっしょ}に{行|い}きませんか。{駅|えき}で{会|あ}いましょう。じゃあ、また{電話|でんわ}します。」",
+          "instructions": "Listen to a voicemail from your friend Shota. You can play it twice. Then answer the questions.",
+          "material": "「あ、{翔太|しょうた}です。{日曜日|にちようび}に{妹|いもうと}と{鎌倉|かまくら}に{行|い}きます。{朝|あさ}{九時|くじ}の{電車|でんしゃ}です。{二人|ふたり}も{一緒|いっしょ}に{行|い}きませんか。{駅|えき}で{会|あ}いましょう。じゃあ、また{電話|でんわ}します。」",
           "questions": [
             {
-              "q": "When is Kenta going?",
+              "q": "When is Shota going?",
               "options": [
                 "On Saturday",
                 "On Sunday",
@@ -1097,10 +1107,10 @@
           "material": "こんにちは！ {週末|しゅうまつ}、{時間|じかん}がありますか。{一緒|いっしょ}に{出|で}かけませんか。",
           "questions": [],
           "rubric": [
-            "Says when they are free or busy with 時間があります／ありません or 土曜日は仕事があります",
+            "Says when they are free or busy with じかんがあります／ありません or どようびはしごとがあります",
             "Suggests an activity with 〜ませんか or 〜ましょう",
-            "Names a day and/or time with に (日曜日に, 十一時に)",
-            "Ends warmly (楽しみです, じゃあ、また)"
+            "Names a day and/or time with に (にちようびに, じゅういちじに)",
+            "Ends warmly (たのしみです, じゃあ、また)"
           ]
         }
       }
@@ -1115,8 +1125,8 @@
         "a": "Has three ideas and their free times (card A)",
         "b": "Has other ideas, a busy Saturday and a friend who wants to come (card B)"
       },
-      "infoA": "Your ideas: see a movie (映画を見る), walk in the park (公園を散歩する), or try the new restaurant by the station (駅の近くのレストラン). You're free on Saturday afternoon and all day Sunday, but on Sunday you want a slow morning (朝はゆっくりしたいです), so nothing before 11:00.",
-      "infoB": "Your ideas: take photos in the park (公園で写真を撮る), or go shopping. You work all day Saturday (土曜日は仕事があります). Your friend Yuki (友達の由紀さん) wants to come along, but movies aren't her thing (映画はちょっと…). You can meet at the station (駅) any time after 10:00.",
+      "infoA": "Your ideas: see a movie (えいがをみます), walk in the park (こうえんをさんぽします), or try the new restaurant by the station (えきのちかくのレストラン). You're free on Saturday afternoon and all day Sunday, but on Sunday you want a slow morning (あさはゆっくりしたいです), so nothing before 11:00.",
+      "infoB": "Your ideas: take photos in the park (こうえんでしゃしんをとります), or go shopping. You work all day Saturday (どようびはしごとがあります). Your friend Yuki (ともだちのゆきさん) wants to come along, but movies aren't her thing (えいがはちょっと…). You can meet at the station (えき) any time after 10:00.",
       "targets": [
         "core:cw-0206",
         "core:cw-0160",
@@ -1128,13 +1138,13 @@
         "grammar:arimasu-imasu"
       ],
       "register": "polite",
-      "twist": "On the repeat, it's going to rain on Sunday (日曜日は雨です) and Yuki can only come on Saturday evening (土曜日の夜). Find an indoor plan and a new time.",
+      "twist": "On the repeat, it's going to rain on Sunday (にちようびはあめです) and Yuki can only come on Saturday evening (どようびのよる). Find an indoor plan and a new time.",
       "aiRole": "Your friend Yuki, who calls to ask whether she can come along and what time to meet",
       "scripted": [
         {
           "role": "a",
-          "jp": "{週末|しゅうまつ}、{一緒|いっしょ}に{出|で}かけませんか。",
-          "en": "Shall we go out together this weekend?"
+          "jp": "{週末|しゅうまつ}はひまですか。{一緒|いっしょ}に{出|で}かけませんか。",
+          "en": "Are you free this weekend? Shall we go out together?"
         },
         {
           "role": "b",
@@ -1189,8 +1199,8 @@
       ]
     },
     "capstone": {
-      "title": "Planning a date",
-      "brief": "Plan a date for next weekend. Start by saying what last weekend was like, then invite each other, say what you each want to do, check what there is nearby, decide who else is coming, and fix a day and a time.",
+      "title": "Our weekend plan",
+      "brief": "Plan next weekend together. Start by saying what last weekend was like, then invite each other, say what you each want to do, check what there is nearby, decide whether to ask a friend along, and fix a day, a time and a meeting place.",
       "minLinesEach": 8,
       "structures": [
         "masenka-mashou",
@@ -1240,7 +1250,7 @@
         "text": "Write a few lines about your week: what you always, often, sometimes and never do.",
         "check": {
           "kind": "write",
-          "instructions": "Your partner sent you the message below. Reply with 4–5 sentences about your own week. Use at least three of いつも, よく, 時々 and たまに, and say one thing you hardly or never do (あまり / 全然 + 〜ません).",
+          "instructions": "A friend from your Japanese class sent you the message below. Reply with 4–5 sentences about your own week. Use at least three of いつも, よく, 時々 and たまに, and say one thing you hardly or never do (あまり / 全然 + 〜ません).",
           "material": "{私|わたし}は{毎朝|まいあさ}コーヒーを{飲|の}みます。{週末|しゅうまつ}はよく{散歩|さんぽ}します。{時々|ときどき}{映画|えいが}を{見|み}ます。ゲームは{全然|ぜんぜん}しません。あなたは？",
           "questions": [],
           "rubric": [
@@ -1257,7 +1267,7 @@
         "check": {
           "kind": "listen",
           "instructions": "Listen to a friend talking about a place she likes. You can play it twice. Then answer the questions.",
-          "material": "{私|わたし}の{家|いえ}の{近|ちか}くに{公園|こうえん}があります。あまり{大|おお}きくないです。でも、とてもきれいな{公園|こうえん}です。{朝|あさ}は{静|しず}かです。{私|わたし}は{毎朝|まいあさ}そこで{散歩|さんぽ}します。{週末|しゅうまつ}は{子|こ}どもがたくさんいます。{時々|ときどき}、{夫|おっと}と{一緒|いっしょ}にそこでお{弁当|べんとう}を{食|た}べます。{夏|なつ}はとても{暑|あつ}いです。{私|わたし}は{秋|あき}の{公園|こうえん}が{大好|だいす}きです。",
+          "material": "{私|わたし}の{家|いえ}の{近|ちか}くに{公園|こうえん}があります。{小|ちい}さいです。でも、きれいな{公園|こうえん}ですよ。{朝|あさ}は{静|しず}かです。{私|わたし}は{毎朝|まいあさ}そこで{散歩|さんぽ}します。{週末|しゅうまつ}は{子|こ}どもがたくさんいます。{時々|ときどき}、{夫|おっと}と{一緒|いっしょ}にそこでお{弁当|べんとう}を{食|た}べます。{夏|なつ}は{暑|あつ}いです。{私|わたし}は{秋|あき}の{公園|こうえん}が{大好|だいす}きです。",
           "questions": [
             {
               "q": "What is the park like in the morning?",
@@ -1375,8 +1385,8 @@
         },
         {
           "role": "b",
-          "jp": "えっと…ラーメンかカレーがいい。うちに{何|なに}がある？",
-          "en": "Hmm… ramen or curry. What have we got at home?"
+          "jp": "えっと…ラーメンかカレーを{食|た}べたい。うちに{何|なに}がある？",
+          "en": "Hmm… I feel like ramen or curry. What have we got at home?"
         },
         {
           "role": "a",
@@ -1472,7 +1482,7 @@
         "check": {
           "kind": "speak",
           "instructions": "Your partner (or the AI) comes home and says the three lines below, one at a time. Reply in casual Japanese: greet them, ask about their day (忙しかった？ 楽しかった？), react, and answer the dinner question. About 1 minute.",
-          "material": "ただいま！\nうん、とても{忙|いそが}しかった。でも、{仕事|しごと}は{楽|たの}しかったよ。\n{晩|ばん}ご{飯|はん}、{何|なに}{食|た}べる？",
+          "material": "ただいま！\nうん、{忙|いそが}しかった。でも、{仕事|しごと}は{楽|たの}しかったよ。\n{晩|ばん}ご{飯|はん}、{何|なに}{食|た}べる？",
           "questions": [],
           "rubric": [
             "Greets with お帰り or お帰りなさい",
@@ -1488,7 +1498,7 @@
         "check": {
           "kind": "listen",
           "instructions": "Your partner left you a voice message. Listen (twice if you like) and answer the questions.",
-          "material": "{私|わたし}だよ。ごめん、{今日|きょう}は{仕事|しごと}がとても{忙|いそが}しい。{九時|くじ}ごろ{帰|かえ}るね。{晩|ばん}ご{飯|はん}のカレーは{冷蔵庫|れいぞうこ}の{中|なか}にあるよ。お{皿|さら}はテーブルの{上|うえ}。それから、{猫|ねこ}のご{飯|はん}はソファーの{横|よこ}にあるよ。じゃあ、またあとでね。",
+          "material": "{私|わたし}だよ。ごめん、{今日|きょう}は{忙|いそが}しい。{九時|くじ}ごろ{帰|かえ}るね。{晩|ばん}ご{飯|はん}のカレーは{冷蔵庫|れいぞうこ}の{中|なか}にあるよ。お{皿|さら}はテーブルの{上|うえ}。それから、{猫|ねこ}のご{飯|はん}はソファーの{横|よこ}にあるよ。じゃあ、またあとでね。",
           "questions": [
             {
               "q": "Where is the curry?",
@@ -1542,7 +1552,7 @@
         "check": {
           "kind": "read",
           "instructions": "Your partner left this note on the fridge. Read it and answer the questions.",
-          "material": "おはよう！\n{郵便局|ゆうびんきょく}と{銀行|ぎんこう}へ{行|い}ってきます。{二時|にじ}ごろ{帰|かえ}るね。\nお{昼|ひる}ご{飯|はん}は{冷蔵庫|れいぞうこ}の{中|なか}にあるよ。おにぎりとサラダ。\n{家|いえ}の{鍵|かぎ}はテーブルの{上|うえ}。\n{今日|きょう}はごみの{日|ひ}！ ごみはドアの{横|よこ}にあるよ。お{願|ねが}いします！\n{帰|かえ}って、{一緒|いっしょ}に{掃除|そうじ}する？",
+          "material": "おはよう！\n{郵便局|ゆうびんきょく}と{銀行|ぎんこう}へ{行|い}ってきます。{二時|にじ}ごろ{帰|かえ}るね。\nお{昼|ひる}ご{飯|はん}は{冷蔵庫|れいぞうこ}の{中|なか}にあるよ。おにぎりとサラダ。\n{家|いえ}の{鍵|かぎ}はテーブルの{上|うえ}。\n{今日|きょう}はごみの{日|ひ}！ ごみはドアの{横|よこ}にあるよ。お{願|ねが}いします！\n{午後|ごご}は{一緒|いっしょ}に{掃除|そうじ}する？",
           "questions": [
             {
               "q": "Where has your partner gone?",
@@ -1579,14 +1589,14 @@
         "text": "Send your partner a short casual message about your day: where you went and how it was.",
         "check": {
           "kind": "write",
-          "instructions": "Your partner sent you the message below. Reply in 3–4 short casual sentences: where you went today, what you did there, and how it was.",
+          "instructions": "Your partner sent you the message below. Reply in 3–4 short, warm sentences: where you went today, what you did there, and how it was. Adjectives can be casual (楽しかったよ); verbs can stay in the ます form for now, because the plain past comes in unit 9.",
           "material": "おつかれさま！ {今日|きょう}は{楽|たの}しかった？ {私|わたし}は{今|いま}、{会社|かいしゃ}。{七時|しちじ}ごろ{帰|かえ}るね。",
           "questions": [],
           "rubric": [
-            "Says where they went with へ or に (〜へ行きました is fine)",
+            "Says where they went with へ or に (〜へ行きました)",
             "Joins two actions with the て-form (〜へ行って、〜を買いました)",
             "Says how it was with a past adjective (楽しかった, 寒かった, 静かでした)",
-            "Sounds casual and warm: no です after plain adjectives, ends with よ or ね"
+            "Sounds warm and casual: no です after い-adjectives (楽しかったよ), and at least one sentence ends with よ or ね"
           ]
         }
       }
@@ -1642,8 +1652,8 @@
         },
         {
           "role": "b",
-          "jp": "ううん、テーブルの{上|うえ}は{鍵|かぎ}だけだよ。",
-          "en": "No, there's only your keys on the table."
+          "jp": "ううん。テーブルの{上|うえ}は{鍵|かぎ}とコップだけだよ。",
+          "en": "No. There are just your keys and a cup on the table."
         },
         {
           "role": "a",
@@ -1783,7 +1793,7 @@
         "check": {
           "kind": "listen",
           "instructions": "Listen to a couple deciding what to buy at the supermarket (two voices, taking turns). Their list says 牛乳, 卵, パン, 石けん and お菓子. Then answer the questions.",
-          "material": "スーパーで{何|なに}{買|か}う？\nえっと、{牛乳|ぎゅうにゅう}がない。{牛乳|ぎゅうにゅう}は{買|か}う。\n{卵|たまご}は？\n{卵|たまご}はまだ{冷蔵庫|れいぞうこ}にあるよ。{今日|きょう}は{買|か}わない。\nパンは？ {二|ふた}つ{買|か}う？\nううん、{一|ひと}つでいいよ。あ、それから、トイレの{石|せっ}けんがない。\nじゃあ、{石|せっ}けんも。お{菓子|かし}は？\nお{菓子|かし}は{買|か}わない！ うちにまだたくさんあるよ。",
+          "material": "スーパーで{何|なに}{買|か}う？\nえっと、{牛乳|ぎゅうにゅう}がない。{牛乳|ぎゅうにゅう}は{買|か}う。\n{卵|たまご}は？\n{卵|たまご}は{冷蔵庫|れいぞうこ}にあるよ。{今日|きょう}は{買|か}わない。\nパンは？ {二|ふた}つ{買|か}う？\nううん、{一|ひと}つだけ。あ、それから、トイレの{石|せっ}けんがない。\nじゃあ、{石|せっ}けんも。お{菓子|かし}は？\nお{菓子|かし}は{買|か}わない！ うちにたくさんあるよ。",
           "questions": [
             {
               "q": "Which item do they decide not to buy today?",
@@ -1827,7 +1837,7 @@
         "b": "Knows the budget, what's already at home and what you need (card B)"
       },
       "infoA": "Card A — you're at the shelf. Towels (タオル): ① big, ¥1,800 each; ② small, ¥600 each; ③ big and really soft (すごくいい), ¥3,000 each. Cups (コップ): ④ glass, ¥500 each; ⑤ big and a bit heavy (ちょっと重い), ¥900 each. All prices include tax (税込). Describe the options with とても / すごく / ちょっと and あまり〜ない, and give the prices.",
-      "infoB": "Card B — you know what you need. Budget: ¥5,000 altogether (全部で五千円まで). You have lots of small towels at home, so you won't buy those (小さいタオルは買わない); you need two big ones. You need two cups, and you don't like heavy cups (重いコップはあまり好きじゃない). Ask which ones are good (どれがいい？) and how much they are, add up the total, and finish by asking the clerk to put everything in a bag (袋に入れてください).",
+      "infoB": "Card B — you know what you need. Budget: up to ¥5,000 altogether (五千円まで). You have lots of small towels at home, so you won't buy those (小さいタオルは買わない); you need two big ones (大きいタオルを二枚). You need two cups (コップを二つ), and you don't like heavy cups (重いコップはあまり好きじゃない). Ask which ones are good (どれがいい？) and how much they are, add up the total, and finish by asking the clerk to put everything in a bag (袋に入れてください).",
       "targets": [
         "grammar:adverbs-degree",
         "grammar:ga-subject",
@@ -1839,8 +1849,8 @@
         "core:cw-0557"
       ],
       "register": "mixed",
-      "twist": "Repeat it 2–7 days later with a ¥3,000 budget and a sale: the soft towels (③) are now half price, ¥1,500 each. Redo the maths and choose again; this time the clerk also asks how you will pay (カードですか、現金ですか).",
-      "aiRole": "The shop clerk (店員): greets you, answers price questions politely, and bags the items when asked (いらっしゃいませ / 袋はどうしますか).",
+      "twist": "Repeat it 2–7 days later with a ¥4,000 budget and a sale: the soft towels (③) are now half price, ¥1,500 each. Redo the maths and choose again; this time the clerk also asks how you will pay (カードですか、現金ですか).",
+      "aiRole": "The shop clerk: greets you, answers price questions politely, and bags the items when asked (いらっしゃいませ / 袋はどうしますか).",
       "scripted": [
         {
           "role": "a",
@@ -1849,18 +1859,18 @@
         },
         {
           "role": "b",
-          "jp": "{大|おお}きいタオルを{二|ふた}つ{買|か}う。{小|ちい}さいタオルは{買|か}わない。うちにたくさんあるよ。",
+          "jp": "{大|おお}きいタオルを{二枚|にまい}{買|か}う。{小|ちい}さいタオルは{買|か}わない。うちにたくさんあるよ。",
           "en": "Let's get two big towels. Not the small ones — we have lots at home."
         },
         {
           "role": "a",
-          "jp": "{大|おお}きいタオルはこれとこれ。これは{千|せん}{八百|はっぴゃく}{円|えん}。これは{三千|さんぜん}{円|えん}で、すごくいいよ。",
+          "jp": "{大|おお}きいタオルはこれとこれ。これは{千|せん}{八百|はっぴゃく}{円|えん}。これは{三千|さんぜん}{円|えん}。すごくいいよ。",
           "en": "The big ones are this and this. This one's 1,800 yen. This one's 3,000 yen, and it's really nice."
         },
         {
           "role": "b",
-          "jp": "{三千|さんぜん}{円|えん}？ ちょっと{高|たか}い。{全部|ぜんぶ}で{五千|ごせん}{円|えん}までだよ。",
-          "en": "3,000 yen? That's a bit pricey. We've only got 5,000 yen altogether."
+          "jp": "{三千|さんぜん}{円|えん}？ ちょっと{高|たか}い。{五千|ごせん}{円|えん}までだよ。",
+          "en": "3,000 yen? That's a bit pricey. We can only spend up to 5,000 yen."
         },
         {
           "role": "a",
@@ -1884,13 +1894,13 @@
         },
         {
           "role": "a",
-          "jp": "{全部|ぜんぶ}でいくら？",
-          "en": "How much is that altogether?"
+          "jp": "じゃあ、いくら？",
+          "en": "So how much does that come to?"
         },
         {
           "role": "b",
-          "jp": "えっと…{三千|さんぜん}{六百|ろっぴゃく}{円|えん}と{千|せん}{円|えん}で、{四千|よんせん}{六百|ろっぴゃく}{円|えん}。{大丈夫|だいじょうぶ}！",
-          "en": "Um… 3,600 and 1,000 makes 4,600 yen. We're fine!"
+          "jp": "えっと…{三千|さんぜん}{六百|ろっぴゃく}{円|えん}と{千|せん}{円|えん}。{四千|よんせん}{六百|ろっぴゃく}{円|えん}だね。{大丈夫|だいじょうぶ}！",
+          "en": "Um… 3,600 and 1,000. So 4,600 yen. We're fine!"
         },
         {
           "role": "a",
@@ -1957,7 +1967,7 @@
         "check": {
           "kind": "read",
           "instructions": "A friend sent you and your partner this message. Read it and answer the questions.",
-          "material": "こんにちは！ {来月|らいげつ}の{十四日|じゅうよっか}（{土曜日|どようび}）は{夫|おっと}の{誕生日|たんじょうび}です。\n{夜|よる}{七時|しちじ}から、うちで{晩|ばん}ご{飯|はん}を{食|た}べます。ケーキもありますよ。\n{二人|ふたり}も{来|き}ませんか。{駅|えき}から{歩|ある}いて{五分|ごふん}です。\n{来|く}る？ {来|こ}ない？ メッセージ{待|ま}ってるね！",
+          "material": "こんにちは！ {来月|らいげつ}の{十四日|じゅうよっか}（{土曜日|どようび}）は{夫|おっと}の{誕生日|たんじょうび}！\n{夜|よる}{七時|しちじ}から、うちで{晩|ばん}ご{飯|はん}を{食|た}べるよ。ケーキもある。\n{二人|ふたり}も{来|こ}ない？ うちは{駅|えき}から{歩|ある}いて{五分|ごふん}だよ。\nメッセージ{待|ま}ってるね！",
           "questions": [
             {
               "q": "What day of the week is the dinner?",
@@ -1978,11 +1988,11 @@
               "answer": 0
             },
             {
-              "q": "What time does dinner start?",
+              "q": "What date is the dinner?",
               "options": [
-                "6:00",
-                "8:00",
-                "7:00"
+                "The 4th of next month",
+                "The 14th of this month",
+                "The 14th of next month"
               ],
               "answer": 2
             }
@@ -2011,7 +2021,7 @@
         "check": {
           "kind": "listen",
           "instructions": "Your partner is telling you about their day. Listen (twice if you like) and answer the questions.",
-          "material": "{今日|きょう}は{大変|たいへん}だった！ {朝|あさ}、{雨|あめ}が{降|ふ}ってたから、バスで{会社|かいしゃ}に{行|い}った。でも、バスがすごく{遅|おそ}かった。{昼|ひる}は{忙|いそが}しかったから、{昼|ひる}ご{飯|はん}を{食|た}べなかった。{仕事|しごと}の{後|あと}、{駅|えき}のコンビニにおにぎりを{買|か}いに{行|い}った。{今|いま}はちょっと{元気|げんき}だよ！",
+          "material": "{今日|きょう}は{大変|たいへん}だった！ {朝|あさ}、{雨|あめ}が{降|ふ}ってたから、バスで{会社|かいしゃ}に{行|い}った。でも、バスがすごく{遅|おそ}かった。{昼|ひる}は{忙|いそが}しかったから、{昼|ひる}ご{飯|はん}を{食|た}べなかった。{夕方|ゆうがた}、{駅|えき}のコンビニにおにぎりを{買|か}いに{行|い}った。でも、{今|いま}は{元気|げんき}だよ！",
           "questions": [
             {
               "q": "How did they get to work, and why?",
@@ -2032,7 +2042,7 @@
               "answer": 1
             },
             {
-              "q": "What did they do after work?",
+              "q": "What did they do in the early evening?",
               "options": [
                 "Met a friend at the station",
                 "Took a taxi home",
@@ -2067,7 +2077,7 @@
         "core:cw-0447"
       ],
       "register": "plain",
-      "twist": "Repeat it 2–7 days later for a birthday instead: card A's free days change (the 17th is now taken by work), card B's restaurant list adds a new closing day, and you also decide what present to go out and buy (プレゼントを買いに行く).",
+      "twist": "Repeat it 2–7 days later for a birthday dinner instead: on card A the 17th is now taken by work (仕事), so find another evening you are both free and a restaurant that is open that day. Also decide what present to go out and buy first (プレゼントを買いに行く).",
       "scripted": [
         {
           "role": "a",
@@ -2106,7 +2116,7 @@
         },
         {
           "role": "b",
-          "jp": "{駅|えき}の{近|ちか}くの{寿司|すし}の{店|みせ}は、{金曜日|きんようび}が{定休日|ていきゅうび}だよ。",
+          "jp": "{駅|えき}の{近|ちか}くの{寿司|すし}の{店|みせ}、{定休日|ていきゅうび}は{金曜日|きんようび}だよ。",
           "en": "The sushi place near the station is closed on Fridays."
         },
         {
@@ -2116,8 +2126,8 @@
         },
         {
           "role": "b",
-          "jp": "{天|てん}ぷらの{店|みせ}は{土曜日|どようび}と{日曜日|にちようび}が{休|やす}み。{金曜日|きんようび}は{大丈夫|だいじょうぶ}。",
-          "en": "The tempura place is closed on Saturdays and Sundays, so Friday's fine."
+          "jp": "{休|やす}みは{土曜日|どようび}と{日曜日|にちようび}。{金曜日|きんようび}は{大丈夫|だいじょうぶ}だよ。",
+          "en": "It's closed on Saturdays and Sundays, so Friday's fine."
         },
         {
           "role": "a",
@@ -2220,12 +2230,12 @@
         "text": "Ask for and give permission when visiting someone's home (may I come in, sit here, take a photo?).",
         "check": {
           "kind": "speak",
-          "instructions": "You're visiting a friend's parents. The AI plays your friend's mother and says the lines below, one at a time. Ask permission politely with 〜てもいいですか at least twice (to come in, to sit down, to take a photo), and give permission when she asks you.",
-          "material": "ようこそ！ どうぞ。\nこちらにどうぞ。お{茶|ちゃ}はいかがですか。\nちょっと{暑|あつ}いですね。{窓|まど}を{開|あ}けてもいいですか。\nこれは{家族|かぞく}の{写真|しゃしん}ですよ。",
+          "instructions": "You're visiting a friend's parents. The AI plays your friend's mother and says the lines below, one at a time. Ask permission politely with 〜てもいいですか at least twice (to sit here, to look at the photos, to take a picture), and give permission when she asks you.",
+          "material": "ようこそ！ どうぞ、{入|はい}ってください。\nお{茶|ちゃ}はいかがですか。\nちょっと{暑|あつ}いですね。{窓|まど}を{開|あ}けてもいいですか。\nこれは{家族|かぞく}の{写真|しゃしん}ですよ。",
           "questions": [],
           "rubric": [
-            "Asks permission with 〜てもいいですか at least twice (入っても / 座っても / 写真を撮っても)",
-            "Makes the て-forms correctly (入って, 座って, 撮って)",
+            "Asks permission with 〜てもいいですか at least twice (ここに座っても / 見ても / 写真を撮っても)",
+            "Makes the て-forms correctly (座って, 見て, 撮って)",
             "Gives permission when asked (どうぞ / いいですよ)",
             "Stays polite with です / ます throughout"
           ]
@@ -2259,7 +2269,7 @@
         "b": "Has the names for the right of the photo, but can see only the left half (card B)"
       },
       "infoA": "Card A. Your friend Mari's notes on the LEFT of the photo (people 1–3): • お父さん (her dad): tall (背が高い), glasses (めがね), a great cook (料理が上手). • おばあさん (her grandma): short hair (髪が短い), loves sweet things (甘いものが大好き). • お兄さん (her big brother): short hair too, always funny (いつも面白い). What you can see — the RIGHT half (people 4–6): 4: long hair, holding a cake. 5: short hair, with a dog. 6: glasses, sitting on a chair. Describe 4–6 with は〜が (4番の人は髪が長い) and let your partner name them; then name 1–3 as your partner describes them (〜だと思う).",
-      "infoB": "Card B. Mari's notes on the RIGHT of the photo (people 4–6): • お母さん (her mum): long hair (髪が長い), makes great cakes (ケーキが上手). • 妹さん (her little sister): short hair, loves dogs and cats (犬や猫が大好き). • おじいさん (her grandpa): glasses, very kind (とても優しい). What you can see — the LEFT half (people 1–3): 1: short hair, eating cake. 2: tall, glasses, holding a frying pan (フライパン). 3: short hair, laughing. Name 4–6 as your partner describes them (〜だと思う), then describe 1–3 with は〜が.",
+      "infoB": "Card B. Mari's notes on the RIGHT of the photo (people 4–6): • お母さん (her mum): long hair (髪が長い), makes delicious cakes (お母さんのケーキはすごくおいしい). • 妹さん (her little sister): short hair, loves dogs and cats (犬や猫が大好き). • おじいさん (her grandpa): glasses, very kind (とても優しい). What you can see — the LEFT half (people 1–3): 1: short hair, eating cake. 2: tall, glasses, holding a frying pan (フライパン). 3: short hair, laughing. Name 4–6 as your partner describes them (〜だと思う), then describe 1–3 with は〜が.",
       "targets": [
         "grammar:wa-ga-description",
         "grammar:to-omou",
@@ -2279,8 +2289,8 @@
         },
         {
           "role": "b",
-          "jp": "{髪|かみ}が{長|なが}い？ じゃあ、お{母|かあ}さんだと{思|おも}う。ケーキがすごく{上手|じょうず}だよ。",
-          "en": "Long hair? Then I think it's her mum. She's brilliant at cakes."
+          "jp": "{髪|かみ}が{長|なが}い？ じゃあ、お{母|かあ}さんだと{思|おも}う。お{母|かあ}さんのケーキ、すごくおいしいよ。",
+          "en": "Long hair? Then I think it's her mum. Her cakes are delicious."
         },
         {
           "role": "a",
@@ -2315,7 +2325,7 @@
         {
           "role": "a",
           "jp": "ケーキ？ じゃあ、おばあさんだと{思|おも}う。{甘|あま}いものが{大好|だいす}きだよ。",
-          "en": "Cake? Then I think it’s her grandma. She loves sweet things."
+          "en": "Cake? Then I think it's her grandma. She loves sweet things."
         },
         {
           "role": "b",
@@ -2385,7 +2395,7 @@
           "rubric": [
             "Uses 〜のが好き with at least two activities (散歩するのが好きです)",
             "Names one thing they don't enjoy much (あまり好きじゃない／苦手です)",
-            "Joins two ideas with けど (映画を見るのは好きだけど、映画館は高い)",
+            "Joins two ideas with けど (映画を見るのが好きだけど、映画館は高い)",
             "Answers all three questions"
           ]
         }
@@ -2401,11 +2411,11 @@
             {
               "q": "Which of these is not allowed inside the museum?",
               "options": [
-                "Talking on your phone",
                 "Carrying a small bag",
+                "Talking on your phone",
                 "Walking around slowly"
               ],
-              "answer": 0
+              "answer": 1
             },
             {
               "q": "What should you do with a big bag?",
@@ -2419,11 +2429,11 @@
             {
               "q": "When can't you visit the museum?",
               "options": [
-                "On Sunday afternoons",
-                "Before eleven in the morning",
-                "On Mondays"
+                "On Mondays",
+                "On Saturdays",
+                "On Sunday afternoons"
               ],
-              "answer": 2
+              "answer": 0
             }
           ]
         }
@@ -2449,7 +2459,7 @@
         "check": {
           "kind": "listen",
           "instructions": "Your friend Ms Sato has left you a voice message about Sunday. Listen and answer the questions. You can listen twice.",
-          "material": "{佐藤|さとう}です。{日曜日|にちようび}の{予定|よてい}です。{十時|じゅうじ}に{駅|えき}の{前|まえ}で{会|あ}いましょう。まず、{駅|えき}の{近|ちか}くにある{美術館|びじゅつかん}に{行|い}きます。{美術館|びじゅつかん}を{出|で}てから、{公園|こうえん}でお{弁当|べんとう}を{食|た}べましょう。お{弁当|べんとう}は{私|わたし}が{作|つく}ります！{食|た}べてから、{公園|こうえん}を{少|すこ}し{散歩|さんぽ}して、{三時|さんじ}ごろカフェに{行|い}きます。{雨|あめ}の{日|ひ}は、{公園|こうえん}じゃなくて、{映画館|えいがかん}に{行|い}きましょう。じゃあ、{日曜日|にちようび}に！",
+          "material": "{佐藤|さとう}です。{日曜日|にちようび}の{予定|よてい}です。{十時|じゅうじ}に{駅|えき}の{前|まえ}で{会|あ}いましょう。まず、{駅|えき}の{近|ちか}くにある{美術館|びじゅつかん}に{行|い}きます。{美術館|びじゅつかん}を{出|で}てから、{公園|こうえん}でお{弁当|べんとう}を{食|た}べましょう。お{弁当|べんとう}は{私|わたし}が{作|つく}ります！{食|た}べてから、{公園|こうえん}を{少|すこ}し{散歩|さんぽ}して、{三時|さんじ}ごろカフェに{行|い}きます。{雨|あめ}の{日|ひ}は、{公園|こうえん}には{行|い}きません。{映画館|えいがかん}に{行|い}きましょう。じゃあ、{日曜日|にちようび}に！",
           "questions": [
             {
               "q": "Where will you go first?",
@@ -2487,7 +2497,7 @@
         "check": {
           "kind": "write",
           "instructions": "Write a short review (3–4 sentences) of a café, film or place you've been to, for a review app. Use the card below: say what it was, one good point, one bad point, and whether you'd go again.",
-          "material": "★★★☆☆\n{行|い}った{所|ところ}・{見|み}た{映画|えいが}：\nよかったこと：\nよくなかったこと：\nまた{行|い}きたいですか：",
+          "material": "★★★☆☆\n{行|い}った{所|ところ}・{見|み}た{映画|えいが}：\nよかったこと：\nよくなかったこと：\nまた{行|い}きたい・{見|み}たいですか：",
           "questions": [],
           "rubric": [
             "Names the place or film with a describing clause (先週行ったカフェは…)",
@@ -2508,7 +2518,7 @@
         "a": "Has a page of local events with times and rules (card A)",
         "b": "Has a list of what you both like and don't like, and the budget (card B)"
       },
-      "infoA": "What's on near you this Sunday (card A):\n• Art museum (びじゅつかん): 10:00–17:00, ¥1,000 each. No photos inside (しゃしんを とっては いけません), no food or drinks.\n• Park (こうえん): bike hire (じてんしゃを かしている) 9:00–13:00, ¥300 each.\n• Cinema (えいがかん): a comedy at 14:00 and at 18:30, ¥1,800 each.\n• Pool (プール): 13:00–20:00, ¥500 each. You must shower first (シャワーを あびてから はいる).\nYou'd like to see the museum. Tell your partner what's on, check what they like (〜のが すき？) and pass on any rules that matter.",
+      "infoA": "What's on near you this Sunday (card A):\n• Art museum (びじゅつかん): 10:00–17:00, ¥1,000 each. No photos inside (しゃしんを とっては いけません), no food or drinks.\n• Park (こうえん): bike hire (じてんしゃを かしている) 9:00–13:00, ¥300 each.\n• Cinema (えいがかん): a comedy at 14:00 and at 18:30, ¥1,500 each.\n• Pool (プール): 13:00–20:00, ¥500 each. You must shower first (シャワーを あびてから はいる).\nYou'd like to see the museum. Tell your partner what's on, check what they like (〜のが すき？) and pass on any rules that matter.",
       "infoB": "What you know (card B):\n• You love cycling (じてんしゃに のるのが すき) and you want to take lots of photos (しゃしん) on Sunday.\n• Swimming pools aren't really your thing (プールは にがて).\n• Budget: ¥5,000 for the two of you, lunch included (lunch out ≈ ¥1,500 for two).\n• You need to be home by 18:00 (your parents are coming for dinner).\nYou don't know what's on: ask (なにが ある？), check times and prices, and agree on two things and their order (〜てから).",
       "targets": [
         "grammar:no-ga-suki",
@@ -2520,7 +2530,7 @@
         "core:cw-0754"
       ],
       "register": "plain",
-      "twist": "Repeat: it's raining on Sunday, so the park is out. Find an indoor plan that you both enjoy and that still fits the budget and the 18:00 deadline.",
+      "twist": "Repeat: it's raining on Sunday, so the park is out. Find an indoor plan you both enjoy that still fits the ¥5,000 budget and the 18:00 deadline (lunch at home is fine).",
       "scripted": [
         {
           "role": "a",
@@ -2636,7 +2646,7 @@
         "check": {
           "kind": "write",
           "instructions": "Your partner has sent you their wish list for your life together. Reply with your own three wishes (different from theirs), each with a reason.",
-          "material": "{私|わたし}の{欲|ほ}しいもの\n1. {犬|いぬ}。{犬|いぬ}が{大好|だいす}きだから！\n2. {広|ひろ}い{台所|だいどころ}。{二人|ふたり}で{料理|りょうり}をしたいから。\n3. {新|あたら}しいソファー。{今|いま}のソファーは{古|ふる}いから。\nあなたは？{三|みっ}つ{書|か}いてね！",
+          "material": "{私|わたし}の{欲|ほ}しいもの\n1. {犬|いぬ}。{犬|いぬ}が{大好|だいす}きだから！\n2. {広|ひろ}い{台所|だいどころ}。{二人|ふたり}で{料理|りょうり}をしたいから。\n3. {新|あたら}しいソファー。{今|いま}のソファーは{古|ふる}いから。\nそっちの{欲|ほ}しいものも{三|みっ}つ{書|か}いてね！",
           "questions": [],
           "rubric": [
             "Names three things with 〜が欲しい",
@@ -2657,20 +2667,20 @@
             {
               "q": "Why will Ken be late?",
               "options": [
-                "He's busy at work",
                 "His train is delayed",
+                "He's busy at work",
                 "He's at the doctor's"
               ],
-              "answer": 0
+              "answer": 1
             },
             {
               "q": "Where does Ken want you to wait?",
               "options": [
-                "At the station ticket gate",
                 "In a coffee shop called 'Rainy Day' in front of the station",
+                "At the station ticket gate",
                 "At his home"
               ],
-              "answer": 1
+              "answer": 0
             },
             {
               "q": "What does your partner ask you at the end?",
@@ -2690,7 +2700,7 @@
         "check": {
           "kind": "read",
           "instructions": "Read this short profile from a magazine's 'Our home' page and answer the questions.",
-          "material": "{私|わたし}たちの{家|いえ}　{田中|たなか}さん{夫婦|ふうふ}\n{夫|おっと}の{雄太|ゆうた}さんと{妻|つま}の{真理|まり}さんは、{結婚|けっこん}して{三年|さんねん}です。{今|いま}、{駅|えき}の{近|ちか}くの{小|ちい}さい{家|いえ}に{住|す}んでいます。{雄太|ゆうた}さんは{銀行|ぎんこう}に{勤|つと}めています。{真理|まり}さんは{病院|びょういん}で{働|はたら}いています。{二人|ふたり}は{料理|りょうり}をするのが{大好|だいす}きです。{週末|しゅうまつ}は{二人|ふたり}で{晩|ばん}ご{飯|はん}を{作|つく}ります。でも、{台所|だいどころ}がとても{狭|せま}いです。だから、{今|いま}、{広|ひろ}い{台所|だいどころ}がある{家|いえ}が{欲|ほ}しいです。{真理|まり}さんは{犬|いぬ}も{欲|ほ}しいと{言|い}っています。{子|こ}どもはまだいません。",
+          "material": "{私|わたし}たちの{家|いえ}　{田中|たなか}さん{夫婦|ふうふ}\n{夫|おっと}の{雄太|ゆうた}さんと{妻|つま}の{真理|まり}さんは、{結婚|けっこん}して{三年|さんねん}です。{今|いま}、{駅|えき}の{近|ちか}くの{小|ちい}さい{家|いえ}に{住|す}んでいます。{雄太|ゆうた}さんは{銀行|ぎんこう}に{勤|つと}めています。{真理|まり}さんは{病院|びょういん}で{働|はたら}いています。{二人|ふたり}は{料理|りょうり}をするのが{大好|だいす}きです。{週末|しゅうまつ}は{二人|ふたり}で{晩|ばん}ご{飯|はん}を{作|つく}ります。でも、{台所|だいどころ}がとても{狭|せま}いです。だから、{二人|ふたり}は{広|ひろ}い{台所|だいどころ}がある{家|いえ}が{欲|ほ}しいと{言|い}っています。{真理|まり}さんは、{犬|いぬ}も{欲|ほ}しいと{思|おも}っています。{子|こ}どもはまだいません。",
           "questions": [
             {
               "q": "How long have Yuta and Mari been married?",
@@ -2879,17 +2889,17 @@
         "text": "Read a simple recipe and put the steps in order.",
         "check": {
           "kind": "read",
-          "instructions": "This recipe card got shuffled. Read steps A–D, work out the right order, and answer the questions.",
-          "material": "{親子丼|おやこどん}を{作|つく}ろう！（{二人|ふたり}・{二十分|にじゅっぷん}）\n{鶏肉|とりにく}200グラム・{玉|たま}ねぎ{一|ひと}つ・{卵|たまご}{三|みっ}つ・ご{飯|はん}・しょうゆ・{砂糖|さとう}\n\nA　{卵|たまご}を{混|ま}ぜてから、{鍋|なべ}に{入|い}れます。{入|い}れてから、あまり{混|ま}ぜないでください。\nB　{鍋|なべ}に{水|みず}としょうゆと{砂糖|さとう}を{入|い}れて、{温|あたた}めます。\nC　まず、{鶏肉|とりにく}と{玉|たま}ねぎを{切|き}ります。\nD　{鶏肉|とりにく}と{玉|たま}ねぎを{鍋|なべ}に{入|い}れて、{五分|ごふん}ぐらい{待|ま}ちます。\n{最後|さいご}に、ご{飯|はん}にかけて{食|た}べましょう！",
+          "instructions": "This recipe card for oyakodon (chicken and egg on rice) got shuffled. Read steps A–D, work out the right order, and answer the questions.",
+          "material": "{鶏肉|とりにく}と{卵|たまご}のご{飯|はん}を{作|つく}ろう！（{二人|ふたり}・{二十分|にじゅっぷん}）\n{鶏肉|とりにく}200グラム・{玉|たま}ねぎ{一|ひと}つ・{卵|たまご}{三|みっ}つ・ご{飯|はん}・しょうゆ・{砂糖|さとう}\n\nA　{卵|たまご}を{混|ま}ぜてから、{鍋|なべ}に{入|い}れます。{入|い}れてから、あまり{混|ま}ぜないでください。\nB　{鍋|なべ}に{水|みず}としょうゆと{砂糖|さとう}を{入|い}れて、{温|あたた}めます。\nC　まず、{鶏肉|とりにく}と{玉|たま}ねぎを{切|き}ります。\nD　{鶏肉|とりにく}と{玉|たま}ねぎを{鍋|なべ}に{入|い}れて、{五分|ごふん}ぐらい{待|ま}ちます。\n{最後|さいご}に、ご{飯|はん}にかけて{食|た}べましょう！",
           "questions": [
             {
               "q": "What is the right order of steps A–D?",
               "options": [
-                "C → B → D → A",
                 "B → C → A → D",
-                "C → D → B → A"
+                "C → A → B → D",
+                "C → B → D → A"
               ],
-              "answer": 0
+              "answer": 2
             },
             {
               "q": "What does the recipe tell you not to do once the eggs are in?",
@@ -2903,11 +2913,11 @@
             {
               "q": "How many eggs do you need?",
               "options": [
+                "Three",
                 "One",
-                "Two",
-                "Three"
+                "Two"
               ],
-              "answer": 2
+              "answer": 0
             }
           ]
         }
@@ -2923,20 +2933,20 @@
             {
               "q": "What does your partner ask you to do first?",
               "options": [
-                "Wash and cut the carrots and potatoes",
                 "Cut the onions",
+                "Wash and cut the carrots and potatoes",
                 "Heat the frying pan"
               ],
-              "answer": 0
+              "answer": 1
             },
             {
               "q": "Which two things should you not do?",
               "options": [
-                "Open the fridge, or cut the onions",
                 "Pick up the frying pan, or add the salt now",
+                "Open the fridge, or cut the onions",
                 "Wash the vegetables, or take out the tomatoes"
               ],
-              "answer": 1
+              "answer": 0
             },
             {
               "q": "Why shouldn't the salt go in yet?",
@@ -2991,10 +3001,10 @@
       "outcomeQuestion": "What are you having for dinner, who's cooking which part, and what does someone need to buy?",
       "roles": {
         "a": "Knows what's in the fridge and the cupboard (card A)",
-        "b": "Knows what you both had for lunch and what's on special at the supermarket (card B)"
+        "b": "Knows what they had for lunch and what's on special at the supermarket (card B)"
       },
       "infoA": "What's at home (card A):\n• Fridge (れいぞうこ): six eggs (たまご), onions (たまねぎ), carrots (にんじん), cheese (チーズ), a little milk. No meat or fish (にくも さかなも ない).\n• Cupboard: rice (こめ), pasta (パスタ), curry roux (カレー), a tin of tomatoes.\nYou're tired, so you'd like something easy (かんたん). You can do the rice and a salad.\nSuggest with 〜よう, compare with 〜より〜のほうが, and ask if your partner needs anything (なにか いる？).",
-      "infoB": "What you know (card B):\n• You both had pasta for lunch at work today (ひるに パスタを たべた), so not pasta again.\n• The supermarket by the station: chicken (とりにく) is half price until 8 p.m., and potatoes (じゃがいも) are cheap. You can stop there on the way home.\n• It's cold today and you'd like something warm, like curry or soup.\nYou don't know what's at home, so ask (なにが ある？) and explain your reasons with 〜んだ.",
+      "infoB": "What you know (card B):\n• You had pasta for lunch at work today (ひるに パスタを たべた), so you'd rather not have it again. Your partner doesn't know this.\n• The supermarket by the station: chicken (とりにく) is half price until 8 p.m., and potatoes (じゃがいも) are cheap. You can stop there on the way home.\n• It's cold today and you'd like something warm, like curry or soup.\nYou don't know what's at home, so ask (なにが ある？) and explain your reasons with 〜んだ.",
       "targets": [
         "grammar:volitional",
         "grammar:yori-hou",
@@ -3105,7 +3115,7 @@
         "check": {
           "kind": "speak",
           "instructions": "The AI asks you how you get to the station. Answer in polite Japanese: explain the way step by step with the て-form and say how long it takes. Then swap: ask the AI how to get to the library and how long it takes.",
-          "material": "1. {家|いえ}から{駅|えき}まで、どうやって{行|い}きますか。\n2. {歩|ある}いて、どのくらいかかりますか。\n3. {駅|えき}まで{一番|いちばん}{近|ちか}い{道|みち}を{教|おし}えてください。",
+          "material": "1. {家|いえ}から{駅|えき}まで、どうやって{行|い}きますか。\n2. {歩|ある}いて、どのくらいかかりますか。\n3. {駅|えき}までの{一番|いちばん}{近|ちか}い{道|みち}を{教|おし}えてください。",
           "questions": [],
           "rubric": [
             "Explains the way in steps with the て-form (まっすぐ行って、二つ目の角を右に曲がって…)",
@@ -3260,7 +3270,7 @@
         },
         {
           "role": "b",
-          "jp": "{川|かわ}の{横|よこ}の{道|みち}を{五分|ごふん}ぐらい{歩|ある}いて。この{道|みち}が{一番|いちばん}{近|ちか}いよ。",
+          "jp": "{川|かわ}の{横|よこ}の{道|みち}を{五分|ごふん}ぐらい{歩|ある}いて。その{道|みち}が{一番|いちばん}{近|ちか}いよ。",
           "en": "Walk along the road by the river for about five minutes. That's the quickest way."
         },
         {
@@ -3280,7 +3290,7 @@
         },
         {
           "role": "b",
-          "jp": "{全部|ぜんぶ}で{十分|じゅっぷん}ぐらいだよ。",
+          "jp": "{全部|ぜんぶ}で{十分|じゅっぷん}ぐらいかかるよ。",
           "en": "About ten minutes in all."
         },
         {
@@ -3332,7 +3342,7 @@
         "check": {
           "kind": "listen",
           "instructions": "Listen to tomorrow's weather forecast and answer the questions.",
-          "material": "{明日|あした}の{天気|てんき}です。{朝|あさ}は{晴|は}れですが、{午後|ごご}から{曇|くも}って、{夕方|ゆうがた}から{雨|あめ}が{降|ふ}ります。{夜|よる}は{風|かぜ}も{強|つよ}くなります。{最高|さいこう}{気温|きおん}は{十八度|じゅうはちど}です。{朝|あさ}と{夜|よる}は{十度|じゅうど}ぐらいで、{寒|さむ}くなります。{出|で}かけるときは、{傘|かさ}を{忘|わす}れないでください。{夜|よる}{出|で}かける{人|ひと}は、{温|あたた}かい{服|ふく}を{着|き}たほうがいいですよ。",
+          "material": "{明日|あした}の{天気|てんき}です。{朝|あさ}は{晴|は}れですが、{午後|ごご}から{曇|くも}って、{夕方|ゆうがた}から{雨|あめ}が{降|ふ}ります。{夜|よる}は{風|かぜ}も{強|つよ}くなります。{最高|さいこう}{気温|きおん}は{十八度|じゅうはちど}です。{朝|あさ}と{夜|よる}は{寒|さむ}くて、{十度|じゅうど}ぐらいです。{出|で}かけるときは、{傘|かさ}を{忘|わす}れないでください。{夜|よる}{出|で}かける{人|ひと}は、{暖|あたた}かい{服|ふく}を{着|き}たほうがいいですよ。",
           "questions": [
             {
               "q": "When will it start raining?",
@@ -3520,8 +3530,8 @@
         },
         {
           "role": "a",
-          "jp": "{六時|ろくじ}ごろ{止|や}むけど、{夜|よる}は{十六度|じゅうろくど}で、{寒|さむ}くなるよ。",
-          "en": "Around six, but it gets cold at night. Sixteen degrees."
+          "jp": "{六時|ろくじ}ごろ{止|や}むけど、{夜|よる}は{寒|さむ}くなるよ。{十六度|じゅうろくど}ぐらい。",
+          "en": "Around six, but it gets cold at night. About sixteen degrees."
         },
         {
           "role": "b",
@@ -3588,7 +3598,7 @@
         "check": {
           "kind": "read",
           "instructions": "You're staying at this ryokan tonight. Read its information sheet, then answer the questions.",
-          "material": "{旅館|りょかん}「さくら」のご{案内|あんない}\nチェックイン　15:00〜19:00\nお{部屋|へや}を{出|で}る{時間|じかん}　〜10:00\n{晩|ばん}ご{飯|はん}　18:00〜20:00（お{部屋|へや}で）\n{朝|あさ}ご{飯|はん}　7:30〜9:00（{食堂|しょくどう}で）\n{温泉|おんせん}　15:00〜24:00／{朝|あさ} 6:00〜9:00\n※{夜|よる}12{時|じ}から{朝|あさ}6{時|じ}までは、{温泉|おんせん}に{入|はい}らないでください。\n※タオルはお{部屋|へや}にあります。{温泉|おんせん}に{持|も}っていってください。\n※{駅|えき}まで{無料|むりょう}のバスがあります（10:00・14:00・16:00）。",
+          "material": "{旅館|りょかん}「さくら」のご{案内|あんない}\nお{部屋|へや}に{入|はい}る{時間|じかん}　15:00〜19:00\nお{部屋|へや}を{出|で}る{時間|じかん}　〜10:00\n{晩|ばん}ご{飯|はん}　18:00〜20:00（お{部屋|へや}で）\n{朝|あさ}ご{飯|はん}　7:30〜9:00（{食堂|しょくどう}で）\n{温泉|おんせん}　15:00〜24:00／{朝|あさ} 6:00〜9:00\n※{夜|よる}12{時|じ}から{朝|あさ}6{時|じ}までは、{温泉|おんせん}に{入|はい}らないでください。\n※タオルはお{部屋|へや}にあります。{温泉|おんせん}に{持|も}っていってください。\n※{駅|えき}まで{無料|むりょう}のバスがあります（10:00・14:00・16:00）。",
           "questions": [
             {
               "q": "What time can you check in?",
@@ -3626,7 +3636,7 @@
         "check": {
           "kind": "listen",
           "instructions": "Your friend Yuki left you a voice message about Kyoto. Listen (you can play it twice), then answer the questions.",
-          "material": "もしもし、ゆきです。{京都|きょうと}に{行|い}くんだって？いいね！\n{私|わたし}は{去年|きょねん}の{秋|あき}に{行|い}ったけど、{人|ひと}が{多|おお}くて{大変|たいへん}だったよ。\n{冬|ふゆ}は{寒|さむ}いけど、{人|ひと}は{少|すく}ないよ。\n{友達|ともだち}は、{駅|えき}の{近|ちか}くの{豆腐|とうふ}の{店|みせ}がとてもおいしいって{言|い}ってた。\nあと、お{寺|てら}は{朝|あさ}{行|い}ったほうがいいって。{昼|ひる}は{人|ひと}が{多|おお}いので。\nじゃあ、{楽|たの}しんでね！お{土産|みやげ}、よろしく！",
+          "material": "もしもし、ゆきです。{京都|きょうと}に{行|い}くんだって？いいね！\n{私|わたし}は{去年|きょねん}の{秋|あき}に{行|い}ったけど、{人|ひと}が{多|おお}くて{大変|たいへん}だったよ。\n{冬|ふゆ}は{寒|さむ}いけど、{人|ひと}は{少|すく}ないよ。\n{友達|ともだち}は、{駅|えき}の{近|ちか}くの{豆腐|とうふ}{料理|りょうり}の{店|みせ}がとてもおいしいって{言|い}ってた。\nあと、{昼|ひる}は{人|ひと}が{多|おお}いので、お{寺|てら}は{朝|あさ}{行|い}ったほうがいいって。\nじゃあ、{楽|たの}しんでね！お{土産|みやげ}、よろしく！",
           "questions": [
             {
               "q": "What did Yuki find hard about Kyoto in autumn?",
@@ -3667,7 +3677,7 @@
           "material": "いらっしゃいませ。すみません、お{部屋|へや}は{三時|さんじ}からなんです。\nはい。ほかに{何|なに}かありますか。\n{晩|ばん}ご{飯|はん}は{六時|ろくじ}からですが、{何時|なんじ}がいいですか。",
           "questions": [],
           "rubric": [
-            "Gives a reason with ので in each answer (はやく ついたので…, はじめてなので…)",
+            "Gives a reason with ので in each answer (これから まちを みに いくので…, はじめてなので…)",
             "Makes a clear request: 〜てもいいですか, 〜てください or 〜を おねがいします",
             "Keeps to です/ます throughout, with no casual forms",
             "Names a specific time for dinner (しちじはんに おねがいします)"
@@ -3686,7 +3696,7 @@
             "Says where they went and how long they stayed",
             "Contrasts a good point and a bad point with は (りょかんは よかったけど、てんきは…)",
             "Uses past forms correctly (〜た / 〜かった, or 〜ました / 〜かったです)",
-            "Uses だけ or しか〜ない at least once (いっぱく だけ, ふつか しか いなかった)"
+            "Uses だけ or しか〜ない at least once (ひとばん だけ, ふつか しか いなかった)"
           ]
         }
       }
@@ -3768,13 +3778,13 @@
         },
         {
           "role": "a",
-          "jp": "いいね。じゃあ、{海|うみ}にしよう！{金曜日|きんようび}に{行|い}って、{日曜日|にちようび}に{帰|かえ}るつもり。",
-          "en": "Great. Let's go to the sea, then! I'm thinking we go on Friday and come back on Sunday."
+          "jp": "いいね。じゃあ、{海|うみ}にしよう！いつ{行|い}く？",
+          "en": "Great. Let's go to the sea, then! When shall we go?"
         },
         {
           "role": "b",
-          "jp": "うん。{八千円|はっせんえん}は、おいしい{魚|さかな}に{使|つか}おう！",
-          "en": "Okay. And let's spend the other ¥8,000 on good fish!"
+          "jp": "{金曜日|きんようび}に{行|い}って、{日曜日|にちようび}に{帰|かえ}るつもり。{八千円|はっせんえん}は、おいしい{魚|さかな}に{使|つか}おう！",
+          "en": "I'm thinking we go on Friday and come back on Sunday. And let's spend the other ¥8,000 on good fish!"
         }
       ]
     },
@@ -3868,7 +3878,7 @@
         "check": {
           "kind": "read",
           "instructions": "This is the label on the medicine your partner got from the clinic. Read it and answer the questions.",
-          "material": "{山本|やまもと}　あおい　{様|さま}\n【{黄色|きいろ}い{薬|くすり}】せきの{薬|くすり}\n{一日|いちにち}３{回|かい}　{朝|あさ}・{昼|ひる}・{晩|ばん}のご{飯|はん}のあと　{一回|いっかい}に{一|ひと}つ\n【{白|しろ}い{薬|くすり}】{熱|ねつ}・{頭|あたま}が{痛|いた}いとき\n{痛|いた}いときだけ{飲|の}んでください。{一回|いっかい}に{一|ひと}つ。\n{次|つぎ}の{薬|くすり}は、６{時間|じかん}{待|ま}ってから{飲|の}んでください。\n※お{酒|さけ}と{一緒|いっしょ}に{飲|の}まないでください。",
+          "material": "{山本|やまもと}　あおい　{様|さま}\n【{黄色|きいろ}い{薬|くすり}】せきの{薬|くすり}\n{一日|いちにち}３{回|かい}　{朝|あさ}・{昼|ひる}・{晩|ばん}のご{飯|はん}のあと　{一回|いっかい}に{一|ひと}つ\n【{白|しろ}い{薬|くすり}】{熱|ねつ}と{頭|あたま}の{薬|くすり}\n{熱|ねつ}があるときや、{頭|あたま}が{痛|いた}いときだけ{飲|の}んでください。{一回|いっかい}に{一|ひと}つ。\n{飲|の}んだあと、６{時間|じかん}は{飲|の}まないでください。\n※お{酒|さけ}と{一緒|いっしょ}に{飲|の}まないでください。",
           "questions": [
             {
               "q": "When should the yellow medicine be taken?",
@@ -3906,7 +3916,7 @@
         "check": {
           "kind": "speak",
           "instructions": "Your partner (or the AI) isn't well and says the lines below. Respond in casual Japanese: guess what's wrong with でしょう (or でしょ), give one piece of advice, and tell them to rest properly.",
-          "material": "なんか{頭|あたま}が{痛|いた}い…。{昨日|きのう}はあまり{寝|ね}なかったんだ。\n{喉|のど}もちょっと{痛|いた}くて、{寒|さむ}い。\nでも、{今日|きょう}は{会議|かいぎ}があるから、{会社|かいしゃ}に{行|い}かなきゃ。",
+          "material": "なんか{頭|あたま}が{痛|いた}い…。{昨日|きのう}はあまり{寝|ね}てないんだ。\n{喉|のど}もちょっと{痛|いた}くて、{寒|さむ}い。\nでも、{今日|きょう}は{会議|かいぎ}があるから、{会社|かいしゃ}に{行|い}かなきゃ。",
           "questions": [],
           "rubric": [
             "Guesses the cause with でしょう / でしょ (かぜでしょう, つかれたんでしょう)",
@@ -3979,7 +3989,7 @@
         },
         {
           "role": "b",
-          "jp": "{風邪|かぜ}でしょう。{病院|びょういん}に{行|い}ったほうがいいよ。",
+          "jp": "たぶん{風邪|かぜ}でしょう。{病院|びょういん}に{行|い}ったほうがいいよ。",
           "en": "It's probably a cold. You'd better go to the clinic."
         },
         {
@@ -4074,7 +4084,7 @@
         "check": {
           "kind": "listen",
           "instructions": "Listen to a teacher introducing a weekend class (you can play it twice), then answer the questions.",
-          "material": "こんにちは。{土曜日|どようび}の{料理|りょうり}のクラスへようこそ。\nこのクラスでは、{日本|にほん}の{家|いえ}の{料理|りょうり}を{作|つく}ることができます。みそ{汁|しる}や{天|てん}ぷらなどを{作|つく}ります。\n{一回|いっかい}{二時間|にじかん}で、{作|つく}った{料理|りょうり}はみんなで{食|た}べます。\n{初|はじ}めての{人|ひと}も{大丈夫|だいじょうぶ}です。{包丁|ほうちょう}が{苦手|にがて}な{人|ひと}は、ゆっくり{練習|れんしゅう}しましょう。\nエプロンとタオルを{持|も}ってきてください。\n{最初|さいしょ}の{一回|いっかい}は{無料|むりょう}です。ぜひ{来|き}てみてください！",
+          "material": "こんにちは。{土曜日|どようび}の{料理|りょうり}のクラスへようこそ。\nこのクラスでは、{日本|にほん}の{家|いえ}でよく{作|つく}る{料理|りょうり}を{習|なら}うことができます。みそ{汁|しる}や{天|てん}ぷらなどを{作|つく}ります。\n{一回|いっかい}{二時間|にじかん}で、{作|つく}った{料理|りょうり}はみんなで{食|た}べます。\n{初|はじ}めての{人|ひと}も{大丈夫|だいじょうぶ}です。{包丁|ほうちょう}が{苦手|にがて}な{人|ひと}は、ゆっくり{練習|れんしゅう}しましょう。\nタオルを{持|も}ってきてください。\n{最初|さいしょ}の{一回|いっかい}は{無料|むりょう}です。ぜひ{来|き}てみてください！",
           "questions": [
             {
               "q": "What do you make in this class?",
@@ -4099,7 +4109,7 @@
               "options": [
                 "A knife; ¥1,000",
                 "Nothing; ¥500",
-                "An apron and a towel; it is free"
+                "A towel; it is free"
               ],
               "answer": 2
             }
@@ -4166,7 +4176,7 @@
         "check": {
           "kind": "write",
           "instructions": "Your friend sent the message below. Reply in 3–5 sentences: a hobby you'd like to try and why, something you can already do, and something you can't do yet.",
-          "material": "{今度|こんど}、{何|なに}か{一緒|いっしょ}に{始|はじ}めない？どんなことがしてみたい？",
+          "material": "{今度|こんど}、{何|なに}か{一緒|いっしょ}に{始|はじ}めない？どんなことをしてみたい？",
           "questions": [],
           "rubric": [
             "Names a hobby with 〜てみたい (ギターを ひいてみたい)",
@@ -4188,7 +4198,7 @@
         "b": "Has listings for a yoga class and a guitar class, and your free evenings (card B)"
       },
       "infoA": "Card A: two class listings. Cooking class (りょうりの クラス): Saturdays 10:00–12:00; ¥3,000 per person per lesson; Japanese home cooking, and you eat what you make; beginners welcome. Dance class (ダンス): Thursdays 20:00–21:00; ¥1,000 per person per lesson; dancing in couples (カップル), no experience needed (はじめての ひとも おどる ことが できる). About you: you love food but you're not good with knives (ほうちょうが にがて), and dancing in front of people feels a bit embarrassing (はずかしい).",
-      "infoB": "Card B: two class listings. Yoga (ヨガ): Tuesdays 19:00–20:00; ¥1,000 per person; you can borrow mats. Guitar (ギター): Sundays 14:00–16:00; ¥2,500 per person; you need your own guitar (about ¥15,000). Your free evenings this month: Thursdays and Fridays only (you always work late on Tuesdays: かようびは ざんぎょう). Saturdays you're both free. Budget for the new hobby: ¥10,000 a month for the two of you (ふたりで いちまんえん). About you: your body is stiff (からだが かたい) and you can't play any instrument.",
+      "infoB": "Card B: two class listings. Yoga (ヨガ): Tuesdays 19:00–20:00; ¥1,000 per person; you can borrow mats. Guitar (ギター): Sundays 14:00–16:00; ¥2,500 per person; you need your own guitar (about ¥15,000). Your free evenings this month: Thursdays and Fridays only (you often work late on Tuesdays: かようびは よく ざんぎょうが ある). Saturdays you're both free. Budget for the new hobby: ¥10,000 a month for the two of you (ふたりで いちまんえん). About you: your body is stiff (からだが かたい) and you can't play any instrument.",
       "targets": [
         "grammar:te-miru",
         "grammar:kamoshirenai",
@@ -4228,8 +4238,8 @@
         },
         {
           "role": "b",
-          "jp": "{火曜日|かようび}の{七時|しちじ}から。でも、{火曜日|かようび}はいつも{残業|ざんぎょう}だから、{行|い}くことができないかもしれない。",
-          "en": "Tuesdays from seven. But I always work late on Tuesdays, so I might not be able to go."
+          "jp": "{火曜日|かようび}の{七時|しちじ}から。でも、{火曜日|かようび}はよく{残業|ざんぎょう}があるから、{行|い}くことができないかもしれない。",
+          "en": "Tuesdays from seven. But I often work late on Tuesdays, so I might not be able to go."
         },
         {
           "role": "a",
@@ -4363,16 +4373,16 @@
       },
       {
         "id": "u19-cd4",
-        "text": "Write a thank-you message for a present, saying who gave it and what you'll do with it.",
+        "text": "Write a thank-you message for a present: what you received, how you feel about it and what you'll do with it.",
         "check": {
           "kind": "write",
-          "instructions": "Your partner's aunt Michiko sent you a scarf for your birthday, with the card below. Write a polite thank-you reply in 3–5 sentences: say what you received, how you feel about it, and what you'll do with it.",
+          "instructions": "Your partner's aunt Michiko sent you a sweater for your birthday, with the card below. Write a polite thank-you reply in 3–5 sentences: say what you received, how you feel about it, and what you'll do with it.",
           "material": "お{誕生日|たんじょうび}おめでとう！{小|ちい}さいプレゼントを{送|おく}りました。{気|き}に{入|い}ったらうれしいです。　みちこ",
           "questions": [],
           "rubric": [
-            "Thanks her and names the present (すてきな マフラーを ありがとうございました)",
+            "Thanks her and names the present (すてきな セーターを ありがとうございました)",
             "Uses くれました or もらいました in the right direction",
-            "Says what they'll do with it, e.g. with 〜たら (さむく なったら、まいにち つかいます)",
+            "Says what they'll do with it, e.g. with 〜たら (さむく なったら、まいにち きます)",
             "Keeps to polite です/ます throughout"
           ]
         }
@@ -4383,7 +4393,7 @@
         "check": {
           "kind": "read",
           "instructions": "Read the gift-service notice at a shop near the station, then answer the questions.",
-          "material": "プレゼントのご{案内|あんない}\n◆プレゼントの{袋|ふくろ}・{箱|はこ}\n　{袋|ふくろ}：{無料|むりょう}　{箱|はこ}：{一|ひと}つ200{円|えん}\n◆{送|おく}る\n　{日本|にほん}のどこにでも、600{円|えん}で{送|おく}ることができます。\n　（5,000{円|えん}{以上|いじょう}{買|か}ったら、{無料|むりょう}で{送|おく}ります）\n◆{交換|こうかん}\n　{買|か}ってから14{日|にち}までできます。レシートを{持|も}ってきてください。\n　※セールの{物|もの}と{食|た}べ{物|もの}はできません。",
+          "material": "プレゼントのご{案内|あんない}\n◆プレゼントの{袋|ふくろ}・{箱|はこ}\n　{袋|ふくろ}：{無料|むりょう}　{箱|はこ}：{一|ひと}つ200{円|えん}\n◆{送|おく}る\n　{日本|にほん}のどこにでも、600{円|えん}で{送|おく}ることができます。\n　（5,000{円|えん}{以上|いじょう}{買|か}ったら、{無料|むりょう}で{送|おく}ります）\n◆{交換|こうかん}\n　{買|か}ってから２{週間|しゅうかん}までできます。レシートを{持|も}ってきてください。\n　※セールの{物|もの}と{食|た}べ{物|もの}はできません。",
           "questions": [
             {
               "q": "How much does wrapping in a box cost?",
@@ -4472,33 +4482,33 @@
         },
         {
           "role": "a",
-          "jp": "いいね！{料理|りょうり}が{好|す}きだから、{毎日|まいにち}{使|つか}えるね。",
-          "en": "Nice! She loves cooking, so she can use it every day."
+          "jp": "いいね！{料理|りょうり}が{好|す}きだから、{毎日|まいにち}{使|つか}えるね。でも、もし{気|き}に{入|い}らなかったら、どうする？",
+          "en": "Nice! She loves cooking, so she can use it every day. But what if she doesn't like it?"
         },
         {
           "role": "b",
-          "jp": "でも、もし{気|き}に{入|い}らなかったら、どうする？",
-          "en": "But what if she doesn't like it?"
-        },
-        {
-          "role": "a",
           "jp": "レシートがあったら、{二週間|にしゅうかん}は{交換|こうかん}できるって。",
-          "en": "They said she can exchange it within two weeks if she has the receipt."
-        },
-        {
-          "role": "b",
-          "jp": "じゃあ、レシートも{袋|ふくろ}に{入|い}れよう。",
-          "en": "Then let's put the receipt in the bag too."
+          "en": "The shop said she can exchange it within two weeks if she has the receipt."
         },
         {
           "role": "a",
-          "jp": "うん。{千五百円|せんごひゃくえん}{残|のこ}るから、カードも{買|か}おう。",
-          "en": "Okay. That leaves ¥1,500, so let's get a card too."
+          "jp": "じゃあ、レシートは{捨|す}てないでね。{千五百円|せんごひゃくえん}{残|のこ}るから、カードも{買|か}おう。",
+          "en": "Then don't throw the receipt away, okay? That leaves ¥1,500, so let's get a card as well."
         },
         {
           "role": "b",
-          "jp": "いいね。{二人|ふたり}でメッセージを{書|か}こう。さとみ、{喜|よろこ}ぶかな。",
-          "en": "Good idea. Let's write a message together. I hope Satomi likes it."
+          "jp": "いいね。{二人|ふたり}でメッセージを{書|か}こう。",
+          "en": "Good idea. Let's write a message together."
+        },
+        {
+          "role": "a",
+          "jp": "うん。さとみ、{喜|よろこ}ぶかな。",
+          "en": "Yeah. I wonder if Satomi will like it."
+        },
+        {
+          "role": "b",
+          "jp": "きっと{喜|よろこ}ぶよ！",
+          "en": "I'm sure she will!"
         }
       ]
     },
@@ -4536,7 +4546,7 @@
         "text": "Shop for clothes: say what's too big, too long or too expensive, and ask for a different one (a smaller one, the blue one).",
         "check": {
           "kind": "speak",
-          "instructions": "You're trying on clothes in a shop. The clerk (the AI or your partner) says the three lines below. Answer each politely: say what's wrong with 〜すぎる and ask for a different one with の.",
+          "instructions": "You're trying on clothes in a shop. The clerk (the AI or your partner) says the three lines below. Answer politely: say what's wrong with 〜すぎる, ask for a different one with の, and say which colour you'd like.",
           "material": "いかがですか。\nこちらのコートは{三万円|さんまんえん}です。\n{色|いろ}は{何色|なにいろ}がいいですか。",
           "questions": [],
           "rubric": [
@@ -4621,7 +4631,7 @@
         "check": {
           "kind": "read",
           "instructions": "You're 170 cm tall and usually wear a size M. Read the size chart and care label on a coat you like, then answer the questions.",
-          "material": "コートのサイズ\nS：{背|せ} 155〜165cm\nM：{背|せ} 165〜175cm\nL：{背|せ} 175〜185cm\n※このコートは{少|すこ}し{小|ちい}さいので、いつもより{一|ひと}つ{大|おお}きいサイズを{選|えら}んでください。\n【{洗|あら}うとき】\n{洗濯機|せんたくき}は{使|つか}わないでください。{水|みず}で、{手|て}で{洗|あら}ってください。\n{白|しろ}い{服|ふく}と{一緒|いっしょ}に{洗|あら}わないでください。",
+          "material": "コートのサイズ\nS：{背|せ} 155〜165cm\nM：{背|せ} 165〜175cm\nL：{背|せ} 175〜185cm\n※このコートは{少|すこ}し{小|ちい}さいので、いつもより{一|ひと}つ{大|おお}きいサイズを{選|えら}んでください。\n【{洗|あら}うとき】\n{洗濯機|せんたくき}は{使|つか}わないでください。{手|て}で{洗|あら}ってください。\n{白|しろ}い{服|ふく}と{一緒|いっしょ}に{洗|あら}わないでください。",
           "questions": [
             {
               "q": "Which size should you buy?",
@@ -4636,7 +4646,7 @@
               "q": "How should you wash this coat?",
               "options": [
                 "In the washing machine on a gentle setting",
-                "By hand, in water",
+                "By hand",
                 "Only at the dry cleaner's"
               ],
               "answer": 1
@@ -4677,7 +4687,7 @@
         "core:cw-1222"
       ],
       "register": "mixed",
-      "twist": "Now B is the buyer and you're shopping for shoes (くつ) with a ¥8,000 budget. The clerk says the size B wants is sold out (うりきれ), so ask for a different one; A gives the honest advice.",
+      "twist": "Now B is the buyer and you're shopping for shoes (くつ) with a ¥8,000 budget. The clerk says they no longer have the size B wants (その サイズは もう ありません), so ask for a different one; A gives the honest advice.",
       "aiRole": "Clothes-shop clerk (てんいん): welcomes you, suggests coats, says きてみてください (please try it on), offers a bigger, smaller or different-coloured one, mentions the 20% sale, and answers questions about price and size in polite shop Japanese.",
       "scripted": [
         {
@@ -4781,8 +4791,8 @@
           "questions": [],
           "rubric": [
             "Says what the week is like (busy, tiring, so-so) and what is happening (meetings, overtime, a business trip)",
-            "Gives at least two reasons joined with 〜し (会議も多いし、残業もあるし…)",
-            "Uses at least one time word (月曜日, 毎晩, 来週…)",
+            "Gives at least two reasons joined with 〜し (かいぎも おおいし、ざんぎょうも あるし…)",
+            "Uses at least one time word (げつようび, まいばん, らいしゅう…)",
             "Keeps going for about 30 seconds without switching to English"
           ]
         }
@@ -4793,7 +4803,7 @@
         "check": {
           "kind": "listen",
           "instructions": "Your partner has just come home with some news from work. Listen, then answer the questions.",
-          "material": "ただいま。ねえ、{聞|き}いて。{山田|やまだ}さん、{来月|らいげつ}{会社|かいしゃ}を{辞|や}めるそうだよ。{田舎|いなか}に{帰|かえ}って、お{父|とう}さんの{店|みせ}を{手伝|てつだ}うんだって。それで、{次|つぎ}の{上司|じょうし}は{大阪|おおさか}から{来|く}る{人|ひと}だそうだよ。ちょっと{厳|きび}しいそうだけど、{仕事|しごと}はすごくできるって。",
+          "material": "ただいま。ねえ、{聞|き}いて。{山田|やまだ}さん、{来月|らいげつ}{会社|かいしゃ}を{辞|や}めるそうだよ。{田舎|いなか}に{帰|かえ}って、お{父|とう}さんの{店|みせ}を{手伝|てつだ}うって。それで、{次|つぎ}の{上司|じょうし}は{大阪|おおさか}から{来|く}る{人|ひと}だそうだよ。ちょっと{厳|きび}しいそうだけど、{仕事|しごと}はすごくできるって。",
           "questions": [
             {
               "q": "Why is Yamada-san leaving the company?",
@@ -4834,9 +4844,9 @@
           "material": "{来週|らいしゅう}の{予定|よてい}\n{月曜日|げつようび}：{朝|あさ}{八時|はちじ}から{会議|かいぎ}\n{水曜日|すいようび}：{大阪|おおさか}に{出張|しゅっちょう}（{木曜日|もくようび}の{夜|よる}に{帰|かえ}る）\n{金曜日|きんようび}：{残業|ざんぎょう}\nメモ：{冷蔵庫|れいぞうこ}の{中|なか}、ほとんど{何|なに}もない！ シャツにアイロン！",
           "questions": [],
           "rubric": [
-            "Names at least three jobs to do in advance with 〜ておく (カレーを作っておく, シャツにアイロンをかけておく)",
-            "Links each job to the schedule with a reason (水曜日は出張だから…)",
-            "Suggests who does each job and when (土曜日に私が…)"
+            "Names at least three jobs to do in advance with 〜ておく (カレーを つくっておく, シャツに アイロンを かけておく)",
+            "Links each job to the schedule with a reason (すいようびは しゅっちょうだから…)",
+            "Suggests who does each job and when (どようびに わたしが…)"
           ]
         }
       },
@@ -4883,13 +4893,13 @@
         "text": "Write a message asking for advice, and suggest what to do if things go well ('If I finish early, shall we eat out?').",
         "check": {
           "kind": "write",
-          "instructions": "Your partner sent you this LINE message. Reply in 2–4 sentences: say what is going on at work, ask their advice about one problem (…どうすればいい？), and suggest a plan for if things go well, with 〜ば (早く終われば、外で食べない？).",
+          "instructions": "Your partner sent you this LINE message. Reply in 2–4 sentences: say what is going on at work, ask their advice about one problem (…どうすれば いい？), and suggest a plan for if things go well, with 〜ば (はやく おわれば、そとで たべない？).",
           "material": "お{疲|つか}れ{様|さま}！ {今日|きょう}も{残業|ざんぎょう}？ {晩|ばん}ご{飯|はん}、どうする？ {何|なに}か{作|つく}っておこうか？",
           "questions": [],
           "rubric": [
             "Explains what is happening at work in a sentence or two",
             "Asks for advice with どうすればいい？ or 〜ばいい？",
-            "Suggests a plan with a 〜ば condition (早く終われば…)",
+            "Suggests a plan with a 〜ば condition (はやく おわれば…)",
             "Uses casual style suited to a partner"
           ]
         }
@@ -4905,8 +4915,8 @@
         "a": "Has their work schedule (late meetings on Tuesday and Thursday) and the shopping list (card A)",
         "b": "Has their schedule (a business trip on Wednesday) and the household jobs (card B)"
       },
-      "infoA": "Your week: late meetings (会議) on Tuesday and Thursday, so you're home after 9 p.m.; Monday and Wednesday you're home by 7. You have the shopping list: detergent (洗剤) and shampoo (シャンプー) are nearly out, and you need meat and vegetables for a big curry. On Tuesday you cycle to work, so you can't carry heavy shopping that day. Find out your partner's week first, then agree: what to buy in advance and when, what to cook on Sunday so there's food for the busy days (作っておけば…), and who takes the rubbish out.",
-      "infoB": "Your week: overtime (残業) on Monday; a business trip (出張) to Osaka on Wednesday — you leave on the 6 a.m. bullet train and are back on Thursday night. You have the list of household jobs: iron the shirts for the trip (アイロン), vacuum (掃除機), rubbish out on Tuesday and Friday mornings, and the laundry. You have no clean shirt for the trip yet, and you've heard your boss (上司) is coming too. Find out your partner's week first, then agree who does each job and on which day, so everything is ready before Wednesday.",
+      "infoA": "Your week: late meetings (かいぎ) on Tuesday and Thursday, so you're home after 9 p.m.; Monday and Wednesday you're home by 7. You have the shopping list: detergent (せんざい) and shampoo (シャンプー) are nearly out, and you need meat and vegetables for a big curry. On Tuesday you cycle to work, so you can't carry heavy shopping that day. Find out your partner's week first, then agree: what to buy in advance and when, what to cook on Sunday so there's food for the busy days (つくっておけば…), and who takes the rubbish out.",
+      "infoB": "Your week: overtime (ざんぎょう) on Monday; a business trip (しゅっちょう) to Osaka on Wednesday — you leave on the 6 a.m. bullet train and are back on Thursday night. You have the list of household jobs: iron the shirts for the trip (アイロン), vacuum (そうじき), rubbish out on Tuesday and Friday mornings, and the laundry. You have no clean shirt for the trip yet, and you've heard your boss (じょうし) is coming too. Find out your partner's week first, then agree who does each job and on which day, so everything is ready before Wednesday.",
       "targets": [
         "grammar:te-oku",
         "grammar:ba-conditional",
@@ -5024,8 +5034,8 @@
           "material": "{日本語|にほんご}を{始|はじ}めて、もうすぐ{一年|いちねん}だね。{何|なに}ができるようになった？ {生活|せいかつ}で{変|か}わったことはある？",
           "questions": [],
           "rubric": [
-            "Says at least two new abilities with 〜ようになった (漢字が読めるようになった)",
-            "Describes one habit that has changed (毎朝走るようになった / あまりお酒を飲まなくなった)",
+            "Says at least two new abilities with 〜ようになった (かんじが よめるように なった)",
+            "Describes one habit that has changed (まいあさ はしるように なった / あまり おさけを のまなく なった)",
             "Gives an example or a reason for at least one change",
             "Keeps talking for about 45 seconds"
           ]
@@ -5037,7 +5047,7 @@
         "check": {
           "kind": "read",
           "instructions": "This sheet came with the keys to your new flat. Read it and answer the questions.",
-          "material": "ごみの{出|だ}し{方|かた}\n・{台所|だいどころ}のごみ：{月曜日|げつようび}と{木曜日|もくようび}。{朝|あさ}{八時|はちじ}までに{出|だ}してください。\n・ペットボトル：{水曜日|すいようび}。{中|なか}を{洗|あら}ってから{出|だ}してください。\n・{八時|はちじ}を{過|す}ぎると、{持|も}っていってもらえません。\n・{夜|よる}{出|だ}すと、{鳥|とり}や{猫|ねこ}が{袋|ふくろ}を{開|あ}けてしまいます。{朝|あさ}に{出|だ}してください。\n・{袋|ふくろ}に{名前|なまえ}は{書|か}かなくてもいいです。\n・{家具|かぐ}などの{大|おお}きいごみは、{前|まえ}に{電話|でんわ}で{連絡|れんらく}してください。",
+          "material": "ごみの{出|だ}し{方|かた}\n・{台所|だいどころ}のごみ：{月曜日|げつようび}と{木曜日|もくようび}。{朝|あさ}{八時|はちじ}までに{出|だ}してください。\n・ペットボトル：{水曜日|すいようび}。{中|なか}を{洗|あら}ってから{出|だ}してください。\n・{八時|はちじ}を{過|す}ぎると、{持|も}っていってもらえません。\n・{夜|よる}{出|だ}すと、{鳥|とり}や{猫|ねこ}が{袋|ふくろ}を{開|あ}けてしまいます。{朝|あさ}に{出|だ}してください。\n・{袋|ふくろ}に{名前|なまえ}は{書|か}かなくてもいいです。\n・{家具|かぐ}などの{大|おお}きいごみは、{出|だ}す{前|まえ}に{電話|でんわ}で{連絡|れんらく}してください。",
           "questions": [
             {
               "q": "When should kitchen rubbish go out?",
@@ -5075,12 +5085,12 @@
         "check": {
           "kind": "speak",
           "instructions": "Your partner has never used this microwave. Using the note stuck on it, explain step by step how to heat a cup of milk: what to press, what happens next, and one thing they don't need to do.",
-          "material": "{電子|でんし}レンジのメモ\n・{温|あたた}めるときは、▲▼で{時間|じかん}を{決|き}めて、{緑|みどり}のボタン。\n・{牛乳|ぎゅうにゅう}（コップ{一|ひと}つ）は{一分|いっぷん}{半|はん}。\n・{終|お}わると、{三回|さんかい}{鳴|な}る。\n・{途中|とちゅう}で{止|と}めるときは、{赤|あか}いボタン。",
+          "material": "{電子|でんし}レンジのメモ\n・{温|あたた}めるときは、▲▼で{時間|じかん}を{決|き}めて、{緑|みどり}のボタン。\n・{牛乳|ぎゅうにゅう}（コップ{一杯|いっぱい}）は{一分|いっぷん}{半|はん}。\n・{終|お}わると、{三回|さんかい}{鳴|な}る。\n・{途中|とちゅう}で{止|と}めるときは、{赤|あか}いボタン。",
           "questions": [],
           "rubric": [
             "Explains at least three steps in order (まず…、それから…)",
-            "Uses 〜と for what happens (緑のボタンを押すと、始まる)",
-            "Tells the partner one thing they don't have to do with 〜なくてもいい (赤いボタンは押さなくてもいい)",
+            "Uses 〜と for what happens (みどりの ボタンを おすと、はじまる)",
+            "Tells the partner one thing they don't have to do with 〜なくてもいい (あかい ボタンは おさなくても いい)",
             "Checks the partner has understood (わかった？ / やってみて)"
           ]
         }
@@ -5091,7 +5101,7 @@
         "check": {
           "kind": "listen",
           "instructions": "Your partner left you a voice message on the way home. Listen, then answer the questions.",
-          "material": "もしもし、{私|わたし}。{今|いま}、{山田|やまだ}さんの{家|いえ}の{前|まえ}なんだけど、{誰|だれ}もいないみたい。{電気|でんき}が{消|き}えてるし、{車|くるま}もないし。{旅行|りょこう}に{行|い}ってるようだね。お{土産|みやげ}は、{明日|あした}また{持|も}ってくる。あと、{駅|えき}の{前|まえ}のパン{屋|や}に、{人|ひと}がたくさん{並|なら}んでた。{新|あたら}しいパンが{出|で}たみたい。{二|ふた}つ{買|か}って{帰|かえ}るね。",
+          "material": "もしもし、{私|わたし}。{今|いま}、{山田|やまだ}さんの{家|いえ}の{前|まえ}なんだけど、{誰|だれ}もいないみたい。{電気|でんき}が{消|き}えてるし、{車|くるま}もないし。{旅行|りょこう}かな。お{土産|みやげ}は、{明日|あした}また{持|も}ってくる。あと、{駅|えき}の{前|まえ}のパン{屋|や}に、{人|ひと}がたくさん{並|なら}んでた。{新|あたら}しいパンが{出|で}たみたい。{二|ふた}つ{買|か}って{帰|かえ}るね。",
           "questions": [
             {
               "q": "Why does your partner think nobody is home at the Yamadas'?",
@@ -5132,9 +5142,9 @@
           "material": "ごめん、{電車|でんしゃ}が{事故|じこ}で{止|と}まってる…。{帰|かえ}るの、{一時間|いちじかん}ぐらい{遅|おく}れそう。{晩|ばん}ご{飯|はん}、まだ{何|なに}も{買|か}ってないし、どうしよう。",
           "questions": [],
           "rubric": [
-            "Reassures the partner (大丈夫だよ / 気をつけてね)",
-            "Uses 〜なくてもいい for at least two things (急がなくてもいい, 買わなくてもいい)",
-            "Says what you'll do instead (私が作っておくね)",
+            "Reassures the partner (だいじょうぶだよ / きを つけてね)",
+            "Uses 〜なくてもいい for at least two things (いそがなくても いい, かわなくても いい)",
+            "Says what you'll do instead (わたしが つくっておくね)",
             "Uses a casual, warm style suited to a partner"
           ]
         }
@@ -5150,8 +5160,8 @@
         "a": "Has the instruction sheet (card A)",
         "b": "Has only a picture of the machine's buttons (card B)"
       },
-      "infoA": "Card A — the instruction sheet for your new washing machine (洗濯機). 電源 (the round button) turns it on. スタート (the green button) starts the wash. コース chooses the programme: 標準 normal (45 min), お急ぎ quick (20 min), 毛布 for blankets. 予約 (timer): press it, then ▲ to choose when the wash should finish, e.g. 7:00. 乾燥 (dry): it dries the clothes too, so you don't have to hang them out (干さなくてもいい) — but sweaters (セーター) seem to shrink, so never dry them. When it finishes it beeps three times (三回鳴る). If the red light comes on, the door isn't shut. Explain one button at a time with 〜と (このボタンを押すと…) and check your partner can say it back.",
-      "infoB": "Card B — a photo of the new washing machine's buttons, with labels you can't read yet: a round button (電源), a green button (スタート), コース (標準 / お急ぎ / 毛布), 予約 with ▲▼, 乾燥, and a small red light. Ask what each one does (これを押すと、どうなる？), repeat each answer back, and at the end explain the whole machine to your partner in your own words. Your goal for tonight: put a wash on so it's finished — and dry — by 7 a.m.",
+      "infoA": "Card A — the instruction sheet for your new washing machine (せんたくき). 電源 (でんげん, the round button) turns it on. スタート (the green button) starts the wash. コース chooses the programme: 標準 (ひょうじゅん) normal, 45 min; お急ぎ (おいそぎ) quick, 20 min; 毛布 (もうふ) for blankets. 予約 (よやく, timer): press it, then ▲ to choose when the wash should finish, e.g. 7:00. 乾燥 (かんそう, dry): it dries the clothes too, so you don't have to hang them out (ほさなくても いい) — but sweaters (セーター) seem to shrink, so never dry them. When it finishes it beeps three times (さんかい なる). If the red light comes on, the door isn't shut. Explain one button at a time with 〜と (この ボタンを おすと…) and check your partner can say it back.",
+      "infoB": "Card B — a photo of the new washing machine's buttons, with labels you can't read yet: a round button (電源), a green button (スタート), コース (標準 / お急ぎ / 毛布), 予約 with ▲▼, 乾燥, and a small red light. Ask what each one does (これを おすと、どう なる？), repeat each answer back, and at the end explain the whole machine to your partner in your own words. Your goal for tonight: put a wash on so it's finished — and dry — by 7 a.m.",
       "targets": [
         "grammar:to-conditional",
         "grammar:you-ni-naru",
@@ -5163,7 +5173,7 @@
         "core:cw-1372"
       ],
       "register": "plain",
-      "twist": "Swap roles and appliances: B now has the instructions for the new air-conditioner remote (冷房 cooling, 暖房 heating, ▲▼ temperature, タイマー), and A has only a picture of it. Goal: the room is warm when you wake up.",
+      "twist": "Swap roles and appliances: B now has the instructions for the new air-conditioner remote (冷房 れいぼう cooling, 暖房 だんぼう heating, ▲▼ temperature, タイマー), and A has only a picture of it. Goal: the room is warm when you wake up.",
       "scripted": [
         {
           "role": "a",
@@ -5177,8 +5187,8 @@
         },
         {
           "role": "a",
-          "jp": "まず、この{丸|まる}いボタンを{押|お}すと、{電気|でんき}がつくよ。",
-          "en": "First, when you press this round button, it comes on."
+          "jp": "まず、この{丸|まる}いボタンを{押|お}すと、つくよ。",
+          "en": "First, when you press this round button, it turns on."
         },
         {
           "role": "b",
@@ -5193,17 +5203,17 @@
         {
           "role": "b",
           "jp": "この「{予約|よやく}」は{何|なに}？",
-          "en": "What's this 予約 one?"
+          "en": "What's this よやく one?"
         },
         {
           "role": "a",
           "jp": "{予約|よやく}を{押|お}して、▲で{時間|じかん}を{決|き}めると、その{時間|じかん}に{終|お}わるよ。",
-          "en": "Press 予約, set a time with ▲, and it'll finish at that time."
+          "en": "Press よやく, set a time with ▲, and it'll finish at that time."
         },
         {
           "role": "b",
           "jp": "{便利|べんり}だね。じゃあ、{乾燥|かんそう}を{使|つか}えば、{干|ほ}さなくてもいいの？",
-          "en": "That's handy. So if I use 乾燥, I don't have to hang the washing out?"
+          "en": "That's handy. So if I use かんそう (dry), I don't have to hang the washing out?"
         },
         {
           "role": "a",
@@ -5212,8 +5222,8 @@
         },
         {
           "role": "b",
-          "jp": "わかった。じゃあ、{言|い}ってみるね。{丸|まる}いボタンを{押|お}して、{服|ふく}と{洗剤|せんざい}を{入|い}れて、{予約|よやく}で{七時|しちじ}にして、{緑|みどり}のボタン！",
-          "en": "Got it. Let me say it back: press the round button, put in the clothes and detergent, set 予約 to seven, then the green button!"
+          "jp": "わかった。じゃあ、{言|い}ってみるね。{丸|まる}いボタンを{押|お}して、{服|ふく}と{洗剤|せんざい}を{入|い}れて、{乾燥|かんそう}も{押|お}して、{予約|よやく}で{七時|しちじ}にして、{緑|みどり}のボタン！",
+          "en": "Got it. Let me say it back: press the round button, put in the clothes and detergent, press かんそう too, set よやく to seven, then the green button!"
         },
         {
           "role": "a",
@@ -5261,12 +5271,12 @@
         "check": {
           "kind": "speak",
           "instructions": "Your partner asks about a big decision (the audio plays the question). Talk for 45–60 seconds about a decision you two have made or are making (moving, changing jobs, a big trip): what you've decided, why, and one difficulty you'll accept.",
-          "material": "{最近|さいきん}、{二人|ふたり}で{何|なに}か{大|おお}きいことを{決|き}めた？ {例|たと}えば、{引|ひ}っ{越|こ}しとか、{仕事|しごと}のこととか。どうしてそう{決|き}めたの？",
+          "material": "{最近|さいきん}、{二人|ふたり}で{何|なに}か{大|おお}きいことを{決|き}めた？ {例|たと}えば、{引|ひ}っ{越|こ}しのこと、{仕事|しごと}のこと…。どうしてそう{決|き}めたの？",
           "questions": [],
           "rubric": [
-            "States the decision with 〜ことにした (引っ越すことにした)",
+            "States the decision with 〜ことにした (ひっこす ことに した)",
             "Gives at least two reasons (〜し、〜し or 〜から)",
-            "Mentions a difficulty and says you'll go ahead anyway with 〜ても (家賃が高くても…)",
+            "Mentions a difficulty and says you'll go ahead anyway with 〜ても (やちんが たかくても…)",
             "Keeps talking for about 45 seconds"
           ]
         }
@@ -5300,7 +5310,7 @@
             {
               "q": "What does your note say about the rent?",
               "options": [
-                "Up to ¥110,000, even if that's expensive",
+                "¥110,000 at the most",
                 "It must be under ¥90,000",
                 "It doesn't matter if there's a garden"
               ],
@@ -5314,11 +5324,11 @@
         "text": "Give advice that builds on what someone has just told you ('If you're moving to Osaka, …').",
         "check": {
           "kind": "speak",
-          "instructions": "A friend tells you three things. Reply to each with a piece of advice that picks up what they just said, using 〜なら (大阪に引っ越すなら、…).",
+          "instructions": "A friend tells you three things. Reply to each with a piece of advice that picks up what they just said, using 〜なら (おおさかに ひっこすなら、…).",
           "material": "{友達|ともだち}の{話|はなし}\n1）「{来月|らいげつ}、{大阪|おおさか}に{引|ひ}っ{越|こ}すんだ。」\n2）「{週末|しゅうまつ}、{二人|ふたり}で{温泉|おんせん}に{行|い}きたいんだけど…。」\n3）「{新|あたら}しいソファーを{買|か}おうと{思|おも}ってるんだ。」",
           "questions": [],
           "rubric": [
-            "Answers each of the three with 〜なら, picking up the friend's words (温泉に行くなら…)",
+            "Answers each of the three with 〜なら, picking up the friend's words (おんせんに いくなら…)",
             "Each piece of advice is a sensible suggestion (〜たほうがいい, 〜がいいよ, 〜てみて)",
             "Gives a reason for at least one piece of advice"
           ]
@@ -5330,12 +5340,12 @@
         "check": {
           "kind": "listen",
           "instructions": "A friend is telling you about a bad day. Listen for what happened to him — you don't need to use these 'was done to me' forms yourself. Then answer the questions.",
-          "material": "{聞|き}いてよ。{昨日|きのう}は{本当|ほんとう}に{大変|たいへん}だったんだ。{朝|あさ}、{駅|えき}に{止|と}めておいた{自転車|じてんしゃ}を{盗|ぬす}まれて、{会社|かいしゃ}に{遅刻|ちこく}しちゃった。それで、{上司|じょうし}に{怒|おこ}られた。{帰|かえ}りは{雨|あめ}に{降|ふ}られて、{服|ふく}が{全部|ぜんぶ}{濡|ぬ}れちゃったし。でも、うちに{帰|かえ}ったら、{妻|つま}に「お{疲|つか}れ{様|さま}」って{言|い}われて、ちょっと{元気|げんき}が{出|で}たよ。",
+          "material": "{聞|き}いてよ。{昨日|きのう}は{本当|ほんとう}に{大変|たいへん}だったんだ。{朝|あさ}、{家|いえ}の{前|まえ}に{止|と}めておいた{自転車|じてんしゃ}を{盗|ぬす}まれて、{会社|かいしゃ}に{遅刻|ちこく}しちゃった。それで、{上司|じょうし}に{怒|おこ}られた。{帰|かえ}りは{雨|あめ}に{降|ふ}られて、{服|ふく}が{全部|ぜんぶ}{濡|ぬ}れちゃったし。でも、うちに{帰|かえ}ったら、{妻|つま}に「お{疲|つか}れ{様|さま}」って{言|い}われて、ちょっと{元気|げんき}が{出|で}たよ。",
           "questions": [
             {
               "q": "What happened to his bicycle?",
               "options": [
-                "It was stolen at the station",
+                "It was stolen from outside his home",
                 "It got a flat tyre",
                 "His wife borrowed it"
               ],
@@ -5373,8 +5383,8 @@
           "rubric": [
             "States the decision with 〜ことにした",
             "Gives at least one reason",
-            "Uses 〜ても to say you'll go ahead despite a difficulty (家賃が高くても…)",
-            "Ends in a friendly way (また連絡するね / 遊びに来てね)"
+            "Uses 〜ても to say you'll go ahead despite a difficulty (やちんが たかくても…)",
+            "Ends in a friendly way (また れんらく するね / あそびに きてね)"
           ]
         }
       }
@@ -5389,8 +5399,8 @@
         "a": "Has the rent and floor plans of the three flats (card A)",
         "b": "Has the travel times to work and notes on each neighbourhood (card B)"
       },
-      "infoA": "Card A — the three flats. ① さくらマンション: rent (家賃) ¥95,000, two rooms + kitchen, small balcony (ベランダ). ② みどりアパート: ¥78,000, one room + kitchen (狭い), small garden, pets OK. ③ そらマンション: ¥118,000, two rooms + a big living room, big balcony, new building. You both agreed on a budget of up to ¥100,000 a month. You'd love a big balcony, but you work from home twice a week and need a quiet room. Share what you know, listen to your partner, and decide together (〜ことにしよう) — even if the flat isn't perfect (〜ても).",
-      "infoB": "Card B — travel and neighbourhoods. ① さくらマンション: 30 min to work for both of you; next to a shopping street (商店街) — handy, but people say it's lively at night. ② みどりアパート: 15 min to your work but 50 min to your partner's; very quiet, but no supermarket nearby. ③ そらマンション: 20 min to both jobs, right by the station, big supermarket; a main road outside, and people say the traffic (渋滞) is noisy. You don't want either of you commuting (通勤) more than 40 minutes. Share what you know, react to your partner's information with 〜なら (家賃なら…, 静かなら…), and decide together.",
+      "infoA": "Card A — the three flats. ① さくらマンション: rent (やちん) ¥95,000, two rooms + kitchen, small balcony (ベランダ). ② みどりアパート: ¥78,000, one room + kitchen (せまい), small garden, pets OK. ③ そらマンション: ¥118,000, two rooms + a big living room, big balcony, new building. You both agreed on a budget of up to ¥100,000 a month. You'd love a big balcony, but you work from home twice a week and need a quiet room. Share what you know, listen to your partner, and decide together (〜ことにしよう) — even if the flat isn't perfect (〜ても).",
+      "infoB": "Card B — travel and neighbourhoods. ① さくらマンション: 30 min to work for both of you; next to a shopping street (しょうてんがい) — handy, but people say it's lively at night. ② みどりアパート: 15 min to your work but 50 min to your partner's; very quiet, but no supermarket nearby. ③ そらマンション: 20 min to both jobs, right by the station, big supermarket; a busy main road outside (くるまが おおい), and people say it's noisy. You don't want either of you commuting (つうきん) more than 40 minutes. Share what you know, react to your partner's information with 〜なら (やちんなら…, しずかなら…), and decide together.",
       "targets": [
         "grammar:koto-ni-suru",
         "grammar:temo-even-if",
@@ -5402,7 +5412,7 @@
       ],
       "register": "plain",
       "twist": "A fourth flat comes up: ¥88,000, two rooms, next to a park, but 45 minutes to both jobs. Decide again — this time B argues for the cheapest flat and A for the closest one.",
-      "aiRole": "Estate agent (不動産屋) who answers your extra questions about the flats in polite Japanese",
+      "aiRole": "Estate agent (ふどうさんや) who answers your extra questions about the flats in polite Japanese",
       "scripted": [
         {
           "role": "a",
@@ -5431,8 +5441,8 @@
         },
         {
           "role": "b",
-          "jp": "{高|たか}くても、{毎日|まいにち}{楽|らく}なら、いいと{思|おも}うけど。でも、{前|まえ}の{道|みち}は{渋滞|じゅうたい}でうるさいそうだよ。",
-          "en": "Even if it's expensive, if every day is easier, I think it could be worth it. But apparently the road outside is noisy with traffic."
+          "jp": "{高|たか}くても、{毎日|まいにち}{楽|らく}なら、いいと{思|おも}うけど。でも、{前|まえ}の{道|みち}は{車|くるま}が{多|おお}くて、うるさいそうだよ。",
+          "en": "Even if it's expensive, if every day is easier, I think it could be worth it. But apparently there's a lot of traffic on the road outside, and it's noisy."
         },
         {
           "role": "a",
@@ -5451,8 +5461,8 @@
         },
         {
           "role": "b",
-          "jp": "じゃあ、さくらマンションにする？",
-          "en": "So, shall we go with Sakura Mansion?"
+          "jp": "{迷|まよ}うね…。じゃあ、さくらマンションにする？",
+          "en": "It's a tough call… So, shall we go with Sakura Mansion?"
         },
         {
           "role": "a",
@@ -5499,8 +5509,8 @@
         "text": "Understand polite staff speech at a hotel, a restaurant or on the phone, and reply in everyday です/ます Japanese.",
         "check": {
           "kind": "listen",
-          "instructions": "You're checking in at a hotel. Listen to the clerk — you only need to understand this very polite Japanese, not use it. Your own replies can be plain です/ます (スミスです。よろしくお願いします。). Then answer the questions.",
-          "material": "いらっしゃいませ。お{名前|なまえ}を{伺|うかが}ってもよろしいでしょうか。\n……スミス{様|さま}でございますね。お{待|ま}ちしておりました。\n{今日|きょう}から{明後日|あさって}まで、お{二人|ふたり}{様|さま}ですね。お{部屋|へや}は805でございます。エレベーターは{右|みぎ}にございます。\n{朝|あさ}ご{飯|はん}は、{地下|ちか}のレストランで、{七時|しちじ}から{九時|くじ}まで{召|め}し{上|あ}がれます。\n{何|なに}かございましたら、いつでもお{電話|でんわ}ください。ごゆっくりどうぞ。",
+          "instructions": "You're checking in at a hotel. Listen to the clerk — you only need to understand this very polite Japanese, not use it. Your own replies can be everyday です/ます (スミスです。よろしく おねがいします。). Then answer the questions.",
+          "material": "いらっしゃいませ。お{名前|なまえ}を{伺|うかが}えますか。\n……スミス{様|さま}でございますね。お{待|ま}ちしておりました。\n{今日|きょう}から{明後日|あさって}まで、お{二人|ふたり}{様|さま}ですね。お{部屋|へや}は805でございます。エレベーターは{右|みぎ}にございます。\n{朝|あさ}ご{飯|はん}は、{地下|ちか}のレストランで、{七時|しちじ}から{九時|くじ}まで{召|め}し{上|あ}がれます。\n{何|なに}かございましたら、いつでもお{電話|でんわ}ください。ごゆっくりどうぞ。",
           "questions": [
             {
               "q": "How long are you staying?",
@@ -5537,14 +5547,14 @@
         "text": "Phone to make or change a booking, asking about what you don't know (what time it starts, whether there are seats).",
         "check": {
           "kind": "speak",
-          "instructions": "The restaurant has answered your call (the audio plays the greeting). Book a table using your note, and ask both questions on it with 〜か inside your sentence (窓の近くの席があるかどうか…, 何時まで開いているか…).",
+          "instructions": "The restaurant has answered your call (the audio plays the greeting). Book a table using your note, and ask both questions on it with 〜か inside your sentence (まどの ちかくの せきが あるか どうか…, なんじまで あいているか…).",
           "material": "（{電話|でんわ}）はい、レストラン・さくらでございます。\n\nあなたのメモ：{土曜日|どようび}　{夜|よる}{七時|しちじ}　{二人|ふたり}\n・{窓|まど}の{近|ちか}くの{席|せき}はある？\n・{何時|なんじ}まで{開|あ}いている？",
           "questions": [],
           "rubric": [
             "Gives the day, the time and the number of people clearly",
-            "Asks at least one question inside a sentence with 〜か or 〜かどうか (何時まで開いているか教えてください)",
+            "Asks at least one question inside a sentence with 〜か or 〜かどうか (なんじまで あいているか おしえてください)",
             "Stays in polite です/ます Japanese throughout",
-            "Confirms and thanks at the end (よろしくお願いします)"
+            "Confirms and thanks at the end (よろしく おねがいします)"
           ]
         }
       },
@@ -5553,11 +5563,11 @@
         "text": "Text your partner exactly where you are: just about to leave, on the way, or just arrived.",
         "check": {
           "kind": "write",
-          "instructions": "It's 6:40 p.m. and your partner sent you this. Reply with exactly where you are and when you'll get there, using 〜ところ (今出るところ / 今電車に乗っているところ / 今駅に着いたところ).",
+          "instructions": "It's 6:40 p.m. and your partner sent you this. Reply with exactly where you are and when you'll get there, using 〜ところ (いま でるところ / いま でんしゃに のっているところ / いま えきに ついたところ).",
           "material": "{今|いま}どこ？ もう{出|で}た？ {七時|しちじ}の{予約|よやく}だよ！",
           "questions": [],
           "rubric": [
-            "Says exactly where you are with 〜ところ (出るところ / 〜ているところ / 着いたところ)",
+            "Says exactly where you are with 〜ところ (でるところ / 〜ているところ / ついたところ)",
             "Gives an arrival time or how long it will take",
             "Keeps it short and natural, in casual LINE style"
           ]
@@ -5612,8 +5622,8 @@
         "a": "Customer calling to book (card A: dates, number of people, requests)",
         "b": "Restaurant staff (card B: free tables, course details, house rules)"
       },
-      "infoA": "You're the customer. Call Restaurant Sakura (レストラン・さくら) to book your anniversary (記念日) dinner: Saturday the 15th, 7:30 p.m., two people. If 7:30 is full, 7:00 or 8:00 is fine — nothing later. Find out, using 〜か inside your questions: whether there's a table (席があるかどうか), what the anniversary course (記念日コース) includes and what it costs, and whether you may bring your own cake (ケーキを持っていってもいいですか). Your partner doesn't eat raw fish (刺身) — ask if it can be changed. Your name is スミス; your phone number is 090-1234-5678. Everyday です/ます is perfect; you don't need keigo.",
-      "infoB": "You work at Restaurant Sakura. Answer the phone: お電話ありがとうございます。レストラン・さくらでございます。 Saturday the 15th: 7:30 is full (もう席がございません); 6:30 and 8:00 are free. Anniversary course: ¥8,000 per person including tax — soup, salad, sashimi, tempura, beef and dessert. Sashimi can be changed to grilled fish (焼いた魚). Cakes are fine if the customer tells you by the day before. You close at 10 p.m. Take the caller's name and phone number and read the booking back. Use the staff phrases: 少々お待ちください, 申し訳ありません, かしこまりました, お待ちしております.",
+      "infoA": "You're the customer. Call Restaurant Sakura (レストラン・さくら) to book your anniversary (きねんび) dinner: Saturday the 15th, 7:30 p.m., two people. If 7:30 is full, 7:00 or 8:00 is fine — nothing later. Find out, using 〜か inside your questions: whether there's a table (せきが あるか どうか), what the anniversary course (きねんび コース) includes and what it costs, and whether you may bring your own cake (ケーキを もっていっても いいですか). Your partner doesn't eat raw fish (さしみ) — ask if it can be changed. Your name is スミス; your phone number is 090-1234-5678. Everyday です/ます is perfect; you don't need keigo.",
+      "infoB": "You work at Restaurant Sakura. Answer the phone: おでんわ ありがとうございます。レストラン・さくらで ございます。 Saturday the 15th: 7:30 is full (もう せきが ございません); 6:30 and 8:00 are free. Anniversary course: ¥8,000 per person including tax — soup, salad, sashimi, tempura, beef and dessert. Sashimi can be changed to grilled fish (やいた さかな). Cakes are fine if the customer tells you by the day before. You close at 10 p.m. Take the caller's name and phone number and read the booking back. Use the staff phrases: しょうしょう おまちください, もうしわけ ありません, かしこまりました, おまちして おります.",
       "targets": [
         "grammar:embedded-questions",
         "grammar:temo-ii",
@@ -5640,8 +5650,8 @@
         },
         {
           "role": "b",
-          "jp": "ありがとうございます。いつがよろしいでしょうか。",
-          "en": "Thank you. When would you like to come?"
+          "jp": "ありがとうございます。ご{予約|よやく}はいつになさいますか。",
+          "en": "Thank you. When would you like to book for?"
         },
         {
           "role": "a",
@@ -5665,13 +5675,13 @@
         },
         {
           "role": "a",
-          "jp": "{刺身|さしみ}が{苦手|にがて}なんですが、{変|か}えていただけますか。",
-          "en": "I'm not keen on sashimi — could you change it?"
+          "jp": "{一人|ひとり}、{刺身|さしみ}が{苦手|にがて}なんですが、{変|か}えていただけますか。",
+          "en": "One of us isn't keen on sashimi — could you change it?"
         },
         {
           "role": "b",
-          "jp": "かしこまりました。{焼|や}いた{魚|さかな}にお{変|か}えします。",
-          "en": "Certainly. We'll change it to grilled fish."
+          "jp": "かしこまりました。{刺身|さしみ}を{焼|や}いた{魚|さかな}に{変|か}えておきます。",
+          "en": "Certainly. We'll change the sashimi to grilled fish for you."
         },
         {
           "role": "a",
@@ -5725,15 +5735,15 @@
     "canDos": [
       {
         "id": "u25-cd1",
-        "text": "Tell your partner kindly what you'd like them to do, or not do, more often.",
+        "text": "Tell your partner kindly what you'd like them to do more often, and what you'd rather they didn't do.",
         "check": {
           "kind": "speak",
           "instructions": "Your partner asks you this (the audio plays it). Answer kindly for 45–60 seconds: one thing you'd like them to do more often and one thing you'd like them not to do, each with a reason. It's a request, not a complaint.",
-          "material": "ねえ、{私|わたし}にもっとしてほしいこと、ある？ してほしくないことも、{本当|ほんとう}のことを{言|い}ってね。",
+          "material": "ねえ、{私|わたし}にもっとしてほしいこと、ある？ してほしくないことも、なんでも{言|い}ってね。",
           "questions": [],
           "rubric": [
             "Makes at least one request with 〜てほしい and one with 〜ないでほしい",
-            "Softens it kindly (できれば, ちょっと, 〜と嬉しい)",
+            "Softens it kindly (できれば, ちょっと, 〜と うれしい)",
             "Gives a reason for each request",
             "Thanks or reassures your partner at the end (いつもありがとう)"
           ]
@@ -5744,14 +5754,14 @@
         "text": "Express disappointment without blaming ('I waited, and yet…'), listen to your partner's side, and make up.",
         "check": {
           "kind": "speak",
-          "instructions": "Your partner came home two hours late without messaging, and the dinner you made has gone cold. They've just walked in (the audio plays their line). Tell them how you felt using 〜のに, without blaming them; ask what happened; then make up.",
-          "material": "（{夜|よる}{十時|じゅうじ}。{晩|ばん}ご{飯|はん}は{冷|つめ}たくなっている。）\nただいま…。ごめん、{遅|おそ}くなっちゃった。",
+          "instructions": "You and your partner planned to see a film tonight, and you've already bought the tickets. Your partner has just come to talk to you (the audio plays their line). Tell them how you feel using 〜のに, without blaming them; ask what happened; then make up and say what you'd like next time.",
+          "material": "（{土曜日|どようび}の{夕方|ゆうがた}。{今夜|こんや}は{二人|ふたり}で{映画|えいが}を{見|み}に{行|い}く{約束|やくそく}。チケットも、もう{買|か}った。）\nごめん…。{今日|きょう}の{映画|えいが}のこと、{忘|わす}れてて…。{会社|かいしゃ}の{人|ひと}と{飲|の}みに{行|い}く{約束|やくそく}、しちゃったんだ。",
           "questions": [],
           "rubric": [
-            "Expresses disappointment with 〜のに (作って待っていたのに…)",
-            "Says how you felt rather than blaming (寂しかった / 心配した)",
-            "Asks for and listens to your partner's side (何があったの？)",
-            "Makes up: accepts the apology and says what you'd like next time with 〜てほしい"
+            "Expresses disappointment with 〜のに (チケットも かったのに… / たのしみに していたのに…)",
+            "Says how you feel rather than blaming (ざんねん / さびしい)",
+            "Asks for and listens to your partner's side (どうして？ / なにが あったの？)",
+            "Makes up: accepts the apology and says what you'd like next time with 〜てほしい (つぎは はやく いってほしい)"
           ]
         }
       },
@@ -5815,7 +5825,7 @@
         "check": {
           "kind": "read",
           "instructions": "Read this advice column from a magazine, then answer the questions.",
-          "material": "【{相談|そうだん}】\n{夫|おっと}は{毎晩|まいばん}、{寝|ね}るまでスマホでゲームをしています。{話|はな}しても、{返事|へんじ}をしてくれません。{二人|ふたり}で{住|す}んでいるのに、とても{寂|さび}しいです。（{妻|つま}・{三十二歳|さんじゅうにさい}）\n【{答|こた}え】\nまず、{自分|じぶん}の{気持|きも}ちを{伝|つた}えてみましょう。「どうしていつもゲームをするの？」と{聞|き}くと、{相手|あいて}は{怒|おこ}られたと{感|かん}じます。「{夜|よる}は{少|すこ}しでも{話|はな}したいな」と、してほしいことを{言|い}うのがいいです。それから、{相手|あいて}の{話|はなし}も{聞|き}いてください。{仕事|しごと}で{疲|つか}れていて、{一人|ひとり}の{時間|じかん}が{欲|ほ}しいのかもしれません。「ゲームは{十時|じゅうじ}まで」など、{二人|ふたり}で{決|き}めるのもいいですね。",
+          "material": "【{相談|そうだん}】\n{夫|おっと}は{毎晩|まいばん}、{寝|ね}るまでスマホでゲームをしています。{私|わたし}が{何|なに}か{言|い}っても、{返事|へんじ}をしてくれません。{一緒|いっしょ}に{住|す}んでいるのに、とても{寂|さび}しいです。（{妻|つま}・{三十二歳|さんじゅうにさい}）\n【{答|こた}え】\nまず、{自分|じぶん}の{気持|きも}ちを{伝|つた}えてみましょう。「どうしていつもゲームをするの？」と{聞|き}くと、{相手|あいて}は{怒|おこ}られたと{感|かん}じます。「{夜|よる}は{少|すこ}しでいいから、{私|わたし}と{話|はな}してほしいな」と、してほしいことを{言|い}うのがいいです。それから、{相手|あいて}の{話|はなし}も{聞|き}いてください。{仕事|しごと}で{疲|つか}れていて、{一人|ひとり}の{時間|じかん}が{欲|ほ}しいのかもしれません。「ゲームは{十時|じゅうじ}まで」など、{二人|ふたり}で{決|き}めるのもいいですね。",
           "questions": [
             {
               "q": "What is the writer's problem?",
@@ -5858,8 +5868,8 @@
         "a": "Wants a quiet hot-spring trip and has reasons (card A)",
         "b": "Wants to see friends in the city and has reasons (card B)"
       },
-      "infoA": "You want a quiet hot-spring trip (温泉) over the long weekend (連休, Saturday to Monday). Your reasons: you've done overtime (残業) every week and you're exhausted; you already went to Tokyo twice last month; you two haven't had time alone together for ages. What you'd like your partner to understand (〜てほしい): you're not against their friends — you just need rest. Start by saying how you feel, not what they did wrong. You could accept: seeing the friends on one day, if you still get at least one night at a hot spring.",
-      "infoB": "You want to see friends in Tokyo over the long weekend (連休). Your reasons: your best friend is visiting from abroad and flies home on Monday; months ago you promised (約束) to join a dinner on Saturday; a chance (機会) like this is rare. What you'd like your partner to understand (〜てほしい): you weren't ignoring how tired they are — you didn't know it was this bad. Use 〜のに once to say how you feel, without blaming. You could accept: seeing your friend only on Saturday and Sunday morning, if your partner comes to the Saturday dinner.",
+      "infoA": "You want a quiet hot-spring trip (おんせん) over the long weekend (れんきゅう, Saturday to Monday). Your reasons: you've done overtime (ざんぎょう) every week and you're exhausted; you already went to Tokyo twice last month; you two haven't had time alone together for ages. What you'd like your partner to understand (〜てほしい): you're not against their friends — you just need rest. Start by saying how you feel, not what they did wrong. You could accept: seeing the friends on one day, if you still get at least one night at a hot spring.",
+      "infoB": "You want to see friends in Tokyo over the long weekend (れんきゅう). Your reasons: your best friend is visiting from abroad and flies home on Monday; months ago you promised (やくそく) to join a dinner on Saturday; a chance (きかい) like this is rare. What you'd like your partner to understand (〜てほしい): you weren't ignoring how tired they are — you didn't know it was this bad. Use 〜のに once to say how you feel, without blaming. You could accept: seeing your friend only on Saturday and Sunday morning, if your partner comes to the Saturday dinner.",
       "targets": [
         "grammar:te-hoshii",
         "grammar:noni",
@@ -5890,8 +5900,8 @@
         },
         {
           "role": "b",
-          "jp": "わかるけど、{一番|いちばん}の{友達|ともだち}が{外国|がいこく}から{来|く}るんだよ。{月曜日|げつようび}には{帰|かえ}っちゃうから、{今|いま}しか{会|あ}えないんだ。",
-          "en": "I get that, but my best friend is coming from abroad. She goes home on Monday, so it's now or never."
+          "jp": "わかるけど、{一番|いちばん}の{友達|ともだち}が{外国|がいこく}から{来|く}るんだよ。{月曜日|げつようび}にはもう{帰|かえ}るから、こんな{機会|きかい}、なかなかないんだ。",
+          "en": "I get that, but my best friend is coming from abroad. She flies home on Monday, so a chance like this doesn't come along often."
         },
         {
           "role": "a",

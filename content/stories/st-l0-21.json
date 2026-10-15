@@ -3,7 +3,7 @@
   "level": "L0",
   "unit": 13,
   "title": "Nothing in the Fridge",
-  "titleJp": "{冷蔵庫|れいぞうこ}に {何|なに}も ない",
+  "titleJp": "れいぞうこに {何|なに}も ない",
   "topic": "food",
   "grammar": [
     "nanika-nanimo",
@@ -11,10 +11,11 @@
     "yori-hou",
     "kara-because",
     "kedo-but",
-    "to-iu",
+    "tai-want",
     "te-imasu",
     "casual-speech",
-    "de-place-means"
+    "de-place-means",
+    "casual-past"
   ],
   "sentences": [
     {
@@ -26,24 +27,24 @@
       "en": "Outside, it's raining."
     },
     {
-      "jp": "「お{腹|なか}が／すいたね。／{何|なに}か／{作|つく}ろうか。」",
-      "en": "\"I'm hungry. Shall we make something?\""
+      "jp": "「おなかが／すいたね。／{何|なに}か／{作|つく}ろう。」",
+      "en": "\"I'm hungry. Let's make something.\""
     },
     {
-      "jp": "{夫|おっと}が／{冷蔵庫|れいぞうこ}を／{開|あ}けました。",
-      "en": "My husband opened the fridge."
+      "jp": "ケンが／れいぞうこを／{開|あ}けました。",
+      "en": "Ken opened the fridge."
     },
     {
       "jp": "「え？／{何|なに}も／ないよ。」",
       "en": "\"Huh? There's nothing in here.\""
     },
     {
-      "jp": "{冷蔵庫|れいぞうこ}には、／{卵|たまご}が／{三|みっ}つと、／{玉|たま}ねぎが／{一|ひと}つ／ありました。",
-      "en": "In the fridge there were three eggs and one onion."
+      "jp": "れいぞうこには、／{卵|たまご}が／{三|みっ}つと、／たまねぎが／{一|ひと}つと、／チーズが／{少|すこ}し／ありました。",
+      "en": "In the fridge there were three eggs, one onion and a little cheese."
     },
     {
-      "jp": "「カレーが／{食|た}べたかったけど、／{肉|にく}が／ないね。」",
-      "en": "\"I wanted curry, but there's no meat.\""
+      "jp": "「ハンバーガーが／{食|た}べたかったけど、／{肉|にく}が／ないね。」",
+      "en": "\"I wanted burgers, but there's no meat.\""
     },
     {
       "jp": "「スーパーに／{行|い}こうか。」",
@@ -54,8 +55,8 @@
       "en": "\"It's raining, so I don't want to go.\""
     },
     {
-      "jp": "「じゃあ、／{卵|たまご}と／{玉|たま}ねぎで／{何|なに}か／{作|つく}ろう。」",
-      "en": "\"Okay then, let's make something with the eggs and the onion.\""
+      "jp": "「しょうがないね。／じゃあ、／{卵|たまご}と／たまねぎで／{何|なに}か／{作|つく}ろう。」",
+      "en": "\"Oh well. Then let's make something with the eggs and the onion.\""
     },
     {
       "jp": "「スープと／{卵|たまご}ご{飯|はん}、／どっちが／いい？」",
@@ -66,33 +67,41 @@
       "en": "\"Soup's better. It's cold.\""
     },
     {
-      "jp": "{夫|おっと}は／{玉|たま}ねぎを／{切|き}りました。",
-      "en": "My husband chopped the onion."
+      "jp": "ケンは／たまねぎを／{切|き}りました。",
+      "en": "Ken chopped the onion."
     },
     {
-      "jp": "わたしは／{卵|たまご}を／{混|ま}ぜました。",
-      "en": "I beat the eggs."
+      "jp": "エマは／{卵|たまご}を／まぜました。",
+      "en": "Emma beat the eggs."
     },
     {
-      "jp": "{卵|たまご}と／{玉|たま}ねぎの／スープが／できました。",
+      "jp": "{最後|さいご}に、／チーズも／{入|い}れました。",
+      "en": "Last of all, they put in the cheese too."
+    },
+    {
+      "jp": "{卵|たまご}と／たまねぎの／スープが／できました。",
       "en": "The egg and onion soup was ready."
     },
     {
-      "jp": "{簡単|かんたん}な／スープだったけど、／とても／おいしかったです。",
-      "en": "It was a simple soup, but it was really good."
+      "jp": "かんたんな／スープだったけど、／なんだか／とても／おいしかったです。",
+      "en": "It was a simple soup, but somehow it tasted wonderful."
     },
     {
-      "jp": "「カレーより／おいしいね。」と／{夫|おっと}が／{言|い}いました。",
-      "en": "\"This is tastier than curry,\" my husband said."
+      "jp": "「ハンバーガーより／おいしいね！」",
+      "en": "\"This is better than burgers!\""
+    },
+    {
+      "jp": "「うん、／さいこう！」",
+      "en": "\"Yeah, it's the best!\""
     }
   ],
   "gist": {
-    "q": "Why didn't they make curry?",
+    "q": "Why didn't they go to the supermarket?",
     "options": [
-      "There was no meat",
-      "The husband can't cook",
-      "They had curry yesterday"
+      "It was closed",
+      "They had no money",
+      "It was raining"
     ],
-    "answer": 0
+    "answer": 2
   }
 }

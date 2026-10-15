@@ -58,22 +58,22 @@
     },
     {
       "role": "b",
-      "jp": "そっか。じゃあ、ご{飯|はん}と{卵|たまご}のみそ{汁|しる}にしよう。",
-      "en": "Fair enough. Let's have rice and egg miso soup, then.",
-      "cue": "rice · egg miso soup · let's"
+      "jp": "そっか。じゃあ、ご{飯|はん}と{卵|たまご}のみそ{汁|しる}にしよう。みそ{汁|しる}は{私|わたし}が{作|つく}るね。",
+      "en": "Fair enough. Let's have rice and egg miso soup, then. I'll make the soup.",
+      "cue": "rice · egg miso soup · I'll make"
     },
     {
       "role": "a",
-      "jp": "いいね。あ、みそはまだ{入|い}れないで。{最後|さいご}に{入|い}れるんだよ。",
-      "en": "Good. Oh, don't put the miso in yet. It goes in at the end.",
+      "jp": "ありがとう。あ、みそはまだ{入|い}れないで。{最後|さいご}に{入|い}れるんだよ。",
+      "en": "Thanks. Oh, don't put the miso in yet. It goes in at the end.",
       "hint": "〜ないで on its own is a casual \"please don't\". 〜んだよ explains why.",
-      "cue": "miso · not yet · at the end"
+      "cue": "thanks · miso · not yet · at the end"
     },
     {
       "role": "b",
-      "jp": "わかった。じゃあ、{私|わたし}はご{飯|はん}を{温|あたた}めるね。",
-      "en": "Got it. I'll heat up the rice, then.",
-      "cue": "OK · I · heat rice"
+      "jp": "わかった。じゃあ、ご{飯|はん}を{温|あたた}めてね。",
+      "en": "Got it. You heat up the rice, then.",
+      "cue": "OK · you · heat rice"
     }
   ]
 }

@@ -15,7 +15,8 @@
     "te-kureru",
     "kara-made",
     "ka-or-ni-suru",
-    "ageru-morau"
+    "ageru-morau",
+    "relative-clauses"
   ],
   "sentences": [
     {
@@ -27,24 +28,28 @@
       "en": "\"On Thursday, from 10 a.m. to 3 p.m., the water will be off.\""
     },
     {
-      "jp": "ミキは／{隣|となり}の／おばあさんに／{会|あ}って、／{話|はなし}を／{聞|き}きました。",
-      "en": "Miki ran into the old lady next door and talked to her about it."
+      "jp": "ミキは／{隣|となり}の／{田中|たなか}さんに／{会|あ}って、／{話|はなし}を／{聞|き}きました。",
+      "en": "Miki ran into Mrs Tanaka next door and asked her about it."
+    },
+    {
+      "jp": "{田中|たなか}さんは、／{一人|ひとり}で／{住|す}んでいる／おばあさんです。",
+      "en": "Mrs Tanaka is an old lady who lives on her own."
     },
     {
       "jp": "「{去年|きょねん}も／{水|みず}が／{止|と}まったのよ。／トイレも／{使|つか}えなかったわ。」",
-      "en": "\"The water stopped last year too. We couldn't even use the toilet.\""
+      "en": "\"The water was cut off last year too. We couldn't even use the toilet.\""
     },
     {
       "jp": "その／{晩|ばん}、／ミキは／ケンに／{話|はな}しました。",
       "en": "That evening, Miki told Ken."
     },
     {
-      "jp": "「{隣|となり}の／おばあさんの／{話|はなし}では、／{去年|きょねん}は／トイレも／{使|つか}えなかったそうだよ。」",
-      "en": "\"The lady next door says that last year they couldn't even use the toilet.\""
+      "jp": "「{田中|たなか}さんの／{話|はなし}では、／{去年|きょねん}は／トイレも／{使|つか}えなかったそうだよ。」",
+      "en": "\"Mrs Tanaka says that last year they couldn't even use the toilet.\""
     },
     {
       "jp": "「{木曜日|もくようび}は／{水|みず}も／{出|で}ないし、／トイレも／{使|つか}えないし、／{大変|たいへん}だね。」",
-      "en": "\"On Thursday there's no water and no toilet — that's going to be tough.\""
+      "en": "\"So on Thursday there's no water and no toilet — that's going to be tough.\""
     },
     {
       "jp": "「{僕|ぼく}は／{会社|かいしゃ}だから／{大丈夫|だいじょうぶ}だけど、／ミキは／うちで／{仕事|しごと}だよね。」",
@@ -63,8 +68,16 @@
       "en": "They filled the bath with water too."
     },
     {
-      "jp": "{洗濯|せんたく}も／しておきました。／お{皿|さら}も／{洗|あら}っておきました。",
-      "en": "They did the laundry ahead of time. They washed the dishes too."
+      "jp": "{麦茶|むぎちゃ}も／たくさん／{作|つく}っておきました。",
+      "en": "They made lots of barley tea in advance as well."
+    },
+    {
+      "jp": "{洗濯|せんたく}も／しておきました。",
+      "en": "They did the laundry ahead of time."
+    },
+    {
+      "jp": "お{皿|さら}も／{全部|ぜんぶ}／{洗|あら}っておきました。",
+      "en": "They washed all the dishes too."
     },
     {
       "jp": "「{水|みず}が／あれば、／{困|こま}らないね。」",
@@ -72,7 +85,7 @@
     },
     {
       "jp": "{木曜日|もくようび}の／{十時|じゅうじ}、／{水|みず}が／{止|と}まりました。",
-      "en": "At ten on Thursday, the water stopped."
+      "en": "At ten on Thursday, the water went off."
     },
     {
       "jp": "ミキは／うちで／{仕事|しごと}を／しました。",
@@ -80,11 +93,11 @@
     },
     {
       "jp": "{昼|ひる}ご{飯|はん}は、／コンビニの／お{弁当|べんとう}に／しました。",
-      "en": "For lunch, she had a convenience store bento."
+      "en": "For lunch, she had a bento from the convenience store."
     },
     {
-      "jp": "{二時|にじ}ごろ、／{隣|となり}の／おばあさんが／{来|き}ました。",
-      "en": "Around two, the old lady next door came over."
+      "jp": "{二時|にじ}ごろ、／{田中|たなか}さんが／{来|き}ました。",
+      "en": "Around two, Mrs Tanaka came round."
     },
     {
       "jp": "「ごめんなさい。／{水|みず}を／{少|すこ}し／{分|わ}けて／くれない？」",
@@ -92,31 +105,35 @@
     },
     {
       "jp": "「{水|みず}を／{入|い}れておくのを、／{忘|わす}れてしまったの。」",
-      "en": "\"I forgot to fill up any water beforehand.\""
+      "en": "\"I forgot to put any water aside.\""
     },
     {
-      "jp": "ミキは／{笑|わら}って、／ペットボトルを／{一本|いっぽん}／あげました。",
-      "en": "Miki laughed and gave her a bottle."
+      "jp": "ミキは／{笑|わら}って、／{水|みず}の／ペットボトルを／{一本|いっぽん}と、／{麦茶|むぎちゃ}を／{半分|はんぶん}／あげました。",
+      "en": "Miki laughed and gave her a bottle of water and half of the barley tea."
     },
     {
-      "jp": "「{去年|きょねん}の／{話|はなし}を／{教|おし}えて／くれたのは、／おばあさんですよ。」",
+      "jp": "「{去年|きょねん}の／{話|はなし}を／{教|おし}えて／くれたのは、／{田中|たなか}さんですよ。」",
       "en": "\"You were the one who told me about last year!\""
     },
     {
-      "jp": "「そうだったわね。」／おばあさんも／{笑|わら}いました。",
-      "en": "\"So I did.\" The old lady laughed too."
+      "jp": "「そうだったわね。」",
+      "en": "\"So I was.\""
+    },
+    {
+      "jp": "{田中|たなか}さんも／{笑|わら}いました。",
+      "en": "Mrs Tanaka laughed too."
     },
     {
       "jp": "{三時|さんじ}に、／{水|みず}が／また／{出|で}ました。",
       "en": "At three, the water came back on."
     },
     {
-      "jp": "{夜|よる}、／{帰|かえ}ってきた／ケンが／{聞|き}きました。／「{大丈夫|だいじょうぶ}だった？」",
+      "jp": "{夜|よる}、／{帰|かえ}ってきた／ケンが／「{大丈夫|だいじょうぶ}だった？」と／{聞|き}きました。",
       "en": "In the evening, Ken came home and asked, \"Was everything okay?\""
     },
     {
-      "jp": "「うん。／{水|みず}を／{入|い}れておいて、／よかった。／おばあさんも／{喜|よろこ}んでいたよ。」",
-      "en": "\"Yes. I'm glad we filled up the water. The lady next door was happy too.\""
+      "jp": "「うん。／{水|みず}を／{入|い}れておいて、／よかった。／{田中|たなか}さんも／{喜|よろこ}んでいたよ。」",
+      "en": "\"Yes. I'm glad we put water aside. Mrs Tanaka was happy too.\""
     }
   ],
   "gist": {

@@ -3,7 +3,7 @@
   "level": "start",
   "unit": 2,
   "title": "Ramen night",
-  "titleJp": "ラーメンの よる",
+  "titleJp": "ラーメンの {夜|よる}",
   "topic": "food",
   "grammar": [
     "wa-desu",
@@ -23,8 +23,8 @@
       "en": "The phone rings."
     },
     {
-      "jp": "「エマ、／ケンです。」",
-      "en": "\"Emma, it's Ken.\""
+      "jp": "「エマ、／ぼくです。」",
+      "en": "\"Emma, it's me.\""
     },
     {
       "jp": "「いま、／どこですか。」",

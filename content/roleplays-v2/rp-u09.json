@@ -54,8 +54,8 @@
     },
     {
       "role": "a",
-      "jp": "{仕事|しごと}が{多|おお}かったから。もうお{腹|なか}がすいた！",
-      "en": "There was so much work. I'm starving now!",
+      "jp": "{仕事|しごと}が{多|おお}かったから。お{腹|なか}がすいた！",
+      "en": "There was so much work. I'm starving!",
       "hint": "The reason comes first, then から.",
       "cue": "so much work · starving"
     },

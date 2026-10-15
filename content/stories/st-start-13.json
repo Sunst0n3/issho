@@ -3,7 +3,7 @@
   "level": "start",
   "unit": 5,
   "title": "The cat at the window",
-  "titleJp": "まどの そとの ねこ",
+  "titleJp": "まどの {外|そと}の ねこ",
   "topic": "animals",
   "grammar": [
     "wa-desu",

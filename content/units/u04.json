@@ -62,7 +62,7 @@
         "rubric": [
           "Says how many with ふたりです",
           "Orders a dish for each person with を and a number (カレーをひとつ、ラーメンをひとつ)",
-          "Orders a drink for each person with ください or お願いします",
+          "Orders a drink for each person with ください or おねがいします",
           "Gets the server's attention or starts the order with すみません"
         ]
       }
@@ -72,7 +72,7 @@
       "text": "Say what your food is like (tasty, spicy, sweet, not hot) and ask your partner about theirs.",
       "check": {
         "kind": "speak",
-        "instructions": "You're eating dinner out with your partner. Answer their questions about your food out loud, react to what they say, then ask about their food.",
+        "instructions": "You're eating dinner out with your partner. Your curry is tasty and not spicy. Answer their questions about your food out loud, react to what they say, then ask about their food.",
         "material": "「そのカレー、どうですか。」\n「{辛|から}いですか。」\n「{私|わたし}のラーメンはちょっと{熱|あつ}いです。でも、おいしいですよ。」",
         "questions": [],
         "rubric": [
@@ -127,12 +127,12 @@
       "check": {
         "kind": "write",
         "instructions": "A friend sends you this message. Reply in 2–4 sentences: where you ate yesterday, what you had, and how you got there.",
-        "material": "こんばんは！ きのうの{夜|よる}、{晩|ばん}ご{飯|はん}はどこで{食|た}べましたか？ {何|なに}を{食|た}べましたか？",
+        "material": "こんばんは！ きのうの{晩|ばん}ご{飯|はん}は、どこで{食|た}べましたか？ {何|なに}を{食|た}べましたか？",
         "questions": [],
         "rubric": [
-          "Says where they ate with 〜で食べました",
-          "Says what they had with 〜を食べました or 〜を飲みました",
-          "Says how they got there with 電車で, バスで or 車で行きました",
+          "Says where they ate with 〜でたべました",
+          "Says what they had with 〜をたべました or 〜をのみました",
+          "Says how they got there with でんしゃで, バスで or くるまでいきました",
           "Uses past ました forms throughout"
         ]
       }
@@ -148,8 +148,8 @@
       "a": "Knows what you both feel like eating",
       "b": "Has the menu with prices and the budget"
     },
-    "infoA": "You know what you both feel like tonight. You want something spicy (辛いラーメン) and a cold beer (冷たいビール). Your partner wants vegetables (野菜ラーメン), nothing spicy, and a juice. You can't see the prices: ask. When the server comes, say how many you are (ふたりです) and order.",
-    "infoB": "You have the menu and the budget: 2,500 yen in total (二千五百円), and the total must stay under it. Menu: ラーメン 800円, 辛いラーメン 950円, 野菜ラーメン 1,000円, ご飯 200円, ビール 600円, ジュース 300円; water is free (お水). Tell your partner the prices and agree what to drop.",
+    "infoA": "You know what you both feel like tonight. You want something spicy (からいラーメン) and a cold beer (つめたいビール). Your partner wants vegetables (やさいラーメン), nothing spicy, and a juice. You can't see the prices: ask. When the server comes, you order. At the end, ask for the bill (おかいけいをおねがいします).",
+    "infoB": "You have the menu and the budget: 2,500 yen in total (にせんごひゃくえん), and the total must stay under it. Menu: ラーメン ¥800, からいラーメン ¥950, やさいラーメン ¥1,000, ごはん ¥200, ビール ¥600, ジュース ¥300; water is free (おみず). You walk in first, so tell the server how many you are (ふたりです). Tell your partner the prices and agree what to drop.",
     "targets": [
       "core:cw-0069",
       "core:cw-0356",
@@ -161,13 +161,18 @@
       "grammar:numbers-prices"
     ],
     "register": "polite",
-    "twist": "On the repeat, the server recommends today's special (おすすめ) at 1,200 yen and one of you wants it; the shop also takes cash only (現金だけ) and you have just 2,000 yen. Re-plan the order.",
+    "twist": "On the repeat, the server recommends today's special (おすすめ) at 1,200 yen and one of you wants it; the shop also takes cash only (げんきんだけ) and you have just 2,000 yen. Re-plan the order.",
     "aiRole": "Ramen shop server who welcomes you, asks how many you are, takes your order and tells you the total",
     "scripted": [
       {
+        "role": "b",
+        "jp": "すみません、ふたりです。",
+        "en": "Excuse me, there are two of us."
+      },
+      {
         "role": "a",
         "jp": "おなかがすきましたね。{私|わたし}は{辛|から}いラーメンです。いくらですか。",
-        "en": "I'm so hungry. I'll have the spicy ramen. How much is it?"
+        "en": "I'm hungry, aren't you? I'll have the spicy ramen. How much is it?"
       },
       {
         "role": "b",
@@ -223,6 +228,11 @@
         "role": "b",
         "jp": "{私|わたし}のは{辛|から}くないです。おいしいですよ。",
         "en": "Mine isn't spicy. It's delicious."
+      },
+      {
+        "role": "a",
+        "jp": "ごちそうさまでした。すみません、お{会計|かいけい}をお{願|ねが}いします。",
+        "en": "That was great, thank you. Excuse me, could we have the bill, please?"
       }
     ]
   },

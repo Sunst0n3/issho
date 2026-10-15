@@ -19,7 +19,7 @@
       "check": {
         "kind": "speak",
         "instructions": "Your partner (or the AI) comes home and says the three lines below, one at a time. Reply in casual Japanese: greet them, ask about their day (忙しかった？ 楽しかった？), react, and answer the dinner question. About 1 minute.",
-        "material": "ただいま！\nうん、とても{忙|いそが}しかった。でも、{仕事|しごと}は{楽|たの}しかったよ。\n{晩|ばん}ご{飯|はん}、{何|なに}{食|た}べる？",
+        "material": "ただいま！\nうん、{忙|いそが}しかった。でも、{仕事|しごと}は{楽|たの}しかったよ。\n{晩|ばん}ご{飯|はん}、{何|なに}{食|た}べる？",
         "questions": [],
         "rubric": [
           "Greets with お帰り or お帰りなさい",
@@ -35,7 +35,7 @@
       "check": {
         "kind": "listen",
         "instructions": "Your partner left you a voice message. Listen (twice if you like) and answer the questions.",
-        "material": "{私|わたし}だよ。ごめん、{今日|きょう}は{仕事|しごと}がとても{忙|いそが}しい。{九時|くじ}ごろ{帰|かえ}るね。{晩|ばん}ご{飯|はん}のカレーは{冷蔵庫|れいぞうこ}の{中|なか}にあるよ。お{皿|さら}はテーブルの{上|うえ}。それから、{猫|ねこ}のご{飯|はん}はソファーの{横|よこ}にあるよ。じゃあ、またあとでね。",
+        "material": "{私|わたし}だよ。ごめん、{今日|きょう}は{忙|いそが}しい。{九時|くじ}ごろ{帰|かえ}るね。{晩|ばん}ご{飯|はん}のカレーは{冷蔵庫|れいぞうこ}の{中|なか}にあるよ。お{皿|さら}はテーブルの{上|うえ}。それから、{猫|ねこ}のご{飯|はん}はソファーの{横|よこ}にあるよ。じゃあ、またあとでね。",
         "questions": [
           {
             "q": "Where is the curry?",
@@ -89,7 +89,7 @@
       "check": {
         "kind": "read",
         "instructions": "Your partner left this note on the fridge. Read it and answer the questions.",
-        "material": "おはよう！\n{郵便局|ゆうびんきょく}と{銀行|ぎんこう}へ{行|い}ってきます。{二時|にじ}ごろ{帰|かえ}るね。\nお{昼|ひる}ご{飯|はん}は{冷蔵庫|れいぞうこ}の{中|なか}にあるよ。おにぎりとサラダ。\n{家|いえ}の{鍵|かぎ}はテーブルの{上|うえ}。\n{今日|きょう}はごみの{日|ひ}！ ごみはドアの{横|よこ}にあるよ。お{願|ねが}いします！\n{帰|かえ}って、{一緒|いっしょ}に{掃除|そうじ}する？",
+        "material": "おはよう！\n{郵便局|ゆうびんきょく}と{銀行|ぎんこう}へ{行|い}ってきます。{二時|にじ}ごろ{帰|かえ}るね。\nお{昼|ひる}ご{飯|はん}は{冷蔵庫|れいぞうこ}の{中|なか}にあるよ。おにぎりとサラダ。\n{家|いえ}の{鍵|かぎ}はテーブルの{上|うえ}。\n{今日|きょう}はごみの{日|ひ}！ ごみはドアの{横|よこ}にあるよ。お{願|ねが}いします！\n{午後|ごご}は{一緒|いっしょ}に{掃除|そうじ}する？",
         "questions": [
           {
             "q": "Where has your partner gone?",
@@ -126,14 +126,14 @@
       "text": "Send your partner a short casual message about your day: where you went and how it was.",
       "check": {
         "kind": "write",
-        "instructions": "Your partner sent you the message below. Reply in 3–4 short casual sentences: where you went today, what you did there, and how it was.",
+        "instructions": "Your partner sent you the message below. Reply in 3–4 short, warm sentences: where you went today, what you did there, and how it was. Adjectives can be casual (楽しかったよ); verbs can stay in the ます form for now, because the plain past comes in unit 9.",
         "material": "おつかれさま！ {今日|きょう}は{楽|たの}しかった？ {私|わたし}は{今|いま}、{会社|かいしゃ}。{七時|しちじ}ごろ{帰|かえ}るね。",
         "questions": [],
         "rubric": [
-          "Says where they went with へ or に (〜へ行きました is fine)",
+          "Says where they went with へ or に (〜へ行きました)",
           "Joins two actions with the て-form (〜へ行って、〜を買いました)",
           "Says how it was with a past adjective (楽しかった, 寒かった, 静かでした)",
-          "Sounds casual and warm: no です after plain adjectives, ends with よ or ね"
+          "Sounds warm and casual: no です after い-adjectives (楽しかったよ), and at least one sentence ends with よ or ね"
         ]
       }
     }
@@ -189,8 +189,8 @@
       },
       {
         "role": "b",
-        "jp": "ううん、テーブルの{上|うえ}は{鍵|かぎ}だけだよ。",
-        "en": "No, there's only your keys on the table."
+        "jp": "ううん。テーブルの{上|うえ}は{鍵|かぎ}とコップだけだよ。",
+        "en": "No. There are just your keys and a cup on the table."
       },
       {
         "role": "a",

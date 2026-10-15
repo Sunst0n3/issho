@@ -3,7 +3,7 @@
   "level": "start",
   "unit": 4,
   "title": "Dinner out",
-  "titleJp": "レストランの よる",
+  "titleJp": "レストランの {夜|よる}",
   "topic": "food",
   "grammar": [
     "wa-desu",

@@ -47,10 +47,10 @@
     },
     {
       "role": "b",
-      "jp": "うん、{父|ちち}がくれた{時計|とけい}だったんだ。うれしい！{私|わたし}からは、これ。",
-      "en": "Yeah, it was the one my dad gave me. I'm so happy! And this is from me.",
+      "jp": "うん、{父|ちち}がくれた{大切|たいせつ}な{時計|とけい}だったんだ。ありがとう、うれしい！{私|わたし}からは、これ。",
+      "en": "Yeah, it was a special one my dad gave me. Thank you, I love it! And this is from me.",
       "hint": "くれた: someone gave it to me (or my side).",
-      "cue": "dad gave it · happy · from me"
+      "cue": "dad gave it · thank you · from me"
     },
     {
       "role": "a",

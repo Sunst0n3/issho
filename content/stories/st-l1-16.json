@@ -15,12 +15,17 @@
     "tte-quote",
     "mae-ni-ato-de",
     "nagara",
-    "n-desu"
+    "n-desu",
+    "te-imasu"
   ],
   "sentences": [
     {
       "jp": "{来週|らいしゅう}は／{連休|れんきゅう}です。",
       "en": "Next week is a long weekend."
+    },
+    {
+      "jp": "ミキは、／{連休|れんきゅう}が／{楽|たの}しみで、／わくわくしていました。",
+      "en": "Miki was really looking forward to the long weekend."
     },
     {
       "jp": "{金曜日|きんようび}の／{夜|よる}、／ケンは／{遅|おそ}く／{帰|かえ}ってきました。",
@@ -31,8 +36,8 @@
       "en": "\"I'm home. Sorry I'm late.\""
     },
     {
-      "jp": "ミキは／{怒|おこ}っていました。",
-      "en": "Miki was angry."
+      "jp": "ミキは／いらいらしていました。",
+      "en": "Miki was irritated."
     },
     {
       "jp": "「{今日|きょう}は／{早|はや}く／{帰|かえ}って、／カレーを／{作|つく}るって／{言|い}ったのに。」",
@@ -59,6 +64,10 @@
       "en": "Miki didn't say anything."
     },
     {
+      "jp": "ミキの／{目|め}から、／{涙|なみだ}が／{出|で}てきました。",
+      "en": "Tears came to Miki's eyes."
+    },
+    {
       "jp": "「どうしたの？」",
       "en": "\"What's wrong?\""
     },
@@ -75,8 +84,8 @@
       "en": "Ken thought for a while."
     },
     {
-      "jp": "「そうだね。／ミキの／{気持|きも}ちを／{聞|き}かなかった。／{本当|ほんとう}に／ごめん。」",
-      "en": "\"You're right. I didn't ask how you felt. I'm really sorry.\""
+      "jp": "「そうだね。／ミキの／{気持|きも}ちを／{考|かんが}えて／いなかった。／{本当|ほんとう}に／ごめん。」",
+      "en": "\"You're right. I wasn't thinking about how you felt. I'm really sorry.\""
     },
     {
       "jp": "「{私|わたし}も／ごめん。／{実|じつ}は、／キャンプが／ちょっと／{苦手|にがて}なの。」",
@@ -91,8 +100,8 @@
       "en": "\"When I was a child, my dad made me go camping every year.\""
     },
     {
-      "jp": "「{雨|あめ}の／{日|ひ}も、／{寒|さむ}い／{日|ひ}も。」",
-      "en": "\"Even on rainy days, even on cold days.\""
+      "jp": "「{雨|あめ}の／{日|ひ}も、／{寒|さむ}い／{日|ひ}も。／あまり／いい／{経験|けいけん}じゃ／なかった。」",
+      "en": "\"Even on rainy days, even on cold days. It wasn't a great experience.\""
     },
     {
       "jp": "「そうだったんだ。／{知|し}らなかったよ。」",
@@ -111,12 +120,24 @@
       "en": "\"Sounds good. If it's sunny, camping might be fun too.\""
     },
     {
+      "jp": "「これからは、／{大事|だいじ}な／ことは、／お{互|たが}いに／{相談|そうだん}しよう。」",
+      "en": "\"From now on, let's talk important things over with each other.\""
+    },
+    {
       "jp": "「それから、／{遅|おそ}く／なったけど、／{今|いま}から／{僕|ぼく}に／カレーを／{作|つく}らせて。」",
       "en": "\"And I know it's late, but let me make the curry now.\""
     },
     {
-      "jp": "ミキは／やっと／{笑|わら}いました。／「うん。／{玉|たま}ねぎは／{私|わたし}が／{切|き}るね。」",
-      "en": "Miki finally smiled. \"Okay. I'll cut the onions.\""
+      "jp": "ミキは／やっと／{笑顔|えがお}に／なりました。",
+      "en": "Miki finally smiled."
+    },
+    {
+      "jp": "「うん。／{玉|たま}ねぎは／{私|わたし}が／{切|き}るね。」",
+      "en": "\"Okay. I'll cut the onions.\""
+    },
+    {
+      "jp": "ケンは／ほっとしました。",
+      "en": "Ken felt relieved."
     },
     {
       "jp": "その／{夜|よる}、／{二人|ふたり}は／{遅|おそ}い／カレーを／{食|た}べながら、／{連休|れんきゅう}の／{予定|よてい}を／{決|き}めました。",

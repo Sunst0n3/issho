@@ -3,7 +3,7 @@
   "unit": 5,
   "title": "Shall we go out on Sunday?",
   "titleJp": "{日曜日|にちようび}、{出|で}かけませんか",
-  "setting": "Friday night at home: after a rainy week, one of you suggests going out together this weekend.",
+  "setting": "Friday night at home: last weekend was a washout, so one of you suggests going out together this weekend.",
   "level": 1,
   "register": "polite",
   "targets": [
@@ -30,15 +30,15 @@
     {
       "role": "a",
       "jp": "{先週|せんしゅう}の{週末|しゅうまつ}は{雨|あめ}でしたね。",
-      "en": "It rained all last weekend, didn't it?",
+      "en": "It rained last weekend, didn't it?",
       "hint": "でした is the past of です.",
       "cue": "last weekend · rain"
     },
     {
       "role": "b",
-      "jp": "そうですね。{今週|こんしゅう}は{出|で}かけたいです。",
-      "en": "It did. This week I want to go out.",
-      "cue": "yes · this week · go out"
+      "jp": "そうですね。{今度|こんど}の{週末|しゅうまつ}は{出|で}かけたいです。",
+      "en": "It did. This weekend I want to go out.",
+      "cue": "yes · this weekend · go out"
     },
     {
       "role": "a",
@@ -49,7 +49,7 @@
     },
     {
       "role": "b",
-      "jp": "いいですね。{何時|なんじ}に{出|で}かけますか。",
+      "jp": "いいですね。{何時|なんじ}に{出|で}かけましょうか。",
       "en": "Sounds good. What time shall we leave?",
       "cue": "sounds good · what time?"
     },

@@ -15,9 +15,11 @@
     "wo-object",
     "ni-time-place",
     "masu-past",
-    "de-place-means",
+    "i-adjectives",
     "tai-want",
     "arimasu-imasu",
+    "to-with",
+    "na-adjectives",
     "adjective-past",
     "he-direction",
     "position-words",
@@ -41,7 +43,7 @@
     },
     {
       "jp": "「しつれいします。」",
-      "en": "\"Thank you for having us.\""
+      "en": "Excuse us. Thank you."
     },
     {
       "jp": "{田中|たなか}さんの／ごしゅじんも／いました。",
@@ -116,18 +118,18 @@
       "en": "\"I think she'll come back to Japan next year.\""
     },
     {
-      "jp": "エマは／アメリカの／{母|はは}に／{会|あ}いたいと／{思|おも}いました。",
-      "en": "Emma thought of her own mom in America and wanted to see her."
+      "jp": "エマは／アメリカの／おかあさんに／{会|あ}いたいと／{思|おも}いました。",
+      "en": "Emma thought, \"I want to see my mom in America.\""
     },
     {
-      "jp": "その／{夜|よる}、／エマは／{母|はは}に／でんわしました。",
+      "jp": "その／{夜|よる}、／エマは／おかあさんに／でんわしました。",
       "en": "That night, Emma called her mom."
     }
   ],
   "gist": {
     "q": "What did Ken and Emma do at Ms Tanaka's house?",
     "options": [
-      "They had dinner and took photos of her cooking",
+      "They had dinner and took photos of the food",
       "They helped her clean the house",
       "They watched TV with her daughter"
     ],

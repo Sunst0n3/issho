@@ -4,22 +4,24 @@
   "unit": 6,
   "title": "Our Sunday café",
   "titleJp": "すきな カフェ",
-  "topic": "hobbies",
+  "topic": "food",
   "grammar": [
     "wa-desu",
     "no-possession",
     "mo-also",
     "masu-forms",
+    "koko-soko-asoko",
     "wo-object",
+    "wo-kudasai",
     "ni-time-place",
+    "keigo-set-phrases",
+    "masu-past",
     "i-adjectives",
-    "de-place-means",
     "arimasu-imasu",
     "to-with",
     "adverbs-frequency",
     "na-adjectives",
     "ka-or-ni-suru",
-    "dictionary-form",
     "suki-kirai"
   ],
   "sentences": [
@@ -28,20 +30,16 @@
       "en": "There's a small café in town."
     },
     {
-      "jp": "ケンと／エマの／すきな／カフェです。",
-      "en": "It's Ken and Emma's favourite café."
-    },
-    {
       "jp": "しずかな／カフェです。",
       "en": "It's a quiet café."
     },
     {
-      "jp": "{人|ひと}も／あまり／いません。",
-      "en": "There aren't many people, either."
+      "jp": "ケンと／エマの／すきな／カフェです。",
+      "en": "It's Ken and Emma's favourite café."
     },
     {
       "jp": "ふたりは／にちようびの／あさ、／よく／ここに／{来|き}ます。",
-      "en": "The two of them often come here on Sunday mornings."
+      "en": "They often come here on Sunday mornings."
     },
     {
       "jp": "ケンは／いつも／コーヒーに／します。",
@@ -49,68 +47,80 @@
     },
     {
       "jp": "エマは／コーヒーが／あまり／すきじゃないです。",
-      "en": "Emma doesn't like coffee much."
+      "en": "Emma doesn't really like coffee."
     },
     {
-      "jp": "エマは／こうちゃか／ジュースに／します。",
-      "en": "Emma has tea or juice."
+      "jp": "エマは／いつも／こうちゃに／します。",
+      "en": "She always has tea."
     },
     {
       "jp": "ときどき、／ケーキも／{食|た}べます。",
       "en": "Sometimes they have cake too."
     },
     {
-      "jp": "ここの／ケーキは／おいしいです。",
-      "en": "The cake here is delicious."
+      "jp": "ここの／ケーキは／ゆうめいです。",
+      "en": "The cake here is famous."
     },
     {
-      "jp": "ふたりは／ここで／{本|ほん}を／{読|よ}みます。",
-      "en": "They read books here."
+      "jp": "{今日|きょう}も／ふたりは／カフェに／{来|き}ました。",
+      "en": "Today they have come to the café again."
     },
     {
-      "jp": "ケンは／{日本語|にほんご}の／{本|ほん}を／{読|よ}みます。",
-      "en": "Ken reads a Japanese book."
+      "jp": "「いらっしゃいませ。」",
+      "en": "\"Welcome.\""
     },
     {
-      "jp": "{日本語|にほんご}は／むずかしいです。",
-      "en": "Japanese is difficult."
+      "jp": "「コーヒーと／こうちゃを／ください。」",
+      "en": "\"A coffee and a tea, please.\""
     },
     {
-      "jp": "でも、／たのしいです。",
-      "en": "But it's fun."
+      "jp": "「すみません。／{今日|きょう}は／コーヒーが／ありません。」",
+      "en": "\"I'm sorry. We have no coffee today.\""
     },
     {
-      "jp": "{今日|きょう}も／にちようびです。",
-      "en": "Today is Sunday again."
+      "jp": "「そうですか…」",
+      "en": "\"Oh... I see.\""
     },
     {
-      "jp": "でも、／ケンは／コーヒーに／しません。",
-      "en": "But Ken doesn't order coffee."
+      "jp": "ケンは／こまります。",
+      "en": "Ken doesn't know what to do."
     },
     {
-      "jp": "「{今日|きょう}は／こうちゃに／する。」",
-      "en": "\"I'll have tea today.\""
+      "jp": "「じゃあ…／こうちゃに／します。」",
+      "en": "\"Well then... I'll have tea.\""
     },
     {
-      "jp": "「へえ、／ほんとう？」",
-      "en": "\"Oh? Really?\""
+      "jp": "ケンは／こうちゃを／{飲|の}みます。",
+      "en": "Ken drinks the tea."
     },
     {
-      "jp": "「エマも／こうちゃ、／ぼくも／こうちゃ！」",
-      "en": "\"You're having tea, and I'm having tea too!\""
+      "jp": "「…おいしい！」",
+      "en": "\"...It's good!\""
     },
     {
-      "jp": "ふたりは／こうちゃを／{飲|の}みます。",
-      "en": "The two of them drink tea."
+      "jp": "「こうちゃ、／すき？」",
+      "en": "\"Do you like tea?\""
+    },
+    {
+      "jp": "「うん、／すき！」",
+      "en": "\"Yes, I like it!\""
+    },
+    {
+      "jp": "「じゃあ、／らいしゅうも／こうちゃ？」",
+      "en": "\"So, tea next week too?\""
+    },
+    {
+      "jp": "「ううん。／らいしゅうは／コーヒーと／こうちゃ！」",
+      "en": "\"Nope. Next week, a coffee AND a tea!\""
     }
   ],
   "gist": {
-    "q": "What is different about this Sunday?",
+    "q": "Why does Ken have tea this Sunday?",
     "options": [
-      "The café is closed",
-      "Ken has tea instead of coffee",
-      "Emma has coffee for the first time"
+      "The café has no coffee today",
+      "Emma orders it for him",
+      "He wants to try the famous cake"
     ],
-    "answer": 1
+    "answer": 0
   }
 }

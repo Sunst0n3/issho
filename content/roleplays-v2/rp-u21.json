@@ -43,7 +43,7 @@
       "role": "a",
       "jp": "お{疲|つか}れ{様|さま}。そういえば、{田中|たなか}さんの{会社|かいしゃ}、{来年|らいねん}{大阪|おおさか}に{引|ひ}っ{越|こ}すそうだよ。",
       "en": "You've worked hard. Oh, by the way — I heard Tanaka-san's company is moving to Osaka next year.",
-      "hint": "Plain form + そうだ passes on news: \"I heard that…\". Don't confuse it with 〜そう \"looks…\" (忙しそう).",
+      "hint": "Plain form + そうだ passes on news: \"I heard that…\". Don't confuse it with 〜そう \"looks…\" (いそがしそう).",
       "cue": "by the way · Tanaka's company · moving"
     },
     {
@@ -63,7 +63,7 @@
       "role": "b",
       "jp": "ありがとう。{早|はや}く{終|お}われば、{明日|あした}は{一緒|いっしょ}に{晩|ばん}ご{飯|はん}{食|た}べよう。",
       "en": "Thanks. If I finish early, let's have dinner together tomorrow.",
-      "hint": "〜ば: 終わる → 終われば \"if (I) finish\".",
+      "hint": "〜ば: おわる → おわれば \"if (I) finish\".",
       "cue": "finish early · dinner together"
     }
   ]

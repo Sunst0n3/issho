@@ -89,7 +89,7 @@
       "check": {
         "kind": "listen",
         "instructions": "Listen to a couple deciding what to buy at the supermarket (two voices, taking turns). Their list says 牛乳, 卵, パン, 石けん and お菓子. Then answer the questions.",
-        "material": "スーパーで{何|なに}{買|か}う？\nえっと、{牛乳|ぎゅうにゅう}がない。{牛乳|ぎゅうにゅう}は{買|か}う。\n{卵|たまご}は？\n{卵|たまご}はまだ{冷蔵庫|れいぞうこ}にあるよ。{今日|きょう}は{買|か}わない。\nパンは？ {二|ふた}つ{買|か}う？\nううん、{一|ひと}つでいいよ。あ、それから、トイレの{石|せっ}けんがない。\nじゃあ、{石|せっ}けんも。お{菓子|かし}は？\nお{菓子|かし}は{買|か}わない！ うちにまだたくさんあるよ。",
+        "material": "スーパーで{何|なに}{買|か}う？\nえっと、{牛乳|ぎゅうにゅう}がない。{牛乳|ぎゅうにゅう}は{買|か}う。\n{卵|たまご}は？\n{卵|たまご}は{冷蔵庫|れいぞうこ}にあるよ。{今日|きょう}は{買|か}わない。\nパンは？ {二|ふた}つ{買|か}う？\nううん、{一|ひと}つだけ。あ、それから、トイレの{石|せっ}けんがない。\nじゃあ、{石|せっ}けんも。お{菓子|かし}は？\nお{菓子|かし}は{買|か}わない！ うちにたくさんあるよ。",
         "questions": [
           {
             "q": "Which item do they decide not to buy today?",
@@ -133,7 +133,7 @@
       "b": "Knows the budget, what's already at home and what you need (card B)"
     },
     "infoA": "Card A — you're at the shelf. Towels (タオル): ① big, ¥1,800 each; ② small, ¥600 each; ③ big and really soft (すごくいい), ¥3,000 each. Cups (コップ): ④ glass, ¥500 each; ⑤ big and a bit heavy (ちょっと重い), ¥900 each. All prices include tax (税込). Describe the options with とても / すごく / ちょっと and あまり〜ない, and give the prices.",
-    "infoB": "Card B — you know what you need. Budget: ¥5,000 altogether (全部で五千円まで). You have lots of small towels at home, so you won't buy those (小さいタオルは買わない); you need two big ones. You need two cups, and you don't like heavy cups (重いコップはあまり好きじゃない). Ask which ones are good (どれがいい？) and how much they are, add up the total, and finish by asking the clerk to put everything in a bag (袋に入れてください).",
+    "infoB": "Card B — you know what you need. Budget: up to ¥5,000 altogether (五千円まで). You have lots of small towels at home, so you won't buy those (小さいタオルは買わない); you need two big ones (大きいタオルを二枚). You need two cups (コップを二つ), and you don't like heavy cups (重いコップはあまり好きじゃない). Ask which ones are good (どれがいい？) and how much they are, add up the total, and finish by asking the clerk to put everything in a bag (袋に入れてください).",
     "targets": [
       "grammar:adverbs-degree",
       "grammar:ga-subject",
@@ -145,8 +145,8 @@
       "core:cw-0557"
     ],
     "register": "mixed",
-    "twist": "Repeat it 2–7 days later with a ¥3,000 budget and a sale: the soft towels (③) are now half price, ¥1,500 each. Redo the maths and choose again; this time the clerk also asks how you will pay (カードですか、現金ですか).",
-    "aiRole": "The shop clerk (店員): greets you, answers price questions politely, and bags the items when asked (いらっしゃいませ / 袋はどうしますか).",
+    "twist": "Repeat it 2–7 days later with a ¥4,000 budget and a sale: the soft towels (③) are now half price, ¥1,500 each. Redo the maths and choose again; this time the clerk also asks how you will pay (カードですか、現金ですか).",
+    "aiRole": "The shop clerk: greets you, answers price questions politely, and bags the items when asked (いらっしゃいませ / 袋はどうしますか).",
     "scripted": [
       {
         "role": "a",
@@ -155,18 +155,18 @@
       },
       {
         "role": "b",
-        "jp": "{大|おお}きいタオルを{二|ふた}つ{買|か}う。{小|ちい}さいタオルは{買|か}わない。うちにたくさんあるよ。",
+        "jp": "{大|おお}きいタオルを{二枚|にまい}{買|か}う。{小|ちい}さいタオルは{買|か}わない。うちにたくさんあるよ。",
         "en": "Let's get two big towels. Not the small ones — we have lots at home."
       },
       {
         "role": "a",
-        "jp": "{大|おお}きいタオルはこれとこれ。これは{千|せん}{八百|はっぴゃく}{円|えん}。これは{三千|さんぜん}{円|えん}で、すごくいいよ。",
+        "jp": "{大|おお}きいタオルはこれとこれ。これは{千|せん}{八百|はっぴゃく}{円|えん}。これは{三千|さんぜん}{円|えん}。すごくいいよ。",
         "en": "The big ones are this and this. This one's 1,800 yen. This one's 3,000 yen, and it's really nice."
       },
       {
         "role": "b",
-        "jp": "{三千|さんぜん}{円|えん}？ ちょっと{高|たか}い。{全部|ぜんぶ}で{五千|ごせん}{円|えん}までだよ。",
-        "en": "3,000 yen? That's a bit pricey. We've only got 5,000 yen altogether."
+        "jp": "{三千|さんぜん}{円|えん}？ ちょっと{高|たか}い。{五千|ごせん}{円|えん}までだよ。",
+        "en": "3,000 yen? That's a bit pricey. We can only spend up to 5,000 yen."
       },
       {
         "role": "a",
@@ -190,13 +190,13 @@
       },
       {
         "role": "a",
-        "jp": "{全部|ぜんぶ}でいくら？",
-        "en": "How much is that altogether?"
+        "jp": "じゃあ、いくら？",
+        "en": "So how much does that come to?"
       },
       {
         "role": "b",
-        "jp": "えっと…{三千|さんぜん}{六百|ろっぴゃく}{円|えん}と{千|せん}{円|えん}で、{四千|よんせん}{六百|ろっぴゃく}{円|えん}。{大丈夫|だいじょうぶ}！",
-        "en": "Um… 3,600 and 1,000 makes 4,600 yen. We're fine!"
+        "jp": "えっと…{三千|さんぜん}{六百|ろっぴゃく}{円|えん}と{千|せん}{円|えん}。{四千|よんせん}{六百|ろっぴゃく}{円|えん}だね。{大丈夫|だいじょうぶ}！",
+        "en": "Um… 3,600 and 1,000. So 4,600 yen. We're fine!"
       },
       {
         "role": "a",

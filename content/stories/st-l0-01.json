@@ -12,6 +12,7 @@
     "masu-forms",
     "wo-object",
     "ni-time-place",
+    "i-adjectives",
     "tai-want",
     "arimasu-imasu",
     "to-with",
@@ -43,8 +44,8 @@
       "en": "Ken loves curry."
     },
     {
-      "jp": "いつも／カレーを／{食|た}べます。",
-      "en": "He always eats curry."
+      "jp": "よく／カレーを／つくります。",
+      "en": "He often makes curry."
     },
     {
       "jp": "げつようびも／カレーでした。",
@@ -52,7 +53,7 @@
     },
     {
       "jp": "すいようびも／カレーでした。",
-      "en": "Wednesday was curry too."
+      "en": "So was Wednesday."
     },
     {
       "jp": "「また／カレー？」",
@@ -63,24 +64,24 @@
       "en": "Emma likes curry too."
     },
     {
-      "jp": "でも、／{今日|きょう}は／ラーメンを／{食|た}べたいです。",
-      "en": "But today she wants to eat ramen."
+      "jp": "でも、／まいにちは／ちょっと…。",
+      "en": "But every day is a bit much..."
     },
     {
-      "jp": "「{今日|きょう}は／ラーメンに／する？」",
-      "en": "\"Shall we have ramen today?\""
+      "jp": "「{今日|きょう}は／ラーメンを／{食|た}べたい！」",
+      "en": "\"Today I want ramen!\""
     },
     {
-      "jp": "「カレーか／ラーメンか…」",
-      "en": "\"Curry or ramen...\""
+      "jp": "「じゃあ、／ラーメンに／する？」",
+      "en": "\"Okay, shall we have ramen, then?\""
     },
     {
-      "jp": "「うん、／いいね。」",
-      "en": "\"Okay, sounds good.\""
+      "jp": "「うん！」",
+      "en": "\"Yeah!\""
     },
     {
-      "jp": "ふたりは／ラーメンの／{店|みせ}に／{行|い}きます。",
-      "en": "The two of them go to a ramen shop."
+      "jp": "ふたりは／まちの／ラーメンの／{店|みせ}に／{行|い}きます。",
+      "en": "The two of them go to a ramen shop in town."
     },
     {
       "jp": "メニューを／{見|み}ます。",
@@ -95,16 +96,20 @@
       "en": "Ken goes for the curry ramen."
     },
     {
-      "jp": "エマも／カレーラーメンに／します。",
-      "en": "Emma goes for the curry ramen too."
+      "jp": "エマは…／エマも／カレーラーメンに／します。",
+      "en": "And Emma... goes for the curry ramen too."
     },
     {
       "jp": "「おいしい！」",
       "en": "\"Delicious!\""
     },
     {
+      "jp": "「カレーも／ラーメンも／だいすき！」",
+      "en": "\"I love curry and I love ramen!\""
+    },
+    {
       "jp": "ふたりは／わらいます。",
-      "en": "The two of them laugh."
+      "en": "They both laugh."
     }
   ],
   "gist": {

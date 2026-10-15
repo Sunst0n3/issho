@@ -13,12 +13,15 @@
     "te-miru",
     "ni-iku-purpose",
     "ka-or-ni-suru",
-    "adj-naru"
+    "node",
+    "yori-hou",
+    "adj-naru",
+    "te-imasu"
   ],
   "sentences": [
     {
-      "jp": "{寒|さむ}く／なりました。",
-      "en": "It has got cold."
+      "jp": "{十二月|じゅうにがつ}の／{初|はじ}め、／{寒|さむ}く／なりました。",
+      "en": "At the beginning of December, it turned cold."
     },
     {
       "jp": "ケンの／コートは、／もう／{古|ふる}いです。",
@@ -27,6 +30,10 @@
     {
       "jp": "{日曜日|にちようび}、／{二人|ふたり}は／デパートへ／コートを／{買|か}いに／{行|い}きました。",
       "en": "On Sunday, the two of them went to a department store to buy a coat."
+    },
+    {
+      "jp": "ケンは／{服|ふく}を／{選|えら}ぶのが／{苦手|にがて}なので、／いつも／ミキに／{選|えら}んで／もらいます。",
+      "en": "Ken isn't good at choosing clothes, so Miki always chooses for him."
     },
     {
       "jp": "{最初|さいしょ}に、／{黒|くろ}い／コートを／{見|み}ました。",
@@ -65,8 +72,8 @@
       "en": "\"Fifty thousand yen! That's too expensive.\""
     },
     {
-      "jp": "それから、／{二人|ふたり}は／セールの／{店|みせ}に／{行|い}きました。",
-      "en": "Next, they went to a shop with a sale on."
+      "jp": "それから、／{二人|ふたり}は／セールを／している／{店|みせ}に／{行|い}きました。",
+      "en": "Next, they went to a shop that was having a sale."
     },
     {
       "jp": "{青|あお}い／コートと／{茶色|ちゃいろ}の／コートが／ありました。",
@@ -97,32 +104,40 @@
       "en": "\"It really suits you. You look kind in it.\""
     },
     {
-      "jp": "{値段|ねだん}は、／セールで／{一万|いちまん}{二千円|にせんえん}でした。",
-      "en": "With the sale, the price was twelve thousand yen."
+      "jp": "{値段|ねだん}も、／さっきの／コートより／だいぶ／{安|やす}くて、／{一万|いちまん}{二千円|にせんえん}でした。",
+      "en": "The price was a lot lower than the first coat, too: twelve thousand yen."
     },
     {
       "jp": "「これに／します！」",
       "en": "\"I'll take this one!\""
     },
     {
+      "jp": "「{今日|きょう}は／サービスで、／この／{手袋|てぶくろ}も／どうぞ。」と／{店員|てんいん}さんが／{言|い}いました。",
+      "en": "\"Today you can have these gloves for free as well,\" said the shop assistant."
+    },
+    {
+      "jp": "「わあ、／ありがとうございます！」",
+      "en": "\"Wow, thank you!\""
+    },
+    {
       "jp": "{店員|てんいん}さんは／{古|ふる}い／コートを／{袋|ふくろ}に／{入|い}れて／くれました。",
       "en": "The shop assistant put his old coat in a bag for him."
     },
     {
-      "jp": "ケンは／{新|あたら}しい／コートを／{着|き}て、／{店|みせ}を／{出|で}ました。",
-      "en": "Ken left the shop wearing his new coat."
+      "jp": "ケンは／{新|あたら}しい／コートを／{着|き}て、／{手袋|てぶくろ}も／して、／{店|みせ}を／{出|で}ました。",
+      "en": "Ken left the shop in his new coat, wearing the gloves too."
     },
     {
       "jp": "{外|そと}は／{雪|ゆき}でした。",
       "en": "Outside, it was snowing."
     },
     {
-      "jp": "「{暖|あたた}かい！／ミキ、／{選|えら}んで／くれて／ありがとう。」",
-      "en": "\"It's warm! Thanks for choosing it for me, Miki.\""
+      "jp": "「{暖|あたた}かい！／ミキの／おかげだよ。／{選|えら}んで／くれて／ありがとう。」",
+      "en": "\"It's warm! It's all thanks to you, Miki. Thanks for choosing it for me.\""
     },
     {
-      "jp": "「どういたしまして。／じゃあ、／{次|つぎ}は／{私|わたし}の／コートね。」",
-      "en": "\"You're welcome. Okay — next, my coat!\""
+      "jp": "「どういたしまして。／じゃあ、／お{礼|れい}に、／{次|つぎ}は／{私|わたし}の／コートを／{買|か}って／くれる？」",
+      "en": "\"You're welcome. So, as a thank-you, will you buy me a coat next?\""
     }
   ],
   "gist": {

@@ -2,99 +2,112 @@
   "id": "st-l0-17",
   "level": "L0",
   "unit": 11,
-  "title": "The Café with a Cat",
-  "titleJp": "{猫|ねこ}が いる カフェ",
-  "topic": "free time",
+  "title": "Will We Make It?",
+  "titleJp": "まにあう？",
+  "topic": "transport",
   "grammar": [
     "relative-clauses",
-    "tewa-ikenai",
-    "kedo-but",
-    "no-ga-suki",
-    "temo-ii",
-    "te-imasu",
-    "adjective-past",
-    "tai-want"
+    "casual-speech",
+    "casual-past",
+    "nai-form",
+    "te-form",
+    "ni-iku-purpose",
+    "tai-want",
+    "kara-made",
+    "time-telling"
   ],
   "sentences": [
     {
-      "jp": "{駅|えき}の{近|ちか}くに／{小|ちい}さい／カフェが／あります。",
-      "en": "There's a little café near the station."
+      "jp": "{土曜日|どようび}の{夜|よる}、／ケンと／エマは／えいがを／{見|み}に／{行|い}きます。",
+      "en": "On Saturday evening, Ken and Emma are going to see a movie."
     },
     {
-      "jp": "{先週|せんしゅう}、／{妻|つま}と／いっしょに／{行|い}きました。",
-      "en": "Last week, I went there with my wife."
+      "jp": "エマが／ずっと／{見|み}たかった／えいがです。",
+      "en": "It's a movie Emma has wanted to see for ages."
     },
     {
-      "jp": "{店|みせ}の{中|なか}に／{大|おお}きい／{猫|ねこ}が／いました。",
-      "en": "There was a big cat inside."
+      "jp": "えいがは／{七時|しちじ}からです。",
+      "en": "The movie starts at seven."
     },
     {
-      "jp": "{猫|ねこ}は／{窓|まど}の{近|ちか}くの／{椅子|いす}の{上|うえ}で／{寝|ね}ていました。",
-      "en": "The cat was asleep on a chair by the window."
+      "jp": "でも、／{今|いま}、／{六時半|ろくじはん}です。",
+      "en": "But it's half past six now."
     },
     {
-      "jp": "{妻|つま}は／{猫|ねこ}が／{大好|だいす}きです。",
-      "en": "My wife loves cats."
+      "jp": "「ケン、／いそいで！」",
+      "en": "\"Ken, hurry!\""
     },
     {
-      "jp": "「かわいい！／{写真|しゃしん}を／{撮|と}っても／いいですか。」",
-      "en": "\"So cute! May I take a photo?\""
+      "jp": "「ちょっと／{待|ま}って！／くつが／ない！」",
+      "en": "\"Hang on! I can't find my shoes!\""
     },
     {
-      "jp": "{店|みせ}の／おばあさんは／{笑|わら}いました。",
-      "en": "The old woman who runs the café smiled."
+      "jp": "くつは／ソファーの{下|した}に／ありました。",
+      "en": "The shoes were under the sofa."
     },
     {
-      "jp": "「どうぞ。／でも、／{猫|ねこ}を／{起|お}こしてはいけませんよ。」",
-      "en": "\"Go ahead. But you mustn't wake the cat.\""
+      "jp": "ふたりは／{駅|えき}まで／{走|はし}りました。",
+      "en": "They ran to the station."
     },
     {
-      "jp": "わたしたちは／コーヒーと／ケーキを／{頼|たの}みました。",
-      "en": "We ordered coffee and cake."
+      "jp": "きっぷを／{買|か}って、／ちかてつに／{乗|の}りました。",
+      "en": "They bought tickets and got on the subway."
     },
     {
-      "jp": "おばあさんが／{作|つく}った／ケーキは、／とても／おいしかったです。",
-      "en": "The cake the old woman made was delicious."
+      "jp": "{次|つぎ}の{駅|えき}で／のりかえました。",
+      "en": "They changed trains at the next station."
     },
     {
-      "jp": "コーヒーも／おいしかったけど、／ちょっと／{高|たか}かったです。",
-      "en": "The coffee was good too, but a bit expensive."
+      "jp": "でも、／その／{電車|でんしゃ}は／{十分|じゅっぷん}ぐらい／{止|と}まりました。",
+      "en": "But that train stopped for about ten minutes."
     },
     {
-      "jp": "{八百円|はっぴゃくえん}でした。",
-      "en": "It was 800 yen."
+      "jp": "「おくれる！／まにあわない！」",
+      "en": "\"We'll be late! We won't make it!\""
     },
     {
-      "jp": "{最後|さいご}に、／{妻|つま}が／{猫|ねこ}を／{見|み}ました。",
-      "en": "At the end, my wife looked over at the cat."
+      "jp": "{六時五十五分|ろくじごじゅうごふん}に、／{駅|えき}に／つきました。",
+      "en": "At 6:55, they got to their station."
     },
     {
-      "jp": "「またね。」",
-      "en": "\"See you.\""
+      "jp": "ふたりは／まっすぐ／{走|はし}って、／かどを／{右|みぎ}に／まがりました。",
+      "en": "They ran straight ahead and turned right at the corner."
     },
     {
-      "jp": "{猫|ねこ}は／{少|すこ}し／{目|め}を／{開|あ}けました。",
-      "en": "The cat opened its eyes a little."
+      "jp": "{七時|しちじ}ちょうどに、／えいがかんに／つきました。",
+      "en": "They reached the cinema at seven on the dot."
     },
     {
-      "jp": "でも、／すぐ／また／{寝|ね}ました。",
-      "en": "But it went straight back to sleep."
+      "jp": "「まにあった！」",
+      "en": "\"We made it!\""
     },
     {
-      "jp": "{高|たか}いけど、／また／{行|い}きたいです。",
-      "en": "It's pricey, but I want to go again."
+      "jp": "でも、／えいがかんの／{人|ひと}が／{言|い}いました。",
+      "en": "But a member of staff at the cinema said:"
     },
     {
-      "jp": "{猫|ねこ}が／いる／カフェで／コーヒーを／{飲|の}むのは、／とても／{楽|たの}しいです。",
-      "en": "Drinking coffee in a café with a cat is so much fun."
+      "jp": "「すみません。／この／えいがは／{明日|あした}の／{七時|しちじ}からですよ。」",
+      "en": "\"I'm sorry. This movie starts tomorrow at seven.\""
+    },
+    {
+      "jp": "エマは／スマホを／{見|み}ました。",
+      "en": "Emma checked her phone."
+    },
+    {
+      "jp": "「あ……／{明日|あした}だ。」",
+      "en": "\"Oh... It's tomorrow.\""
+    },
+    {
+      "jp": "ふたりは／わらって、／えいがかんの{近|ちか}くで／ラーメンを／{食|た}べて／{帰|かえ}りました。",
+      "en": "They laughed, had ramen near the cinema and went home."
     }
   ],
   "gist": {
-    "q": "What wasn't so good about the café?",
+    "q": "Why couldn't they see the movie?",
     "options": [
-      "The coffee was a bit expensive",
-      "The cake wasn't very good",
-      "The cat was noisy"
+      "The movie was on the next day",
+      "They arrived too late",
+      "The cinema was closed"
     ],
     "answer": 0
   }

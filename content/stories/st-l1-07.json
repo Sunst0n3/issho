@@ -7,15 +7,17 @@
   "topic": "celebrations",
   "grammar": [
     "ageru-morau",
+    "kureru",
     "potential-form",
     "te-shimau",
     "tara-conditional",
-    "kureru",
     "nagara",
     "dake-shika",
     "toki-when",
     "n-desu",
-    "relative-clauses"
+    "relative-clauses",
+    "ka-or-ni-suru",
+    "tai-want"
   ],
   "sentences": [
     {
@@ -31,8 +33,8 @@
       "en": "But Ken can't make cakes."
     },
     {
-      "jp": "ケンは／お{姉|ねえ}さんに／{電話|でんわ}しました。",
-      "en": "Ken phoned his older sister."
+      "jp": "ケンは／お{姉|ねえ}さんに／メッセージを／{送|おく}りました。",
+      "en": "Ken sent a message to his older sister."
     },
     {
       "jp": "お{姉|ねえ}さんは／ケーキを／{作|つく}るのが／とても／{上手|じょうず}です。",
@@ -43,31 +45,39 @@
       "en": "\"I want to make a simple strawberry cake. Teach me!\""
     },
     {
-      "jp": "お{姉|ねえ}さんは／すぐ／メールを／くれました。",
-      "en": "His sister sent him an email right away."
+      "jp": "お{姉|ねえ}さんは／すぐ／{返事|へんじ}を／くれました。",
+      "en": "His sister replied right away."
     },
     {
-      "jp": "「ケーキが／{焼|や}けたら、／{上|うえ}に／いちごを／{置|お}いてね。」",
-      "en": "\"When the cake is baked, put the strawberries on top.\""
+      "jp": "「{簡単|かんたん}だよ。／ケーキが／{焼|や}けたら、／{上|うえ}に／いちごを／{並|なら}べるだけ。」",
+      "en": "\"It's easy. When the cake is baked, you just line the strawberries up on top.\""
     },
     {
       "jp": "{誕生日|たんじょうび}の／{朝|あさ}、／ミキは／{友達|ともだち}と／{出|で}かけました。",
       "en": "On the morning of her birthday, Miki went out with a friend."
     },
     {
-      "jp": "ケンは／{一人|ひとり}で／ケーキを／{作|つく}りました。",
-      "en": "Ken made the cake by himself."
+      "jp": "ミキが／{留守|るす}の／とき、／ケンは／{一人|ひとり}で／ケーキを／{作|つく}りました。",
+      "en": "While Miki was out, Ken made the cake by himself."
+    },
+    {
+      "jp": "{卵|たまご}を／{割|わ}るのも、／{初|はじ}めてでした。",
+      "en": "It was his first time even cracking eggs."
     },
     {
       "jp": "ケーキを／{焼|や}きながら、／ケンは／いちごを／{一|ひと}つ／{食|た}べました。",
       "en": "While the cake was baking, Ken ate one strawberry."
     },
     {
-      "jp": "「おいしい！」／もう／{一|ひと}つ。／もう／{一|ひと}つ…。",
-      "en": "\"Delicious!\" Another one. And another one..."
+      "jp": "「おいしい！」",
+      "en": "\"Delicious!\""
     },
     {
-      "jp": "ケーキが／{焼|や}けた／とき、／いちごは／{一|ひと}つも／ありませんでした。",
+      "jp": "もう／{一|ひと}つ、／もう／{一|ひと}つ…。",
+      "en": "Another one, and another one..."
+    },
+    {
+      "jp": "ケーキが／{焼|や}けた／とき、／いちごは／{一|ひと}つも／{残|のこ}っていませんでした。",
       "en": "When the cake was baked, there wasn't a single strawberry left."
     },
     {
@@ -79,12 +89,12 @@
       "en": "\"Oh no!\""
     },
     {
-      "jp": "{冷蔵庫|れいぞうこ}には／みかんしか／ありません。",
-      "en": "There was nothing in the fridge but mandarin oranges."
+      "jp": "{冷蔵庫|れいぞうこ}を／{見|み}ましたが、／みかんしか／{見|み}つかりません。",
+      "en": "He looked in the fridge, but all he could find were mandarin oranges."
     },
     {
-      "jp": "ケンは／いちごの／{代|か}わりに、／みかんを／{置|お}きました。",
-      "en": "Ken put mandarin oranges on instead of strawberries."
+      "jp": "ケンは／いちごの／{代|か}わりに、／みかんを／{並|なら}べました。",
+      "en": "So Ken lined up mandarin oranges instead of strawberries."
     },
     {
       "jp": "{夕方|ゆうがた}、／ミキが／{帰|かえ}ってきました。",
@@ -99,16 +109,16 @@
       "en": "\"What, you can make cakes? Amazing!\""
     },
     {
-      "jp": "「{実|じつ}は、／いちごの／ケーキだったんだけど…。」",
-      "en": "\"Actually, it was supposed to be a strawberry cake...\""
+      "jp": "「{実|じつ}は、／いちごの／ケーキに／したかったんだけど…。」",
+      "en": "\"Actually, I wanted to make it a strawberry cake...\""
     },
     {
       "jp": "ケンの／{話|はなし}を／{聞|き}いて、／ミキは／たくさん／{笑|わら}いました。",
       "en": "When she heard Ken's story, Miki laughed and laughed."
     },
     {
-      "jp": "「みかんの／ケーキも／おいしいよ。／ありがとう。」",
-      "en": "\"A mandarin cake is delicious too. Thank you.\""
+      "jp": "「みかんの／ケーキも／おいしいよ。／{本当|ほんとう}に／ありがとう。」",
+      "en": "\"A mandarin cake is delicious too. Thank you so much.\""
     },
     {
       "jp": "その／{日|ひ}、／ミキは／お{母|かあ}さんから／{花|はな}を／もらいました。",
@@ -124,7 +134,7 @@
     },
     {
       "jp": "「{来年|らいねん}は、／いちごの／ケーキが／{食|た}べたいな。」と／ミキは／{笑|わら}いました。",
-      "en": "\"Next year, I'd like a strawberry cake,\" Miki said with a smile."
+      "en": "\"Next year, I'd like a strawberry cake,\" Miki said with a laugh."
     }
   ],
   "gist": {

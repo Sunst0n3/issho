@@ -2,118 +2,129 @@
   "id": "st-l0-10",
   "level": "L0",
   "unit": 9,
-  "title": "The wrong train",
-  "titleJp": "ちがう {電車|でんしゃ}",
-  "topic": "transport",
+  "title": "The 4th or the 8th?",
+  "titleJp": "よっか？ ようか？",
+  "topic": "calendar",
   "grammar": [
     "wa-desu",
+    "ka-question",
     "no-possession",
-    "mo-also",
     "ne-yo",
     "masu-forms",
     "wo-object",
+    "time-telling",
     "ni-time-place",
     "masu-past",
+    "i-adjectives",
     "de-place-means",
+    "masenka-mashou",
     "arimasu-imasu",
-    "deshita",
-    "adverbs-frequency",
-    "na-adjectives",
+    "to-with",
+    "ka-or-ni-suru",
     "casual-speech",
-    "position-words",
     "te-form",
-    "adverbs-degree",
+    "kara-made",
+    "nai-form",
     "ga-subject",
     "dates-days",
     "ni-iku-purpose",
+    "te-imasu",
     "casual-past",
     "kara-because"
   ],
   "sentences": [
     {
-      "jp": "どようびに、／ケンと／エマは／そばを／{食|た}べに／{行|い}きました。",
-      "en": "On Saturday, Ken and Emma went out to eat soba."
+      "jp": "もくようびの／{夜|よる}、／エマの／ともだちの／ゆいさんから／でんわが／ありました。",
+      "en": "On Thursday evening, Emma's friend Yui phoned."
     },
     {
-      "jp": "となりの／まちに／ゆうめいな／そばの／{店|みせ}が／あります。",
-      "en": "There's a famous soba restaurant in the next town."
+      "jp": "エマは／おふろに／{入|はい}っていました。",
+      "en": "Emma was in the bath."
     },
     {
-      "jp": "ふたりは／{駅|えき}で／{電車|でんしゃ}に／のりました。",
-      "en": "They got on a train at the station."
+      "jp": "ケンが／でんわに／{出|で}ました。",
+      "en": "Ken answered the phone."
     },
     {
-      "jp": "{電車|でんしゃ}の／{中|なか}で、／ふたりは／たくさん／はなして、／たくさん／わらいました。",
-      "en": "On the train, they talked a lot and laughed a lot."
+      "jp": "「ケンさん、／{四日|よっか}は／わたしの／たんじょうびです。」",
+      "en": "\"Ken, the fourth is my birthday.\""
     },
     {
-      "jp": "エマが／まどの／{外|そと}を／{見|み}ました。",
-      "en": "Emma looked out of the window."
+      "jp": "「うちで／ばんごはんを／{食|た}べませんか。」",
+      "en": "\"Would you two like to come for dinner at my place?\""
     },
     {
-      "jp": "「あれ、／ここ、／どこ？」",
-      "en": "\"Huh, where are we?\""
+      "jp": "「{八日|ようか}ですね。／いいですね！」",
+      "en": "\"The eighth? Sounds great!\""
     },
     {
-      "jp": "{駅|えき}の／{名前|なまえ}が／ちがいました。",
-      "en": "The station names were wrong."
+      "jp": "「エマ、／{八日|ようか}に／ゆいさんの／うちで／ばんごはんだよ。」",
+      "en": "\"Emma, we're having dinner at Yui's on the eighth.\""
     },
     {
-      "jp": "「この／{電車|でんしゃ}、／ちがう！」",
-      "en": "\"This is the wrong train!\""
+      "jp": "{十月|じゅうがつ}／{四日|よっか}、／どようびです。",
+      "en": "It's Saturday, October the fourth."
     },
     {
-      "jp": "ふたりは／つぎの／{駅|えき}で／おりました。",
-      "en": "They got off at the next station."
+      "jp": "ケンと／エマは／うちで／テレビを／{見|み}ていました。",
+      "en": "Ken and Emma were at home watching TV."
     },
     {
-      "jp": "ちいさい／{駅|えき}でした。",
-      "en": "It was a small station."
+      "jp": "{六時|ろくじ}に、／ゆいさんから／でんわが／ありました。",
+      "en": "At six, Yui called."
     },
     {
-      "jp": "{人|ひと}も／あまり／いませんでした。",
-      "en": "There weren't many people around, either."
+      "jp": "「エマ、／いま／どこ？／ばんごはん、／できたよ！」",
+      "en": "\"Emma, where are you? Dinner's ready!\""
     },
     {
-      "jp": "「おなかが／すいた…」",
-      "en": "\"I'm hungry...\""
+      "jp": "「ゆいさんの／たんじょうびは／{八日|ようか}じゃない？」",
+      "en": "\"Isn't your birthday on the eighth?\""
     },
     {
-      "jp": "{駅|えき}の／{前|まえ}に／ちいさい／{店|みせ}が／ありました。",
-      "en": "There was a little restaurant in front of the station."
+      "jp": "「ちがうよ！／{四日|よっか}！／{今日|きょう}！」",
+      "en": "\"No! The fourth! Today!\""
     },
     {
-      "jp": "うどんの／{店|みせ}でした。",
-      "en": "It was an udon restaurant."
+      "jp": "「ケン！」",
+      "en": "\"Ken!\""
     },
     {
-      "jp": "ふたりは／うどんを／{食|た}べました。",
-      "en": "They ate udon."
+      "jp": "「ごめん！／{四日|よっか}と／{八日|ようか}、／わからなかった…」",
+      "en": "Sorry! I couldn't tell the fourth from the eighth..."
     },
     {
-      "jp": "「この／うどん、／すごく／おいしいね！」",
-      "en": "\"This udon is really good!\""
+      "jp": "ふたりは／すぐ／うちを／{出|で}て、／ワインを／{買|か}いに／{行|い}きました。",
+      "en": "They left the house right away and went to buy some wine."
     },
     {
-      "jp": "「うん、／ちがう／{電車|でんしゃ}に／のったから、／この／{店|みせ}に／{来|き}た。」",
-      "en": "\"Yeah, we got on the wrong train, so we found this place.\""
+      "jp": "{七時|しちじ}に、／ふたりは／ゆいさんの／うちに／いました。",
+      "en": "At seven, they were at Yui's place."
     },
     {
-      "jp": "「よかったね。」",
-      "en": "\"Lucky us.\""
+      "jp": "「ゆいさん、／たんじょうび、／おめでとう！／ごめんなさい！」",
+      "en": "\"Happy birthday, Yui! We're so sorry!\""
     },
     {
-      "jp": "そばは／また／こんど。",
-      "en": "Soba will have to wait until next time."
+      "jp": "ゆいさんは／わらいました。",
+      "en": "Yui laughed."
+    },
+    {
+      "jp": "「だいじょうぶ。／{四日|よっか}と／{八日|ようか}は／むずかしいから。」",
+      "en": "\"It's fine. The fourth and the eighth are hard to tell apart.\""
+    },
+    {
+      "jp": "「らいねんは、／{八日|ようか}に／する？」",
+      "en": "\"Shall I have it on the eighth next year?\""
     }
   ],
   "gist": {
-    "q": "What happened to Ken and Emma's plan to eat soba?",
+    "q": "Why were Ken and Emma late for Yui's birthday dinner?",
     "options": [
-      "They ate soba at the famous restaurant",
-      "The soba restaurant was closed, so they went home",
-      "They took the wrong train and ate udon instead"
+      "Their train was late",
+      "Ken heard \"the eighth\" instead of \"the fourth\"",
+      "Yui changed the day"
     ],
-    "answer": 2
+    "answer": 1
   }
 }

@@ -7,9 +7,12 @@
   "topic": "shopping",
   "grammar": [
     "wa-desu",
+    "ka-question",
     "no-possession",
+    "ne-yo",
     "masu-forms",
     "wo-object",
+    "counting-tsu",
     "time-telling",
     "ni-time-place",
     "keigo-set-phrases",
@@ -19,6 +22,7 @@
     "arimasu-imasu",
     "to-with",
     "deshita",
+    "dictionary-form",
     "suki-kirai",
     "adjective-past",
     "he-direction",
@@ -39,8 +43,8 @@
       "en": "There's a new café near the station."
     },
     {
-      "jp": "{田中|たなか}さんの／すきな／カフェです。",
-      "en": "It's Ms Tanaka's favourite café."
+      "jp": "となりの／{田中|たなか}さんの／すきな／カフェです。",
+      "en": "It's the favourite café of their neighbour, Ms Tanaka."
     },
     {
       "jp": "ケンと／エマは／カフェへ／{行|い}きました。",
@@ -95,8 +99,12 @@
       "en": "They waited ten minutes."
     },
     {
-      "jp": "ふたりは／ケーキと／コーヒーを／たのみました。",
-      "en": "They ordered cake and coffee."
+      "jp": "ふたりは／ケーキを／ふたつ／たのみました。",
+      "en": "They ordered two slices of cake."
+    },
+    {
+      "jp": "ケンは／コーヒー、／エマは／こうちゃです。",
+      "en": "Coffee for Ken, tea for Emma."
     },
     {
       "jp": "ケーキは／とても／おいしかったです。",

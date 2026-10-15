@@ -44,13 +44,13 @@
       "role": "a",
       "jp": "{駅|えき}からどうやって{行|い}けばいいか、{教|おし}えてくれる？",
       "en": "Can you tell me how to get there from the station?",
-      "hint": "A question can sit inside a sentence: 〜か + 教えてくれる？",
+      "hint": "A question can sit inside a sentence: 〜か + おしえて くれる？",
       "cue": "how to get there · tell me"
     },
     {
       "role": "b",
       "jp": "{改札|かいさつ}を{出|で}て、{右|みぎ}にまっすぐ。パン{屋|や}の{隣|となり}だよ。",
-      "en": "Go out through the ticket gate and straight on to the right. It's next to the bakery.",
+      "en": "Go out through the ticket gate, turn right and keep going straight. It's next to the bakery.",
       "cue": "ticket gate · right · next to bakery"
     },
     {

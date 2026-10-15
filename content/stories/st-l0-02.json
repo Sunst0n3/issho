@@ -2,103 +2,136 @@
   "id": "st-l0-02",
   "level": "L0",
   "unit": 6,
-  "title": "The cat next door",
-  "titleJp": "となりの ねこ",
-  "topic": "animals",
+  "title": "Like it or not?",
+  "titleJp": "すき？ きらい？",
+  "topic": "food",
   "grammar": [
     "wa-desu",
     "no-possession",
-    "mo-also",
     "masu-forms",
     "wo-object",
-    "ni-time-place",
-    "arimasu-imasu",
+    "masu-past",
+    "de-place-means",
     "to-with",
     "adverbs-frequency",
     "na-adjectives",
+    "ka-or-ni-suru",
+    "dictionary-form",
     "suki-kirai"
   ],
   "sentences": [
     {
-      "jp": "となりの／{田中|たなか}さんの／うちに／ねこが／います。",
-      "en": "There's a cat at Ms Tanaka's house next door."
+      "jp": "どようびの／よるです。",
+      "en": "It's Saturday night."
     },
     {
-      "jp": "{名前|なまえ}は／タマです。",
-      "en": "Her name is Tama."
+      "jp": "ケンと／エマは／うちで／ばんごはんを／{食|た}べました。",
+      "en": "Ken and Emma have had dinner at home."
     },
     {
-      "jp": "タマは／しずかな／ねこです。",
-      "en": "Tama is a quiet cat."
+      "jp": "「ケン、／ゲーム、／する？」",
+      "en": "\"Ken, want to play a game?\""
     },
     {
-      "jp": "そして、／きれいな／ねこです。",
-      "en": "And she's a pretty cat."
+      "jp": "「うん、／する！／なんの／ゲーム？」",
+      "en": "\"Sure! What game?\""
     },
     {
-      "jp": "タマは／よく／ケンと／エマの／うちに／{来|き}ます。",
-      "en": "Tama often comes to Ken and Emma's house."
+      "jp": "「かんたんな／ゲーム。」",
+      "en": "\"An easy one.\""
     },
     {
-      "jp": "タマは／{魚|さかな}が／だいすきです。",
-      "en": "Tama loves fish."
+      "jp": "エマは／ききます。",
+      "en": "Emma asks."
     },
     {
-      "jp": "でも、／{雨|あめ}が／きらいです。",
-      "en": "But she hates rain."
+      "jp": "「わたしの／すきな／たべものは／なに？」",
+      "en": "\"What's my favourite food?\""
     },
     {
-      "jp": "{雨|あめ}の／あさは／{来|き}ません。",
-      "en": "On rainy mornings she doesn't come."
+      "jp": "「すし！」",
+      "en": "\"Sushi!\""
     },
     {
-      "jp": "エマは／ねこが／だいすきです。",
-      "en": "Emma loves cats."
+      "jp": "「そう！／じゃあ、／きらいな／たべものは？」",
+      "en": "\"Right! And what food do I hate?\""
     },
     {
-      "jp": "「ケン、／ねこ、／すき？」",
-      "en": "\"Ken, do you like cats?\""
+      "jp": "「えっと…／バナナ？」",
+      "en": "\"Um... bananas?\""
     },
     {
-      "jp": "「ううん、／あまり。」",
-      "en": "\"Nah, not really.\""
+      "jp": "「そう！／すごい！」",
+      "en": "\"Right! Wow!\""
     },
     {
-      "jp": "でも、／ケンは／まいあさ／まどを／あけます。",
-      "en": "But every morning Ken opens the window."
+      "jp": "「わたしは／あさ、／いつも／なにを／{飲|の}む？」",
+      "en": "\"What do I always drink in the morning?\""
     },
     {
-      "jp": "そして、／タマを／まちます。",
-      "en": "And he waits for Tama."
+      "jp": "「コーヒー！」",
+      "en": "\"Coffee!\""
     },
     {
-      "jp": "「タマ、／おはよう！」",
-      "en": "\"Morning, Tama!\""
+      "jp": "「ちがう。／あさは／いつも／こうちゃ。」",
+      "en": "\"Wrong. In the morning I always have tea.\""
     },
     {
-      "jp": "ケンは／タマと／よく／あそびます。",
-      "en": "Ken often plays with Tama."
+      "jp": "エマは／コーヒーが／あまり／すきじゃないです。",
+      "en": "Emma doesn't really like coffee."
     },
     {
-      "jp": "エマは／わらいます。",
-      "en": "Emma laughs."
+      "jp": "「こんどは／ぼく。」",
+      "en": "\"My turn.\""
     },
     {
-      "jp": "ケンは／ほんとうは／タマが／だいすきです。",
-      "en": "The truth is, Ken loves Tama."
+      "jp": "「ぼくは／しゅうまつ、／よく／なにを／する？」",
+      "en": "\"What do I often do at the weekend?\""
     },
     {
-      "jp": "{雨|あめ}の／あさは、／ケンは／ちょっと／さびしいです。",
-      "en": "On rainy mornings, Ken is a little lonely."
+      "jp": "「ゲーム！」",
+      "en": "\"Video games!\""
+    },
+    {
+      "jp": "「ちがう。／ゲームは／ときどき。」",
+      "en": "\"Wrong. Games are just sometimes.\""
+    },
+    {
+      "jp": "「じゃあ…／りょうり？」",
+      "en": "\"Then... cooking?\""
+    },
+    {
+      "jp": "「そう！／しゅうまつは／よく／エマと／りょうりを／する。」",
+      "en": "\"Yes! At the weekend I often cook with you.\""
+    },
+    {
+      "jp": "「じゃあ、／ぼくと／エマの／だいすきな／たべものは？」",
+      "en": "Then what food do you and I both love?"
+    },
+    {
+      "jp": "ふたりは／いっしょに／{言|い}います。",
+      "en": "They say it together."
+    },
+    {
+      "jp": "「カレーラーメン！」",
+      "en": "\"Curry ramen!\""
+    },
+    {
+      "jp": "「あしたの／ばんごはん、／カレーラーメンに／する？」",
+      "en": "\"Shall we have curry ramen for dinner tomorrow?\""
+    },
+    {
+      "jp": "「うん！」",
+      "en": "\"Yes!\""
     }
   ],
   "gist": {
-    "q": "How does Ken really feel about Tama?",
+    "q": "What food do Ken and Emma both love?",
     "options": [
-      "He doesn't like her at all",
-      "He is scared of her",
-      "He loves her and waits for her every morning"
+      "Sushi",
+      "Curry ramen",
+      "Bananas"
     ],
-    "answer": 2
+    "answer": 1
   }
 }

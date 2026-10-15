@@ -2,8 +2,8 @@
   "id": "st-l0-24",
   "level": "L0",
   "unit": 14,
-  "title": "The Wrong Stop",
-  "titleJp": "{知|し}らない {駅|えき}",
+  "title": "Follow the Sound",
+  "titleJp": "{花火|はなび}の {音|おと}",
   "topic": "transport",
   "grammar": [
     "toki-when",
@@ -11,84 +11,93 @@
     "adj-naru",
     "duration-kakaru",
     "ichiban",
-    "relative-clauses",
+    "te-kudasai",
     "te-form",
-    "te-imasu",
-    "to-iu"
+    "kara-made",
+    "he-direction",
+    "te-iru-state"
   ],
   "sentences": [
     {
-      "jp": "{日曜日|にちようび}、／トムと／エマは／{温泉|おんせん}に／{行|い}きました。",
-      "en": "On Sunday, Tom and Emma went to a hot spring."
+      "jp": "{八月|はちがつ}の／{土曜日|どようび}、／ケンと／エマは／となりの／{町|まち}の／まつりに／{行|い}きました。",
+      "en": "One Saturday in August, Ken and Emma went to a festival in the next town."
     },
     {
-      "jp": "{温泉|おんせん}まで／{電車|でんしゃ}で／{二時間|にじかん}／かかります。",
-      "en": "It takes two hours by train to get there."
+      "jp": "{夜|よる}{八時|はちじ}から、／{川|かわ}で／{花火|はなび}が／あります。",
+      "en": "There were going to be fireworks by the river from eight in the evening."
     },
     {
-      "jp": "{大|おお}きい／{駅|えき}で／{乗|の}り{換|か}えました。",
-      "en": "They changed trains at a big station."
+      "jp": "{駅|えき}から／{川|かわ}まで、／{歩|ある}いて／{十五分|じゅうごふん}ぐらい／かかります。",
+      "en": "It takes about fifteen minutes to walk from the station to the river."
     },
     {
-      "jp": "{次|つぎ}の／{電車|でんしゃ}は／{静|しず}かで、／{暖|あたた}かかったです。",
-      "en": "The next train was quiet and warm."
+      "jp": "でも、／{駅|えき}を／{出|で}た／とき、／{道|みち}が／わかりませんでした。",
+      "en": "But when they came out of the station, they didn't know the way."
     },
     {
-      "jp": "{二人|ふたり}は／{眠|ねむ}くなりました。",
-      "en": "They both got sleepy."
+      "jp": "{人|ひと}が／{多|おお}くて、／{道|みち}も／せまかったです。",
+      "en": "It was crowded, and the streets were narrow, too."
     },
     {
-      "jp": "{起|お}きた／とき、／{電車|でんしゃ}は／{知|し}らない／{駅|えき}に／{止|と}まっていました。",
-      "en": "When they woke up, the train was stopped at a station they didn't know."
+      "jp": "ふたりは／こうばんの／おまわりさんに／{聞|き}きました。",
+      "en": "They asked the police officer at the police box."
     },
     {
-      "jp": "「あ！／{温泉|おんせん}の／{駅|えき}は／{二|ふた}つ／{前|まえ}だよ！」",
-      "en": "\"Oh no! Our stop was two stations back!\""
+      "jp": "「すみません、／{川|かわ}は／どっちですか。」",
+      "en": "\"Excuse me, which way is the river?\""
     },
     {
-      "jp": "{二人|ふたり}は／{急|いそ}いで／{降|お}りました。",
-      "en": "They hurried off the train."
+      "jp": "「この／{道|みち}を／まっすぐ／{行|い}って、／しんごうを／{右|みぎ}に／まがってください。」",
+      "en": "\"Go straight along this street and turn right at the traffic light.\""
     },
     {
-      "jp": "{小|ちい}さくて、／{古|ふる}い／{駅|えき}でした。",
-      "en": "It was a small, old station."
+      "jp": "でも、／しんごうを／まがった／とき、／{道|みち}が／{二|ふた}つ／ありました。",
+      "en": "But when they turned at the light, the road split in two."
     },
     {
-      "jp": "{次|つぎ}の／{電車|でんしゃ}まで、／{一時間|いちじかん}／ありました。",
-      "en": "The next train was an hour away."
+      "jp": "「{右|みぎ}？／{左|ひだり}？」",
+      "en": "\"Right? Left?\""
     },
     {
-      "jp": "{駅|えき}の{外|そと}に／{出|で}た／とき、／エマが／「すごい！」と／{言|い}いました。",
-      "en": "When they stepped outside the station, Emma said, \"Wow!\""
+      "jp": "{空|そら}は／もう／{暗|くら}く／なっていました。",
+      "en": "The sky had already grown dark."
     },
     {
-      "jp": "{目|め}の{前|まえ}に／{大|おお}きい／{山|やま}と／{青|あお}い／{川|かわ}が／ありました。",
-      "en": "Right in front of them were a big mountain and a blue river."
+      "jp": "その／とき、／{大|おお}きい／{音|おと}が／しました。",
+      "en": "Just then, there was a loud boom."
     },
     {
-      "jp": "とても／きれいで、／{静|しず}かな／{所|ところ}でした。",
-      "en": "It was a beautiful, quiet place."
+      "jp": "「あ、／{花火|はなび}の／{音|おと}だ！」",
+      "en": "\"Oh, that's the fireworks!\""
     },
     {
-      "jp": "{二人|ふたり}は／{川|かわ}の{近|ちか}くを／{散歩|さんぽ}して、／{写真|しゃしん}を／たくさん／{撮|と}りました。",
-      "en": "They strolled by the river and took lots of photos."
+      "jp": "ふたりは／{音|おと}の{方|ほう}へ／{走|はし}りました。",
+      "en": "They ran toward the sound."
     },
     {
-      "jp": "{温泉|おんせん}に／{着|つ}いた／とき、／もう／{夕方|ゆうがた}でした。",
-      "en": "By the time they reached the hot spring, it was already evening."
+      "jp": "{川|かわ}に／ついた／とき、／{空|そら}が／{赤|あか}く／なりました。",
+      "en": "When they reached the river, the sky turned red."
     },
     {
-      "jp": "でも、／{今日|きょう}／いちばん／よかったのは、／あの／{小|ちい}さい／{駅|えき}でした。",
-      "en": "But the best part of the day was that little station."
+      "jp": "それから、／{青|あお}く／なって、／{黄色|きいろ}く／なりました。",
+      "en": "Then it turned blue, and then yellow."
+    },
+    {
+      "jp": "「きれい……。」",
+      "en": "\"Beautiful...\""
+    },
+    {
+      "jp": "{今年|ことし}／いちばん／きれいな／{花火|はなび}でした。",
+      "en": "They were the most beautiful fireworks of the year."
     }
   ],
   "gist": {
-    "q": "Why did they get off at a station they didn't know?",
+    "q": "How did Ken and Emma find the river in the end?",
     "options": [
-      "They fell asleep and missed their stop",
-      "The train broke down",
-      "Emma wanted to take photos"
+      "A police officer walked them there",
+      "They followed the sound of the fireworks",
+      "They looked at a map on a phone"
     ],
-    "answer": 0
+    "answer": 1
   }
 }

@@ -22,10 +22,10 @@
         "material": "「{土曜日|どようび}、{映画|えいが}を{見|み}ませんか。」\n「じゃあ、{日曜日|にちようび}はどうですか。{公園|こうえん}を{散歩|さんぽ}しませんか。」",
         "questions": [],
         "rubric": [
-          "Turns down softly with すみません or ちょっと… and a short reason (土曜日は仕事があります)",
-          "Accepts with いいですね and a ましょう sentence (行きましょう)",
+          "Turns down softly with すみません or ちょっと… and a short reason (どようびはしごとがあります)",
+          "Accepts with いいですね and a ましょう sentence (いきましょう)",
           "Makes their own invitation with 〜ませんか",
-          "Names a day or time with に (日曜日に, 十時に)"
+          "Names a day or time with に (にちようびに, じゅうじに)"
         ]
       }
     },
@@ -38,9 +38,9 @@
         "material": "「{週末|しゅうまつ}、どこに{行|い}きたいですか。」\n「{何|なに}をしたいですか。」",
         "questions": [],
         "rubric": [
-          "Says a place they want to go with 〜に行きたいです",
+          "Says a place they want to go with 〜にいきたいです",
           "Says what they want to do there with 〜を〜たいです",
-          "Asks their partner with どこに行きたいですか or 何をしたいですか"
+          "Asks their partner with どこにいきたいですか or なにをしたいですか"
         ]
       }
     },
@@ -50,7 +50,7 @@
       "check": {
         "kind": "read",
         "instructions": "Your neighbour sends you this message. Read it and answer the questions.",
-        "material": "エマさん、サムさん、こんにちは！\n{来週|らいしゅう}の{土曜日|どようび}は{夫|おっと}の{誕生日|たんじょうび}です。\n{六時半|ろくじはん}に、うちで{一緒|いっしょ}に{晩|ばん}ご{飯|はん}を{食|た}べませんか。\n{山田|やまだ}さんと{奥|おく}さんも{来|き}ます。\nケーキもありますよ！\n{田中|たなか}{美咲|みさき}",
+        "material": "エマさん、ケンさん、こんにちは！\n{来週|らいしゅう}の{土曜日|どようび}は{夫|おっと}の{誕生日|たんじょうび}です。\n{六時半|ろくじはん}に、うちで{一緒|いっしょ}に{晩|ばん}ご{飯|はん}を{食|た}べませんか。\n{鈴木|すずき}さんと{奥|おく}さんも{来|き}ます。\nケーキもありますよ！\n{田中|たなか}{美咲|みさき}",
         "questions": [
           {
             "q": "Where is the dinner?",
@@ -73,8 +73,8 @@
           {
             "q": "Who else is coming?",
             "options": [
-              "Mr. Yamada and his wife",
-              "Mr. Yamada's friend",
+              "Mr. Suzuki and his wife",
+              "Mr. Suzuki's friend",
               "Nobody else"
             ],
             "answer": 0
@@ -87,11 +87,11 @@
       "text": "Understand a short voicemail from a friend about their plans: when, where and who they're going with.",
       "check": {
         "kind": "listen",
-        "instructions": "Listen to a voicemail from your friend Kenta. You can play it twice. Then answer the questions.",
-        "material": "「あ、{健太|けんた}です。{日曜日|にちようび}に{妹|いもうと}と{鎌倉|かまくら}に{行|い}きます。{朝|あさ}{九時|くじ}の{電車|でんしゃ}です。{二人|ふたり}も{一緒|いっしょ}に{行|い}きませんか。{駅|えき}で{会|あ}いましょう。じゃあ、また{電話|でんわ}します。」",
+        "instructions": "Listen to a voicemail from your friend Shota. You can play it twice. Then answer the questions.",
+        "material": "「あ、{翔太|しょうた}です。{日曜日|にちようび}に{妹|いもうと}と{鎌倉|かまくら}に{行|い}きます。{朝|あさ}{九時|くじ}の{電車|でんしゃ}です。{二人|ふたり}も{一緒|いっしょ}に{行|い}きませんか。{駅|えき}で{会|あ}いましょう。じゃあ、また{電話|でんわ}します。」",
         "questions": [
           {
-            "q": "When is Kenta going?",
+            "q": "When is Shota going?",
             "options": [
               "On Saturday",
               "On Sunday",
@@ -129,10 +129,10 @@
         "material": "こんにちは！ {週末|しゅうまつ}、{時間|じかん}がありますか。{一緒|いっしょ}に{出|で}かけませんか。",
         "questions": [],
         "rubric": [
-          "Says when they are free or busy with 時間があります／ありません or 土曜日は仕事があります",
+          "Says when they are free or busy with じかんがあります／ありません or どようびはしごとがあります",
           "Suggests an activity with 〜ませんか or 〜ましょう",
-          "Names a day and/or time with に (日曜日に, 十一時に)",
-          "Ends warmly (楽しみです, じゃあ、また)"
+          "Names a day and/or time with に (にちようびに, じゅういちじに)",
+          "Ends warmly (たのしみです, じゃあ、また)"
         ]
       }
     }
@@ -147,8 +147,8 @@
       "a": "Has three ideas and their free times (card A)",
       "b": "Has other ideas, a busy Saturday and a friend who wants to come (card B)"
     },
-    "infoA": "Your ideas: see a movie (映画を見る), walk in the park (公園を散歩する), or try the new restaurant by the station (駅の近くのレストラン). You're free on Saturday afternoon and all day Sunday, but on Sunday you want a slow morning (朝はゆっくりしたいです), so nothing before 11:00.",
-    "infoB": "Your ideas: take photos in the park (公園で写真を撮る), or go shopping. You work all day Saturday (土曜日は仕事があります). Your friend Yuki (友達の由紀さん) wants to come along, but movies aren't her thing (映画はちょっと…). You can meet at the station (駅) any time after 10:00.",
+    "infoA": "Your ideas: see a movie (えいがをみます), walk in the park (こうえんをさんぽします), or try the new restaurant by the station (えきのちかくのレストラン). You're free on Saturday afternoon and all day Sunday, but on Sunday you want a slow morning (あさはゆっくりしたいです), so nothing before 11:00.",
+    "infoB": "Your ideas: take photos in the park (こうえんでしゃしんをとります), or go shopping. You work all day Saturday (どようびはしごとがあります). Your friend Yuki (ともだちのゆきさん) wants to come along, but movies aren't her thing (えいがはちょっと…). You can meet at the station (えき) any time after 10:00.",
     "targets": [
       "core:cw-0206",
       "core:cw-0160",
@@ -160,13 +160,13 @@
       "grammar:arimasu-imasu"
     ],
     "register": "polite",
-    "twist": "On the repeat, it's going to rain on Sunday (日曜日は雨です) and Yuki can only come on Saturday evening (土曜日の夜). Find an indoor plan and a new time.",
+    "twist": "On the repeat, it's going to rain on Sunday (にちようびはあめです) and Yuki can only come on Saturday evening (どようびのよる). Find an indoor plan and a new time.",
     "aiRole": "Your friend Yuki, who calls to ask whether she can come along and what time to meet",
     "scripted": [
       {
         "role": "a",
-        "jp": "{週末|しゅうまつ}、{一緒|いっしょ}に{出|で}かけませんか。",
-        "en": "Shall we go out together this weekend?"
+        "jp": "{週末|しゅうまつ}はひまですか。{一緒|いっしょ}に{出|で}かけませんか。",
+        "en": "Are you free this weekend? Shall we go out together?"
       },
       {
         "role": "b",
@@ -221,8 +221,8 @@
     ]
   },
   "capstone": {
-    "title": "Planning a date",
-    "brief": "Plan a date for next weekend. Start by saying what last weekend was like, then invite each other, say what you each want to do, check what there is nearby, decide who else is coming, and fix a day and a time.",
+    "title": "Our weekend plan",
+    "brief": "Plan next weekend together. Start by saying what last weekend was like, then invite each other, say what you each want to do, check what there is nearby, decide whether to ask a friend along, and fix a day, a time and a meeting place.",
     "minLinesEach": 8,
     "structures": [
       "masenka-mashou",

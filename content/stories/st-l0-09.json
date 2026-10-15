@@ -10,6 +10,7 @@
     "ka-question",
     "no-possession",
     "kore-sore-are",
+    "ne-yo",
     "numbers-prices",
     "masu-forms",
     "wo-object",
@@ -19,12 +20,14 @@
     "i-adjectives",
     "de-place-means",
     "arimasu-imasu",
+    "to-with",
     "ka-or-ni-suru",
     "dictionary-form",
     "he-direction",
     "casual-speech",
     "te-form",
     "adverbs-degree",
+    "nai-form",
     "te-kudasai",
     "ga-subject"
   ],
@@ -122,8 +125,8 @@
       "en": "But Emma's mom doesn't understand Japanese."
     },
     {
-      "jp": "「エマ、／でんわで／{読|よ}んで。」",
-      "en": "\"Emma, read it to her on the phone.\""
+      "jp": "「だいじょうぶ。／エマ、／でんわで／えいごで／{読|よ}んで！」",
+      "en": "\"No problem. Emma, read it to her in English on the phone!\""
     }
   ],
   "gist": {

@@ -24,7 +24,7 @@
         "rubric": [
           "Uses 〜のが好き with at least two activities (散歩するのが好きです)",
           "Names one thing they don't enjoy much (あまり好きじゃない／苦手です)",
-          "Joins two ideas with けど (映画を見るのは好きだけど、映画館は高い)",
+          "Joins two ideas with けど (映画を見るのが好きだけど、映画館は高い)",
           "Answers all three questions"
         ]
       }
@@ -40,11 +40,11 @@
           {
             "q": "Which of these is not allowed inside the museum?",
             "options": [
-              "Talking on your phone",
               "Carrying a small bag",
+              "Talking on your phone",
               "Walking around slowly"
             ],
-            "answer": 0
+            "answer": 1
           },
           {
             "q": "What should you do with a big bag?",
@@ -58,11 +58,11 @@
           {
             "q": "When can't you visit the museum?",
             "options": [
-              "On Sunday afternoons",
-              "Before eleven in the morning",
-              "On Mondays"
+              "On Mondays",
+              "On Saturdays",
+              "On Sunday afternoons"
             ],
-            "answer": 2
+            "answer": 0
           }
         ]
       }
@@ -88,7 +88,7 @@
       "check": {
         "kind": "listen",
         "instructions": "Your friend Ms Sato has left you a voice message about Sunday. Listen and answer the questions. You can listen twice.",
-        "material": "{佐藤|さとう}です。{日曜日|にちようび}の{予定|よてい}です。{十時|じゅうじ}に{駅|えき}の{前|まえ}で{会|あ}いましょう。まず、{駅|えき}の{近|ちか}くにある{美術館|びじゅつかん}に{行|い}きます。{美術館|びじゅつかん}を{出|で}てから、{公園|こうえん}でお{弁当|べんとう}を{食|た}べましょう。お{弁当|べんとう}は{私|わたし}が{作|つく}ります！{食|た}べてから、{公園|こうえん}を{少|すこ}し{散歩|さんぽ}して、{三時|さんじ}ごろカフェに{行|い}きます。{雨|あめ}の{日|ひ}は、{公園|こうえん}じゃなくて、{映画館|えいがかん}に{行|い}きましょう。じゃあ、{日曜日|にちようび}に！",
+        "material": "{佐藤|さとう}です。{日曜日|にちようび}の{予定|よてい}です。{十時|じゅうじ}に{駅|えき}の{前|まえ}で{会|あ}いましょう。まず、{駅|えき}の{近|ちか}くにある{美術館|びじゅつかん}に{行|い}きます。{美術館|びじゅつかん}を{出|で}てから、{公園|こうえん}でお{弁当|べんとう}を{食|た}べましょう。お{弁当|べんとう}は{私|わたし}が{作|つく}ります！{食|た}べてから、{公園|こうえん}を{少|すこ}し{散歩|さんぽ}して、{三時|さんじ}ごろカフェに{行|い}きます。{雨|あめ}の{日|ひ}は、{公園|こうえん}には{行|い}きません。{映画館|えいがかん}に{行|い}きましょう。じゃあ、{日曜日|にちようび}に！",
         "questions": [
           {
             "q": "Where will you go first?",
@@ -126,7 +126,7 @@
       "check": {
         "kind": "write",
         "instructions": "Write a short review (3–4 sentences) of a café, film or place you've been to, for a review app. Use the card below: say what it was, one good point, one bad point, and whether you'd go again.",
-        "material": "★★★☆☆\n{行|い}った{所|ところ}・{見|み}た{映画|えいが}：\nよかったこと：\nよくなかったこと：\nまた{行|い}きたいですか：",
+        "material": "★★★☆☆\n{行|い}った{所|ところ}・{見|み}た{映画|えいが}：\nよかったこと：\nよくなかったこと：\nまた{行|い}きたい・{見|み}たいですか：",
         "questions": [],
         "rubric": [
           "Names the place or film with a describing clause (先週行ったカフェは…)",
@@ -147,7 +147,7 @@
       "a": "Has a page of local events with times and rules (card A)",
       "b": "Has a list of what you both like and don't like, and the budget (card B)"
     },
-    "infoA": "What's on near you this Sunday (card A):\n• Art museum (びじゅつかん): 10:00–17:00, ¥1,000 each. No photos inside (しゃしんを とっては いけません), no food or drinks.\n• Park (こうえん): bike hire (じてんしゃを かしている) 9:00–13:00, ¥300 each.\n• Cinema (えいがかん): a comedy at 14:00 and at 18:30, ¥1,800 each.\n• Pool (プール): 13:00–20:00, ¥500 each. You must shower first (シャワーを あびてから はいる).\nYou'd like to see the museum. Tell your partner what's on, check what they like (〜のが すき？) and pass on any rules that matter.",
+    "infoA": "What's on near you this Sunday (card A):\n• Art museum (びじゅつかん): 10:00–17:00, ¥1,000 each. No photos inside (しゃしんを とっては いけません), no food or drinks.\n• Park (こうえん): bike hire (じてんしゃを かしている) 9:00–13:00, ¥300 each.\n• Cinema (えいがかん): a comedy at 14:00 and at 18:30, ¥1,500 each.\n• Pool (プール): 13:00–20:00, ¥500 each. You must shower first (シャワーを あびてから はいる).\nYou'd like to see the museum. Tell your partner what's on, check what they like (〜のが すき？) and pass on any rules that matter.",
     "infoB": "What you know (card B):\n• You love cycling (じてんしゃに のるのが すき) and you want to take lots of photos (しゃしん) on Sunday.\n• Swimming pools aren't really your thing (プールは にがて).\n• Budget: ¥5,000 for the two of you, lunch included (lunch out ≈ ¥1,500 for two).\n• You need to be home by 18:00 (your parents are coming for dinner).\nYou don't know what's on: ask (なにが ある？), check times and prices, and agree on two things and their order (〜てから).",
     "targets": [
       "grammar:no-ga-suki",
@@ -159,7 +159,7 @@
       "core:cw-0754"
     ],
     "register": "plain",
-    "twist": "Repeat: it's raining on Sunday, so the park is out. Find an indoor plan that you both enjoy and that still fits the budget and the 18:00 deadline.",
+    "twist": "Repeat: it's raining on Sunday, so the park is out. Find an indoor plan you both enjoy that still fits the ¥5,000 budget and the 18:00 deadline (lunch at home is fine).",
     "scripted": [
       {
         "role": "a",

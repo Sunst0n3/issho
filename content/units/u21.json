@@ -22,8 +22,8 @@
         "questions": [],
         "rubric": [
           "Says what the week is like (busy, tiring, so-so) and what is happening (meetings, overtime, a business trip)",
-          "Gives at least two reasons joined with 〜し (会議も多いし、残業もあるし…)",
-          "Uses at least one time word (月曜日, 毎晩, 来週…)",
+          "Gives at least two reasons joined with 〜し (かいぎも おおいし、ざんぎょうも あるし…)",
+          "Uses at least one time word (げつようび, まいばん, らいしゅう…)",
           "Keeps going for about 30 seconds without switching to English"
         ]
       }
@@ -34,7 +34,7 @@
       "check": {
         "kind": "listen",
         "instructions": "Your partner has just come home with some news from work. Listen, then answer the questions.",
-        "material": "ただいま。ねえ、{聞|き}いて。{山田|やまだ}さん、{来月|らいげつ}{会社|かいしゃ}を{辞|や}めるそうだよ。{田舎|いなか}に{帰|かえ}って、お{父|とう}さんの{店|みせ}を{手伝|てつだ}うんだって。それで、{次|つぎ}の{上司|じょうし}は{大阪|おおさか}から{来|く}る{人|ひと}だそうだよ。ちょっと{厳|きび}しいそうだけど、{仕事|しごと}はすごくできるって。",
+        "material": "ただいま。ねえ、{聞|き}いて。{山田|やまだ}さん、{来月|らいげつ}{会社|かいしゃ}を{辞|や}めるそうだよ。{田舎|いなか}に{帰|かえ}って、お{父|とう}さんの{店|みせ}を{手伝|てつだ}うって。それで、{次|つぎ}の{上司|じょうし}は{大阪|おおさか}から{来|く}る{人|ひと}だそうだよ。ちょっと{厳|きび}しいそうだけど、{仕事|しごと}はすごくできるって。",
         "questions": [
           {
             "q": "Why is Yamada-san leaving the company?",
@@ -75,9 +75,9 @@
         "material": "{来週|らいしゅう}の{予定|よてい}\n{月曜日|げつようび}：{朝|あさ}{八時|はちじ}から{会議|かいぎ}\n{水曜日|すいようび}：{大阪|おおさか}に{出張|しゅっちょう}（{木曜日|もくようび}の{夜|よる}に{帰|かえ}る）\n{金曜日|きんようび}：{残業|ざんぎょう}\nメモ：{冷蔵庫|れいぞうこ}の{中|なか}、ほとんど{何|なに}もない！ シャツにアイロン！",
         "questions": [],
         "rubric": [
-          "Names at least three jobs to do in advance with 〜ておく (カレーを作っておく, シャツにアイロンをかけておく)",
-          "Links each job to the schedule with a reason (水曜日は出張だから…)",
-          "Suggests who does each job and when (土曜日に私が…)"
+          "Names at least three jobs to do in advance with 〜ておく (カレーを つくっておく, シャツに アイロンを かけておく)",
+          "Links each job to the schedule with a reason (すいようびは しゅっちょうだから…)",
+          "Suggests who does each job and when (どようびに わたしが…)"
         ]
       }
     },
@@ -124,13 +124,13 @@
       "text": "Write a message asking for advice, and suggest what to do if things go well ('If I finish early, shall we eat out?').",
       "check": {
         "kind": "write",
-        "instructions": "Your partner sent you this LINE message. Reply in 2–4 sentences: say what is going on at work, ask their advice about one problem (…どうすればいい？), and suggest a plan for if things go well, with 〜ば (早く終われば、外で食べない？).",
+        "instructions": "Your partner sent you this LINE message. Reply in 2–4 sentences: say what is going on at work, ask their advice about one problem (…どうすれば いい？), and suggest a plan for if things go well, with 〜ば (はやく おわれば、そとで たべない？).",
         "material": "お{疲|つか}れ{様|さま}！ {今日|きょう}も{残業|ざんぎょう}？ {晩|ばん}ご{飯|はん}、どうする？ {何|なに}か{作|つく}っておこうか？",
         "questions": [],
         "rubric": [
           "Explains what is happening at work in a sentence or two",
           "Asks for advice with どうすればいい？ or 〜ばいい？",
-          "Suggests a plan with a 〜ば condition (早く終われば…)",
+          "Suggests a plan with a 〜ば condition (はやく おわれば…)",
           "Uses casual style suited to a partner"
         ]
       }
@@ -146,8 +146,8 @@
       "a": "Has their work schedule (late meetings on Tuesday and Thursday) and the shopping list (card A)",
       "b": "Has their schedule (a business trip on Wednesday) and the household jobs (card B)"
     },
-    "infoA": "Your week: late meetings (会議) on Tuesday and Thursday, so you're home after 9 p.m.; Monday and Wednesday you're home by 7. You have the shopping list: detergent (洗剤) and shampoo (シャンプー) are nearly out, and you need meat and vegetables for a big curry. On Tuesday you cycle to work, so you can't carry heavy shopping that day. Find out your partner's week first, then agree: what to buy in advance and when, what to cook on Sunday so there's food for the busy days (作っておけば…), and who takes the rubbish out.",
-    "infoB": "Your week: overtime (残業) on Monday; a business trip (出張) to Osaka on Wednesday — you leave on the 6 a.m. bullet train and are back on Thursday night. You have the list of household jobs: iron the shirts for the trip (アイロン), vacuum (掃除機), rubbish out on Tuesday and Friday mornings, and the laundry. You have no clean shirt for the trip yet, and you've heard your boss (上司) is coming too. Find out your partner's week first, then agree who does each job and on which day, so everything is ready before Wednesday.",
+    "infoA": "Your week: late meetings (かいぎ) on Tuesday and Thursday, so you're home after 9 p.m.; Monday and Wednesday you're home by 7. You have the shopping list: detergent (せんざい) and shampoo (シャンプー) are nearly out, and you need meat and vegetables for a big curry. On Tuesday you cycle to work, so you can't carry heavy shopping that day. Find out your partner's week first, then agree: what to buy in advance and when, what to cook on Sunday so there's food for the busy days (つくっておけば…), and who takes the rubbish out.",
+    "infoB": "Your week: overtime (ざんぎょう) on Monday; a business trip (しゅっちょう) to Osaka on Wednesday — you leave on the 6 a.m. bullet train and are back on Thursday night. You have the list of household jobs: iron the shirts for the trip (アイロン), vacuum (そうじき), rubbish out on Tuesday and Friday mornings, and the laundry. You have no clean shirt for the trip yet, and you've heard your boss (じょうし) is coming too. Find out your partner's week first, then agree who does each job and on which day, so everything is ready before Wednesday.",
     "targets": [
       "grammar:te-oku",
       "grammar:ba-conditional",

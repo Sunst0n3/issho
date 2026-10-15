@@ -35,7 +35,7 @@
       "check": {
         "kind": "write",
         "instructions": "Your partner has sent you their wish list for your life together. Reply with your own three wishes (different from theirs), each with a reason.",
-        "material": "{私|わたし}の{欲|ほ}しいもの\n1. {犬|いぬ}。{犬|いぬ}が{大好|だいす}きだから！\n2. {広|ひろ}い{台所|だいどころ}。{二人|ふたり}で{料理|りょうり}をしたいから。\n3. {新|あたら}しいソファー。{今|いま}のソファーは{古|ふる}いから。\nあなたは？{三|みっ}つ{書|か}いてね！",
+        "material": "{私|わたし}の{欲|ほ}しいもの\n1. {犬|いぬ}。{犬|いぬ}が{大好|だいす}きだから！\n2. {広|ひろ}い{台所|だいどころ}。{二人|ふたり}で{料理|りょうり}をしたいから。\n3. {新|あたら}しいソファー。{今|いま}のソファーは{古|ふる}いから。\nそっちの{欲|ほ}しいものも{三|みっ}つ{書|か}いてね！",
         "questions": [],
         "rubric": [
           "Names three things with 〜が欲しい",
@@ -56,20 +56,20 @@
           {
             "q": "Why will Ken be late?",
             "options": [
-              "He's busy at work",
               "His train is delayed",
+              "He's busy at work",
               "He's at the doctor's"
             ],
-            "answer": 0
+            "answer": 1
           },
           {
             "q": "Where does Ken want you to wait?",
             "options": [
-              "At the station ticket gate",
               "In a coffee shop called 'Rainy Day' in front of the station",
+              "At the station ticket gate",
               "At his home"
             ],
-            "answer": 1
+            "answer": 0
           },
           {
             "q": "What does your partner ask you at the end?",
@@ -89,7 +89,7 @@
       "check": {
         "kind": "read",
         "instructions": "Read this short profile from a magazine's 'Our home' page and answer the questions.",
-        "material": "{私|わたし}たちの{家|いえ}　{田中|たなか}さん{夫婦|ふうふ}\n{夫|おっと}の{雄太|ゆうた}さんと{妻|つま}の{真理|まり}さんは、{結婚|けっこん}して{三年|さんねん}です。{今|いま}、{駅|えき}の{近|ちか}くの{小|ちい}さい{家|いえ}に{住|す}んでいます。{雄太|ゆうた}さんは{銀行|ぎんこう}に{勤|つと}めています。{真理|まり}さんは{病院|びょういん}で{働|はたら}いています。{二人|ふたり}は{料理|りょうり}をするのが{大好|だいす}きです。{週末|しゅうまつ}は{二人|ふたり}で{晩|ばん}ご{飯|はん}を{作|つく}ります。でも、{台所|だいどころ}がとても{狭|せま}いです。だから、{今|いま}、{広|ひろ}い{台所|だいどころ}がある{家|いえ}が{欲|ほ}しいです。{真理|まり}さんは{犬|いぬ}も{欲|ほ}しいと{言|い}っています。{子|こ}どもはまだいません。",
+        "material": "{私|わたし}たちの{家|いえ}　{田中|たなか}さん{夫婦|ふうふ}\n{夫|おっと}の{雄太|ゆうた}さんと{妻|つま}の{真理|まり}さんは、{結婚|けっこん}して{三年|さんねん}です。{今|いま}、{駅|えき}の{近|ちか}くの{小|ちい}さい{家|いえ}に{住|す}んでいます。{雄太|ゆうた}さんは{銀行|ぎんこう}に{勤|つと}めています。{真理|まり}さんは{病院|びょういん}で{働|はたら}いています。{二人|ふたり}は{料理|りょうり}をするのが{大好|だいす}きです。{週末|しゅうまつ}は{二人|ふたり}で{晩|ばん}ご{飯|はん}を{作|つく}ります。でも、{台所|だいどころ}がとても{狭|せま}いです。だから、{二人|ふたり}は{広|ひろ}い{台所|だいどころ}がある{家|いえ}が{欲|ほ}しいと{言|い}っています。{真理|まり}さんは、{犬|いぬ}も{欲|ほ}しいと{思|おも}っています。{子|こ}どもはまだいません。",
         "questions": [
           {
             "q": "How long have Yuta and Mari been married?",

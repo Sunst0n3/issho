@@ -2,96 +2,97 @@
   "id": "st-l0-19",
   "level": "L0",
   "unit": 12,
-  "title": "Our Wish List",
-  "titleJp": "わたしたちの ほしい もの",
+  "title": "We Want a Dog",
+  "titleJp": "いぬが ほしい",
   "topic": "home",
   "grammar": [
     "hoshii",
     "te-iru-state",
     "to-iu",
-    "de-amount",
     "mou-mada",
     "kedo-but",
     "kara-because",
-    "tai-want",
-    "te-form"
+    "casual-speech",
+    "te-form",
+    "arimasu-imasu",
+    "to-omou"
   ],
   "sentences": [
     {
-      "jp": "{僕|ぼく}は／{妻|つま}と／{二人|ふたり}で／{住|す}んでいます。",
-      "en": "I live with my wife, just the two of us."
+      "jp": "ケンと／エマは、／{駅|えき}の{近|ちか}くの／{小|ちい}さい／{家|いえ}に／すんでいます。",
+      "en": "Ken and Emma live in a small house near the station."
     },
     {
-      "jp": "{家|いえ}は／{駅|えき}から／ちょっと／{遠|とお}いです。",
-      "en": "Our house is a bit far from the station."
+      "jp": "{古|ふる}い／{家|いえ}ですけど、／{小|ちい}さい／にわが／あります。",
+      "en": "It's an old house, but it has a little garden."
     },
     {
-      "jp": "{古|ふる}い／{家|いえ}ですけど、／{小|ちい}さい／{庭|にわ}が／あります。",
-      "en": "It's an old house, but it has a small garden."
+      "jp": "エマは／{本|ほん}が／たくさん／あるけど、／ほんだなは／{小|ちい}さいです。",
+      "en": "Emma has lots of books, but the bookshelf is small."
     },
     {
-      "jp": "{猫|ねこ}も／います。",
-      "en": "We have a cat, too."
+      "jp": "だから、／いつも／「{大|おお}きい／ほんだなが／ほしい」と／{言|い}っています。",
+      "en": "So she's always saying, \"I want a big bookshelf.\""
     },
     {
-      "jp": "{名前|なまえ}は／モモと／いいます。",
-      "en": "Her name is Momo."
+      "jp": "ケンは、／{車|くるま}が／ほしいと／{言|い}っています。",
+      "en": "Ken says he wants a car."
     },
     {
-      "jp": "{妻|つま}は／{料理|りょうり}が／{大好|だいす}きです。",
-      "en": "My wife loves cooking."
+      "jp": "「ねえ、／ケン。／{何色|なにいろ}の／{車|くるま}が／ほしい？」",
+      "en": "\"Hey, Ken. What color car do you want?\""
     },
     {
-      "jp": "でも、／うちの／{台所|だいどころ}は／とても／{狭|せま}いです。",
-      "en": "But our kitchen is very small."
+      "jp": "「{赤|あか}い／{車|くるま}！」",
+      "en": "\"A red one!\""
     },
     {
-      "jp": "{妻|つま}は／「{広|ひろ}い／{台所|だいどころ}が／ほしい」と／いつも／{言|い}っています。",
-      "en": "My wife is always saying, \"I want a big kitchen.\""
+      "jp": "{今|いま}、／{車|くるま}を／{持|も}っていないから、／{買|か}い{物|もの}が／たいへんです。",
+      "en": "They don't have a car right now, so shopping is hard work."
     },
     {
-      "jp": "{僕|ぼく}は／{車|くるま}が／ほしいです。",
-      "en": "I want a car."
+      "jp": "それから、／ふたりは／いぬも／ほしいと／{思|おも}っています。",
+      "en": "And they would both love a dog, too."
     },
     {
-      "jp": "{今|いま}、／{車|くるま}を／{持|も}っていないから、／{買|か}い{物|もの}が／{大変|たいへん}です。",
-      "en": "We don't have a car right now, so shopping is hard work."
+      "jp": "でも、／{毎日|まいにち}、／となりの／ねこが／にわに／{来|き}ます。",
+      "en": "But every day, the cat from next door comes into their garden."
     },
     {
-      "jp": "それから、／{僕|ぼく}たちは／{犬|いぬ}も／ほしいです。",
-      "en": "And we'd like a dog, too."
+      "jp": "タマという／ねこです。",
+      "en": "A cat called Tama."
     },
     {
-      "jp": "{犬|いぬ}と／いっしょに／{毎朝|まいあさ}／{公園|こうえん}を／{散歩|さんぽ}したいです。",
-      "en": "We'd love to walk in the park with a dog every morning."
+      "jp": "タマは／いぬが／{嫌|きら}いです。",
+      "en": "Tama hates dogs."
     },
     {
-      "jp": "でも、／モモは／{犬|いぬ}が／{嫌|きら}いです。",
-      "en": "But Momo hates dogs."
+      "jp": "{先週|せんしゅう}、／{白|しろ}い／いぬが／にわに／{来|き}ました。",
+      "en": "Last week, a white dog came into the garden."
     },
     {
-      "jp": "{先週|せんしゅう}、／{隣|となり}の／{犬|いぬ}が／うちの／{庭|にわ}に／{来|き}ました。",
-      "en": "Last week, the neighbors' dog came into our garden."
+      "jp": "タマは／とても／おこりました。",
+      "en": "Tama was furious."
     },
     {
-      "jp": "モモは／とても／{怒|おこ}って、／{一日|いちにち}／ベッドの{下|した}に／いました。",
-      "en": "Momo got really angry and stayed under the bed all day."
+      "jp": "そして、／うちに／{入|はい}って、／{一日|いちにち}／ソファーの{下|した}に／いました。",
+      "en": "Then she ran into the house and stayed under the sofa all day."
     },
     {
-      "jp": "だから、／{犬|いぬ}は／まだ／いません。",
-      "en": "So we still don't have a dog."
+      "jp": "だから、／いぬは／まだ／いません。",
+      "en": "So they still don't have a dog."
     },
     {
-      "jp": "{犬|いぬ}が／ほしいけど、／モモも／{大切|たいせつ}な／{家族|かぞく}です。",
-      "en": "We want a dog, but Momo is an important part of our family too."
+      "jp": "「いぬは／ほしいけど、／タマも／たいせつな／{友|とも}だちだね。」",
+      "en": "\"We do want a dog, but Tama is a dear friend, too.\""
     }
   ],
   "gist": {
-    "q": "Why don't they have a dog yet?",
+    "q": "Why don't Ken and Emma have a dog yet?",
     "options": [
       "They don't have a car",
-      "Their kitchen is too small",
-      "Their cat hates dogs"
+      "Their house is too small",
+      "The neighbour's cat hates dogs"
     ],
     "answer": 2
   }

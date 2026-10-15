@@ -2,100 +2,141 @@
   "id": "st-l0-06",
   "level": "L0",
   "unit": 7,
-  "title": "A rainy Sunday",
-  "titleJp": "{雨|あめ}の にちようび",
-  "topic": "home",
+  "title": "One umbrella",
+  "titleJp": "かさは ひとつ",
+  "topic": "weather",
   "grammar": [
     "wa-desu",
     "no-possession",
-    "mo-also",
+    "ne-yo",
     "masu-forms",
     "wo-object",
+    "counting-tsu",
+    "ni-time-place",
     "masu-past",
+    "i-adjectives",
     "de-place-means",
+    "arimasu-imasu",
     "deshita",
     "dictionary-form",
     "adjective-past",
     "he-direction",
     "casual-speech",
+    "position-words",
     "te-form"
   ],
   "sentences": [
     {
-      "jp": "にちようびの／あさ、／{外|そと}は／{雨|あめ}でした。",
-      "en": "On Sunday morning, it was raining outside."
+      "jp": "あさは／いい／てんきでした。",
+      "en": "The morning was lovely."
     },
     {
-      "jp": "ケンと／エマは／おそく／おきました。",
-      "en": "Ken and Emma got up late."
+      "jp": "エマは／スマホで／てんきを／{見|み}ました。",
+      "en": "Emma checked the weather on her phone."
     },
     {
-      "jp": "「{今日|きょう}、／こうえんへ／{行|い}く？」",
-      "en": "\"Shall we go to the park today?\""
+      "jp": "「{夜|よる}は／{雨|あめ}…」",
+      "en": "\"Rain tonight...\""
     },
     {
-      "jp": "「{雨|あめ}だよ。」",
-      "en": "\"It's raining.\""
+      "jp": "エマは／かさを／もって、／かいしゃへ／{行|い}きました。",
+      "en": "Emma took her umbrella and went to work."
     },
     {
-      "jp": "「じゃあ、／うちで／えいが、／{見|み}る？」",
-      "en": "\"Then shall we watch a movie at home?\""
+      "jp": "ひるは／{晴|は}れでした。",
+      "en": "At lunchtime it was sunny."
     },
     {
-      "jp": "「うん、／いいね！」",
-      "en": "\"Yeah, sounds good!\""
+      "jp": "あつかったです。",
+      "en": "It was hot."
     },
     {
-      "jp": "ケンは／コーヒーを／いれて、／エマは／あさごはんを／つくりました。",
-      "en": "Ken made coffee, and Emma made breakfast."
+      "jp": "かさは／おもかったです。",
+      "en": "The umbrella felt heavy."
     },
     {
-      "jp": "ふたりは／ソファーで／あさごはんを／{食|た}べて、／えいがを／{見|み}ました。",
-      "en": "They ate breakfast on the sofa and watched a movie."
+      "jp": "{夜|よる}、／エマは／{電車|でんしゃ}で／うちへ／かえりました。",
+      "en": "In the evening, Emma took the train home."
     },
     {
-      "jp": "ちょっと／かなしい／えいがでした。",
-      "en": "It was a bit of a sad movie."
+      "jp": "{電車|でんしゃ}の／{中|なか}で、／ちょっと／ねました。",
+      "en": "She dozed a little on the train."
     },
     {
-      "jp": "エマは／なきました。",
-      "en": "Emma cried."
+      "jp": "{駅|えき}で／{電車|でんしゃ}を／おりて、／{外|そと}を／{見|み}ました。",
+      "en": "She got off at her station and looked outside."
     },
     {
-      "jp": "ケンも／ちょっと／なきました。",
-      "en": "Ken cried a little too."
+      "jp": "{雨|あめ}です！",
+      "en": "It's raining!"
     },
     {
-      "jp": "ひるごはんは／いっしょに／ラーメンを／つくりました。",
-      "en": "For lunch, they made ramen together."
+      "jp": "「あ！／かさ！」",
+      "en": "\"Oh no! My umbrella!\""
     },
     {
-      "jp": "ごごは／{本|ほん}を／{読|よ}んで、／ちょっと／ねました。",
-      "en": "In the afternoon, they read and had a little nap."
+      "jp": "かさを／{電車|でんしゃ}に／わすれました。",
+      "en": "She had left her umbrella on the train."
     },
     {
-      "jp": "よるも／まだ／{雨|あめ}でした。",
-      "en": "In the evening, it was still raining."
+      "jp": "エマは／うちに／でんわを／しました。",
+      "en": "Emma called home."
     },
     {
-      "jp": "でも、／{雨|あめ}の／にちようびは／たのしかったです。",
-      "en": "But the rainy Sunday was fun."
+      "jp": "「ケン、／いま、／うち？」",
+      "en": "\"Ken, are you home?\""
     },
     {
-      "jp": "「あしたも／にちようびが／いい！」",
-      "en": "\"I wish tomorrow was Sunday too!\""
+      "jp": "「うん、／うちだよ。」",
+      "en": "\"Yeah, I'm home.\""
     },
     {
-      "jp": "エマは／わらいました。",
-      "en": "Emma laughed."
+      "jp": "「{駅|えき}に／いる。／かさ、／{電車|でんしゃ}の／{中|なか}…」",
+      "en": "\"I'm at the station. My umbrella's on the train...\""
+    },
+    {
+      "jp": "「だいじょうぶ。／すぐ／{行|い}く！」",
+      "en": "\"Don't worry. I'll be right there!\""
+    },
+    {
+      "jp": "エマは／{駅|えき}の／{前|まえ}で／まちました。",
+      "en": "Emma waited in front of the station."
+    },
+    {
+      "jp": "ケンは／すぐ／{来|き}ました。",
+      "en": "Ken came straight away."
+    },
+    {
+      "jp": "でも、／かさは／ひとつです。",
+      "en": "But he had only one umbrella."
+    },
+    {
+      "jp": "「かさ、／ひとつだけ？」",
+      "en": "\"Only one umbrella?\""
+    },
+    {
+      "jp": "「うん、／ひとつだけ。」",
+      "en": "\"Yep, only one.\""
+    },
+    {
+      "jp": "ふたりは／ひとつの／かさで／うちへ／かえりました。",
+      "en": "They walked home together under one umbrella."
+    },
+    {
+      "jp": "「ちょっと／せまいね。」",
+      "en": "\"It's a bit of a squeeze, huh?\""
+    },
+    {
+      "jp": "「でも、／あたたかい。」",
+      "en": "\"But it's warm.\""
     }
   ],
   "gist": {
-    "q": "How did Ken and Emma spend the rainy Sunday?",
+    "q": "How do Ken and Emma get home from the station?",
     "options": [
-      "At the park, in the rain",
-      "At home: a movie, cooking, reading and a nap",
-      "At work"
+      "By taxi",
+      "Together under one umbrella",
+      "Emma gets her umbrella back from the train"
     ],
     "answer": 1
   }

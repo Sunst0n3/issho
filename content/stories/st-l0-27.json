@@ -12,14 +12,14 @@
     "hou-ga-ii",
     "adj-naru",
     "volitional",
-    "te-kudasai",
+    "te-form",
     "casual-speech",
     "to-iu"
   ],
   "sentences": [
     {
-      "jp": "{土曜日|どようび}の{朝|あさ}、／{天気予報|てんきよほう}を／{見|み}ました。",
-      "en": "On Saturday morning, I checked the weather forecast."
+      "jp": "{土曜日|どようび}の{朝|あさ}、／エマは／{天気予報|てんきよほう}を／{見|み}ました。",
+      "en": "On Saturday morning, Emma checked the weather forecast."
     },
     {
       "jp": "{午前|ごぜん}は／{晴|は}れ、／{午後|ごご}は／{雨|あめ}です。",
@@ -27,51 +27,51 @@
     },
     {
       "jp": "{気温|きおん}は／{十八度|じゅうはちど}です。",
-      "en": "The temperature: 18 degrees."
+      "en": "The temperature: eighteen degrees."
     },
     {
-      "jp": "「{雨|あめ}が／{降|ふ}る／{前|まえ}に、／{公園|こうえん}に／{行|い}こう。」",
-      "en": "\"Let's go to the park before it rains.\""
+      "jp": "「{雨|あめ}が／{降|ふ}る／{前|まえ}に、／こうえんに／さくらを／{見|み}に／{行|い}こう。」",
+      "en": "\"Let's go and see the cherry blossoms in the park before it rains.\""
     },
     {
-      "jp": "わたしは／{自分|じぶん}の{傘|かさ}と、／{夫|おっと}の{傘|かさ}を／{持|も}ちました。",
-      "en": "I took my umbrella and my husband's."
+      "jp": "エマは／{自分|じぶん}の／かさと、／ケンの／かさを／{持|も}ちました。",
+      "en": "Emma took her own umbrella and Ken's."
     },
     {
-      "jp": "「{傘|かさ}は／{要|い}らないよ。／{空|そら}を／{見|み}て。／{雲|くも}が／ないよ。」",
-      "en": "\"We don't need umbrellas. Look at the sky. There isn't a cloud.\""
+      "jp": "「かさは／いらないよ。／ほら、／{空|そら}に／{雲|くも}が／ないよ。」",
+      "en": "\"We don't need umbrellas. Look, there isn't a cloud in the sky.\""
     },
     {
       "jp": "「でも、／{持|も}っていった／{方|ほう}が／いいよ。」",
-      "en": "\"Still, it's better to take them.\""
+      "en": "\"Still, we'd better take them.\""
     },
     {
-      "jp": "{公園|こうえん}の／{桜|さくら}は／とても／きれいでした。",
+      "jp": "こうえんの／さくらは／とても／きれいでした。",
       "en": "The cherry blossoms in the park were gorgeous."
     },
     {
-      "jp": "わたしたちは／{桜|さくら}の{下|した}を／{歩|ある}いたり、／{写真|しゃしん}を／{撮|と}ったり／しました。",
-      "en": "We walked under the cherry trees, took photos, and so on."
+      "jp": "ふたりは／さくらの{下|した}を／{歩|ある}いたり、／{写真|しゃしん}を／{撮|と}ったり／しました。",
+      "en": "They strolled under the cherry trees, took photos and so on."
     },
     {
-      "jp": "お{弁当|べんとう}を／{食|た}べた／{後|あと}で、／{夫|おっと}は／{木|き}の／{下|した}で／{寝|ね}ました。",
-      "en": "After we ate our bento, my husband fell asleep under a tree."
+      "jp": "お{弁当|べんとう}を／{食|た}べた／{後|あと}で、／ケンは／{木|き}の／{下|した}で／ねました。",
+      "en": "After they ate their bento, Ken fell asleep under a tree."
     },
     {
-      "jp": "{二時|にじ}ごろ、／{空|そら}が／{暗|くら}くなりました。",
-      "en": "Around two, the sky grew dark."
+      "jp": "{二時|にじ}ごろ、／{空|そら}が／くもって、／{風|かぜ}が／{強|つよ}く／なりました。",
+      "en": "Around two, the sky clouded over and the wind picked up."
     },
     {
       "jp": "そして、／{雨|あめ}に／なりました。",
       "en": "And then the rain came."
     },
     {
-      "jp": "{夫|おっと}は／{起|お}きて、／「あ、／{傘|かさ}……」と／{言|い}いました。",
-      "en": "My husband woke up and said, \"Oh — umbrellas…\""
+      "jp": "ケンは／おきて、／「あ、／かさ……。」と／{言|い}いました。",
+      "en": "Ken woke up and said, \"Oh — umbrellas...\""
     },
     {
-      "jp": "わたしは／{笑|わら}って、／{傘|かさ}を／{一本|いっぽん}／{渡|わた}しました。",
-      "en": "I laughed and handed him one of the umbrellas."
+      "jp": "エマは／わらって、／かさを／{一本|いっぽん}／わたしました。",
+      "en": "Emma laughed and handed him one."
     },
     {
       "jp": "「ありがとう。／{次|つぎ}から、／{天気予報|てんきよほう}を／ちゃんと／{見|み}るよ。」",
@@ -79,10 +79,10 @@
     }
   ],
   "gist": {
-    "q": "Why did she take two umbrellas?",
+    "q": "Why did Emma take two umbrellas?",
     "options": [
       "The forecast said rain in the afternoon",
-      "Her husband asked her to",
+      "Ken asked her to",
       "It was raining in the morning"
     ],
     "answer": 0

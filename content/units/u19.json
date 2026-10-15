@@ -83,16 +83,16 @@
     },
     {
       "id": "u19-cd4",
-      "text": "Write a thank-you message for a present, saying who gave it and what you'll do with it.",
+      "text": "Write a thank-you message for a present: what you received, how you feel about it and what you'll do with it.",
       "check": {
         "kind": "write",
-        "instructions": "Your partner's aunt Michiko sent you a scarf for your birthday, with the card below. Write a polite thank-you reply in 3–5 sentences: say what you received, how you feel about it, and what you'll do with it.",
+        "instructions": "Your partner's aunt Michiko sent you a sweater for your birthday, with the card below. Write a polite thank-you reply in 3–5 sentences: say what you received, how you feel about it, and what you'll do with it.",
         "material": "お{誕生日|たんじょうび}おめでとう！{小|ちい}さいプレゼントを{送|おく}りました。{気|き}に{入|い}ったらうれしいです。　みちこ",
         "questions": [],
         "rubric": [
-          "Thanks her and names the present (すてきな マフラーを ありがとうございました)",
+          "Thanks her and names the present (すてきな セーターを ありがとうございました)",
           "Uses くれました or もらいました in the right direction",
-          "Says what they'll do with it, e.g. with 〜たら (さむく なったら、まいにち つかいます)",
+          "Says what they'll do with it, e.g. with 〜たら (さむく なったら、まいにち きます)",
           "Keeps to polite です/ます throughout"
         ]
       }
@@ -103,7 +103,7 @@
       "check": {
         "kind": "read",
         "instructions": "Read the gift-service notice at a shop near the station, then answer the questions.",
-        "material": "プレゼントのご{案内|あんない}\n◆プレゼントの{袋|ふくろ}・{箱|はこ}\n　{袋|ふくろ}：{無料|むりょう}　{箱|はこ}：{一|ひと}つ200{円|えん}\n◆{送|おく}る\n　{日本|にほん}のどこにでも、600{円|えん}で{送|おく}ることができます。\n　（5,000{円|えん}{以上|いじょう}{買|か}ったら、{無料|むりょう}で{送|おく}ります）\n◆{交換|こうかん}\n　{買|か}ってから14{日|にち}までできます。レシートを{持|も}ってきてください。\n　※セールの{物|もの}と{食|た}べ{物|もの}はできません。",
+        "material": "プレゼントのご{案内|あんない}\n◆プレゼントの{袋|ふくろ}・{箱|はこ}\n　{袋|ふくろ}：{無料|むりょう}　{箱|はこ}：{一|ひと}つ200{円|えん}\n◆{送|おく}る\n　{日本|にほん}のどこにでも、600{円|えん}で{送|おく}ることができます。\n　（5,000{円|えん}{以上|いじょう}{買|か}ったら、{無料|むりょう}で{送|おく}ります）\n◆{交換|こうかん}\n　{買|か}ってから２{週間|しゅうかん}までできます。レシートを{持|も}ってきてください。\n　※セールの{物|もの}と{食|た}べ{物|もの}はできません。",
         "questions": [
           {
             "q": "How much does wrapping in a box cost?",
@@ -192,33 +192,33 @@
       },
       {
         "role": "a",
-        "jp": "いいね！{料理|りょうり}が{好|す}きだから、{毎日|まいにち}{使|つか}えるね。",
-        "en": "Nice! She loves cooking, so she can use it every day."
+        "jp": "いいね！{料理|りょうり}が{好|す}きだから、{毎日|まいにち}{使|つか}えるね。でも、もし{気|き}に{入|い}らなかったら、どうする？",
+        "en": "Nice! She loves cooking, so she can use it every day. But what if she doesn't like it?"
       },
       {
         "role": "b",
-        "jp": "でも、もし{気|き}に{入|い}らなかったら、どうする？",
-        "en": "But what if she doesn't like it?"
-      },
-      {
-        "role": "a",
         "jp": "レシートがあったら、{二週間|にしゅうかん}は{交換|こうかん}できるって。",
-        "en": "They said she can exchange it within two weeks if she has the receipt."
-      },
-      {
-        "role": "b",
-        "jp": "じゃあ、レシートも{袋|ふくろ}に{入|い}れよう。",
-        "en": "Then let's put the receipt in the bag too."
+        "en": "The shop said she can exchange it within two weeks if she has the receipt."
       },
       {
         "role": "a",
-        "jp": "うん。{千五百円|せんごひゃくえん}{残|のこ}るから、カードも{買|か}おう。",
-        "en": "Okay. That leaves ¥1,500, so let's get a card too."
+        "jp": "じゃあ、レシートは{捨|す}てないでね。{千五百円|せんごひゃくえん}{残|のこ}るから、カードも{買|か}おう。",
+        "en": "Then don't throw the receipt away, okay? That leaves ¥1,500, so let's get a card as well."
       },
       {
         "role": "b",
-        "jp": "いいね。{二人|ふたり}でメッセージを{書|か}こう。さとみ、{喜|よろこ}ぶかな。",
-        "en": "Good idea. Let's write a message together. I hope Satomi likes it."
+        "jp": "いいね。{二人|ふたり}でメッセージを{書|か}こう。",
+        "en": "Good idea. Let's write a message together."
+      },
+      {
+        "role": "a",
+        "jp": "うん。さとみ、{喜|よろこ}ぶかな。",
+        "en": "Yeah. I wonder if Satomi will like it."
+      },
+      {
+        "role": "b",
+        "jp": "きっと{喜|よろこ}ぶよ！",
+        "en": "I'm sure she will!"
       }
     ]
   },

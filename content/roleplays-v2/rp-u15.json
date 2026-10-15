@@ -45,9 +45,9 @@
     },
     {
       "role": "b",
-      "jp": "{明日|あした}は{雨|あめ}だから、{雨|あめ}が{降|ふ}る{前|まえ}に、{今日|きょう}{公園|こうえん}に{行|い}かない？",
-      "en": "It's going to rain tomorrow, so shall we go to the park today, before the rain?",
-      "cue": "rain tomorrow · before · park today?"
+      "jp": "{明日|あした}から{雨|あめ}だよ。{雨|あめ}が{降|ふ}る{前|まえ}に、{公園|こうえん}で{桜|さくら}を{見|み}ない？",
+      "en": "It's going to rain from tomorrow. Shall we go and see the blossoms in the park before it rains?",
+      "cue": "rain tomorrow · before · see blossoms?"
     },
     {
       "role": "a",

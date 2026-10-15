@@ -16,8 +16,8 @@
       "text": "Understand polite staff speech at a hotel, a restaurant or on the phone, and reply in everyday です/ます Japanese.",
       "check": {
         "kind": "listen",
-        "instructions": "You're checking in at a hotel. Listen to the clerk — you only need to understand this very polite Japanese, not use it. Your own replies can be plain です/ます (スミスです。よろしくお願いします。). Then answer the questions.",
-        "material": "いらっしゃいませ。お{名前|なまえ}を{伺|うかが}ってもよろしいでしょうか。\n……スミス{様|さま}でございますね。お{待|ま}ちしておりました。\n{今日|きょう}から{明後日|あさって}まで、お{二人|ふたり}{様|さま}ですね。お{部屋|へや}は805でございます。エレベーターは{右|みぎ}にございます。\n{朝|あさ}ご{飯|はん}は、{地下|ちか}のレストランで、{七時|しちじ}から{九時|くじ}まで{召|め}し{上|あ}がれます。\n{何|なに}かございましたら、いつでもお{電話|でんわ}ください。ごゆっくりどうぞ。",
+        "instructions": "You're checking in at a hotel. Listen to the clerk — you only need to understand this very polite Japanese, not use it. Your own replies can be everyday です/ます (スミスです。よろしく おねがいします。). Then answer the questions.",
+        "material": "いらっしゃいませ。お{名前|なまえ}を{伺|うかが}えますか。\n……スミス{様|さま}でございますね。お{待|ま}ちしておりました。\n{今日|きょう}から{明後日|あさって}まで、お{二人|ふたり}{様|さま}ですね。お{部屋|へや}は805でございます。エレベーターは{右|みぎ}にございます。\n{朝|あさ}ご{飯|はん}は、{地下|ちか}のレストランで、{七時|しちじ}から{九時|くじ}まで{召|め}し{上|あ}がれます。\n{何|なに}かございましたら、いつでもお{電話|でんわ}ください。ごゆっくりどうぞ。",
         "questions": [
           {
             "q": "How long are you staying?",
@@ -54,14 +54,14 @@
       "text": "Phone to make or change a booking, asking about what you don't know (what time it starts, whether there are seats).",
       "check": {
         "kind": "speak",
-        "instructions": "The restaurant has answered your call (the audio plays the greeting). Book a table using your note, and ask both questions on it with 〜か inside your sentence (窓の近くの席があるかどうか…, 何時まで開いているか…).",
+        "instructions": "The restaurant has answered your call (the audio plays the greeting). Book a table using your note, and ask both questions on it with 〜か inside your sentence (まどの ちかくの せきが あるか どうか…, なんじまで あいているか…).",
         "material": "（{電話|でんわ}）はい、レストラン・さくらでございます。\n\nあなたのメモ：{土曜日|どようび}　{夜|よる}{七時|しちじ}　{二人|ふたり}\n・{窓|まど}の{近|ちか}くの{席|せき}はある？\n・{何時|なんじ}まで{開|あ}いている？",
         "questions": [],
         "rubric": [
           "Gives the day, the time and the number of people clearly",
-          "Asks at least one question inside a sentence with 〜か or 〜かどうか (何時まで開いているか教えてください)",
+          "Asks at least one question inside a sentence with 〜か or 〜かどうか (なんじまで あいているか おしえてください)",
           "Stays in polite です/ます Japanese throughout",
-          "Confirms and thanks at the end (よろしくお願いします)"
+          "Confirms and thanks at the end (よろしく おねがいします)"
         ]
       }
     },
@@ -70,11 +70,11 @@
       "text": "Text your partner exactly where you are: just about to leave, on the way, or just arrived.",
       "check": {
         "kind": "write",
-        "instructions": "It's 6:40 p.m. and your partner sent you this. Reply with exactly where you are and when you'll get there, using 〜ところ (今出るところ / 今電車に乗っているところ / 今駅に着いたところ).",
+        "instructions": "It's 6:40 p.m. and your partner sent you this. Reply with exactly where you are and when you'll get there, using 〜ところ (いま でるところ / いま でんしゃに のっているところ / いま えきに ついたところ).",
         "material": "{今|いま}どこ？ もう{出|で}た？ {七時|しちじ}の{予約|よやく}だよ！",
         "questions": [],
         "rubric": [
-          "Says exactly where you are with 〜ところ (出るところ / 〜ているところ / 着いたところ)",
+          "Says exactly where you are with 〜ところ (でるところ / 〜ているところ / ついたところ)",
           "Gives an arrival time or how long it will take",
           "Keeps it short and natural, in casual LINE style"
         ]
@@ -129,8 +129,8 @@
       "a": "Customer calling to book (card A: dates, number of people, requests)",
       "b": "Restaurant staff (card B: free tables, course details, house rules)"
     },
-    "infoA": "You're the customer. Call Restaurant Sakura (レストラン・さくら) to book your anniversary (記念日) dinner: Saturday the 15th, 7:30 p.m., two people. If 7:30 is full, 7:00 or 8:00 is fine — nothing later. Find out, using 〜か inside your questions: whether there's a table (席があるかどうか), what the anniversary course (記念日コース) includes and what it costs, and whether you may bring your own cake (ケーキを持っていってもいいですか). Your partner doesn't eat raw fish (刺身) — ask if it can be changed. Your name is スミス; your phone number is 090-1234-5678. Everyday です/ます is perfect; you don't need keigo.",
-    "infoB": "You work at Restaurant Sakura. Answer the phone: お電話ありがとうございます。レストラン・さくらでございます。 Saturday the 15th: 7:30 is full (もう席がございません); 6:30 and 8:00 are free. Anniversary course: ¥8,000 per person including tax — soup, salad, sashimi, tempura, beef and dessert. Sashimi can be changed to grilled fish (焼いた魚). Cakes are fine if the customer tells you by the day before. You close at 10 p.m. Take the caller's name and phone number and read the booking back. Use the staff phrases: 少々お待ちください, 申し訳ありません, かしこまりました, お待ちしております.",
+    "infoA": "You're the customer. Call Restaurant Sakura (レストラン・さくら) to book your anniversary (きねんび) dinner: Saturday the 15th, 7:30 p.m., two people. If 7:30 is full, 7:00 or 8:00 is fine — nothing later. Find out, using 〜か inside your questions: whether there's a table (せきが あるか どうか), what the anniversary course (きねんび コース) includes and what it costs, and whether you may bring your own cake (ケーキを もっていっても いいですか). Your partner doesn't eat raw fish (さしみ) — ask if it can be changed. Your name is スミス; your phone number is 090-1234-5678. Everyday です/ます is perfect; you don't need keigo.",
+    "infoB": "You work at Restaurant Sakura. Answer the phone: おでんわ ありがとうございます。レストラン・さくらで ございます。 Saturday the 15th: 7:30 is full (もう せきが ございません); 6:30 and 8:00 are free. Anniversary course: ¥8,000 per person including tax — soup, salad, sashimi, tempura, beef and dessert. Sashimi can be changed to grilled fish (やいた さかな). Cakes are fine if the customer tells you by the day before. You close at 10 p.m. Take the caller's name and phone number and read the booking back. Use the staff phrases: しょうしょう おまちください, もうしわけ ありません, かしこまりました, おまちして おります.",
     "targets": [
       "grammar:embedded-questions",
       "grammar:temo-ii",
@@ -157,8 +157,8 @@
       },
       {
         "role": "b",
-        "jp": "ありがとうございます。いつがよろしいでしょうか。",
-        "en": "Thank you. When would you like to come?"
+        "jp": "ありがとうございます。ご{予約|よやく}はいつになさいますか。",
+        "en": "Thank you. When would you like to book for?"
       },
       {
         "role": "a",
@@ -182,13 +182,13 @@
       },
       {
         "role": "a",
-        "jp": "{刺身|さしみ}が{苦手|にがて}なんですが、{変|か}えていただけますか。",
-        "en": "I'm not keen on sashimi — could you change it?"
+        "jp": "{一人|ひとり}、{刺身|さしみ}が{苦手|にがて}なんですが、{変|か}えていただけますか。",
+        "en": "One of us isn't keen on sashimi — could you change it?"
       },
       {
         "role": "b",
-        "jp": "かしこまりました。{焼|や}いた{魚|さかな}にお{変|か}えします。",
-        "en": "Certainly. We'll change it to grilled fish."
+        "jp": "かしこまりました。{刺身|さしみ}を{焼|や}いた{魚|さかな}に{変|か}えておきます。",
+        "en": "Certainly. We'll change the sashimi to grilled fish for you."
       },
       {
         "role": "a",

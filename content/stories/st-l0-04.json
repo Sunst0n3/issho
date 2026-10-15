@@ -8,10 +8,13 @@
   "grammar": [
     "wa-desu",
     "no-possession",
+    "mo-also",
     "masu-forms",
     "wo-object",
     "time-telling",
     "ni-time-place",
+    "masu-past",
+    "i-adjectives",
     "arimasu-imasu",
     "to-with",
     "dictionary-form",
@@ -23,24 +26,32 @@
   ],
   "sentences": [
     {
-      "jp": "よるの／{七時|しちじ}です。",
-      "en": "It's seven in the evening."
+      "jp": "{冬|ふゆ}の／{夜|よる}、／{七時|しちじ}です。",
+      "en": "It's seven o'clock on a winter evening."
     },
     {
-      "jp": "{外|そと}は／{雨|あめ}です。",
-      "en": "It's raining outside."
+      "jp": "{外|そと}は／さむいです。",
+      "en": "It's cold outside."
     },
     {
       "jp": "エマは／{電車|でんしゃ}を／おりて、／{歩|ある}いて／うちへ／かえります。",
       "en": "Emma gets off the train and walks home."
     },
     {
-      "jp": "でも、／かさが／ありません。",
-      "en": "But she has no umbrella."
+      "jp": "{今日|きょう}の／しごとは／たいへんでした。",
+      "en": "Work was tough today."
     },
     {
-      "jp": "「ただいま！」",
-      "en": "\"I'm home!\""
+      "jp": "{電車|でんしゃ}も／さむかったです。",
+      "en": "The train was cold, too."
+    },
+    {
+      "jp": "エマは／つかれました。",
+      "en": "Emma is worn out."
+    },
+    {
+      "jp": "「ただいま…」",
+      "en": "\"I'm home...\""
     },
     {
       "jp": "「おかえりなさい！」",
@@ -51,20 +62,8 @@
       "en": "Ken is in the kitchen."
     },
     {
-      "jp": "「さむい！」",
-      "en": "\"It's cold!\""
-    },
-    {
-      "jp": "「{雨|あめ}、／すごいね。」",
-      "en": "\"What a lot of rain.\""
-    },
-    {
-      "jp": "「だいじょうぶ？」",
-      "en": "\"Are you okay?\""
-    },
-    {
-      "jp": "「おふろ、／{入|はい}る？」",
-      "en": "\"Want to have a bath?\""
+      "jp": "「おつかれさま！／おふろ、／{入|はい}る？」",
+      "en": "\"You must be tired! Want to have a bath?\""
     },
     {
       "jp": "「うん、／{入|はい}る。」",
@@ -87,39 +86,35 @@
       "en": "Warm soup, rice and fish."
     },
     {
-      "jp": "「すごい！」",
-      "en": "\"Wow!\""
+      "jp": "「すごい！／ケン、／ありがとう！」",
+      "en": "\"Wow! Thank you, Ken!\""
     },
     {
-      "jp": "「ケン、／ありがとう。」",
-      "en": "\"Thank you, Ken.\""
+      "jp": "「いただきます！」",
+      "en": "\"Let's eat!\""
     },
     {
       "jp": "ふたりは／いっしょに／{食|た}べます。",
       "en": "They eat together."
     },
     {
-      "jp": "{今日|きょう}、／エマの／しごとは／たいへんでした。",
-      "en": "Emma's work was tough today."
+      "jp": "「スープ、／おいしい！」",
+      "en": "\"This soup is delicious!\""
     },
     {
-      "jp": "でも、／ケンの／スープは／おいしかったです。",
-      "en": "But Ken's soup was delicious."
+      "jp": "エマは／もう／げんきです。",
+      "en": "Emma feels like herself again."
     },
     {
-      "jp": "エマは／うれしかったです。",
-      "en": "Emma was happy."
-    },
-    {
-      "jp": "あしたは／かさを／もって／{行|い}きます。",
-      "en": "Tomorrow she'll take an umbrella."
+      "jp": "「あしたの／ばんごはんは／わたし！」",
+      "en": "I'll do dinner tomorrow!"
     }
   ],
   "gist": {
-    "q": "What has Ken done when Emma gets home in the rain?",
+    "q": "What has Ken done when Emma gets home?",
     "options": [
       "He has made dinner for her",
-      "He has gone out to meet her with an umbrella",
+      "He has gone out to meet her at the station",
       "He has gone to bed"
     ],
     "answer": 0

@@ -13,7 +13,6 @@
     "potential-form",
     "tara-conditional",
     "te-imasu",
-    "te-kureru",
     "casual-speech"
   ],
   "sentences": [
@@ -26,36 +25,40 @@
       "en": "He has lots of meetings, he has a business trip, and he's working late every night."
     },
     {
-      "jp": "{日曜日|にちようび}の／{夜|よる}、／ミキは／{一週間|いっしゅうかん}の／{晩|ばん}ご{飯|はん}を／{作|つく}っておきました。",
-      "en": "On Sunday night, Miki made a week's worth of dinners in advance."
+      "jp": "{日曜日|にちようび}の／{夜|よる}、／ミキは／{月曜日|げつようび}から／{金曜日|きんようび}までの／{晩|ばん}ご{飯|はん}を／{作|つく}っておきました。",
+      "en": "On Sunday night, Miki made dinners for Monday to Friday in advance."
     },
     {
-      "jp": "カレーも／スープも／{作|つく}って、／{冷蔵庫|れいぞうこ}に／{入|い}れておきました。",
-      "en": "She made curry and soup too, and put them in the fridge."
+      "jp": "カレーと／おでんと／ぎょうざを／{作|つく}って、／{冷蔵庫|れいぞうこ}に／{入|い}れておきました。",
+      "en": "She made curry, oden and gyoza and put them in the fridge."
     },
     {
-      "jp": "「{電子|でんし}レンジで／{温|あたた}めれば、／すぐ／{食|た}べられるよ。」",
-      "en": "\"If you heat them in the microwave, you can eat right away.\""
+      "jp": "ケンも／シャツ／{五枚|ごまい}に／アイロンを／かけておきました。",
+      "en": "Ken ironed five shirts in advance, too."
+    },
+    {
+      "jp": "「{電子|でんし}レンジで／{温|あたた}めれば、／すぐ／{食|た}べられるよ。」と／ミキが／{言|い}いました。",
+      "en": "\"If you heat them up in the microwave, you can eat right away,\" Miki said."
     },
     {
       "jp": "「ありがとう！／{本当|ほんとう}に／{嬉|うれ}しい。」",
       "en": "\"Thank you! That makes me really happy.\""
     },
     {
-      "jp": "{月曜日|げつようび}、／ケンは／{会社|かいしゃ}で／{同僚|どうりょう}から／びっくりする／{話|はなし}を／{聞|き}きました。",
-      "en": "On Monday, Ken heard some surprising news from a coworker."
+      "jp": "{月曜日|げつようび}、／ケンは／{同僚|どうりょう}から／いい／{話|はなし}を／{聞|き}きました。",
+      "en": "On Monday, Ken heard some good news from a coworker."
     },
     {
-      "jp": "「{社長|しゃちょう}が／{来月|らいげつ}、／{会社|かいしゃ}を／{辞|や}めるそうですよ。」",
-      "en": "\"I heard the company president is leaving next month.\""
+      "jp": "「{金曜日|きんようび}の／{会議|かいぎ}は／なくなったそうですよ。」",
+      "en": "\"I heard Friday's meeting has been cancelled.\""
     },
     {
-      "jp": "「え、／{本当|ほんとう}ですか。」",
-      "en": "\"What, really?\""
+      "jp": "「よかった！／じゃあ、／{金曜日|きんようび}は／{早|はや}く／{帰|かえ}れますね。」",
+      "en": "\"Great! Then we can go home early on Friday.\""
     },
     {
-      "jp": "その／{日|ひ}、／ケンは／{夜|よる}{十時|じゅうじ}に／{帰|かえ}りました。",
-      "en": "That day, Ken got home at ten at night."
+      "jp": "その／{日|ひ}、／ケンは／{夜|よる}{十時|じゅうじ}に／{帰|かえ}って、／カレーを／{食|た}べました。",
+      "en": "That day, Ken got home at ten at night and had the curry."
     },
     {
       "jp": "{火曜日|かようび}は／{大阪|おおさか}に／{出張|しゅっちょう}でした。",
@@ -74,8 +77,12 @@
       "en": "His shoulders hurt, he was sleepy, and he still hadn't had dinner."
     },
     {
-      "jp": "でも、／{冷蔵庫|れいぞうこ}を／{開|あ}けたら、／ミキの／カレーが／ありました。",
-      "en": "But when he opened the fridge, there was Miki's curry."
+      "jp": "でも、／{冷蔵庫|れいぞうこ}を／{開|あ}けたら、／ミキの／おでんが／ありました。",
+      "en": "But when he opened the fridge, there was Miki's oden."
+    },
+    {
+      "jp": "{大根|だいこん}が／{柔|やわ}らかくて、／とても／おいしかったです。",
+      "en": "The daikon was soft and very tasty."
     },
     {
       "jp": "「ミキ、／ありがとう…。」",
@@ -102,16 +109,20 @@
       "en": "And he left the office at six."
     },
     {
-      "jp": "{居酒屋|いざかや}で、／{二人|ふたり}は／ビールで／{乾杯|かんぱい}しました。",
-      "en": "At the pub, they toasted with beer."
+      "jp": "{居酒屋|いざかや}で、／ケンは／ビール、／ミキは／ウーロン{茶|ちゃ}で／{乾杯|かんぱい}しました。",
+      "en": "At the pub, they toasted — Ken with beer, Miki with oolong tea."
+    },
+    {
+      "jp": "{焼|や}き{鳥|とり}も／{唐揚|からあ}げも／おいしかったです。",
+      "en": "The yakitori and the fried chicken were both delicious."
     },
     {
       "jp": "「{一週間|いっしゅうかん}、／お{疲|つか}れ{様|さま}！」",
       "en": "\"Well done this week!\""
     },
     {
-      "jp": "「ミキの／カレーの／おかげだよ。」",
-      "en": "\"It's all thanks to your curry.\""
+      "jp": "「ミキの／おでんの／おかげだよ。」",
+      "en": "\"It's all thanks to your oden.\""
     },
     {
       "jp": "「{来週|らいしゅう}は？」",

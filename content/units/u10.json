@@ -72,12 +72,12 @@
       "text": "Ask for and give permission when visiting someone's home (may I come in, sit here, take a photo?).",
       "check": {
         "kind": "speak",
-        "instructions": "You're visiting a friend's parents. The AI plays your friend's mother and says the lines below, one at a time. Ask permission politely with 〜てもいいですか at least twice (to come in, to sit down, to take a photo), and give permission when she asks you.",
-        "material": "ようこそ！ どうぞ。\nこちらにどうぞ。お{茶|ちゃ}はいかがですか。\nちょっと{暑|あつ}いですね。{窓|まど}を{開|あ}けてもいいですか。\nこれは{家族|かぞく}の{写真|しゃしん}ですよ。",
+        "instructions": "You're visiting a friend's parents. The AI plays your friend's mother and says the lines below, one at a time. Ask permission politely with 〜てもいいですか at least twice (to sit here, to look at the photos, to take a picture), and give permission when she asks you.",
+        "material": "ようこそ！ どうぞ、{入|はい}ってください。\nお{茶|ちゃ}はいかがですか。\nちょっと{暑|あつ}いですね。{窓|まど}を{開|あ}けてもいいですか。\nこれは{家族|かぞく}の{写真|しゃしん}ですよ。",
         "questions": [],
         "rubric": [
-          "Asks permission with 〜てもいいですか at least twice (入っても / 座っても / 写真を撮っても)",
-          "Makes the て-forms correctly (入って, 座って, 撮って)",
+          "Asks permission with 〜てもいいですか at least twice (ここに座っても / 見ても / 写真を撮っても)",
+          "Makes the て-forms correctly (座って, 見て, 撮って)",
           "Gives permission when asked (どうぞ / いいですよ)",
           "Stays polite with です / ます throughout"
         ]
@@ -111,7 +111,7 @@
       "b": "Has the names for the right of the photo, but can see only the left half (card B)"
     },
     "infoA": "Card A. Your friend Mari's notes on the LEFT of the photo (people 1–3): • お父さん (her dad): tall (背が高い), glasses (めがね), a great cook (料理が上手). • おばあさん (her grandma): short hair (髪が短い), loves sweet things (甘いものが大好き). • お兄さん (her big brother): short hair too, always funny (いつも面白い). What you can see — the RIGHT half (people 4–6): 4: long hair, holding a cake. 5: short hair, with a dog. 6: glasses, sitting on a chair. Describe 4–6 with は〜が (4番の人は髪が長い) and let your partner name them; then name 1–3 as your partner describes them (〜だと思う).",
-    "infoB": "Card B. Mari's notes on the RIGHT of the photo (people 4–6): • お母さん (her mum): long hair (髪が長い), makes great cakes (ケーキが上手). • 妹さん (her little sister): short hair, loves dogs and cats (犬や猫が大好き). • おじいさん (her grandpa): glasses, very kind (とても優しい). What you can see — the LEFT half (people 1–3): 1: short hair, eating cake. 2: tall, glasses, holding a frying pan (フライパン). 3: short hair, laughing. Name 4–6 as your partner describes them (〜だと思う), then describe 1–3 with は〜が.",
+    "infoB": "Card B. Mari's notes on the RIGHT of the photo (people 4–6): • お母さん (her mum): long hair (髪が長い), makes delicious cakes (お母さんのケーキはすごくおいしい). • 妹さん (her little sister): short hair, loves dogs and cats (犬や猫が大好き). • おじいさん (her grandpa): glasses, very kind (とても優しい). What you can see — the LEFT half (people 1–3): 1: short hair, eating cake. 2: tall, glasses, holding a frying pan (フライパン). 3: short hair, laughing. Name 4–6 as your partner describes them (〜だと思う), then describe 1–3 with は〜が.",
     "targets": [
       "grammar:wa-ga-description",
       "grammar:to-omou",
@@ -131,8 +131,8 @@
       },
       {
         "role": "b",
-        "jp": "{髪|かみ}が{長|なが}い？ じゃあ、お{母|かあ}さんだと{思|おも}う。ケーキがすごく{上手|じょうず}だよ。",
-        "en": "Long hair? Then I think it's her mum. She's brilliant at cakes."
+        "jp": "{髪|かみ}が{長|なが}い？ じゃあ、お{母|かあ}さんだと{思|おも}う。お{母|かあ}さんのケーキ、すごくおいしいよ。",
+        "en": "Long hair? Then I think it's her mum. Her cakes are delicious."
       },
       {
         "role": "a",
@@ -167,7 +167,7 @@
       {
         "role": "a",
         "jp": "ケーキ？ じゃあ、おばあさんだと{思|おも}う。{甘|あま}いものが{大好|だいす}きだよ。",
-        "en": "Cake? Then I think it’s her grandma. She loves sweet things."
+        "en": "Cake? Then I think it's her grandma. She loves sweet things."
       },
       {
         "role": "b",
