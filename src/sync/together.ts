@@ -19,7 +19,7 @@ import { addDays, weekStart } from '../srs/days.ts';
 import { creditTogetherSession } from '../srs/habits.ts';
 import { completeOutputCheck, learnerAiContext, pendingOutputChecks } from '../srs/output.ts';
 import { applyPartnerVerdicts } from '../srs/together.ts';
-import { aiCheck, aiStatus, ApiError, getQuizzes, getTogether, isPairedSettings, postTogetherEventRaw } from './client.ts';
+import { aiCheck, aiStatus, ApiError, getQuizzes, getTogether, isPairedSettings, pairingOwner, samePairingOwner, postTogetherEventRaw } from './client.ts';
 import { uuid } from './outbox.ts';
 import { onServerEvent, onStatusChange, sendClientEvent } from './socket.ts';
 
@@ -46,6 +46,7 @@ export async function postTogetherEvent(event: TogetherEvent, now: Date = new Da
     week: weekStart(dayKey(now)),
     event: JSON.stringify(event),
     attempts: 0,
+    owner: pairingOwner(await getSettings()),
   });
   void flushTogetherOutbox();
 }
@@ -55,7 +56,16 @@ async function flushOnce(): Promise<{ sent: number; blocked: boolean; remaining:
   if (!isPairedSettings(await getSettings())) return { sent: 0, blocked: true, remaining: await waiting() };
   let sent = 0;
   for (const row of await outbox().orderBy('createdAt').toArray()) {
-    if (row.failed) continue;
+    if (!row.owner) {
+      await outbox().update(row.clientId, { failed: 'unknown_pairing' });
+      continue;
+    }
+    if (!samePairingOwner(row.owner, pairingOwner(await getSettings()))) {
+      await outbox().update(row.clientId, { failed: 'other_pairing' });
+      continue;
+    }
+    if (row.failed === 'other_pairing') await outbox().update(row.clientId, { failed: undefined });
+    else if (row.failed) continue;
     let event: TogetherEvent;
     try {
       event = JSON.parse(row.event) as TogetherEvent;
@@ -64,9 +74,10 @@ async function flushOnce(): Promise<{ sent: number; blocked: boolean; remaining:
       continue;
     }
     try {
-      const state = await postTogetherEventRaw({ clientId: row.clientId, week: row.week, event });
+      const state = await postTogetherEventRaw({ clientId: row.clientId, week: row.week, event }, row.owner);
       await outbox().delete(row.clientId);
       sent++;
+      if (!samePairingOwner(row.owner, pairingOwner(await getSettings()))) continue;
       setState({ state, fetchedAt: Date.now(), offline: false });
       void creditRecentSessions(state);
       await mirrorPlan(state).catch((e: unknown) => console.warn('could not save the household plan', e));

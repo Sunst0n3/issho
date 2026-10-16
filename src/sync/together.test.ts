@@ -186,6 +186,26 @@ const rows = () => db.togetherOutbox.orderBy('createdAt').toArray();
 // ---- Tests ---------------------------------------------------------------------------------
 
 describe('postTogetherEvent', () => {
+  it('quarantines events after a member change and sends them only when their owner returns', async () => {
+    server.routes.events = () => new TypeError('offline');
+    await postTogetherEvent({ type: 'goal', goal: { text: 'private plan', targetDate: '2026-12-01' } });
+    await flushTogetherOutbox();
+    await updateSettings({ memberId: 'partner', deviceToken: 'partner-token' });
+    server.posted.length = 0;
+    server.routes.events = () => null;
+    expect(await flushTogetherOutbox()).toBe(0);
+    expect(server.posted).toHaveLength(0);
+    expect((await rows())[0].failed).toBe('other_pairing');
+    await updateSettings({ memberId: 'me', deviceToken: 'tok' });
+    expect(await flushTogetherOutbox()).toBe(1);
+  });
+
+  it('does not guess the owner of legacy events', async () => {
+    await db.togetherOutbox.put({ clientId: 'legacy', createdAt: new Date(), week: '2026-10-12', event: JSON.stringify({ type: 'goal', goal: { text: 'old', targetDate: '2026-12-01' } }), attempts: 0 });
+    expect(await flushTogetherOutbox()).toBe(0);
+    expect(server.posted).toHaveLength(0);
+    expect((await rows())[0].failed).toBe('unknown_pairing');
+  });
   it('queues offline, then flushes in order with the same clientIds once the server is back', async () => {
     server.routes.events = () => new TypeError('Failed to fetch');
     await postTogetherEvent({ type: 'slots', slots: [{ session: 'A', weekday: 2, time: '20:00' }] });

@@ -57,6 +57,10 @@ afterEach(() => {
 });
 
 describe('requests', () => {
+  it('treats a configured but temporarily unready model as retryable', async () => {
+    fetchMock.mockResolvedValueOnce(json({ ok: true, version: 'test', aiEnabled: true, aiReady: false, ttsEnabled: false }));
+    await expect(aiStatus()).resolves.toBe('unreachable');
+  });
   it('sends the bearer token and JSON body to the configured server', async () => {
     const msg: ChatMessage = { id: 7, clientId: 'c1', memberId: 'm1', createdAt: '2026-10-14T10:00:00Z', kind: 'text', text: 'おはよう' };
     fetchMock.mockResolvedValueOnce(json(msg));

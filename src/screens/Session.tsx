@@ -43,6 +43,7 @@ import { finishStep, planMakeup, planMicro, planToday, startSitting, type DayPla
 import { learnedToday, retention } from '../srs/progress.ts';
 import { packsFor, prefetchPacks, setDefaultAudioRate } from '../speech/audio.ts';
 import { pushStats, useHousehold } from '../sync/stats.ts';
+import { requestServerBackup } from '../sync/backups.ts';
 import '../components/study/study.css';
 
 type ShortMode = 'micro' | 'welcome' | 'makeup';
@@ -327,6 +328,7 @@ function SessionRun({ onRestart }: { onRestart: () => void }) {
         console.error('could not complete the session', e);
       }
       void pushStats({ immediate: true });
+      void requestServerBackup().catch((e: unknown) => console.warn('could not queue the server backup', e));
       setSummary(await summaryData(plan, state.learned, after).catch(() => ({ minutesToday: 0 })));
       // Keep the next days' audio close at hand.
       void (async () => {

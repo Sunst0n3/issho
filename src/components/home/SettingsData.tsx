@@ -1,13 +1,16 @@
 // Settings: backup, restore and reset (Data), and About.
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { version } from '../../../package.json';
+import type { BackupSnapshot } from '../../../shared/api.ts';
 import { BackupError, backupFileName, exportBackup, importBackup, type BackupImport } from '../../lib/backup.ts';
 import { loadAudioManifest } from '../../lib/data.ts';
-import { dayKey, db, updateSettings, type IsshoDB } from '../../lib/db.ts';
+import { dayKey, db, getSettings, updateSettings, type IsshoDB } from '../../lib/db.ts';
 import type { KanaScript } from '../../lib/types.ts';
 import { applyPlacement, PLACEMENT_ITEMS } from '../../srs/course.ts';
 import { planReviewDays } from '../../srs/habits.ts';
 import { pushStats } from '../../sync/stats.ts';
+import { requestServerBackup } from '../../sync/backups.ts';
+import { getServerBackup, isPairedSettings, listBackups, pairingOwner, samePairingOwner } from '../../sync/client.ts';
 import { useLive } from './useLive.ts';
 import { SettingsSection } from './SettingsStudy.tsx';
 import { plural } from './labels.ts';
@@ -102,6 +105,11 @@ export function DataSection() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<Message>();
   const [restore, setRestore] = useState<PendingRestore>();
+  const [snapshots, setSnapshots] = useState<BackupSnapshot[]>();
+  const backupSettings = useLive(getSettings, []);
+  const settings = backupSettings.status === 'ready' ? backupSettings.value : undefined;
+  const paired = settings && isPairedSettings(settings);
+  const ownBackup = settings && samePairingOwner(settings.serverBackupOwner, pairingOwner(settings));
   const [resetOpen, setResetOpen] = useState(false);
   const [typed, setTyped] = useState('');
   const resetWord = useRef<HTMLInputElement>(null);
@@ -153,6 +161,14 @@ export function DataSection() {
     });
   };
 
+  const onServerRestore = (id: string) => run(async () => {
+    const backup = await importBackup(await getServerBackup(id));
+    const [items, reviewLogs] = await Promise.all([db.items.count(), db.reviewLogs.count()]);
+    setRestore({ backup, here: { items, reviewLogs } });
+    setResetOpen(false);
+    return { ok: true, text: 'Server backup checked. Confirm below to restore it.' };
+  });
+
   const onRestore = (backup: BackupImport) => run(async () => {
     await backup.apply();
     setRestore(undefined);
@@ -177,8 +193,33 @@ export function DataSection() {
     <SettingsSection id="set-data" title="Data">
       <div className="set-row">
         <p className="hm-hint">
-          Your progress lives only on this phone. Save a backup now and then, or before changing phones.
+          Progress is saved on this phone. When connected, completed sessions also back up to your home server, which keeps your fourteen latest snapshots. Keep a manual copy before changing phones.
         </p>
+        <p className="hm-hint" role="status">
+          {ownBackup && settings?.serverBackupCompletedAt
+            ? `Last server backup: ${new Date(settings.serverBackupCompletedAt).toLocaleString()}.`
+            : 'No server backup confirmed on this phone yet.'}
+          {settings?.serverBackupPending && ' A backup is waiting for your home server.'}
+        </p>
+        {paired && <>
+          <div className="set-buttons">
+            <button type="button" className="btn secondary small" disabled={busy} onClick={() => void run(async () => {
+              await requestServerBackup();
+              return (await getSettings()).serverBackupPending
+                ? { ok: false, text: 'Backup is waiting. Check that your home server is running and up to date. Manual export is available below.' }
+                : { ok: true, text: 'Progress backed up to your home server.' };
+            })}>Back up to server now</button>
+            <button type="button" className="btn secondary small" disabled={busy} onClick={() => void run(async () => {
+              const found = await listBackups(); setSnapshots(found);
+              return { ok: true, text: found.length ? 'Choose a snapshot to check before restoring.' : 'No server snapshots yet. Back up this phone first.' };
+            })}>Find server backups</button>
+          </div>
+          {snapshots?.map((snapshot) => <p key={snapshot.id}>
+            <button type="button" className="btn ghost small" disabled={busy} onClick={() => void onServerRestore(snapshot.id)}>
+              Restore snapshot from {new Date(snapshot.createdAt).toLocaleString()}
+            </button>
+          </p>)}
+        </>}
         <div className="set-buttons">
           <button type="button" className="btn secondary small" onClick={() => void onExport()} disabled={busy}>
             Export backup

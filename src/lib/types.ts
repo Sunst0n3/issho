@@ -729,6 +729,8 @@ export interface TogetherOutboxRecord {
   event: string;
   attempts: number;
   failed?: string;
+  /** Events may only be delivered as the member and household that queued them. */
+  owner?: LastPairing;
 }
 
 /** A partner quiz this phone took part in; idempotency for applying verdicts. */
@@ -822,6 +824,10 @@ export interface Settings {
   householdName?: string;
   /** Kept across unpairing: the chat cache and unsent messages belong to that household. */
   lastPairing?: LastPairing;
+  serverBackupRequestedAt?: string;
+  serverBackupCompletedAt?: string;
+  serverBackupPending?: boolean;
+  serverBackupOwner?: LastPairing;
 }
 
 export interface LastPairing {

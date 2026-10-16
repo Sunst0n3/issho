@@ -143,6 +143,7 @@ export function ConnectServerForm({ onConnected, onSkip, compact }: {
         <input ref={nameRef} id={`${id}-name`} className="text-input" value={nameValue} maxLength={40}
           autoComplete="given-name" onChange={(e) => setName(e.target.value)} {...invalidProps('name', `${id}-name-hint`)} />
         <span id={`${id}-name-hint`} className="tg-field-hint">This is how your partner sees you.</span>
+        <p className="tg-field-hint">This browser keeps one learner's progress. Changing the connected name does not switch progress. Use another device or browser profile for another learner.</p>
       </div>
       <div className="tg-field">
         <label htmlFor={`${id}-code`}>Household code</label>

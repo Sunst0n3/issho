@@ -238,6 +238,9 @@ export async function importBackup(file: Blob): Promise<BackupImport> {
           householdName: current.householdName, lastPairing: current.lastPairing,
         }
         : { deviceToken: undefined, memberId: undefined, householdName: undefined, lastPairing: current.lastPairing };
+      // A restore is local until its next snapshot succeeds; old backup timestamps are not evidence of protection.
+      Object.assign(pairing, { serverBackupRequestedAt: new Date().toISOString(), serverBackupPending: true,
+        serverBackupCompletedAt: current.serverBackupCompletedAt, serverBackupOwner: current.serverBackupOwner });
       // A backup made before onboarding has no settings row; keep this device's.
       const settings = backupSettings.length ? backupSettings.map((s) => ({ ...s, ...pairing })) : [current];
       await db.transaction('rw', db.tables, async () => {

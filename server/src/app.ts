@@ -16,6 +16,7 @@ import { clientErrorCode, HttpError } from './errors.ts';
 import { Hub } from './hub.ts';
 import { RateLimiter } from './rate-limit.ts';
 import { aiRoutes } from './routes/ai.ts';
+import { backupRoutes } from './routes/backups.ts';
 import { healthRoutes } from './routes/health.ts';
 import { meRoutes } from './routes/me.ts';
 import { messageRoutes } from './routes/messages.ts';
@@ -153,6 +154,7 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
   await app.register(async (api) => {
     api.addHook('onRequest', authHook(ctx, (request) => bearerToken(request.headers.authorization)));
     meRoutes(api, ctx);
+    backupRoutes(api, ctx);
     statsRoutes(api, ctx);
     messageRoutes(api, ctx);
     voiceRoutes(api, ctx);

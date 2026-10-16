@@ -15,6 +15,7 @@ import type {
   AiRolePlayResponse,
   AiTranslateRequest,
   AiTranslateResponse,
+  BackupSnapshot,
   ChatMessage,
   CreateQuizRequest,
   HealthResponse,
@@ -191,6 +192,8 @@ async function forgetPairing(): Promise<void> {
 }
 
 interface RequestOptions {
+  /** Offline work is bound to the identity that created it. */
+  owner?: LastPairing;
   method?: 'GET' | 'POST' | 'PATCH';
   /** JSON-serialized unless it is FormData. */
   body?: unknown;
@@ -212,6 +215,7 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   const { method = 'GET', body, auth = true, timeoutMs = DEFAULT_TIMEOUT_MS, as = 'json', forgetIfUnauthorized = true, signal } = opts;
   if (signal?.aborted) throw abortedError();
   const settings = await getSettings();
+  if (opts.owner && !samePairingOwner(opts.owner, pairingOwner(settings))) throw new ApiError(0, 'other_pairing');
   const url = endpoint(opts.serverUrl ?? settings.serverUrl, path);
   const headers: Record<string, string> = { Accept: as === 'json' ? 'application/json' : '*/*' };
   if (auth) {
@@ -299,10 +303,35 @@ export type AiStatus = 'on' | 'off' | 'unreachable';
 export async function aiStatus(): Promise<AiStatus> {
   try {
     if (!isPairedSettings(await getSettings())) return 'off';
-    return (await health()).aiEnabled === true ? 'on' : 'off';
+    const status = await health();
+    if (!status.aiEnabled) return 'off';
+    return status.aiReady === false ? 'unreachable' : 'on';
   } catch (e) {
     return e instanceof ApiError && e.code === 'invalid_server_url' ? 'off' : 'unreachable';
   }
+}
+
+/** Captures the learner identity even while deliberately disconnected. */
+export function pairingOwner(settings: Settings): LastPairing | undefined {
+  if (!settings.memberId) return settings.lastPairing;
+  return { memberId: settings.memberId, serverUrl: normalizeServerUrl(settings.serverUrl ?? ''),
+    householdId: settings.lastPairing?.householdId };
+}
+
+export function samePairingOwner(a: LastPairing | undefined, b: LastPairing | undefined): boolean {
+  if (!a || !b || a.memberId !== b.memberId) return false;
+  return a.householdId && b.householdId ? a.householdId === b.householdId
+    : normalizeServerUrl(a.serverUrl) === normalizeServerUrl(b.serverUrl);
+}
+
+export function uploadBackup(backup: unknown, owner?: LastPairing): Promise<BackupSnapshot> {
+  return request('/api/backups', { method: 'POST', body: backup, timeoutMs: SLOW_TIMEOUT_MS, owner });
+}
+
+export function listBackups(): Promise<BackupSnapshot[]> { return request('/api/backups'); }
+
+export function getServerBackup(id: string): Promise<Blob> {
+  return request(`/api/backups/${encodeURIComponent(id)}`, { as: 'blob', timeoutMs: SLOW_TIMEOUT_MS });
 }
 
 /** POST /api/register. Low level: prefer pair(), which also stores the result. */
@@ -492,8 +521,8 @@ export function getTogether(): Promise<TogetherState> {
  * POST /api/together/events (idempotent by clientId). Low level: prefer postTogetherEvent() in
  * together.ts, which queues the event so it is never lost offline.
  */
-export function postTogetherEventRaw(req: TogetherEventRequest): Promise<TogetherState> {
-  return request('/api/together/events', { method: 'POST', body: req });
+export function postTogetherEventRaw(req: TogetherEventRequest, owner?: LastPairing): Promise<TogetherState> {
+  return request('/api/together/events', { method: 'POST', body: req, owner });
 }
 
 /**

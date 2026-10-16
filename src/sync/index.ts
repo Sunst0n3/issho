@@ -5,6 +5,7 @@
 // progress changes.
 
 import { liveQuery } from 'dexie';
+import { startServerBackups } from './backups.ts';
 import { db, DEFAULT_SETTINGS } from '../lib/db.ts';
 import type { DayRecord } from '../lib/types.ts';
 import { socketUrl } from './client.ts';
@@ -19,7 +20,7 @@ let stopSync: (() => void) | null = null;
 export function startSync(): () => void {
   if (stopSync) return stopSync;
 
-  const stops = [startOutbox(), startChat(), startHousehold(), startTogetherSync()];
+  const stops = [startOutbox(), startChat(), startHousehold(), startTogetherSync(), startServerBackups()];
 
   let pairing: string | undefined;
   const settingsSub = liveQuery(() => db.settings.get('me')).subscribe({

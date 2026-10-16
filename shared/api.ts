@@ -12,8 +12,17 @@ export interface HealthResponse {
   ok: true;
   version: string;
   aiEnabled: boolean;
+  /** Configured provider is ready now; older servers omit this. */
+  aiReady?: boolean;
   /** A VOICEVOX engine answered recently: POST /api/tts works. */
   ttsEnabled: boolean;
+}
+
+/** A private, recoverable learning snapshot belonging to the authenticated member. */
+export interface BackupSnapshot {
+  id: string;
+  createdAt: string;
+  bytes: number;
 }
 
 // POST /api/register — join the household from a new device.
