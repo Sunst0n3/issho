@@ -28,6 +28,25 @@ describe('config', () => {
     assert.equal(config.ttsCacheMb, 300);
   });
 
+  it('selects providers explicitly and preserves legacy Anthropic settings', () => {
+    const config = (env: NodeJS.ProcessEnv = {}) => loadConfig({ HOUSEHOLD_CODE: 'secret', ...env });
+    assert.equal(config().aiProvider, 'off');
+    assert.equal(config({ ANTHROPIC_API_KEY: 'test' }).aiProvider, 'anthropic');
+    assert.equal(config({ AI_PROVIDER: 'off', ANTHROPIC_API_KEY: 'test' }).aiProvider, 'off');
+    const local = config({ AI_PROVIDER: 'ollama', AI_BASE_URL: ' http://ollama:11434/ ' });
+    assert.equal(local.aiProvider, 'ollama');
+    assert.equal(local.aiBaseUrl, 'http://ollama:11434');
+    assert.equal(local.aiModel, 'qwen3.5:4b-q4_K_M');
+    assert.equal(config({ AI_PROVIDER: 'anthropic', ANTHROPIC_API_KEY: 'test', AI_MODEL: 'custom' }).aiModel, 'custom');
+    assert.equal(config({ ANTHROPIC_API_KEY: 'test', ANTHROPIC_MODEL: 'legacy' }).aiModel, 'legacy');
+    for (const env of [
+      { AI_PROVIDER: 'typo' }, { AI_PROVIDER: 'anthropic' },
+      { AI_PROVIDER: 'ollama', AI_BASE_URL: 'file:///tmp/model' },
+      { AI_PROVIDER: 'ollama', AI_BASE_URL: 'http://user:pass@localhost:11434' },
+      { AI_PROVIDER: 'ollama', AI_BASE_URL: 'http://localhost:11434/?secret=1' },
+    ]) assert.throws(() => config(env), ConfigError);
+  });
+
   it('reads overrides', () => {
     const config = loadConfig({
       HOUSEHOLD_CODE: 'secret',

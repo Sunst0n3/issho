@@ -22,6 +22,7 @@ import {
   AiError,
   charDiff,
   createAnthropicAi,
+  createOllamaAi,
   grammarTitlesLoader,
   locate,
   type AiService,
@@ -367,6 +368,122 @@ describe('Anthropic AI service', () => {
     } as unknown as Anthropic;
     const ai = createAnthropicAi({ apiKey: 'test', model: 'm', client });
     await assert.rejects(ai.translate({ english: 'hi' }), TypeError);
+  });
+});
+
+describe('Ollama AI service', () => {
+  const answer = { japanese: 'こんにちは', romaji: 'konnichiwa', note: '' };
+  const reply = (value: unknown) => Response.json({ done: true, message: { content: JSON.stringify(value) } });
+  it('uses native schema output with bounded inference and the existing prompts', async () => {
+    const requests: { url: string; body: any }[] = [];
+    const ai = createOllamaAi({ baseUrl: 'http://ollama:11434/', model: 'qwen3.5:4b-q4_K_M', fetch: async (url, init) => {
+      requests.push({ url: String(url), body: JSON.parse(String(init?.body)) });
+      return reply(answer);
+    } });
+    assert.deepEqual(await ai.translate({ english: 'hello' }), answer);
+    assert.equal(requests[0].url, 'http://ollama:11434/api/chat');
+    const body = requests[0].body;
+    assert.equal(body.model, 'qwen3.5:4b-q4_K_M');
+    assert.equal(body.stream, false);
+    assert.equal(body.think, false);
+    assert.equal(body.options.num_ctx, 4096);
+    assert.ok(body.options.num_predict <= 2048);
+    assert.equal(body.options.temperature, 0.2);
+    assert.equal(body.keep_alive, '5m');
+    assert.equal(body.format.type, 'object');
+    assert.deepEqual(Object.keys(body.format.properties), ['japanese', 'romaji', 'note']);
+    assert.equal(body.messages[0].role, 'system');
+    assert.match(body.messages[1].content, /<english>\nhello/);
+    assert.equal('output_config' in body, false);
+  });
+
+  it('rejects malformed, incomplete and schema-invalid output without returning a correction', async () => {
+    for (const response of [reply({ japanese: 1 }), Response.json({ done: true, message: { content: 'not json' } }),
+      Response.json({ done: false, message: { content: JSON.stringify(answer) } }),
+      Response.json({ done: true, done_reason: 'length', message: { content: JSON.stringify(answer) } })]) {
+      const ai = createOllamaAi({ baseUrl: 'http://ollama:11434', model: 'm', fetch: async () => response });
+      await assert.rejects(ai.translate({ english: 'hi' }), { code: 'ai_bad_output' });
+    }
+  });
+
+  it('maps unavailable and missing model failures without falling back to Anthropic', async () => {
+    for (const [status, code] of [[404, 'ai_unavailable'], [503, 'ai_unavailable']] as const) {
+      const ai = createOllamaAi({ baseUrl: 'http://ollama:11434', model: 'm', fetch: async () => Response.json({ error: 'no' }, { status }) });
+      await assert.rejects(ai.translate({ english: 'hi' }), { code });
+    }
+  });
+
+  it('serializes inference, bounds the waiting queue, and releases after a failure', async () => {
+    let release!: () => void;
+    let calls = 0;
+    const ai = createOllamaAi({ baseUrl: 'http://ollama:11434', model: 'm', fetch: async () => {
+      calls++;
+      if (calls === 1) await new Promise<void>((resolve) => { release = resolve; });
+      return calls === 1 ? Response.json({}, { status: 503 }) : reply(answer);
+    } });
+    const first = assert.rejects(ai.translate({ english: 'one' }), { code: 'ai_unavailable' });
+    await new Promise((resolve) => setImmediate(resolve));
+    const second = ai.translate({ english: 'two' });
+    await assert.rejects(ai.translate({ english: 'three' }), { code: 'ai_unavailable' });
+    assert.equal(calls, 1);
+    release();
+    await first;
+    assert.deepEqual(await second, answer);
+    assert.equal(calls, 2);
+  });
+
+  it('aborts inference at its whole-call deadline', async () => {
+    let aborted = false;
+    const ai = createOllamaAi({ baseUrl: 'http://ollama:11434', model: 'm', deadlineMs: 20, fetch: async (_url, init) => {
+      await new Promise((_resolve, reject) => init?.signal?.addEventListener('abort', () => {
+        aborted = true; reject(init.signal?.reason);
+      }));
+      return reply(answer);
+    } });
+    // AbortSignal.timeout uses an unref timer.
+    const keepAlive = setTimeout(() => {}, 200);
+    try { await assert.rejects(ai.translate({ english: 'hi' }), { code: 'ai_unavailable' }); }
+    finally { clearTimeout(keepAlive); }
+    assert.equal(aborted, true);
+  });
+
+  it('expires a queued request without sending it to the engine or blocking the next caller', async () => {
+    let release!: () => void;
+    let calls = 0;
+    const ai = createOllamaAi({ baseUrl: 'http://ollama:11434', model: 'm', deadlineMs: 25, fetch: async () => {
+      calls++;
+      // Deliberately hold the active fetch even through its abort, to isolate queue expiration.
+      if (calls === 1) await new Promise<void>((resolve) => { release = resolve; });
+      return reply(answer);
+    } });
+    const first = ai.translate({ english: 'one' }).catch(() => undefined);
+    await new Promise((resolve) => setImmediate(resolve));
+    const keepAlive = setTimeout(() => {}, 200);
+    try {
+      await assert.rejects(ai.translate({ english: 'expires in queue' }), { code: 'ai_unavailable' });
+      assert.equal(calls, 1);
+      const next = ai.translate({ english: 'next' });
+      release();
+      await first;
+      assert.deepEqual(await next, answer);
+      assert.equal(calls, 2);
+    } finally { clearTimeout(keepAlive); release(); }
+  });
+
+  it('health reflects model installation and recovers when the engine returns', async () => {
+    let ready = false;
+    const ai = createOllamaAi({ baseUrl: 'http://ollama:11434', model: 'm', fetch: async (url) => {
+      assert.equal(String(url), 'http://ollama:11434/api/tags');
+      if (!ready) throw new TypeError('offline');
+      return Response.json({ models: [{ name: 'm' }] });
+    } });
+    const server = await createTestServer({ ai });
+    try {
+      assert.equal((await server.app.inject('/api/health')).json().aiEnabled, true);
+      assert.equal((await server.app.inject('/api/health')).json().aiReady, false);
+      ready = true;
+      assert.equal((await server.app.inject('/api/health')).json().aiReady, true);
+    } finally { await server.close(); }
   });
 });
 

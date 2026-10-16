@@ -54,3 +54,46 @@ services:
       timeout: 5s
       start_period: 120s
       retries: 3
+
+  # Optional local AI. Enable ONE profile: ai-gpu (NVIDIA Container Toolkit required) or ai-cpu.
+  # In server/.env set AI_PROVIDER=ollama, AI_BASE_URL=http://ollama:11434,
+  # and AI_MODEL=qwen3.5:4b-q4_K_M. Start the selected engine, then install its model:
+  #   docker compose --profile ai-gpu up -d --build
+  #   docker compose exec ollama-gpu ollama pull qwen3.5:4b-q4_K_M
+  # For CPU use --profile ai-cpu and exec ollama-cpu instead (slower; calls still time out at 40s).
+  # No dependency on the engine: Issho starts with AI unavailable while it warms up or is offline.
+  ollama-cpu: &ollama
+    image: ollama/ollama:latest
+    profiles: ["ai-cpu"]
+    restart: unless-stopped
+    cpus: 4
+    mem_limit: 8g
+    environment:
+      OLLAMA_NUM_PARALLEL: "1"
+      OLLAMA_MAX_LOADED_MODELS: "1"
+      OLLAMA_CONTEXT_LENGTH: "4096"
+      OLLAMA_KEEP_ALIVE: "5m"
+      OLLAMA_FLASH_ATTENTION: "1"
+      OLLAMA_KV_CACHE_TYPE: q8_0
+      # Reserve 1 GiB of the 3060 Ti's VRAM for other processes.
+      OLLAMA_GPU_OVERHEAD: "1073741824"
+    volumes:
+      - ollama-models:/root/.ollama
+    networks:
+      default:
+        aliases: [ollama]
+    # No published model port: phones reach only Issho's authenticated AI routes.
+
+  ollama-gpu:
+    <<: *ollama
+    profiles: ["ai-gpu"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  ollama-models:

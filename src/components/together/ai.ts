@@ -1,4 +1,4 @@
-// Whether the home server has the AI helper turned on, asked once per session,
+// Whether the home server has the AI helper turned on, refreshed while mounted,
 // and friendly wording for the helper's errors.
 
 import { useEffect, useState, useSyncExternalStore } from 'react';
@@ -15,11 +15,13 @@ export type AiProblem = 'ai_misconfigured' | 'ai_unavailable';
  * or model points at the server's setup; an erroring API is nothing to fix at home.
  */
 export const AI_BROKEN_NOTICE: Record<AiProblem, string> = {
-  ai_misconfigured: "The AI helper isn't working — check the server's API key.",
+  ai_misconfigured: "The AI helper isn't working — check the server's AI provider and model settings.",
   ai_unavailable: "The AI helper isn't answering right now, so messages send without a check.",
 };
 
+const REFRESH_MS = 30_000;
 let known: Promise<boolean> | null = null;
+let expiresAt = 0;
 let problem: AiProblem | undefined;
 /** Bumps whenever the session's verdict changes, so mounted screens re-ask. */
 let version = 0;
@@ -37,8 +39,13 @@ function subscribe(cb: () => void) {
 
 /** Resolves false when the helper is off or the server can't be asked right now. */
 export function aiAvailable(): Promise<boolean> {
-  if (!known) {
-    const asking = health().then((h) => h.aiEnabled === true);
+  if (!known || Date.now() >= expiresAt) {
+    const asking: Promise<boolean> = health().then((h) => {
+      const ready = h.aiEnabled === true && h.aiReady !== false;
+      if (known === asking && ready && problem) { problem = undefined; changed(); }
+      return ready;
+    });
+    expiresAt = Date.now() + REFRESH_MS;
     known = asking;
     // Only a real answer is remembered; an unreachable server is asked again next time.
     asking.catch(() => { if (known === asking) known = null; });
@@ -46,29 +53,31 @@ export function aiAvailable(): Promise<boolean> {
   return known.catch(() => false);
 }
 
-/** The server said 'ai_disabled' after all: hide the helper for the rest of the session. */
+/** Hide the helper until the next readiness refresh after a server configuration change. */
 export function markAiDisabled(): void {
   known = Promise.resolve(false);
+  expiresAt = Date.now() + REFRESH_MS;
   changed();
 }
 
-/** The helper's failure when it is a server-side problem that won't fix itself, else undefined. */
+/** A server-side failure, including an engine that can recover by itself. */
 export function aiProblemOf(e: unknown): AiProblem | undefined {
   const code = e instanceof ApiError ? e.code : undefined;
   return code === 'ai_misconfigured' || code === 'ai_unavailable' ? code : undefined;
 }
 
 /**
- * The helper failed on the server's side: stop asking it for the rest of the session
- * (messages go without a check), and remember why so Settings can say so.
+ * A failed engine gets a short pause. Mounted screens retry readiness after the pause,
+ * so a warming or restarted local engine becomes usable without reloading the app.
  */
 export function markAiBroken(why: AiProblem): void {
-  problem ??= why;
+  problem = why;
   known = Promise.resolve(false);
+  expiresAt = Date.now() + REFRESH_MS;
   changed();
 }
 
-/** Why the helper isn't working this session, if it failed on the server's side. */
+/** The latest helper failure, cleared when readiness recovers. */
 export function aiProblem(): AiProblem | undefined {
   return problem;
 }
@@ -81,6 +90,7 @@ export function useAiProblem(): AiProblem | undefined {
 /** For tests. */
 export function resetAiAvailability(): void {
   known = null;
+  expiresAt = 0;
   problem = undefined;
   changed();
 }
@@ -93,10 +103,12 @@ export function useAiAvailable(reachable: boolean): boolean {
   const [on, setOn] = useState(false);
   const verdict = useSyncExternalStore(subscribe, () => version, () => version);
   useEffect(() => {
-    if (!reachable) return;
+    if (!reachable) { setOn(false); return; }
     let live = true;
-    void aiAvailable().then((v) => { if (live) setOn(v); });
-    return () => { live = false; };
+    const refresh = () => { void aiAvailable().then((v) => { if (live) setOn(v); }); };
+    refresh();
+    const timer = setInterval(refresh, REFRESH_MS);
+    return () => { live = false; clearInterval(timer); };
   }, [reachable, verdict]);
   return on;
 }

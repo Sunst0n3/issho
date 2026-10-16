@@ -1,5 +1,5 @@
 import { accessSync, constants, mkdirSync } from 'node:fs';
-import { createAnthropicAi } from './ai.ts';
+import { createAnthropicAi, createOllamaAi } from './ai.ts';
 import { buildApp, loggerOptions } from './app.ts';
 import { ConfigError, dataPaths, loadConfig, type Config } from './config.ts';
 import { Store } from './db.ts';
@@ -32,9 +32,11 @@ try {
 }
 
 const store = new Store(dataPaths(config.dataDir).database);
-const ai = config.anthropicApiKey
-  ? createAnthropicAi({ apiKey: config.anthropicApiKey, model: config.anthropicModel })
-  : null;
+const ai = config.aiProvider === 'ollama'
+  ? createOllamaAi({ baseUrl: config.aiBaseUrl, model: config.aiModel })
+  : config.aiProvider === 'anthropic' && config.anthropicApiKey
+    ? createAnthropicAi({ apiKey: config.anthropicApiKey, model: config.aiModel })
+    : null;
 const tts = config.voicevoxUrl
   ? createVoicevoxTts({ baseUrl: config.voicevoxUrl, cacheDir: dataPaths(config.dataDir).tts, maxCacheMb: config.ttsCacheMb })
   : null;
@@ -78,7 +80,8 @@ app.log.info(
   {
     household: store.householdName() ?? config.householdName,
     aiEnabled: ai !== null,
-    model: ai ? config.anthropicModel : undefined,
+    aiProvider: config.aiProvider,
+    model: ai ? config.aiModel : undefined,
     // The engine may still be starting (its image warms up for a while); /api/health follows it.
     tts: tts ? config.voicevoxUrl : 'off',
   },

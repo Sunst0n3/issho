@@ -26,6 +26,8 @@ export type GrammarTitles = ReadonlyMap<string, string>;
 
 /** The AI helper behind /api/ai/*. Injected into the app so tests can stub it. */
 export interface AiService {
+  /** Local engines can be configured while still starting or missing their model. */
+  available?(): Promise<boolean>;
   check(request: AiCheckRequest, grammar?: GrammarTitles): Promise<AiCheckResponse>;
   translate(request: AiTranslateRequest): Promise<AiTranslateResponse>;
   rolePlay(request: AiRolePlayRequest, grammar?: GrammarTitles): Promise<AiRolePlayResponse>;
@@ -236,6 +238,109 @@ export function createAnthropicAi(options: AnthropicAiOptions): AiService {
     return output;
   }
 
+  return createAiService(ask);
+}
+
+export interface OllamaAiOptions {
+  baseUrl: string;
+  model: string;
+  /** Override native fetch and the whole-call deadline for tests. */
+  fetch?: typeof fetch;
+  deadlineMs?: number;
+}
+
+/** Native Ollama transport: all learner prompts and response finishing stay shared. */
+export function createOllamaAi(options: OllamaAiOptions): AiService {
+  const request = options.fetch ?? fetch;
+  const baseUrl = options.baseUrl.replace(/\/+$/, '');
+  const deadlineMs = options.deadlineMs ?? DEADLINE_MS;
+  let active = false;
+  // A household can have one inference running and one waiting. More work should retry later,
+  // rather than consuming the game server's memory or a caller's entire timeout in a backlog.
+  let waiting: (() => void) | undefined;
+
+  async function acquire(signal: AbortSignal): Promise<void> {
+    if (!active) { active = true; return; }
+    if (waiting) throw new AiError(503, 'ai_unavailable');
+    await new Promise<void>((resolve, reject) => {
+      const ready = () => {
+        signal.removeEventListener('abort', abort);
+        resolve();
+      };
+      const abort = () => {
+        if (waiting === ready) waiting = undefined;
+        reject(new AiError(503, 'ai_unavailable'));
+      };
+      waiting = ready;
+      signal.addEventListener('abort', abort, { once: true });
+      if (signal.aborted) abort();
+    });
+  }
+
+  function release(): void {
+    const next = waiting;
+    waiting = undefined;
+    if (next) next();
+    else active = false;
+  }
+
+  const ask: Ask = async (schema, system, user) => {
+    const signal = AbortSignal.timeout(deadlineMs);
+    await acquire(signal);
+    try {
+      signal.throwIfAborted();
+      const response = await request(`${baseUrl}/api/chat`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        signal,
+        body: JSON.stringify({
+          model: options.model,
+          messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
+          stream: false,
+          think: false,
+          format: z.toJSONSchema(schema),
+          options: { num_ctx: 4096, num_predict: 1536, temperature: 0.2 },
+          keep_alive: '5m',
+        }),
+      });
+      if (!response.ok) {
+        // A missing local model can become ready after its pull finishes; keep queued checks retryable.
+        throw new AiError(response.status === 404 ? 503 : 502, 'ai_unavailable');
+      }
+      const envelope = z.object({
+        done: z.literal(true),
+        done_reason: z.string().optional(),
+        message: z.object({ content: z.string() }),
+      }).safeParse(await response.json());
+      if (!envelope.success || envelope.data.done_reason === 'length') throw new AiError(502, 'ai_bad_output');
+      const output = schema.safeParse(JSON.parse(envelope.data.message.content));
+      if (!output.success) throw new AiError(502, 'ai_bad_output');
+      return output.data;
+    } catch (error) {
+      if (error instanceof AiError) throw error;
+      if (error instanceof SyntaxError) throw new AiError(502, 'ai_bad_output', { cause: error });
+      throw new AiError(503, 'ai_unavailable', { cause: error });
+    } finally {
+      release();
+    }
+  };
+
+  return {
+    ...createAiService(ask),
+    async available() {
+      try {
+        const response = await request(`${baseUrl}/api/tags`, { signal: AbortSignal.timeout(1500) });
+        if (!response.ok) return false;
+        const models = z.object({ models: z.array(z.object({ name: z.string() })) }).safeParse(await response.json());
+        return models.success && models.data.models.some(({ name }) => name === options.model);
+      } catch { return false; }
+    },
+  };
+}
+
+type Ask = <S extends z.ZodType>(schema: S, system: string, user: string) => Promise<z.output<S>>;
+
+function createAiService(ask: Ask): AiService {
   return {
     async check(request, grammar) {
       const reveal = request.mode !== 'prompt';
@@ -567,4 +672,3 @@ function toAiError(error: unknown): unknown {
   if (error instanceof Anthropic.AnthropicError) return new AiError(502, 'ai_bad_output', { cause: error });
   return error;
 }
-

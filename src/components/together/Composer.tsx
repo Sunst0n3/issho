@@ -26,7 +26,7 @@ import { MicButton } from './MicButton.tsx';
 import { TranslateSheet } from './TranslateSheet.tsx';
 
 /** After this long the check is abandoned and the message can go as written. */
-export const CHECK_TIMEOUT_MS = 10_000;
+export const CHECK_TIMEOUT_MS = 45_000;
 /** The home server rejects longer messages for good. */
 export const MAX_MESSAGE_LENGTH = 2000;
 /** At most this many issues are shown, whatever the server sends. */

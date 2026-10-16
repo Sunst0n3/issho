@@ -8,6 +8,7 @@ export function healthRoutes(app: FastifyInstance, ctx: AppContext): void {
     ok: true,
     version: ctx.version,
     aiEnabled: ctx.ai !== null,
+    aiReady: ctx.ai ? await (ctx.ai.available?.() ?? true) : false,
     // The TTS service answers from its last background check, so this never waits on the engine.
     ttsEnabled: ctx.tts?.available() ?? false,
   }));

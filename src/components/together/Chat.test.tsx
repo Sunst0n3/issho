@@ -399,7 +399,7 @@ describe('Chat', () => {
     await typeAndSend('ただいま');
 
     expect(await screen.findByText(/Checking your message/)).toBeTruthy();
-    expect(mocks.withTimeout).toHaveBeenCalledWith(expect.any(Promise), 10_000);
+    expect(mocks.withTimeout).toHaveBeenCalledWith(expect.any(Promise), 45_000);
     expect(mocks.queueChatMessage).not.toHaveBeenCalled();
     giveUp();
     await waitFor(() => expect(mocks.queueChatMessage).toHaveBeenCalledWith({ kind: 'text', text: 'ただいま' }));
@@ -461,7 +461,7 @@ describe('Chat', () => {
   });
 
   it.each([
-    ['ai_misconfigured', "The AI helper isn't working — check the server's API key."],
+    ['ai_misconfigured', "The AI helper isn't working — check the server's AI provider and model settings."],
     // The API itself erroring isn't a setup problem: don't send anyone to check the key.
     ['ai_unavailable', "The AI helper isn't answering right now, so messages send without a check."],
   ] as const)('says once that the helper is broken (%s), then sends without checking', async (code, notice) => {

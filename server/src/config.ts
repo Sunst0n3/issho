@@ -12,6 +12,9 @@ export interface Config {
   householdCode: string;
   /** HOUSEHOLD_NAME. A name set with the admin CLI (stored in the database) takes precedence. */
   householdName: string;
+  aiProvider: 'off' | 'anthropic' | 'ollama';
+  aiBaseUrl: string;
+  aiModel: string;
   anthropicApiKey: string | null;
   anthropicModel: string;
   /**
@@ -44,7 +47,28 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     );
   }
 
+  const anthropicApiKey = env.ANTHROPIC_API_KEY?.trim() || null;
+  const aiProvider = env.AI_PROVIDER?.trim() || (anthropicApiKey ? 'anthropic' : 'off');
+  if (!['off', 'anthropic', 'ollama'].includes(aiProvider)) {
+    throw new ConfigError('AI_PROVIDER must be off, anthropic or ollama.');
+  }
+  if (aiProvider === 'anthropic' && !anthropicApiKey) {
+    throw new ConfigError('ANTHROPIC_API_KEY is required when AI_PROVIDER=anthropic.');
+  }
+  const aiBaseUrl = env.AI_BASE_URL?.trim().replace(/\/+$/, '') || 'http://127.0.0.1:11434';
+  if (aiProvider === 'ollama') {
+    let url: URL;
+    try { url = new URL(aiBaseUrl); }
+    catch { throw new ConfigError('AI_BASE_URL must be an http(s) address.'); }
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password || url.search || url.hash) {
+      throw new ConfigError('AI_BASE_URL must be an http(s) address without credentials, query or fragment.');
+    }
+  }
+
   return {
+    aiProvider: aiProvider as Config['aiProvider'],
+    aiBaseUrl,
+    aiModel: env.AI_MODEL?.trim() || (aiProvider === 'ollama' ? 'qwen3.5:4b-q4_K_M' : env.ANTHROPIC_MODEL?.trim() || DEFAULT_ANTHROPIC_MODEL),
     port: parsePort(env.PORT),
     host: env.HOST?.trim() || '0.0.0.0',
     ...loadAdminConfig(env),
