@@ -15,6 +15,7 @@ import {
   pickRead,
   pickStory,
   recordStoryStep,
+  readyStoryIds,
   resetReadingMemory,
   storyCoverage,
   stretchStories,
@@ -117,18 +118,36 @@ describe('stories', () => {
 
   it('never picks a story below 98 % for a first read', () => {
     expect(storyCoverage(story('low', 979, 1000), isKnown)).toBe(0.979);
-    expect(pickStory([story('low', 979, 1000)], { isKnown, progress: new Map(), today: TODAY })).toBeNull();
-    expect(pickStory([story('ok', 98, 100)], { isKnown, progress: new Map(), today: TODAY })).toEqual({ storyId: 'ok', step: 'rwl', shared: false });
+    expect(pickStory([story('low', 979, 1000)], { isKnown, grammarKnown: new Set<string>(), progress: new Map(), today: TODAY })).toBeNull();
+    expect(pickStory([story('ok', 98, 100)], { isKnown, grammarKnown: new Set<string>(), progress: new Map(), today: TODAY })).toEqual({ storyId: 'ok', step: 'rwl', shared: false });
   });
 
   it('prefers a due listen step, then the shared story, then level order', () => {
     const stories = [story('a', 100, 100, { level: 'start' }), story('b', 100, 100), story('shared', 100, 100, { level: 'L1' })];
     const listenDue: StoryProgressRecord = { storyId: 'b', stage: 1, firstDay: addDays(TODAY, -3), nextDay: TODAY, gist: [true], cpm: [] };
-    expect(pickStory(stories, { isKnown, progress: new Map([['b', listenDue]]), today: TODAY, sharedStoryId: 'shared' }))
+    expect(pickStory(stories, { isKnown, grammarKnown: new Set<string>(), progress: new Map([['b', listenDue]]), today: TODAY, sharedStoryId: 'shared' }))
       .toEqual({ storyId: 'b', step: 'listen', shared: false });
-    expect(pickStory(stories, { isKnown, progress: new Map(), today: TODAY, sharedStoryId: 'shared' }))
+    expect(pickStory(stories, { isKnown, grammarKnown: new Set<string>(), progress: new Map(), today: TODAY, sharedStoryId: 'shared' }))
       .toEqual({ storyId: 'shared', step: 'rwl', shared: true });
-    expect(pickStory(stories, { isKnown, progress: new Map(), today: TODAY })).toEqual({ storyId: 'a', step: 'rwl', shared: false });
+    expect(pickStory(stories, { isKnown, grammarKnown: new Set<string>(), progress: new Map(), today: TODAY })).toEqual({ storyId: 'a', step: 'rwl', shared: false });
+  });
+
+  it('requires all grammar for a fresh story, including a shared story', () => {
+    const gated = story('gated', 100, 100, { grammar: ['wa-desu', 'nai-form'] });
+    const ctx = { isKnown, grammarKnown: new Set(['wa-desu']), progress: new Map(), today: TODAY, sharedStoryId: 'gated' };
+    expect(pickStory([gated], ctx)).toBeNull();
+    expect(pickStory([gated], { ...ctx, grammarKnown: new Set(gated.grammar) })?.storyId).toBe('gated');
+    const started: StoryProgressRecord = { storyId: gated.id, stage: 1, firstDay: addDays(TODAY, -3), nextDay: TODAY, gist: [], cpm: [] };
+    expect(pickStory([gated], { ...ctx, progress: new Map([[gated.id, started]]) })?.step).toBe('listen');
+  });
+
+  it('publishes readiness only after both words and grammar are introduced', async () => {
+    fixtures.stories = [story('ready', 100, 100), story('gated', 100, 100, { grammar: ['wa-desu'] })];
+    await introduceItem('word', 'k', at(2026, 3, 1));
+    await gradeCard('word:k|read', Rating.Good, { durationMs: 1, mode: 'typed', now: at(2026, 3, 2) });
+    expect(await readyStoryIds(at(2026, 3, 20))).toEqual(['ready']);
+    await introduceItem('grammar', 'wa-desu', at(2026, 3, 3));
+    expect(await readyStoryIds(at(2026, 3, 20))).toEqual(['gated', 'ready']);
   });
 
   it('offers stretch stories between 95 % and 98 %', () => {
@@ -183,6 +202,17 @@ describe('pickRead', () => {
     expect(plan.story).toEqual({ storyId: 'st', step: 'rwl', shared: false });
     expect(plan.sentences).toHaveLength(1);
     expect(plan.minutes).toBe(3);
+  });
+
+  it('passes grammar readiness through the real read planner', async () => {
+    await setup(30_000);
+    fixtures.stories[0].grammar = ['wa-desu'];
+    const before = await pickRead({ minutes: 3, sharedStoryId: 'st' }, NOW);
+    expect(before.story).toBeUndefined();
+    expect(before.sentences.length).toBeGreaterThan(0);
+    await introduceItem('grammar', 'wa-desu', at(2026, 3, 19));
+    expect((await pickRead({ minutes: 3, sharedStoryId: 'st' }, NOW)).story)
+      .toEqual({ storyId: 'st', step: 'rwl', shared: true });
   });
 
   it('plans a story in whole minutes, as Today shows them', async () => {

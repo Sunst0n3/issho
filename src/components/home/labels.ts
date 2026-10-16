@@ -1,12 +1,12 @@
 // Wording shared by the home screens: daily minutes, dates, greetings, counts.
 import type { DailyMinutes, TogetherSlot } from '../../lib/types.ts';
 
-/** What each daily budget gives in a year, from the final-plan simulation (simF5, 2 seeds). */
+/** Session size guidance; annual introductions vary with reviews, accuracy and days studied. */
 export const MINUTES_NOTES: Record<DailyMinutes, string> = {
-  20: 'about 165–175 kanji, 1,300 words in a year',
-  25: 'about 270–310 kanji, 1,550 words in a year',
-  30: 'about 350 kanji, 1,800 words in a year',
-  40: 'about 530 kanji, 2,400 words in a year',
+  20: 'A lighter daily session, with room to build a habit',
+  25: 'A steady daily session for reviews and new material',
+  30: 'More daily time for reviews, reading and new material',
+  40: 'A longer daily session with more room for practice',
 };
 
 export const MINUTES_TITLES: Record<DailyMinutes, string> = {

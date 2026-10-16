@@ -159,6 +159,44 @@
           }
         ]
       }
+    },
+    {
+      "id": "u01-cd6",
+      "text": "Recognise familiar casual replies between partners: yes, no, agreement, thanks and an apology.",
+      "check": {
+        "kind": "listen",
+        "instructions": "These are whole expressions from your early words, used with your partner: うん (yes), ううん (no), そう (right), ありがとう (thanks), ごめん (sorry), and いいね (sounds good). Recognise the complete chunks; you do not need to form new casual verb endings yet. Listen to three short exchanges at home, then choose what the replies mean. You can play them twice.",
+        "material": "「ごめん。」\n「ううん。」\n\n「ありがとう。」\n「うん。」\n\n「いいね。」\n「そう。」",
+        "questions": [
+          {
+            "q": "In the first exchange, your partner replies ううん to your apology. What are they doing?",
+            "options": [
+              "Rejecting the need to apologise: no, it is okay",
+              "Saying yes, they agree",
+              "Thanking you"
+            ],
+            "answer": 0
+          },
+          {
+            "q": "In the second exchange, how does うん differ from ううん in the first?",
+            "options": [
+              "Both mean no",
+              "うん is yes; ううん is no",
+              "うん is a formal apology"
+            ],
+            "answer": 1
+          },
+          {
+            "q": "In the last exchange, which reply means “right / that is so”?",
+            "options": [
+              "ごめん",
+              "ありがとう",
+              "そう"
+            ],
+            "answer": 2
+          }
+        ]
+      }
     }
   ],
   "conversation": "rp-u01",

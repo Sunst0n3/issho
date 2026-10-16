@@ -110,6 +110,7 @@ export default function Onboarding() {
   const [finishing, setFinishing] = useState(false);
   const [error, setError] = useState<string>();
   const finished = useRef(false);
+  const finishAfterKana = useRef(false);
   const edited = useRef(false);
   /** The together slots were posted to the household during the together step. */
   const posted = useRef(false);
@@ -206,14 +207,13 @@ export default function Onboarding() {
     setFinishing(true);
     setError(undefined);
     try {
-      const s = await updateSettings({ name: name.trim(), planReviewDays: planReviewDays(dayKey()), onboarded: true });
+      const s = await updateSettings({ name: name.trim(), planReviewDays: planReviewDays(dayKey()), onboarded: true,
+        togetherSlots: saved?.togetherSlots.length ? saved.togetherSlots : completeSlots(slots) });
       void shareWithHousehold(s);
       void requestPersistentStorage();
       setDone(true);
-      // Back past the steps to where onboarding began, which then becomes Today
-      // (below), so the back gesture on Today doesn't walk through old steps.
-      if (depth > 0) navigate(-depth);
-      else navigate('/', { replace: true });
+      // Rendering one redirect below also handles Back into an old setup entry.
+      // Do not race the browser's asynchronous history.go() against the app gate.
     } catch {
       finished.current = false;
       setFinishing(false);
@@ -239,7 +239,8 @@ export default function Onboarding() {
   /** A status line already says how the script goes (its check was taken, or passed before). */
   const settled = (script: KanaScript) => knows[script] && (placement[script] !== undefined || passedBefore(script));
 
-  const startKanaChecks = async () => {
+  const startKanaChecks = async (quick = false) => {
+    finishAfterKana.current = quick;
     edited.current = true;
     setError(undefined);
     // Switched off after its check passed: the pass is undone, so the sprint teaches the script.
@@ -254,7 +255,7 @@ export default function Onboarding() {
       setPlacement((p) => Object.fromEntries(Object.entries(p).filter(([s]) => !withdrawn.includes(s as KanaScript))));
     }
     const queue = SCRIPTS.filter((s) => knows[s] && !placement[s] && !passedBefore(s));
-    if (!queue.length) go('habit');
+    if (!queue.length) { if (quick) await finish(); else go('habit'); }
     else setKanaPhase({ kind: 'check', script: queue[0], queue: queue.slice(1) });
   };
 
@@ -273,11 +274,11 @@ export default function Onboarding() {
     if (queue.length) setKanaPhase({ kind: 'check', script: queue[0], queue: queue.slice(1) });
     else {
       setKanaPhase({ kind: 'ask' });
-      go('habit');
+      if (finishAfterKana.current) void finish(); else go('habit');
     }
   };
 
-  if (done && depth === 0) return <Navigate to="/" replace />;
+  if (done || saved?.onboarded) return <Navigate to="/" replace />;
   // Later steps need the name (pairing uses it): a reload or link there without one starts at the name.
   if (saved && !done && index > STEPS.indexOf('name') && !name.trim()) {
     return <Navigate to={{ search: stepSearch('name') }} replace />;
@@ -334,7 +335,7 @@ export default function Onboarding() {
           footer={<button type="button" className="btn primary block" onClick={() => void saveAndGo({ dailyMinutes: minutes }, 'kana')}>Continue</button>}
         >
           <MinutesOptions value={minutes} onChange={(m) => { edited.current = true; setMinutes(m); }} legend="Minutes each day" />
-          <p className="hm-hint">These are estimates from a simulated year. You can change the time any day in Settings.</p>
+          <p className="hm-hint">Your pace follows your reviews and study time. You can change the time any day in Settings.</p>
         </StepFrame>
       );
       break;
@@ -358,7 +359,10 @@ export default function Onboarding() {
         <StepFrame
           title="Do you already know kana?"
           lead="Hiragana and katakana are the two Japanese alphabets. If you know one, a quick check lets you skip its lessons."
-          footer={<button type="button" className="btn primary block" onClick={() => void startKanaChecks()}>Continue</button>}
+          footer={<>
+            <button type="button" className="btn primary block" onClick={() => void startKanaChecks(true)} disabled={finishing}>Start learning</button>
+            <button type="button" className="btn ghost block" onClick={() => void startKanaChecks()} disabled={finishing}>Set up my routine first</button>
+          </>}
         >
           <div className="card onboard-switches">
             <Switch label={<>I know hiragana <span className="hm-kana-sample" lang="ja">あいう</span></>}
@@ -378,6 +382,7 @@ export default function Onboarding() {
             <p key={s} className="hm-hint" role="status">Switched off: the sprint teaches {s} from the start.</p>
           ))}
           {sprintHint() && <p className="hm-hint">{sprintHint()}</p>}
+          <p className="hm-hint">Habits, reminders and partner connection can wait until after your first lesson. Find them in Settings and Together.</p>
         </StepFrame>
       );
       break;
@@ -469,8 +474,8 @@ export default function Onboarding() {
         {index > 0
           ? <button type="button" className="icon-btn" aria-label="Back" onClick={back} disabled={finishing}><Icon name="back" size={22} /></button>
           : <span className="onboard-spacer" aria-hidden="true" />}
-        <ProgressBar value={(index + 1) / STEPS.length} label="Setup progress" />
-        <span className="onboard-step">Step {index + 1} of {STEPS.length}</span>
+        <ProgressBar value={index < 4 ? (index + 1) / 4 : (index - 3) / 4} label="Setup progress" />
+        <span className="onboard-step">{index < 4 ? `Step ${index + 1} of 4` : `Optional setup ${index - 3} of 4`}</span>
       </div>
       {error && <p className="hm-error" role="alert">{error}</p>}
       {/* Until the saved answers are read, a tap could move on without them (and lose the saved name). */}

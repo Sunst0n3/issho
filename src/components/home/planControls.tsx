@@ -21,7 +21,7 @@ export function MinutesOptions({ value, onChange, legend = 'Minutes each day' }:
           <input type="radio" name={name} value={m} checked={m === value} onChange={() => onChange(m)} />
           <span className="hm-option-main">
             <span className="hm-option-title">{m} min a day · {MINUTES_TITLES[m]}</span>
-            <span className="hm-option-detail">At this pace: {MINUTES_NOTES[m]}.</span>
+            <span className="hm-option-detail">What to expect: {MINUTES_NOTES[m]}.</span>
           </span>
           {m === DEFAULT_MINUTES && <span className="chip ai">Suggested</span>}
         </label>

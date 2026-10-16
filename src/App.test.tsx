@@ -21,7 +21,6 @@ vi.mock('./screens/Today.tsx', async () => {
   const { Link } = await import('react-router-dom');
   return { default: () => <><h1>Today screen</h1><Link to="/settings">Settings</Link></> };
 });
-vi.mock('./screens/Onboarding.tsx', () => ({ default: () => <h1>Welcome screen</h1> }));
 vi.mock('./screens/Settings.tsx', () => ({ default: () => <h1>Settings screen</h1> }));
 vi.mock('./screens/LearnHub.tsx', () => ({ default: () => <h1>Learn screen</h1> }));
 vi.mock('./screens/WritePractice.tsx', () => ({ default: () => <h1>Write screen</h1> }));
@@ -110,7 +109,7 @@ describe('App', () => {
   it('sends a learner who has not onboarded to the welcome screen from any page', async () => {
     await updateSettings({ onboarded: false });
     renderApp('/settings');
-    expect(await screen.findByRole('heading', { name: 'Welcome screen' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: 'Japanese, together' })).toBeTruthy();
     expect(where()).toBe('/welcome');
   });
 

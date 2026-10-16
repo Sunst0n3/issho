@@ -5,7 +5,7 @@ import { loadCurriculum, loadKanji, loadStories, loadWordInfo, type WordInfo } f
 import { dayKey, db, itemId } from '../../lib/db.ts';
 import type { CardRecord, Curriculum, CurriculumUnit, ItemRecord, KanjiEntry, ReviewLogRecord, StoryEntry, StoryProgressRecord } from '../../lib/types.ts';
 import { isLearned } from '../../srs/progress.ts';
-import { EASY_COVERAGE, loadKnownWords, storyCoverage, stretchStories } from '../../srs/readListen.ts';
+import { EASY_COVERAGE, grammarIntroduced, loadKnownWords, storyCoverage, storyGrammarKnown, stretchStories } from '../../srs/readListen.ts';
 
 /** How many upcoming kanji are marked "next up". */
 export const NEXT_UP = 5;
@@ -142,12 +142,13 @@ export interface StoryShelves {
 }
 
 /** pure */
-export function storyShelves(stories: readonly StoryEntry[], isKnown: (ref: string) => boolean, progress: ReadonlyMap<string, StoryProgressRecord>): StoryShelves {
+export function storyShelves(stories: readonly StoryEntry[], isKnown: (ref: string) => boolean, progress: ReadonlyMap<string, StoryProgressRecord>, grammarKnown: ReadonlySet<string>): StoryShelves {
   const stretchIds = new Set(stretchStories(stories, isKnown).map((s) => s.id));
   const shelves: StoryShelves = { easy: [], stretch: [], read: [], later: 0 };
   for (const story of stories) {
     const view: StoryView = { story, coverage: storyCoverage(story, isKnown), progress: progress.get(story.id) };
     if (view.progress && view.progress.stage > 0) shelves.read.push(view);
+    else if (!storyGrammarKnown(story, grammarKnown)) shelves.later++;
     else if (view.coverage >= EASY_COVERAGE) shelves.easy.push(view);
     else if (stretchIds.has(story.id)) shelves.stretch.push(view);
     else shelves.later++;
@@ -156,6 +157,6 @@ export function storyShelves(stories: readonly StoryEntry[], isKnown: (ref: stri
 }
 
 export async function loadStoryShelves(): Promise<StoryShelves> {
-  const [stories, known, progress] = await Promise.all([loadStories(), loadKnownWords(), db.stories.toArray()]);
-  return storyShelves(stories, (ref) => known.isKnown(ref), new Map(progress.map((p) => [p.storyId, p])));
+  const [stories, known, progress, grammarKnown] = await Promise.all([loadStories(), loadKnownWords(), db.stories.toArray(), grammarIntroduced()]);
+  return storyShelves(stories, (ref) => known.isKnown(ref), new Map(progress.map((p) => [p.storyId, p])), grammarKnown);
 }

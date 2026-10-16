@@ -75,7 +75,7 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-const next = () => fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+const next = () => fireEvent.click(screen.queryByRole('button', { name: 'Continue' }) ?? screen.getByRole('button', { name: 'Set up my routine first' }));
 
 async function throughName(name = 'Sam') {
   fireEvent.click(await screen.findByRole('button', { name: 'Get started' }));
@@ -119,13 +119,13 @@ describe('Onboarding', () => {
   it('walks through every step and saves the plan', async () => {
     renderAt('/welcome', '/welcome', <Onboarding />);
     expect(await screen.findByRole('heading', { name: 'Japanese, together' })).toBeTruthy();
-    expect(screen.getByText('Step 1 of 8')).toBeTruthy();
+    expect(screen.getByText('Step 1 of 4')).toBeTruthy();
     await throughName('  Sam ');
 
     // Minutes: 25 is the default, with the simulated notes.
     expect((screen.getByRole('radio', { name: /25 min a day/ }) as HTMLInputElement).checked).toBe(true);
-    expect(screen.getByText(/about 270–310 kanji, 1,550 words in a year/)).toBeTruthy();
-    expect(screen.getByText(/about 165–175 kanji, 1,300 words in a year/)).toBeTruthy();
+    expect(screen.getByText(/A steady daily session/)).toBeTruthy();
+    expect(screen.getByText(/A lighter daily session/)).toBeTruthy();
     fireEvent.click(screen.getByRole('radio', { name: /30 min a day/ }));
     next();
 
@@ -176,7 +176,7 @@ describe('Onboarding', () => {
     next();
 
     await screen.findByRole('heading', { name: 'Study together' });
-    expect(screen.getByText('Step 8 of 8')).toBeTruthy();
+    expect(screen.getByText('Optional setup 4 of 4')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Not now' }));
 
     expect(await screen.findByText('Home screen')).toBeTruthy();
@@ -478,7 +478,7 @@ describe('Onboarding', () => {
     await updateSettings({ name: 'Kim' });
     renderWithHistory('/welcome?step=habit');
     expect(await screen.findByRole('heading', { name: 'When will you study?' })).toBeTruthy();
-    expect(screen.getByText('Step 5 of 8')).toBeTruthy();
+    expect(screen.getByText('Optional setup 1 of 4')).toBeTruthy();
   });
 
   it('asks for the name first when a later step is opened without one', async () => {
@@ -496,7 +496,7 @@ describe('Onboarding', () => {
     expect(await screen.findByText('Home screen')).toBeTruthy();
     expect(at()).toBe('/');
     browserBack();
-    expect(screen.getByText('Home screen')).toBeTruthy();
+    expect(await screen.findByText('Home screen')).toBeTruthy();
   });
 
   it('goes back a step without losing answers', async () => {

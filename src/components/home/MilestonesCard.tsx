@@ -32,7 +32,7 @@ export function MilestonesCard({ counts }: { counts: Counts }) {
     <section className="card hm-stat-card" aria-labelledby="milestones-title">
       <h2 id="milestones-title" className="hm-section-title">Milestones</h2>
       <p className="hm-hint">
-        Targets at 25 minutes a day. You: {counts.kanjiIntroduced.toLocaleString()} kanji,{' '}
+        Introduction targets; your pace depends on reviews and study time. You: {counts.kanjiIntroduced.toLocaleString()} kanji,{' '}
         {counts.wordsIntroduced.toLocaleString()} words, {counts.grammarIntroduced.toLocaleString()} grammar points.
       </p>
       <ol className="hm-milestones">
@@ -46,7 +46,7 @@ export function MilestonesCard({ counts }: { counts: Counts }) {
               </span>
               <span className="hm-milestone-text">
                 <span className="hm-milestone-title">
-                  {m.id} · around day {m.day.toLocaleString()}
+                  {m.id}
                   {reached && <span className="visually-hidden"> (reached)</span>}
                 </span>
                 <span className="hm-hint">{targetText(m, counts.kanaTotal)}</span>

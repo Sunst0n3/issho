@@ -4,6 +4,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { canDoAvailable, gradeCanDoQuestions } from '../src/srs/candos.ts';
 import { rubyToPlain } from '../src/lib/ruby.ts';
 import type { CoreWord, PreToken, RolePlay, UnitSpec, WordEntry } from '../src/lib/types.ts';
 import { mergeContent, readContentSources } from './lib/content.ts';
@@ -59,6 +60,28 @@ describe('content units', () => {
       expect(u.capstone.structures.length, `u${u.id}`).toBeGreaterThanOrEqual(MIN_CAPSTONE_STRUCTURES);
       for (const s of u.capstone.structures) expect(unitOf.get(s)!, `u${u.id} ${s}`).toBeLessThanOrEqual(u.id);
     }
+  });
+
+  it('offers a unit-1 casual-expression recognition bridge without moving systematic plain grammar', () => {
+    const unit = units[0];
+    const cd = unit.canDos.find((c) => c.id === 'u01-cd6');
+    expect(cd).toBeDefined();
+    expect(cd!.check.kind).toBe('listen');
+    expect(cd!.ready).toBe(true);
+    expect(canDoAvailable(cd!, unit, new Set(unit.grammar))).toBe(true);
+    expect(canDoAvailable(cd!, unit, new Set())).toBe(false);
+    expect(cd!.check.instructions).toContain('whole expressions');
+    // These familiar chunks are taught in the early core stream, not new conjugations.
+    for (const kana of ['うん', 'ううん', 'そう', 'ありがとう', 'ごめん', 'いいね']) {
+      const word = core.find((w) => w.kana === kana);
+      expect(word, kana).toBeDefined();
+      expect(word!.order, kana).toBeLessThanOrEqual(40);
+      expect(cd!.check.material, kana).toContain(kana);
+    }
+    expect(gradeCanDoQuestions(cd!, cd!.check.questions.map((q) => q.answer)).passed).toBe(true);
+    expect(cd!.check.questions).toHaveLength(3);
+    expect(unit.grammar).not.toContain('dictionary-form');
+    expect(['dictionary-form', 'nai-form', 'casual-past'].map((id) => grammarOrder.get(id))).toEqual([29, 38, 44]);
   });
 
   it('target only core words and grammar that exist', () => {

@@ -90,13 +90,24 @@ describe('spokenMatches', () => {
     expect(spokenMatches('こおひい', { written: 'コーヒー', readings: ['こーひー', 'こおひい'] })).toBe(true);
   });
 
-  it('accepts a near miss at 0.75 similarity and refuses a different word', () => {
+  it('refuses near misses unless an accepted form is explicitly listed', () => {
     const word = { written: '図書館', readings: ['としょかん'] };
     // One kana off in five: 0.8.
-    expect(spokenMatches('としょかに', word)).toBe(true);
+    expect(spokenMatches('としょかに', word)).toBe(false);
+    expect(spokenMatches('としょかに', { ...word, readings: [...word.readings, 'としょかに'] })).toBe(true);
     // Two off in five: 0.6.
     expect(spokenMatches('としかに', word)).toBe(false);
     expect(spokenMatches('びょういん', word)).toBe(false);
+  });
+
+  it.each([
+    ['せんしゅう', 'こんしゅう'],
+    ['びよういん', 'びょういん'],
+    ['どようび', 'かようび'],
+    ['おばあさん', 'おかあさん'],
+    ['ニュース', 'ジュース'],
+  ])('does not credit %s for %s', (heard, expected) => {
+    expect(spokenMatches(heard, { readings: [expected] })).toBe(false);
   });
 
   it('refuses empty or punctuation-only transcripts', () => {

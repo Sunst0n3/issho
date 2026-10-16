@@ -152,6 +152,11 @@ export function exampleSentenceFor(ref: string, sentences: readonly SentenceEntr
 // ---------------------------------------------------------------------------
 
 export const STORY_LADDER = { listen: 3, reread: 10 } as const;
+/** Grammar readiness is separate from lexical coverage, which excludes function words. */
+export function storyGrammarKnown(story: StoryEntry, grammarKnown: ReadonlySet<string>): boolean {
+  return story.grammar.every((g) => grammarKnown.has(g));
+}
+
 export interface StoryPick { storyId: string; step: 'rwl' | 'listen'; shared: boolean }
 
 const LEVEL_RANK: Record<StoryLevel, number> = { start: 0, L0: 1, L1: 2 };
@@ -162,11 +167,11 @@ function byLevel(a: StoryEntry, b: StoryEntry): number {
 
 /**
  * pure. Priority: (1) a 'listen' step due (stage 1, nextDay ≤ today); (2) the shared weekly story at stage 0
- * with coverage ≥ 0.98; (3) a stage-0 story with coverage ≥ 0.98, by level (start, L0, L1), unit, id. Never below 0.98.
+ * with coverage ≥ 0.98 and all grammar introduced; (3) a stage-0 story with the same gates, by level (start, L0, L1), unit, id. Never below 0.98.
  */
 export function pickStory(
   stories: readonly StoryEntry[],
-  ctx: { isKnown: (ref: string) => boolean; progress: ReadonlyMap<string, StoryProgressRecord>; today: string; sharedStoryId?: string },
+  ctx: { isKnown: (ref: string) => boolean; grammarKnown: ReadonlySet<string>; progress: ReadonlyMap<string, StoryProgressRecord>; today: string; sharedStoryId?: string },
 ): StoryPick | null {
   const shared = (id: string) => id === ctx.sharedStoryId;
   const listen = stories
@@ -177,7 +182,7 @@ export function pickStory(
     .sort((a, b) => (ctx.progress.get(a.id)!.nextDay!).localeCompare(ctx.progress.get(b.id)!.nextDay!) || byLevel(a, b));
   if (listen.length) return { storyId: listen[0].id, step: 'listen', shared: shared(listen[0].id) };
 
-  const fresh = (s: StoryEntry) => (ctx.progress.get(s.id)?.stage ?? 0) === 0 && storyCoverage(s, ctx.isKnown) >= EASY_COVERAGE;
+  const fresh = (s: StoryEntry) => (ctx.progress.get(s.id)?.stage ?? 0) === 0 && storyGrammarKnown(s, ctx.grammarKnown) && storyCoverage(s, ctx.isKnown) >= EASY_COVERAGE;
   const sharedStory = ctx.sharedStoryId ? stories.find((s) => s.id === ctx.sharedStoryId) : undefined;
   if (sharedStory && fresh(sharedStory)) return { storyId: sharedStory.id, step: 'rwl', shared: true };
   const next = [...stories].sort(byLevel).find(fresh);
@@ -194,12 +199,12 @@ export function stretchStories(stories: readonly StoryEntry[], isKnown: (ref: st
 
 export const READY_STORIES_MAX = 60;
 
-/** Stories at ≥ 98 % for this learner (MemberProgress.readyStories, max 60). */
+/** Stories at ≥ 98 % with every grammar tag introduced (MemberProgress.readyStories, max 60). */
 export async function readyStoryIds(now: Date = new Date()): Promise<string[]> {
-  const [stories, known] = await Promise.all([loadStories(), loadKnownWords(now)]);
+  const [stories, known, grammarKnown] = await Promise.all([loadStories(), loadKnownWords(now), grammarIntroduced()]);
   return [...stories]
     .sort(byLevel)
-    .filter((s) => storyCoverage(s, known.isKnown) >= EASY_COVERAGE)
+    .filter((s) => storyGrammarKnown(s, grammarKnown) && storyCoverage(s, known.isKnown) >= EASY_COVERAGE)
     .slice(0, READY_STORIES_MAX)
     .map((s) => s.id);
 }
@@ -272,7 +277,7 @@ async function restingSentences(today: string): Promise<Set<string>> {
   return new Set((await db.shownSentences.where('day').aboveOrEqual(since).toArray()).map((r) => r.id));
 }
 
-async function grammarIntroduced(): Promise<Set<string>> {
+export async function grammarIntroduced(): Promise<Set<string>> {
   const keys = await db.items.where('kind').equals('grammar').primaryKeys();
   return new Set(keys.map((k) => String(k).slice('grammar:'.length)));
 }
@@ -309,6 +314,7 @@ export async function pickRead(opts: { minutes: number; sharedStoryId?: string }
   const plan: ReadPlan = { kind: 'sentences', kanaWords: [], sentences: [], minutes: 0 };
   const pick = pickStory(stories, {
     isKnown: ctx.known.isKnown,
+    grammarKnown: ctx.grammarKnown,
     progress: new Map(progressRows.map((p) => [p.storyId, p])),
     today,
     sharedStoryId: opts.sharedStoryId,

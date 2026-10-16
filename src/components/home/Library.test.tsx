@@ -182,22 +182,33 @@ describe('Library: stories', () => {
     expect(within(stretch).getByRole('link', { name: /Stretch story/ }).getAttribute('href')).toBe('/read/st-stretch');
     const read = screen.getByRole('region', { name: 'Read' });
     expect(within(read).getByRole('link', { name: /The station/ }).textContent).toContain('in progress');
-    expect(screen.getByText('1 more story opens up as you learn words.')).toBeTruthy();
+    expect(screen.getByText('1 more story opens up as you learn more words and grammar.')).toBeTruthy();
   });
 
   it('says when stories open up before any can be read', async () => {
     renderAt('/library/stories', '/library/:tab', <Library />);
-    expect(await screen.findByText(/Stories open up once you know enough of their words/)).toBeTruthy();
+    expect(await screen.findByText(/Stories open up once you know enough of their words and grammar/)).toBeTruthy();
   });
 });
 
 describe('library helpers', () => {
   it('shelves a started story as read, whatever its coverage', () => {
     const progress = new Map([['st-start-01', { storyId: 'st-start-01', stage: 2 as const, gist: [], cpm: [] }]]);
-    const shelves = storyShelves(STORIES, () => true, progress);
+    const shelves = storyShelves(STORIES, () => true, progress, new Set());
     expect(shelves.read.map((v) => v.story.id)).toEqual(['st-start-01']);
     expect(shelves.easy.map((v) => v.story.id)).toEqual(['st-l0-02', 'st-l1-03']);
-    expect(storyShelves([storyOf('x', filler(3))], () => false, new Map()).later).toBe(1);
+    expect(storyShelves([storyOf('x', filler(3))], () => false, new Map(), new Set()).later).toBe(1);
+  });
+
+  it('keeps unknown grammar off fresh ready shelves while preserving started stories', () => {
+    const gated = { ...storyOf('gated', []), grammar: ['nai-form'] };
+    const unseen = storyShelves([gated], () => true, new Map(), new Set());
+    expect(unseen.easy).toEqual([]);
+    expect(unseen.later).toBe(1);
+    const ready = storyShelves([gated], () => true, new Map(), new Set(['nai-form']));
+    expect(ready.easy.map((v) => v.story.id)).toEqual(['gated']);
+    const progress = new Map([['gated', { storyId: 'gated', stage: 2 as const, gist: [], cpm: [] }]]);
+    expect(storyShelves([gated], () => true, progress, new Set()).read.map((v) => v.story.id)).toEqual(['gated']);
   });
 
   it('matches words in either width and case', () => {

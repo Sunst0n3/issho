@@ -128,12 +128,12 @@ async function openReset() {
 }
 
 describe('Settings: study', () => {
-  it('saves the daily minutes, with the simulated note', async () => {
+  it('saves the daily minutes, with session guidance', async () => {
     renderAt('/settings', '/settings', <Settings />);
     const study = await section('Study');
-    expect(within(study).getByText(/At 25 minutes: about 270–310 kanji/)).toBeTruthy();
+    expect(within(study).getByText(/At 25 minutes: A steady daily session/)).toBeTruthy();
     fireEvent.click(within(study).getByRole('radio', { name: '40 min' }));
-    expect(within(study).getByText(/At 40 minutes: about 530 kanji, 2,400 words/)).toBeTruthy();
+    expect(within(study).getByText(/At 40 minutes: A longer daily session/)).toBeTruthy();
     await waitFor(async () => expect((await getSettings()).dailyMinutes).toBe(40));
   });
 

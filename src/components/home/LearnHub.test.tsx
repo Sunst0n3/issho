@@ -278,7 +278,9 @@ describe('LearnHub', () => {
       'hm-milestone reached', 'hm-milestone reached', 'hm-milestone next', 'hm-milestone later', 'hm-milestone later',
     ]);
     expect(items[2].getAttribute('aria-current')).toBe('step');
-    expect(items[2].textContent).toContain('M2 · around day 180');
+    expect(items[2].textContent).toContain('M2');
+    expect(milestones.textContent).not.toMatch(/around day|Targets at 25 minutes/);
+    expect(milestones.textContent).toContain('Introduction targets');
     expect(items[2].textContent).toContain('175 kanji, 900 words, 60 grammar points');
     expect(items[3].textContent).toContain('265–310 kanji');
   });

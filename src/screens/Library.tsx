@@ -354,12 +354,12 @@ function StoriesTab() {
   const none = !easy.length && !stretch.length && !read.length;
   return (
     <>
-      {none && <p className="empty">Stories open up once you know enough of their words, at about 200 words.</p>}
+      {none && <p className="empty">Stories open up once you know enough of their words and grammar.</p>}
       <StoryList title="Easy" hint="You know nearly every word: read while listening." views={easy} />
       <StoryList title="Stretch" hint="A few new words: tap a word for its English." views={stretch} stretch />
       <StoryList title="Read" hint="Stories you've started or finished." views={read} />
       {later > 0 && !none && (
-        <p className="hm-hint">{plural(later, 'more story', 'more stories')} {later === 1 ? 'opens' : 'open'} up as you learn words.</p>
+        <p className="hm-hint">{plural(later, 'more story', 'more stories')} {later === 1 ? 'opens' : 'open'} up as you learn more words and grammar.</p>
       )}
     </>
   );

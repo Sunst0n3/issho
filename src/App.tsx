@@ -165,8 +165,8 @@ function RouteAnnouncer({ pathname }: { pathname: string }) {
 }
 
 /**
- * Before onboarding only /welcome opens; after it, /welcome sends the learner
- * home instead of starting setup again (which would overwrite their choices).
+ * Before onboarding only /welcome opens. Onboarding owns the return home,
+ * including visits after setup; keeping one navigation owner avoids competing POP/replace transitions.
  */
 function OnboardingGate({ pathname, children }: { pathname: string; children: ReactNode }) {
   const onboarded = useLiveQuery(async () => (await getSettings()).onboarded, []);
@@ -174,7 +174,6 @@ function OnboardingGate({ pathname, children }: { pathname: string; children: Re
   // Unknown paths show "Page not found" either way.
   if (!isKnownPath(pathname)) return children;
   if (!onboarded && pathname !== '/welcome') return <Navigate to="/welcome" replace />;
-  if (onboarded && pathname === '/welcome') return <Navigate to="/" replace />;
   return children;
 }
 
